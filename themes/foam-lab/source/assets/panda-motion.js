@@ -1,7 +1,7 @@
 /* Shared animation conductor. Audio starts only after the sound switch is used. */
 'use strict';
 (() => {
- const durations={wave:2400,sleep:5400,jump:2500,roll:3300,dance:4200,crawl:4800,sing:5200,sway:4000,spin:3200,stretch:3300,munch:3700,cheer:2900,read:5000,water:4400,fish:5600,meditate:6000,experiment:4800};
+ const durations={wave:2400,sleep:5400,jump:2500,roll:3300,dance:4200,crawl:4800,sing:5200,sway:4000,spin:3200,stretch:3300,munch:3700,cheer:2900,read:5000,water:4400,fish:5600,meditate:6000,experiment:4800,typing:4200,kite:5200,bubbles:5500,photo:3000,taichi:6000,streamline:5000,firework:4400,walk:1600,highfive:3200,hug:3300,selfie:3500,duet:6000};
  const running=new Map(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
  let context=null,activeVoices=[],audioTimer,sound=false,audioGeneration=0;
  try{sound=localStorage.getItem('foamlab-panda-sound')==='true';}catch{}

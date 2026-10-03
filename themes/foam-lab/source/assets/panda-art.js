@@ -94,9 +94,9 @@
   g('pa-p pa-p-calm', `<ellipse class="pa-aura" cx="80" cy="110" rx="66" ry="62"/><path class="pa-leaf pa-calm-leaf" d="M26 92q8-6 14-2q-6 6-14 2z"/><path class="pa-leaf pa-calm-leaf pa-calm-2" d="M134 84q-8-6-14-2q6 6 14 2z"/>`)
  ].join('');
 
- const character = `<g class="pa-char">${behind}${body}${outfitsOnBody}${legs}${scarf('scarf', 'pa-scarf')}${scarf('redscarf', 'pa-redscarf')}${held}${head}${arms}${front}</g>`;
+ const character = () => `<g class="pa-char">${window.foamTownPandaParts?.ride||''}${behind}${body}${outfitsOnBody}${window.foamTownPandaParts?.body||''}${legs}${scarf('scarf', 'pa-scarf')}${scarf('redscarf', 'pa-redscarf')}${held}${head}${window.foamTownPandaParts?.head||''}${arms}${front}${window.foamTownPandaParts?.props||''}</g>`;
 
- const full = (label) => `<svg class="panda-art" viewBox="0 0 160 180" role="img" aria-label="${label}" focusable="false"><g class="pa-scene">${scene}</g><ellipse class="pa-shadow" cx="80" cy="167" rx="40" ry="5"/><g class="pa-stage"><g class="pa-mover">${character}</g></g><g class="pa-fx">${fx}</g></svg>`;
+ const full = (label) => `<svg class="panda-art" viewBox="0 0 160 180" role="img" aria-label="${label}" focusable="false"><g class="pa-scene">${scene}</g><ellipse class="pa-shadow" cx="80" cy="167" rx="40" ry="5"/><g class="pa-stage"><g class="pa-mover">${character()}</g></g><g class="pa-fx">${fx}</g></svg>`;
  const face = () => `<svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char">${head}</g></svg>`;
 
  window.foamPandaArt = (faceOnly = false, label = '熊猫') => faceOnly ? face() : full(label);

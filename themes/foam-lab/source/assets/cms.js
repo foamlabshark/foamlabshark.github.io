@@ -21,7 +21,7 @@
  }
  function readCourseFields(form){const downloads=[];for(const row of form.querySelectorAll('.cms-download-row')){const label=row.querySelector('.course-file-label').value.trim(),url=row.querySelector('.course-file-url').value.trim(),description=row.querySelector('.course-file-description').value.trim(),verification=row.querySelector('.course-file-verification').value.trim();if(!label&&!url&&!description&&!verification)continue;const safe=L.safeURL(url);if(!safe||(new URL(safe).protocol!=='https:'&&new URL(safe).origin!==location.origin))throw Error('案例下载需要有效的站内路径或 HTTPS 地址。');const original=row._original||{},unchanged=L.safeURL(original.url)===safe;downloads.push({...(unchanged?original:{kind:'case'}),label:label||'配套案例',url,description,verification});}return {downloads,topics:[...form.querySelectorAll('[data-course-topic]:checked')].map(x=>x.dataset.courseTopic)};}
  function shell(){
-  const primary=[['content',editor?'内容管理':'我的文章'],...(moderator?[['moderation','评论与讨论']]:[]),...(editor?[['files','下载资源']]:[]),...(admin?[['roles','成员管理']]:[])];
+  const primary=[['content',editor?'内容管理':'我的文章'],...(moderator?[['moderation','评论与讨论'],['town','熊猫小镇']]:[]),...(editor?[['files','下载资源']]:[]),...(admin?[['roles','成员管理']]:[])];
   const secondary=[...(admin?[['settings','站点设置']]:[]),['backup','维护与备份']];
   const tab=([id,label])=>'<button type="button" data-cms-tab="'+id+'" class="'+(id===active?'selected':'')+'">'+label+'</button>';
   root.innerHTML='<div id="cms-notice" class="lab-evidence" role="status" hidden></div><div class="cms-shell"><nav class="cms-nav" aria-label="管理功能">'+primary.map(tab).join('')+'<details id="cms-more"><summary>更多管理</summary><div>'+secondary.map(tab).join('')+'</div></details></nav><div id="cms-panel"></div></div>';
@@ -40,6 +40,7 @@
   const api={L,root,run,notice,all,UI,admin,editor,moderator,load,getRows:()=>rows,openItem:async(id,seed)=>{active='content';await renderTab();await edit(id,seed);}};
   if(active==='files')await window.FoamCMSResources(api);
   if(active==='moderation')await window.FoamCMSModeration(api);
+  if(active==='town')await window.FoamCMSTown(api);
   if(active==='roles')await window.FoamCMSMembers(api);if(active==='settings')await settings();if(active==='backup')backup();
  }
  function locationOptions(value,allOption=false){if(editor&&D.available)return '<option value="">全部目录</option><option value="unassigned" '+(value==='unassigned'?'selected':'')+'>未归类</option>'+D.nodes.map(n=>'<option value="'+n.id+'" '+(n.id===value?'selected':'')+'>'+esc(D.path(n.id))+'</option>').join('');return (allOption?'<option value="">全部栏目</option>':'')+UI.placements.filter(p=>editor||['article','log'].includes(p.id)).map(p=>'<option value="'+p.id+'" '+(p.id===value?'selected':'')+'>'+esc(p.label)+'</option>').join('');}

@@ -4,10 +4,11 @@ const {chromium}=require('C:/Users/shark/.cache/codex-runtimes/codex-primary-run
 const {fixture,ready,content}=require('./check-cms-ui.cjs');
 const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,'.openfoam-work/panda');fs.mkdirSync(OUT,{recursive:true});
 const origin=process.env.FOAM_CHECK_ORIGIN||'http://localhost:4173';
-const entries=require('./panda-catalog.json').map(i=>[i.id,i.category,i.title,i.required_level,i.description]);
+const catalog=require('./panda-catalog.json');
+const entries=catalog.map(i=>[i.id,i.category,i.title,i.required_level,i.description]);
 async function petFixture(browser,options={}){
  const f=await fixture(browser,'member',options);let xp=options.xp??40,checked=false,failure=false,delay=0;
- const pet={user_id:'22222222-2222-4222-8222-222222222222',name:'泡泡',form:'cub',outfit:'none',action:'wave',decoration:'no-decor',visible:true,motion:true};const events=[];const calls=[];
+ const pet={user_id:'22222222-2222-4222-8222-222222222222',name:'泡泡',form:'cub',outfit:'none',action:'wave',decoration:'no-decor',visible:true,motion:true,ride:'walk',quickbar:['wave','highfive','smile','heart','thumb','give-bamboo']};const events=[];const calls=[];
  await f.page.context().route('**/rest/v1/rpc/foamlab_pet',async route=>{
   const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'POST,OPTIONS'};
   if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers});
@@ -16,10 +17,10 @@ async function petFixture(browser,options={}){
   if(failure)return route.fulfill({status:503,headers,contentType:'application/json',body:JSON.stringify({message:'成长记录暂时无法读取。'})});
   let awarded=0;
   if(data.operation==='checkin'&&!checked){xp+=10;awarded=10;checked=true;events.push({kind:'checkin',points:10,created_at:new Date().toISOString()});}
-  if(data.operation==='settings'){for(const key of ['name','motion','visible'])if(key in data.payload)pet[key]=data.payload[key];}
+  if(data.operation==='settings'){for(const key of ['name','motion','visible','ride','quickbar','show_town_entry'])if(key in data.payload)pet[key]=data.payload[key];}
   if(data.operation==='equip'){const entry=entries.find(x=>x[0]===data.payload.id);assert(entry&&entry[3]<=level,'Client tried to equip locked item');pet[entry[1]]=entry[0];}
   const lv=Math.floor((1+Math.sqrt(1+xp/6.25))/2);
-  await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify({pet:{...pet,xp},level:lv,level_start:25*lv*(lv-1),next_level_xp:25*lv*(lv+1),checked_in:checked,awarded,items:entries.map(([id,category,title,required_level,description])=>({id,category,title,required_level,description,unlocked:required_level<=lv})),events})});
+  await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify({pet:{...pet,xp},level:lv,level_start:25*lv*(lv-1),next_level_xp:25*lv*(lv+1),checked_in:checked,awarded,items:catalog.map(i=>({...i,unlocked:i.required_level<=lv&&(!i.requirement||(options.achievements||[]).includes(i.id))&&(!i.festival||(options.festivals||[]).includes(i.festival))})),events})});
  });
  return {...f,calls,pet,setXP:v=>xp=v,setFailure:v=>failure=v,setDelay:v=>delay=v};
 }
@@ -49,7 +50,7 @@ if(require.main===module)(async()=>{const browser=await chromium.launch({channel
   await p.locator('.panda-grab').focus();await p.keyboard.press('ArrowRight');const after=await p.locator('#panda-pet').boundingBox();assert(Math.abs(after.x-moved.x-16)<2);checks.push('keyboard movement');
   await p.locator('[data-pet-hide]').click();await p.waitForSelector('.panda-dock:not([hidden])');assert(await p.locator('#panda-pet').isHidden());await p.locator('.panda-dock').click();await p.waitForSelector('#panda-pet:not([hidden])');checks.push('hide and restore');
   await p.locator('#panda-settings [name=name]').fill('竹竹');await p.locator('#panda-settings [name=motion]').uncheck();await p.locator('#panda-settings [type=submit]').click();await p.waitForFunction(()=>document.querySelector('#panda-pet')?.dataset.quiet==='true');assert.equal(await p.locator('.panda-nameplate span').textContent(),'竹竹');checks.push('name and animation preferences');
-  f.setXP(2300);await p.evaluate(()=>dispatchEvent(new Event('foamlab:activity')));await p.waitForFunction(()=>document.querySelector('.panda-level-tag')?.textContent==='Lv.10');await p.click('#panda-item-cap');await p.waitForFunction(()=>document.querySelector('#panda-pet')?.dataset.outfit==='cap');await p.click('#panda-tab-form');await p.click('#panda-item-master');await p.waitForFunction(()=>document.querySelector('#panda-pet')?.dataset.form==='master');await p.click('#panda-tab-action');assert.equal(await p.locator('.panda-item').count(),17);await p.click('#panda-item-dance');await p.waitForFunction(()=>document.querySelector('#panda-item-dance')?.getAttribute('aria-pressed')==='true');checks.push('level 10 form, costume and action collection');
+  f.setXP(2300);await p.evaluate(()=>dispatchEvent(new Event('foamlab:activity')));await p.waitForFunction(()=>document.querySelector('.panda-level-tag')?.textContent==='Lv.10');await p.click('#panda-item-cap');await p.waitForFunction(()=>document.querySelector('#panda-pet')?.dataset.outfit==='cap');await p.click('#panda-tab-form');await p.click('#panda-item-master');await p.waitForFunction(()=>document.querySelector('#panda-pet')?.dataset.form==='master');await p.click('#panda-tab-action');assert.equal(await p.locator('.panda-item').count(),catalog.filter(i=>i.category==='action').length);await p.click('#panda-item-dance');await p.waitForFunction(()=>document.querySelector('#panda-item-dance')?.getAttribute('aria-pressed')==='true');checks.push('level 10 form, costume and action collection');
   await p.evaluate(()=>{const el=document.querySelector('#panda-pet');el.style.left=(innerWidth-152)+'px';el.style.top=(innerHeight-210)+'px';dispatchEvent(new Event('resize'));});await p.click('#panda-tab-outfit');await p.evaluate(()=>scrollTo(0,170));await p.screenshot({path:path.join(OUT,'account-desktop.png'),animations:'disabled'});
   await p.emulateMedia({colorScheme:'dark',reducedMotion:'reduce'});await p.evaluate(()=>document.documentElement.dataset.theme='dark');assert.equal(await p.locator('#panda-pet').getAttribute('data-quiet'),'true');await p.screenshot({path:path.join(OUT,'account-dark.png'),animations:'disabled'});checks.push('dark mode and reduced motion');
   f.setFailure(true);await p.click('#panda-item-scarf');await p.waitForFunction(()=>document.querySelector('.panda-form-status')?.textContent.includes('暂时无法读取'));checks.push('RPC error retains existing pet and reports retryable failure');f.setFailure(false);
