@@ -27,6 +27,7 @@
 - `supabase/tests/panda-town.sql`：可回滚的数据库行为与权限测试。
 - `tools/check-town.cjs`：浏览器操作测试；使用隔离数据，不公开发帖。
 - `tools/check-town-game.cjs`：移动、碰撞、地图布局、像素行走、昼夜路灯和手机操作测试。
+- `tools/check-town-controls.cjs`：WASD、方向键、中文输入法、松键、弹窗暂停和手机触控测试。
 - `tools/check-town-layout.cjs`：满员街道、研究所扩展、建筑与道路间距、路灯占地，以及导航顶部入口。
 
 ## 规则与隐私

@@ -1,13 +1,17 @@
 'use strict';
 (() => {
  const TILE=32,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));let active=null;
+ const directions=new Set(['arrowleft','arrowright','arrowup','arrowdown','w','a','s','d']);
+ // Physical keys remain available when an IME reports key="Process" or changes key on release.
+ const inputKey=e=>({KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',ArrowUp:'arrowup',ArrowLeft:'arrowleft',ArrowDown:'arrowdown',ArrowRight:'arrowright',KeyE:'e',KeyM:'m',Space:' ',Escape:'escape'}[e.code]||e.key?.toLowerCase()||'');
+ const editing=target=>target?.isContentEditable||target?.closest?.('input,textarea,select');
  class TownGame{
   constructor(viewport,config){active?.destroy();active=this;this.viewport=viewport;this.world=viewport.querySelector('.town-street-world');this.config=config;this.width=2460;this.height=1760;
    // Authored village plots: public buildings surround a clearing, houses follow the landscape.
    const publicPlots={notice:[58,348],school:[478,158],workshop:[1282,199],hospital:[1782,409],library:[883,113],gallery:[1322,736],spot:[963,683]};
    const homes=[[38,658],[612,765],[2054,578],[1888,977],[486,1176],[754,1194],[1022,1112],[1382,1206],[1636,1194],[1650,138]];
    let house=0,group=0;this.positions=config.buildings.map(b=>{let p;if(b[3])p=homes[house++%homes.length];else if(b[0]==='gate')p=[-500,-500];else if(b[0]==='institute'){const n=group++;p=[430+(n%4)*400,1730+Math.floor(n/4)*340];this.height=Math.max(this.height,p[1]+330);}else p=publicPlots[b[0]]||[2100,160];return{x:p[0],y:p[1],hidden:b[0]==='gate'};});
-   this.position={x:1035,y:954};this.keys=new Set();this.path=[];this.camera={x:0,y:0};this.handlers=[];this.decor();this.bind();this.last=performance.now();this.tick=this.tick.bind(this);this.frame=requestAnimationFrame(this.tick);}
+   this.position={x:1035,y:954};this.keys=new Set();this.touchKeys=new Map();this.path=[];this.camera={x:0,y:0};this.handlers=[];this.decor();this.bind();this.last=performance.now();this.tick=this.tick.bind(this);this.frame=requestAnimationFrame(this.tick);}
   on(target,event,fn,options){target.addEventListener(event,fn,options);this.handlers.push(()=>target.removeEventListener(event,fn,options));}
   decor(){const w=this.world;w.style.width=this.width+'px';w.style.height=this.height+'px';w.classList.add('town-game-world');w.dataset.quiet=String(this.config.muted?.()||false);w.querySelectorAll('.town-cloud').forEach(e=>e.remove());this.obstacles=[];
    const ground=document.createElement('div');ground.className='town-game-ground';
@@ -69,16 +73,17 @@
   showTarget(x,y){this.world.querySelector('.town-game-target')?.remove();const target=document.createElement('i');target.className='town-game-target';target.style.left=x-10+'px';target.style.top=y-7+'px';this.world.append(target);setTimeout(()=>target.remove(),2200);}
   nearest(){let best=null,min=105;for(let i=0;i<this.positions.length;i++){const p=this.positions[i];if(p.hidden)continue;const d=Math.hypot(p.x+100-this.position.x,p.y+216-this.position.y);if(d<min){best=i;min=d;}}return best;}
   interact(){const index=this.nearest();if(index!==null)this.config.interact?.(index);}
+  stopMovement(){this.keys.clear();this.touchKeys.clear();this.path=[];this.after=null;}
   bind(){const v=this.viewport;v.tabIndex=0;v.setAttribute('aria-label','小镇地图。方向键或 W A S D 移动，空格或 E 与建筑互动。');
-   this.on(window,'keydown',e=>{if(document.querySelector('dialog[open]')||e.target.closest('input,textarea,select')||e.ctrlKey||e.metaKey||e.altKey)return;const key=e.key.toLowerCase();if(['arrowleft','arrowright','arrowup','arrowdown','w','a','s','d'].includes(key)){e.preventDefault();this.keys.add(key);this.path=[];this.after=null;}if([' ','e'].includes(key)){e.preventDefault();this.interact();}if(key==='m')location.hash='map';if(key==='escape')document.querySelector('[data-town=settings]')?.click();});
-   this.on(window,'keyup',e=>this.keys.delete(e.key.toLowerCase()));this.on(window,'blur',()=>this.keys.clear());
+   this.on(window,'keydown',e=>{if(document.querySelector('dialog[open]')||editing(e.target)||e.ctrlKey||e.metaKey||e.altKey)return;const key=inputKey(e);if(directions.has(key)){e.preventDefault();this.keys.add(key);this.path=[];this.after=null;}if([' ','e'].includes(key)){e.preventDefault();if(!e.repeat)this.interact();}if(key==='m'&&!e.repeat)location.hash='map';if(key==='escape'&&!e.repeat)document.querySelector('[data-town=settings]')?.click();});
+   this.on(window,'keyup',e=>this.keys.delete(inputKey(e)));this.on(window,'blur',()=>this.stopMovement());
    this.on(v,'click',e=>{if(e.target.closest('a,button'))return;const r=v.getBoundingClientRect();this.walkTo((e.clientX-r.left-this.camera.x)/this.zoom,(e.clientY-r.top-this.camera.y)/this.zoom);});
    let drag=null;this.on(v,'pointerdown',e=>{if(this.config.playable||e.target.closest('a,button'))return;drag={x:e.clientX,y:e.clientY,ox:this.position.x,oy:this.position.y};});this.on(v,'pointermove',e=>{if(!drag)return;this.position.x=clamp(drag.ox-(e.clientX-drag.x)/this.zoom,100,this.width-100);this.position.y=clamp(drag.oy-(e.clientY-drag.y)/this.zoom,100,this.height-100);});this.on(window,'pointerup',()=>drag=null);
-   document.querySelectorAll('[data-game-direction]').forEach(b=>{this.on(b,'pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);this.keys.add(b.dataset.gameDirection);this.path=[];this.after=null;});const stop=()=>this.keys.delete(b.dataset.gameDirection);this.on(b,'pointerup',stop);this.on(b,'pointercancel',stop);});
-   const action=document.querySelector('[data-game-interact]');if(action)this.on(action,'click',()=>this.interact());this.on(document,'visibilitychange',()=>{this.keys.clear();});
+   document.querySelectorAll('[data-game-direction]').forEach(b=>{this.on(b,'pointerdown',e=>{e.preventDefault();v.focus({preventScroll:true});b.setPointerCapture(e.pointerId);this.touchKeys.set(e.pointerId,b.dataset.gameDirection);this.path=[];this.after=null;});const stop=e=>this.touchKeys.delete(e.pointerId);this.on(b,'pointerup',stop);this.on(b,'pointercancel',stop);this.on(b,'lostpointercapture',stop);});
+   const action=document.querySelector('[data-game-interact]');if(action)this.on(action,'click',()=>this.interact());this.on(document,'visibilitychange',()=>this.stopMovement());
   }
-  tick(now){this.frame=requestAnimationFrame(this.tick);const dt=Math.min(.05,(now-this.last)/1000);this.last=now;if(document.hidden)return;const own=this.avatar(),paused=!!document.querySelector('dialog[open]')||this.viewport.closest('.is-text-mode');let dx=0,dy=0;
-   if(!paused){dx=(this.keys.has('d')||this.keys.has('arrowright')?1:0)-(this.keys.has('a')||this.keys.has('arrowleft')?1:0);dy=(this.keys.has('s')||this.keys.has('arrowdown')?1:0)-(this.keys.has('w')||this.keys.has('arrowup')?1:0);}
+  tick(now){this.frame=requestAnimationFrame(this.tick);const dt=Math.min(.05,(now-this.last)/1000);this.last=now;if(document.hidden)return;const own=this.avatar(),paused=!!document.querySelector('dialog[open]')||this.viewport.closest('.is-text-mode')||editing(document.activeElement);let dx=0,dy=0;
+   if(paused)this.stopMovement();else{const touch=[...this.touchKeys.values()],pressed=key=>this.keys.has(key)||touch.includes(key);dx=(pressed('d')||pressed('arrowright')?1:0)-(pressed('a')||pressed('arrowleft')?1:0);dy=(pressed('s')||pressed('arrowdown')?1:0)-(pressed('w')||pressed('arrowup')?1:0);}
    let walking=dx!==0||dy!==0;if(this.path.length&&!walking&&!paused&&this.config.playable){const target=this.path[0],distance=Math.hypot(target.x-this.position.x,target.y-this.position.y);if(distance<6){this.path.shift();if(!this.path.length){const done=this.after;this.after=null;done?.();}}else{dx=(target.x-this.position.x)/distance;dy=(target.y-this.position.y)/distance;walking=true;}}
    if(walking&&!paused){const norm=Math.max(1,Math.hypot(dx,dy)),ride=this.config.ride?.(),speed=ride==='jog'?215:ride==='bicycle'?270:ride==='skateboard'?245:160,nx=this.position.x+dx/norm*dt*speed,ny=this.position.y+dy/norm*dt*speed;if(!this.config.playable||this.walkable(nx,this.position.y))this.position.x=clamp(nx,64,this.width-64);if(!this.config.playable||this.walkable(this.position.x,ny))this.position.y=clamp(ny,78,this.height-64);if(own){own.dataset.action='walk';own.dataset.direction=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';}}
    else if(own?.dataset.action==='walk')delete own.dataset.action;
