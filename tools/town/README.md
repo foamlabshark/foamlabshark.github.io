@@ -29,6 +29,10 @@
 - `tools/check-town-game.cjs`：移动、碰撞、地图布局、像素行走、昼夜路灯和手机操作测试。
 - `tools/check-town-controls.cjs`：WASD、方向键、中文输入法、松键、弹窗暂停和手机触控测试。
 - `tools/check-town-layout.cjs`：满员街道、研究所扩展、建筑与道路间距、路灯占地，以及导航顶部入口。
+- `tools/check-town-play.cjs`：八方向移动（两键斜走、小键盘 7/9/1/3、触屏方向盘滑动）、奔跑、寻路、NPC、竹笋、钓鱼知识卡、操作说明和 1–6 快捷键测试。
+- `themes/foam-lab/source/assets/town/town-game.js`：移动引擎（惯性、滑墙、A* 寻路、步幅驱动的行走动画、平滑镜头、小地图）。
+- `themes/foam-lab/source/assets/town/town-play.js`、`town-play.css`：NPC、每日竹笋与小任务、湖边钓鱼与知识卡图鉴、环境动画、操作说明与游戏界面样式。这些只保存在浏览器本地，不写数据库，也不加经验。
+- `tools/town/build-panda-walk.py`：从 `panda-walk.png` 生成对齐后的 `panda-walk-v2.png`。
 
 ## 规则与隐私
 
