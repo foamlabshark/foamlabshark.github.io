@@ -7,19 +7,17 @@
  const svg=p=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';
  // 每个子目录的入口说明（按目录 key 匹配；后台新增的目录会使用目录名和简介）
  const INFO={
-  resource:{ask:'想复现算例、下载源码？',when:'本站整理的可复现算例、编程源码与经典文献，大多附带下载。',icon:svg('<path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/>')},
-  recommendation:{ask:'想找官方文档或工具？',when:'站外的官方手册、API 文档、网格与可视化工具、社区论坛。',icon:svg('<path d="M10 14 21 3m0 0h-7m7 0v7M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>')},
-  reference:{ask:'想查命令、字典或报错？',when:'两份中文参考手册，按章节查命令用法、字典写法和常见报错。',icon:svg('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15zM5 19.5A1.5 1.5 0 0 0 6.5 21H19"/>')}
+  resource:{ask:'下载算例与源码',when:'编程实例、算例包与使用说明。',icon:svg('<path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/>')},
+  recommendation:{ask:'查找文档、工具与文献',when:'官方文档、工具教程、论文、专著与社区资源。',icon:svg('<path d="M10 14 21 3m0 0h-7m7 0v7M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>')}
  };
  const OTHER_ICON=svg('<path d="M4 6h16M4 12h16M4 18h10"/>');
  // 分组顺序：先给入门最常用的，再到进阶与社区
- const TRACK_ORDER=['可复现实例','源码与算例','论文与专著','站点与实践','官方文档','教程与课程','源码与开发','几何网格','可视化与数据','学术社区'];
+ const TRACK_ORDER=['源码与算例','站点与实践','官方文档','教程与课程','论文与专著','源码与开发','几何网格','可视化与数据','学术社区'];
  const TRACK_NOTE={
-  '可复现实例':'附完整运行日志与绘图脚本，可按相同设置重现结果。',
-  '源码与算例':'已适配 v2512 的编程实例与算例包。',
+  '源码与算例':'编程实例与算例包，附使用说明。',
   '论文与专著':'经典文献原件与章节导读。',
   '站点与实践':'本站资料的出处与版本说明。',
-  '官方文档':'版本说明与官方手册；与其他资料有出入时，以这里为准。',
+  '官方文档':'版本说明、用户手册与编程接口。',
   '教程与课程':'官方算例库与系统的入门培训资料。',
   '源码与开发':'源码浏览、C++ API 查询与工作流辅助工具。',
   '几何网格':'几何建模与网格生成工具。',
@@ -50,7 +48,7 @@
    const rest=rows.filter(r=>!used.has(r.id));if(rest.length)out.push({key:'other',name:'其他资料',url:'',rows:rest});
    return out.filter(s=>s.rows.length);
   }
-  return [['resource','算例与源码'],['recommendation','资源推荐'],['reference','参考手册']].map(([key,name])=>({key,name,url:key==='reference'?'/reference/':'/resources/?kind='+key,rows:rows.filter(r=>r.kind===key)})).filter(s=>s.rows.length);
+  return [['resource','算例与源码'],['recommendation','资源推荐']].map(([key,name])=>({key,name,url:'/resources/?kind='+key,rows:rows.filter(r=>r.kind===key)})).filter(s=>s.rows.length);
  }
  H.render=({listing,rows,words,filtered,mode,D})=>{
   if(mode!=='resources')return false;
@@ -59,7 +57,7 @@
   listing.classList.add('rh-mode');if(pager?.classList.contains('list-pagination'))pager.innerHTML='';
   const sections=filtered?null:sectionsFor(rows,D);
   if(!sections){listing.innerHTML=rows.length?body(rows):'<div class="lab-empty">目前没有符合条件的内容。</div>';if(count)count.textContent=rows.length+' 项内容';return true;}
-  // 顶部三个入口：先回答“我该去哪一类”
+  // 入口与当前目录树一致。
   wrap?.querySelector('.directory-children')?.remove();
   let guide=wrap?.querySelector('.rh-guide');if(!guide&&wrap){guide=document.createElement('nav');guide.className='rh-guide';guide.setAttribute('aria-label','按需求选择资料类型');wrap.querySelector('.catalog-search')?.before(guide);}
   if(guide)guide.innerHTML=sections.map(s=>{const info=INFO[s.key]||{};return '<a href="#'+anchor(s)+'">'+(info.icon||OTHER_ICON)+'<div><strong>'+esc(info.ask||s.name)+'</strong><span>'+esc(s.name)+' · <em>'+s.rows.length+' 项</em></span></div></a>';}).join('');
