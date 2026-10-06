@@ -1,0 +1,43 @@
+/* Keep the article centered; chapters expand above it on demand. */
+.article-shell.lab-reader{display:flex;flex-direction:column;max-width:1060px;gap:16px;padding:32px 40px 70px}
+.lab-reader>.article{width:100%}
+.lab-reader>.reader-outline{display:block;position:static;align-self:stretch;width:100%;max-height:none;padding:0;overflow:visible}
+.reader-outline details{width:max-content;max-width:100%;margin:0;padding:0;border:1px solid var(--lab-border);border-radius:6px;background:var(--lab-panel)}
+.reader-outline details[open]{width:100%}
+.reader-outline summary{font-size:14px;font-weight:600;color:var(--lab-blue);cursor:pointer;padding:10px 14px}
+.reader-outline summary:focus-visible{outline:2px solid var(--lab-blue);outline-offset:3px;border-radius:5px}
+.reader-outline details[open]>summary{border-bottom:1px solid var(--lab-border)}
+.reader-outline .chapter-series{margin:12px 16px 6px;font-size:13px;color:var(--lab-muted)}
+.reader-outline nav{margin:0 10px;padding:4px 0;max-height:min(38vh,360px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.reader-outline #chapter-list a{display:block;border-left:2px solid transparent;padding:7px 9px;margin:0;font-size:13px;line-height:1.6;color:var(--lab-muted);text-decoration:none;border-radius:0 4px 4px 0}
+.reader-outline #chapter-list a:hover{background:var(--lab-soft);color:var(--lab-blue)}
+.reader-outline #chapter-list a[aria-current=page]{border-left-color:var(--lab-blue);background:var(--lab-soft);color:var(--lab-blue);font-weight:600}
+.reader-outline .text-link{display:inline-block;margin:12px 16px;font-size:13px}
+.lab-reader .lab-lead{margin-bottom:20px;padding-bottom:18px;font-size:16px}
+.lab-reader .prose>p:first-child{margin-top:0}
+.prose .figure-source{display:block;font-size:11px;line-height:1.6;font-weight:400;margin-top:4px;color:var(--lab-muted)}
+.prose details{margin:20px 0;border:1px solid var(--lab-border);border-radius:6px;padding:14px 18px;background:var(--lab-panel)}
+.prose details>summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--lab-blue)}
+.prose details[open]>summary{margin-bottom:16px}
+@media(max-width:1100px){
+ .article-shell.lab-reader{padding:28px 32px 60px}
+ .reader-outline nav{max-height:280px}
+}
+@media(max-width:760px){.lab-reader .lab-lead{font-size:15px}.prose details{padding:12px}}
+@media print{.article-shell.lab-reader{display:block;padding:0}.lab-reader>.reader-outline{display:none}}
+
+.course-entry-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin:24px 0;font-size:14px}.course-entry-links a{color:var(--lab-blue);border-bottom:1px solid var(--lab-border);padding:5px 0}
+
+.lab-reader:not(.has-chapters)>.reader-outline{display:none}
+
+/* The global outline supplies page headings; reserve the article width for reading. */
+.article-shell:not(.lab-reader){display:block;max-width:1180px}
+.article-shell:not(.lab-reader)>.article-toc{display:none}
+.article-shell>.article{min-width:0;padding:32px;background:var(--refine-panel);border:1px solid var(--lab-border);border-radius:9px}
+.article-shell>.article>.prose{max-width:none}
+.article-shell>.article>.prose>p{max-width:54rem}
+@media(max-width:760px){.article-shell>.article{padding:22px 18px}.article-shell.lab-reader{padding:20px 12px 36px}.article-shell:not(.lab-reader){padding:20px 12px 36px}}
+@media print{.article-shell>.article{padding:0;border:0;background:white}}
+/* Hold the old cached body until the latest published article is ready. No-JS readers keep the static version. */
+.article-cms-loading{display:none}.has-js .article[data-cms-state=loading]>.prose{display:none}.has-js .article[data-cms-state=loading]>.article-cms-loading{display:grid;gap:18px;padding:12px 0 32px;color:var(--muted);font-size:14px;min-height:280px}.article-cms-loading i{display:block;height:18px;max-width:95%;border-radius:4px;background:var(--line,#e3e9e3);opacity:.55}.article-cms-loading i:last-child{max-width:65%}
+.has-js .article-shell:has(.article[data-cms-state=loading])>.article-toc{visibility:hidden}

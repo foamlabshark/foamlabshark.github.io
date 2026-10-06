@@ -1,0 +1,549 @@
+{
+  "id": "shandong",
+  "name": "山东",
+  "difficulty": "basic",
+  "story": "山东拥有石油开采、炼化与储运产业，输油管道把生产、加工和运输环节连接起来。长直管内远离入口的流动会逐渐形成稳定的统计速度分布，因此可以截取其中一段研究充分发展湍流。",
+  "files": [
+    {
+      "path": "0.orig/U",
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "o99c656b004ed"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "odd699d38c1d2"
+        },
+        ";\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        name    swirl;\n        type    ",
+        {
+          "gap": "o8f37fd26475d"
+        },
+        ";\n\n        code\n        #{\n            // Uncomment for testing on non-windows systems [fragile]\n            // IOobject::scopeSeparator = '_';\n\n            const vector axis(1, 0, 0);\n\n            vectorField v(2.0*this->patch().Cf() ^ axis);\n            v.replace(vector::X, 1.0);\n            operator==(v);\n        #};\n\n        value           $internalField;\n    }\n\n    outlet\n    {\n        type            inletOutlet;\n        inletValue      $internalField;\n        value           $internalField;\n    }\n\n    walls\n    {\n        type            noSlip;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o99c656b004ed",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "odd699d38c1d2",
+          "type": "vector",
+          "label": "internalField",
+          "source": "0.orig/U 的初始内部场均匀，数值为 (1, 0, 0)（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "o8f37fd26475d",
+          "type": "select",
+          "label": "boundaryField/inlet/type",
+          "source": "0.orig/U 的 inlet：边界模型采用 codedFixedValue。",
+          "options": [
+            "codedFixedValue",
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "zeroGradient"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0.orig/p",
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "oe102945240b0"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "o777d6c4037da"
+        },
+        ";\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        type            zeroGradient;\n    }\n\n    outlet\n    {\n        type            fixedValue;\n        value           uniform 0;\n    }\n\n    walls\n    {\n        type            zeroGradient;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "oe102945240b0",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "o777d6c4037da",
+          "type": "number",
+          "label": "internalField",
+          "source": "0.orig/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "constant/transportProperties",
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  ",
+        {
+          "gap": "o387c34083ff4"
+        },
+        ";\n\nnu              ",
+        {
+          "gap": "o0f2b0b1f7f87"
+        },
+        ";\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o387c34083ff4",
+          "type": "select",
+          "label": "transportModel",
+          "source": "constant/transportProperties 中 transportModel 取 Newtonian。",
+          "options": [
+            "BirdCarreau",
+            "CrossPowerLaw",
+            "HerschelBulkley",
+            "Newtonian",
+            "powerLaw"
+          ]
+        },
+        {
+          "id": "o0f2b0b1f7f87",
+          "type": "number",
+          "label": "nu",
+          "source": "constant/transportProperties 中 nu 取 1e-06 m²/s。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "constant/turbulenceProperties",
+      "description": "选择层流、RAS 或 LES，以及相应模型名称。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType      ",
+        {
+          "gap": "o61c77ed299bf"
+        },
+        ";\n\nRAS\n{\n    RASModel        ",
+        {
+          "gap": "o4a3474d685ef"
+        },
+        ";\n\n    turbulence      on;\n\n    printCoeffs     on;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o61c77ed299bf",
+          "type": "select",
+          "label": "simulationType",
+          "source": "constant/turbulenceProperties 中 simulationType 取 RAS。",
+          "options": [
+            "DES",
+            "LES",
+            "RAS",
+            "laminar"
+          ]
+        },
+        {
+          "id": "o4a3474d685ef",
+          "type": "select",
+          "label": "RAS/RASModel",
+          "source": "constant/turbulenceProperties 中 RAS/RASModel 取 realizableKE。",
+          "options": [
+            "SpalartAllmaras",
+            "kEpsilon",
+            "kOmegaSST",
+            "realizableKE"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/fvSchemes",
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         ",
+        {
+          "gap": "od2b19c431655"
+        },
+        ";\n}\n\ngradSchemes\n{\n    default         ",
+        {
+          "gap": "o0b573d822e26"
+        },
+        ";\n}\n\ndivSchemes\n{\n    default         ",
+        {
+          "gap": "oe5a39a51e2dd"
+        },
+        ";\n\n    div(phi,U)      bounded Gauss limitedLinearV 1;\n\n    turbulence      bounded Gauss limitedLinear 1;\n    div(phi,k)      $turbulence;\n    div(phi,epsilon) $turbulence;\n    div(phi,nuTilda) $turbulence;\n    div(phi,R)      $turbulence;\n    div(R)          Gauss linear;\n\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         ",
+        {
+          "gap": "oaa66884dd5d8"
+        },
+        ";\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "od2b19c431655",
+          "type": "select",
+          "label": "ddtSchemes/default",
+          "source": "system/fvSchemes 中 ddtSchemes/default 取 steadyState。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "o0b573d822e26",
+          "type": "select",
+          "label": "gradSchemes/default",
+          "source": "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oe5a39a51e2dd",
+          "type": "select",
+          "label": "divSchemes/default",
+          "source": "system/fvSchemes 中 divSchemes/default 取 none。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "none",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oaa66884dd5d8",
+          "type": "select",
+          "label": "laplacianSchemes/default",
+          "source": "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear corrected",
+            "backward",
+            "steadyState"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/controlDict",
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     ",
+        {
+          "gap": "o0195ae8d31cc"
+        },
+        ";\n\nstartFrom       startTime;\n\nstartTime       0;\n\nstopAt          endTime;\n\nendTime         ",
+        {
+          "gap": "occ0837b689b3"
+        },
+        ";\n\ndeltaT          ",
+        {
+          "gap": "o2a18fc22e9fd"
+        },
+        ";\n\nwriteControl    timeStep;\n\nwriteInterval   ",
+        {
+          "gap": "o0a2e698b7797"
+        },
+        ";\n\npurgeWrite      0;\n\nwriteFormat     ascii;\n\nwritePrecision  6;\n\nwriteCompression off;\n\ntimeFormat      general;\n\ntimePrecision   6;\n\nrunTimeModifiable true;\n\nfunctions\n{\n    #include \"coordinateTransform\"\n    #include \"momentum\"\n    #include \"timeInfo\"\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o0195ae8d31cc",
+          "type": "select",
+          "label": "application",
+          "source": "求解器使用 simpleFoam。",
+          "options": [
+            "icoFoam",
+            "interFoam",
+            "pimpleFoam",
+            "rhoCentralFoam",
+            "simpleFoam"
+          ]
+        },
+        {
+          "id": "occ0837b689b3",
+          "type": "number",
+          "label": "endTime",
+          "source": "终止时间/迭代编号为 1000。",
+          "options": []
+        },
+        {
+          "id": "o2a18fc22e9fd",
+          "type": "number",
+          "label": "deltaT",
+          "source": "初始时间步（稳态求解时为迭代步长）为 1。",
+          "options": []
+        },
+        {
+          "id": "o0a2e698b7797",
+          "type": "number",
+          "label": "writeInterval",
+          "source": "结果写出间隔（单位由文件中的 writeControl 决定）为 100。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "run.sh",
+      "kind": "workflow",
+      "title": "运行步骤 · 命令排序",
+      "parts": [
+        "# 在算例目录中执行；先加载 OpenFOAM 环境及教程辅助函数\n. \"${WM_PROJECT_DIR:?}/bin/tools/RunFunctions\"\n",
+        {
+          "gap": "original-run-order"
+        }
+      ],
+      "gaps": [
+        {
+          "id": "original-run-order",
+          "type": "commands",
+          "label": "命令顺序",
+          "source": "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → topoSet → refineHexMesh c0 -overwrite → decomposePar -cellDist → runParallel simpleFoam → reconstructPar。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。",
+          "options": [
+            "blockMesh",
+            "checkMesh",
+            "decomposePar",
+            "decomposePar -cellDist",
+            "foamToVTK -latestTime",
+            "reconstructPar",
+            "refineHexMesh c0 -overwrite",
+            "restore0Dir",
+            "runParallel simpleFoam",
+            "topoSet"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceArchive": "/downloads/town/originals/shandong-v2512.zip",
+  "dependencies": [],
+  "revision": "original-v2512-1",
+  "title": "周期圆管的充分发展湍流",
+  "solver": "simpleFoam",
+  "source": "incompressible/simpleFoam/pipeCyclic",
+  "meshImage": "/assets/town/province-cases/shandong-mesh.png",
+  "patches": [
+    "inlet",
+    "outlet",
+    "side1",
+    "side2",
+    "walls"
+  ],
+  "statement": {
+    "physical": [
+      "山东拥有石油开采、炼化与储运产业，输油管道把生产、加工和运输环节连接起来。长直管内远离入口的流动会逐渐形成稳定的统计速度分布，因此可以截取其中一段研究充分发展湍流。"
+    ],
+    "geometry": [
+      "1,600 个单元。网格由本页原始文件和运行步骤生成，所有长度使用 SI 米。",
+      "在示意图中核对边界名称；初始化文件和附带几何可在完整原始目录中查看。",
+      "网格外包络沿 x、y、z 的长度依次为 10 × 0.70711 × 0.49384 m。点击图可放大查看实际 patch 名称及位置；同一边界可包含多处面。"
+    ],
+    "properties": [
+      "constant/transportProperties 中 transportModel 取 Newtonian。",
+      "constant/transportProperties 中 nu 取 1e-06 m²/s。",
+      "constant/turbulenceProperties 中 simulationType 取 RAS。",
+      "constant/turbulenceProperties 中 RAS/RASModel 取 realizableKE。"
+    ],
+    "boundary": [
+      "0.orig 保存初始化前的原始场。运行 restore0Dir 后会复制为 0；若教程使用 setFields，再按初始化字典写入各单元的场值。请填写原始配置，逐单元列表由工具生成。",
+      "0.orig/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+      "0.orig/U 的初始内部场均匀，数值为 (1, 0, 0)（采用该场的 SI 单位）。",
+      "0.orig/U 的 inlet：边界模型采用 codedFixedValue。",
+      "0.orig/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+      "0.orig/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。"
+    ],
+    "control": [
+      "求解器使用 simpleFoam。",
+      "终止时间/迭代编号为 1000。",
+      "初始时间步（稳态求解时为迭代步长）为 1。",
+      "结果写出间隔（单位由文件中的 writeControl 决定）为 100。"
+    ],
+    "numerics": [
+      "system/fvSchemes 中 ddtSchemes/default 取 steadyState。",
+      "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+      "system/fvSchemes 中 divSchemes/default 取 none。",
+      "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。"
+    ],
+    "run": [
+      "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → topoSet → refineHexMesh c0 -overwrite → decomposePar -cellDist → runParallel simpleFoam → reconstructPar。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。"
+    ]
+  },
+  "referenceFiles": [
+    {
+      "path": "0.orig/U",
+      "bytes": 1601,
+      "sha256": "31fb61a033242a21e4ea294597834eac1387763dceddacf21312b71f63cc9c3e",
+      "exercise": true,
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。"
+    },
+    {
+      "path": "0.orig/epsilon",
+      "bytes": 1369,
+      "sha256": "93a946a629020feb2bd72c8814ef2ba9cdbd9f7c4a282903202b8b0f1c80dac9",
+      "exercise": false,
+      "description": "湍动能耗散率，与 k 一起用于相应的湍流模型。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      epsilon;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -3 0 0 0 0];\n\ninternalField   uniform 1;\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        type            turbulentMixingLengthDissipationRateInlet;\n        mixingLength    0.5;       // 0.5m - half channel height\n        value           $internalField;\n    }\n\n    outlet\n    {\n        type            inletOutlet;\n        inletValue      $internalField;\n    }\n\n    walls\n    {\n        type            epsilonWallFunction;\n        value           $internalField;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/k",
+      "bytes": 1346,
+      "sha256": "ce07bd907d114c07740c72852147c1490dd0c9933d0ae78b35cdbf08f59740c5",
+      "exercise": false,
+      "description": "湍动能场，给出湍流初始水平及入口、壁面的条件。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      k;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -2 0 0 0 0];\n\ninternalField   uniform 1;\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        type            turbulentIntensityKineticEnergyInlet;\n        intensity       0.05;       // 5% turbulent intensity\n        value           $internalField;\n    }\n\n    outlet\n    {\n        type            inletOutlet;\n        inletValue      $internalField;\n    }\n\n    walls\n    {\n        type            kqRWallFunction;\n        value           uniform 0;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/nuTilda",
+      "bytes": 1149,
+      "sha256": "4f8b142093ba1182890ef783ed0092e917c721a1d06be7c1e97eb2ac331d5022",
+      "exercise": false,
+      "description": "Spalart–Allmaras 模型的输运变量，用于计算湍流黏度。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      nuTilda;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -1 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        type            zeroGradient;\n    }\n\n    outlet\n    {\n        type            zeroGradient;\n    }\n\n    walls\n    {\n        type            zeroGradient;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/nut",
+      "bytes": 1265,
+      "sha256": "33c073b4ab891db5c0a76e231fc9ec676054f0e75872e0d48f2799b20514bf98",
+      "exercise": false,
+      "description": "湍流运动黏度，常由湍流模型计算，并在壁面使用相应壁面函数。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      nut;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -1 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n\n    inlet\n    {\n        type            calculated;\n        value           $internalField;\n    }\n\n    outlet\n    {\n        type            calculated;\n        value           $internalField;\n    }\n\n    walls\n    {\n        type            nutkWallFunction;\n        value           $internalField;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/p",
+      "bytes": 1176,
+      "sha256": "e192f930469446d5c5b4e9c5f8c14936ebba4c1f9824e944000ef5e5f705e2b2",
+      "exercise": true,
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。"
+    },
+    {
+      "path": "Allclean",
+      "bytes": 340,
+      "sha256": "b0638622510e7f58eb29f287328f82f1ea320c5c28c2a7cd281f792b0867899c",
+      "exercise": false,
+      "description": "官方清理脚本，用于清除教程运行生成的数据。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions      # Tutorial clean functions\n#------------------------------------------------------------------------------\n\ncleanCase0\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "Allrun",
+      "bytes": 574,
+      "sha256": "580cfe629d425960c09bd34d9c10d55bfe5330a81563f85d54150f46aee312ea",
+      "exercise": false,
+      "description": "官方运行脚本；包含该教程的准备、初始化与求解步骤。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions\n#------------------------------------------------------------------------------\n\ncanCompile || exit 0    # Dynamic code\n\nrestore0Dir\n\nrunApplication blockMesh\n\nrunApplication topoSet\n\nrunApplication refineHexMesh c0 -overwrite\n\nrunApplication decomposePar -cellDist\n\nrunParallel $(getApplication)\n\nrunApplication reconstructPar\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "constant/transportProperties",
+      "bytes": 896,
+      "sha256": "93e1f9bee430379c4fa060bf079e0a9a75869e560b1eb17cd5ae1bc4c7114166",
+      "exercise": true,
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。"
+    },
+    {
+      "path": "constant/turbulenceProperties",
+      "bytes": 964,
+      "sha256": "2ed0330eb2b56bd669f6a76dddb3d75ab71d852a4a2d4c97114a78f48c2fb233",
+      "exercise": true,
+      "description": "选择层流、RAS 或 LES，以及相应模型名称。"
+    },
+    {
+      "path": "system/blockMeshDict",
+      "bytes": 2334,
+      "sha256": "5a681d5176f6ddcac0b74daed77d59d6d6437431d3b62446dea64b55f3aa009d",
+      "exercise": false,
+      "description": "网格顶点、块、单元数、加密比例及边界名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      blockMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nmergeType points;   // Wedge geometry - Merge points instead of topology\n\nscale   1;\n\n//- Half angle of wedge in degrees\nhalfAngle 45.0;\n\n//- Radius of pipe [m]\nradius  0.5;\n\ny               #eval{ $radius*sin(degToRad($halfAngle)) };\nz               #eval{ $radius*cos(degToRad($halfAngle)) };\nminY            #eval{ -1*$y };\nminZ            #eval{ -1*$z };\n\nvertices\n(\n    (0  0 0)        //0\n    (10 0 0)        //1\n    (10 0 0)        //2\n    (0  0 0)        //3\n\n    (0  $minY $z)   //4\n    (10 $minY $z)   //5\n    (10 $y $z)      //6\n    (0  $y $z)      //7\n\n);\n\nblocks\n(\n    hex (0 1 2 3 4 5 6 7) (50 5 5) simpleGrading (1 1 1)\n);\n\nedges\n(\n    arc 4 7 origin (0 0 0)\n    arc 5 6 origin (10 0 0)\n);\n\nboundary\n(\n    inlet\n    {\n        type patch;\n        faces\n        (\n            (0 4 7 3)\n        );\n    }\n\n    outlet\n    {\n        type patch;\n        faces\n        (\n            (1 2 6 5)\n        );\n    }\n\n    side1\n    {\n        type cyclicAMI;\n        neighbourPatch side2;\n        faces\n        (\n            (0 1 5 4)\n        );\n\n        transform rotational;\n        rotationAxis (1 0 0);\n        rotationCentre (0 0 0);\n    }\n\n    side2\n    {\n        type cyclicAMI;\n        neighbourPatch side1;\n        faces\n        (\n            (7 6 2 3)\n        );\n\n        transform rotational;\n        rotationAxis (1 0 0);\n        rotationCentre (0 0 0);\n    }\n\n    walls\n    {\n        type wall;\n        faces\n        (\n            (4 5 6 7)\n            (3 2 1 0)\n        );\n    }\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/controlDict",
+      "bytes": 1287,
+      "sha256": "72f6c1431d2270a1622ee3bf8ddcf7e47e7fee1f784fcf0b8b40962cf5abf4d7",
+      "exercise": true,
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。"
+    },
+    {
+      "path": "system/coordinateTransform",
+      "bytes": 462,
+      "sha256": "d2e50eab77f938f33be11abc9efa4ca7f3cfd3237fa2c746af5b659677fbf04b",
+      "exercise": false,
+      "description": "该教程使用的计算或预处理字典，按原始内容保留。",
+      "text": "/// -*- C++ -*-\ncoordinateTransform\n{\n    type    fieldCoordinateSystemTransform;\n    libs    (fieldFunctionObjects);\n    log     true;\n    fields  ( U );\n\n    writeControl writeTime;\n\n    coordinateSystem\n    {\n        type    cylindrical;\n        origin  (0 0 0);\n        rotation\n        {\n            type cylindrical;\n            axis (1 0 0);  //< local Z\n        }\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/decomposeParDict",
+      "bytes": 889,
+      "sha256": "d6431b5b55091c4ab3719899a20884903054ddfed4939a41f2bda770a56dfb22",
+      "exercise": false,
+      "description": "并行分区方法及进程数，供 decomposePar 与并行运行使用。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      decomposeParDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nnumberOfSubdomains 5;\n\nmethod          scotch;\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/fvSchemes",
+      "bytes": 1468,
+      "sha256": "4a42509b0a2885379d0c5ccb8fbe5f1cf9506c90cd8e678380a5a2624ffbd760",
+      "exercise": true,
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。"
+    },
+    {
+      "path": "system/fvSolution",
+      "bytes": 1882,
+      "sha256": "5c8934faa99408cd133f1c9eb68426514ad74fb217b7be320badec1991ead30a",
+      "exercise": false,
+      "description": "线性方程求解器、收敛容差，以及压力与速度耦合算法的设置。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          GAMG;\n        smoother        GaussSeidel;\n        tolerance       1e-06;\n        relTol          0.05;\n    }\n\n    pFinal\n    {\n        $p;\n        tolerance       1e-06;\n        relTol          0;\n    }\n\n    \"(U|k|epsilon)\"\n    {\n        solver          smoothSolver;\n        smoother        symGaussSeidel;\n        tolerance       1e-05;\n        relTol          0.1;\n    }\n\n    \"(U|k|epsilon)Final\"\n    {\n        $U;\n        tolerance       1e-05;\n        relTol          0;\n    }\n}\n\nPIMPLE\n{\n    nOuterCorrectors 4;\n    nCorrectors     1;\n    nNonOrthogonalCorrectors 0;\n    pRefCell        0;\n    pRefValue       0;\n}\n\nSIMPLE\n{\n    nNonOrthogonalCorrectors 0;\n    residualControl\n    {\n        p               1e-2;\n        U               1e-3;\n        \"(k|epsilon)\"   1e-3;\n    }\n}\n\nrelaxationFactors\n{\n    fields\n    {\n        p               0.3;\n    }\n    equations\n    {\n        U               0.7;\n        k               0.7;\n        \"epsilon.*\"     0.7;\n    }\n}\n\ncache\n{\n    grad(U);\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/momentum",
+      "bytes": 626,
+      "sha256": "52ddda5d0fc8f049beefbb96b51da93afa9711bb381311e4b6296ea004d325c8",
+      "exercise": false,
+      "description": "该教程使用的计算或预处理字典，按原始内容保留。",
+      "text": "// -*- C++ -*-\n// Calculate momentum fields\nmomentum\n{\n    type    momentum;\n    libs    (fieldFunctionObjects);\n    log     true;\n    useNamePrefix   true;\n\n    executeInterval 10;\n    writeControl    writeTime;\n\n    // writeToFile     true;\n\n    writeMomentum   true;\n    writePosition   true;\n    writeVelocity   true;\n\n    // Cells to select (all/cellSet/cellZone)\n    regionType  all;\n    // name     c0;\n\n    cylindrical true;\n\n    origin  (0 0 0);\n    rotation\n    {\n        type cylindrical;\n        axis (1 0 0);   //< local Z\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/timeInfo",
+      "bytes": 272,
+      "sha256": "9ea77ca1923cdf3d8aac35817ab079fd0c68cb35e21a55cebff66ab025ec4fc7",
+      "exercise": false,
+      "description": "该教程使用的计算或预处理字典，按原始内容保留。",
+      "text": "// -*- C++ -*-\n// Record execution/clock time\ntime\n{\n    type    timeInfo;\n    libs    (utilityFunctionObjects);\n    log     true;\n\n    // writeToFile     true;\n\n    perTimeStep     true;\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/topoSetDict",
+      "bytes": 1569,
+      "sha256": "912002d6994c2281c6f79b53c04446a5d008c73633b4b812091b760053676600",
+      "exercise": false,
+      "description": "按几何条件选择网格集合或区域，供加密、阻力源等设置使用。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      topoSetDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nactions\n(\n    {\n        name    f0;\n        type    faceSet;\n        action  new;\n        source  patchToFace;\n        patch   side1;\n    }\n    {\n        name    f0;\n        type    faceSet;\n        action  subset;\n        source  boxToFace;\n        box     (0 -100 -100)(100 -0.2 100);\n    }\n    {\n        name    c0;\n        type    cellSet;\n        action  new;\n        source  faceToCell;\n        set     f0;\n        option  any;\n    }\n\n    {\n        name    walls;\n        type    faceSet;\n        action  new;\n        source  patchToFace;\n        patch   walls;\n    }\n    {\n        name    c0;\n        type    cellSet;\n        action  subtract;\n        source  faceToCell;\n        set     walls;\n        option  any;\n    }\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    }
+  ],
+  "gaps": 18,
+  "xp": 40,
+  "bamboo": 12,
+  "boundaryImage": "/assets/town/province-cases/shandong-boundaries.svg"
+}

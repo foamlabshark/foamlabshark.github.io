@@ -1,0 +1,476 @@
+{
+  "id": "zhejiang",
+  "name": "浙江",
+  "difficulty": "basic",
+  "story": "浙江的钱塘江以潮涌闻名，河道水流的变化还与底床高程和局部水深密切相关。理解底床起伏怎样影响水面，是认识浅水流动的一个起点。本关在浅水通道底部放置一处方形隆起，研究水深与流速的响应。",
+  "files": [
+    {
+      "path": "0.orig/h",
+      "description": "水深标量场；h0 表示底床高程，h + h0 表示自由液面高程。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      h;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "oa185c63e8b4c"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "o8f9aed404d2c"
+        },
+        ";\n\nboundaryField\n{\n    ",
+        {
+          "gap": "o6a4a29798721"
+        },
+        "\n    {\n        type            zeroGradient;\n    }\n\n    inlet\n    {\n        type            zeroGradient;\n    }\n\n    outlet\n    {\n        type            fixedValue;\n        value           $internalField;\n    }\n\n    frontAndBack\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "oa185c63e8b4c",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/h 中的场为长度，单位 m；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "o8f9aed404d2c",
+          "type": "number",
+          "label": "internalField",
+          "source": "0.orig/h 的初始内部场均匀，数值为 0.01（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "o6a4a29798721",
+          "type": "name",
+          "label": "boundaryField/sides/name",
+          "source": "0.orig/h 这一段对应的网格边界名是 sides；从示意图的边界分组中选择，保持大小写一致。",
+          "options": [
+            "frontAndBack",
+            "inlet",
+            "outlet",
+            "sides"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0.orig/hU",
+      "description": "水深与速度的乘积，量纲为 m²/s；速度由 U = hU / h 得到。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      hU;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "od9278e443f59"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "o72e0fe425988"
+        },
+        ";\n\nboundaryField\n{\n    sides\n    {\n        type            ",
+        {
+          "gap": "obfe0cf5f791e"
+        },
+        ";\n    }\n\n    inlet\n    {\n        type            ",
+        {
+          "gap": "o6edd2ed8d7c9"
+        },
+        ";\n        value           $internalField;\n    }\n\n    outlet\n    {\n        type            ",
+        {
+          "gap": "o68dd3a21d7a6"
+        },
+        ";\n    }\n\n    frontAndBack\n    {\n        type            ",
+        {
+          "gap": "o53df3c99f06d"
+        },
+        ";\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "od9278e443f59",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/hU 中的场为SI 基本量纲指数按 kg、m、s、K、mol、A、cd 顺序为 0、2、-1、0、0、0、0；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "o72e0fe425988",
+          "type": "vector",
+          "label": "internalField",
+          "source": "0.orig/hU 的初始内部场均匀，数值为 (0.001, 0, 0)（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "obfe0cf5f791e",
+          "type": "select",
+          "label": "boundaryField/sides/type",
+          "source": "0.orig/hU 的 sides：法向速度为零，切向采用无摩擦滑移。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o6edd2ed8d7c9",
+          "type": "select",
+          "label": "boundaryField/inlet/type",
+          "source": "0.orig/hU 的 inlet：直接指定边界上的场值，不从内部单元外推。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o68dd3a21d7a6",
+          "type": "select",
+          "label": "boundaryField/outlet/type",
+          "source": "0.orig/hU 的 outlet：边界法向梯度为零。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o53df3c99f06d",
+          "type": "select",
+          "label": "boundaryField/frontAndBack/type",
+          "source": "0.orig/hU 的 frontAndBack：前后面不参与求解，为二维空边界。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/fvSchemes",
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         ",
+        {
+          "gap": "od2b19c431655"
+        },
+        ";\n}\n\ngradSchemes\n{\n    default         ",
+        {
+          "gap": "o0b573d822e26"
+        },
+        ";\n}\n\ndivSchemes\n{\n    default         ",
+        {
+          "gap": "oe5a39a51e2dd"
+        },
+        ";\n    div(phiv,hU)    Gauss LUST un;\n}\n\nlaplacianSchemes\n{\n    default         ",
+        {
+          "gap": "oaa66884dd5d8"
+        },
+        ";\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         uncorrected;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "od2b19c431655",
+          "type": "select",
+          "label": "ddtSchemes/default",
+          "source": "system/fvSchemes 中 ddtSchemes/default 取 CrankNicolson 0.9。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "o0b573d822e26",
+          "type": "select",
+          "label": "gradSchemes/default",
+          "source": "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oe5a39a51e2dd",
+          "type": "select",
+          "label": "divSchemes/default",
+          "source": "system/fvSchemes 中 divSchemes/default 取 none。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "none",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oaa66884dd5d8",
+          "type": "select",
+          "label": "laplacianSchemes/default",
+          "source": "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear uncorrected。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear uncorrected",
+            "backward",
+            "steadyState"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/controlDict",
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     ",
+        {
+          "gap": "o0195ae8d31cc"
+        },
+        ";\n\nstartFrom       startTime;\n\nstartTime       0;\n\nstopAt          endTime;\n\nendTime         ",
+        {
+          "gap": "occ0837b689b3"
+        },
+        ";\n\ndeltaT          ",
+        {
+          "gap": "o2a18fc22e9fd"
+        },
+        ";\n\nwriteControl    runTime;\n\nwriteInterval   ",
+        {
+          "gap": "o0a2e698b7797"
+        },
+        ";\n\npurgeWrite      0;\n\nwriteFormat     ascii;\n\nwritePrecision  6;\n\nwriteCompression off;\n\ntimeFormat      general;\n\ntimePrecision   6;\n\nrunTimeModifiable false;\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o0195ae8d31cc",
+          "type": "select",
+          "label": "application",
+          "source": "求解器使用 shallowWaterFoam。",
+          "options": [
+            "icoFoam",
+            "interFoam",
+            "pimpleFoam",
+            "shallowWaterFoam",
+            "simpleFoam"
+          ]
+        },
+        {
+          "id": "occ0837b689b3",
+          "type": "number",
+          "label": "endTime",
+          "source": "终止时间/迭代编号为 100。",
+          "options": []
+        },
+        {
+          "id": "o2a18fc22e9fd",
+          "type": "number",
+          "label": "deltaT",
+          "source": "初始时间步（稳态求解时为迭代步长）为 0.1。",
+          "options": []
+        },
+        {
+          "id": "o0a2e698b7797",
+          "type": "number",
+          "label": "writeInterval",
+          "source": "结果写出间隔（单位由文件中的 writeControl 决定）为 1。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "run.sh",
+      "kind": "workflow",
+      "title": "运行步骤 · 命令排序",
+      "parts": [
+        "# 在算例目录中执行；先加载 OpenFOAM 环境及教程辅助函数\n. \"${WM_PROJECT_DIR:?}/bin/tools/RunFunctions\"\n",
+        {
+          "gap": "original-run-order"
+        }
+      ],
+      "gaps": [
+        {
+          "id": "original-run-order",
+          "type": "commands",
+          "label": "命令顺序",
+          "source": "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → setFields → shallowWaterFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。",
+          "options": [
+            "blockMesh",
+            "checkMesh",
+            "decomposePar",
+            "foamToVTK -latestTime",
+            "reconstructPar",
+            "restore0Dir",
+            "setFields",
+            "shallowWaterFoam"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceArchive": "/downloads/town/originals/zhejiang-v2512.zip",
+  "dependencies": [],
+  "revision": "original-v2512-1",
+  "title": "浅水流越过方形底部隆起",
+  "solver": "shallowWaterFoam",
+  "source": "incompressible/shallowWaterFoam/squareBump",
+  "meshImage": "/assets/town/province-cases/zhejiang-mesh.png",
+  "patches": [
+    "sides",
+    "inlet",
+    "outlet",
+    "frontAndBack"
+  ],
+  "statement": {
+    "physical": [
+      "浙江的钱塘江以潮涌闻名，河道水流的变化还与底床高程和局部水深密切相关。理解底床起伏怎样影响水面，是认识浅水流动的一个起点。本关在浅水通道底部放置一处方形隆起，研究水深与流速的响应。"
+    ],
+    "geometry": [
+      "400 个单元。网格由本页原始文件和运行步骤生成，所有长度使用 SI 米。",
+      "在示意图中核对边界名称；初始化文件和附带几何可在完整原始目录中查看。",
+      "网格外包络沿 x、y、z 的长度依次为 1 × 1 × 0.1 m。点击图可放大查看实际 patch 名称及位置；同一边界可包含多处面。"
+    ],
+    "properties": [],
+    "boundary": [
+      "0.orig 保存初始化前的原始场。运行 restore0Dir 后会复制为 0；若教程使用 setFields，再按初始化字典写入各单元的场值。请填写原始配置，逐单元列表由工具生成。",
+      "本关初始自由液面高程为 0.01 m。setFieldsDict 在 x、y 均为 0.45–0.55 m 的区域设置 h0 = 0.001 m、h = 0.009 m，其余区域 h0 = 0、h = 0.01 m；两处的 h + h0 相同。hU 分别取 (0.0009 0 0) 与 (0.001 0 0)，对应相同的初始速度 (0.1 0 0) m/s。",
+      "0.orig/h 中的场为长度，单位 m；填写七个基本量纲指数。",
+      "0.orig/h 的初始内部场均匀，数值为 0.01（采用该场的 SI 单位）。",
+      "0.orig/h 这一段对应的网格边界名是 sides；从示意图的边界分组中选择，保持大小写一致。",
+      "0.orig/hU 中的场为SI 基本量纲指数按 kg、m、s、K、mol、A、cd 顺序为 0、2、-1、0、0、0、0；填写七个基本量纲指数。",
+      "0.orig/hU 的初始内部场均匀，数值为 (0.001, 0, 0)（采用该场的 SI 单位）。",
+      "0.orig/hU 的 sides：法向速度为零，切向采用无摩擦滑移。",
+      "0.orig/hU 的 inlet：直接指定边界上的场值，不从内部单元外推。",
+      "0.orig/hU 的 outlet：边界法向梯度为零。",
+      "0.orig/hU 的 frontAndBack：前后面不参与求解，为二维空边界。"
+    ],
+    "control": [
+      "求解器使用 shallowWaterFoam。",
+      "终止时间/迭代编号为 100。",
+      "初始时间步（稳态求解时为迭代步长）为 0.1。",
+      "结果写出间隔（单位由文件中的 writeControl 决定）为 1。"
+    ],
+    "numerics": [
+      "system/fvSchemes 中 ddtSchemes/default 取 CrankNicolson 0.9。",
+      "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+      "system/fvSchemes 中 divSchemes/default 取 none。",
+      "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear uncorrected。"
+    ],
+    "run": [
+      "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → setFields → shallowWaterFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。"
+    ]
+  },
+  "referenceFiles": [
+    {
+      "path": "0.orig/h",
+      "bytes": 1196,
+      "sha256": "3f8088444b29ec6fe1cf3941d5900dc50139d01e966fefc7ef91667654dbf56e",
+      "exercise": true,
+      "description": "水深标量场；h0 表示底床高程，h + h0 表示自由液面高程。"
+    },
+    {
+      "path": "0.orig/h0",
+      "bytes": 1156,
+      "sha256": "a06f4792ecc6e6f8816057455d22fcfa8c3346e3312af54430e0a0fcb315c8f5",
+      "exercise": false,
+      "description": "底床高程场；本关由 setFieldsDict 指定局部隆起的范围与高度。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      h0;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 0 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    sides\n    {\n        type            zeroGradient;\n    }\n\n    inlet\n    {\n        type            zeroGradient;\n    }\n\n    outlet\n    {\n        type            zeroGradient;\n    }\n\n    frontAndBack\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/hTotal",
+      "bytes": 1271,
+      "sha256": "bef80e25b82400371e24a28fb4b9a54481a30e1865d0bfc44790acc416c3b270",
+      "exercise": false,
+      "description": "自由液面高程，即水深 h 与底床高程 h0 之和。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      hTotal;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 0 0 0 0 0];\n\ninternalField   uniform 0.01;\n\nboundaryField\n{\n    sides\n    {\n        type            calculated;\n        value           uniform 0.01;\n    }\n\n    inlet\n    {\n        type            calculated;\n        value           uniform 0.01;\n    }\n\n    outlet\n    {\n        type            calculated;\n        value           uniform 0.01;\n    }\n\n    frontAndBack\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "0.orig/hU",
+      "bytes": 1197,
+      "sha256": "263851065f3f8a6dadd864b4b11d0647222cff46215a96947896be41b38aa03d",
+      "exercise": true,
+      "description": "水深与速度的乘积，量纲为 m²/s；速度由 U = hU / h 得到。"
+    },
+    {
+      "path": "Allclean",
+      "bytes": 340,
+      "sha256": "b0638622510e7f58eb29f287328f82f1ea320c5c28c2a7cd281f792b0867899c",
+      "exercise": false,
+      "description": "官方清理脚本，用于清除教程运行生成的数据。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions      # Tutorial clean functions\n#------------------------------------------------------------------------------\n\ncleanCase0\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "Allrun",
+      "bytes": 425,
+      "sha256": "f0f27b34d26c21c542129984386a8477b5c499080ae9ab1a345da7f314513178",
+      "exercise": false,
+      "description": "官方运行脚本；包含该教程的准备、初始化与求解步骤。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions\n#------------------------------------------------------------------------------\n\nrestore0Dir\n\nrunApplication blockMesh\n\nrunApplication setFields\n\nrunApplication $(getApplication)\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "constant/gravitationalProperties",
+      "bytes": 983,
+      "sha256": "a129f9de02531217e1fa6a9c376fa2364e5657577b2cce9016be4756a036ba36",
+      "exercise": false,
+      "description": "浅水方程使用的重力及旋转相关参数。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      gravitationalProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ng            g           [0 1 -2 0 0 0 0]  (0 0 -9.81);\nrotating     true;\nOmega        Omega       [0 0 -1 0 0 0 0]  (0 0 7.292e-5);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/blockMeshDict",
+      "bytes": 1537,
+      "sha256": "9e750ec60b83fc8a4346aca6386684a4e9572850a76f60f0c4da9678ba090df2",
+      "exercise": false,
+      "description": "网格顶点、块、单元数、加密比例及边界名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      blockMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nscale   1;\n\nvertices\n(\n    (0 0 0)\n    (1 0 0)\n    (1 1 0)\n    (0 1 0)\n    (0 0 0.1)\n    (1 0 0.1)\n    (1 1 0.1)\n    (0 1 0.1)\n);\n\nblocks\n(\n    hex (0 1 2 3 4 5 6 7) (20 20 1) simpleGrading (1 1 1)\n);\n\nedges\n(\n);\n\nboundary\n(\n    sides\n    {\n        type patch;\n        faces\n        (\n            (3 7 6 2)\n            (1 5 4 0)\n        );\n    }\n    inlet\n    {\n        type patch;\n        faces\n        (\n            (0 4 7 3)\n        );\n    }\n    outlet\n    {\n        type patch;\n        faces\n        (\n            (2 6 5 1)\n        );\n    }\n    frontAndBack\n    {\n        type empty;\n        faces\n        (\n            (0 3 2 1)\n            (4 5 6 7)\n        );\n    }\n);\n\nmergePatchPairs\n(\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/controlDict",
+      "bytes": 1194,
+      "sha256": "e38d4f3073949aeb241075f45c46cea53321b28e31aea70b1aee493d2be07f7c",
+      "exercise": true,
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。"
+    },
+    {
+      "path": "system/fvSchemes",
+      "bytes": 1191,
+      "sha256": "04b9da5e272613710ad2a895b336dd3bbba954fb5b86a3626245dcd55ec964de",
+      "exercise": true,
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。"
+    },
+    {
+      "path": "system/fvSolution",
+      "bytes": 1450,
+      "sha256": "53c3b23b6d6c9a2df4c84ff1253adaebb1638ef908704ec58872ba901d269bf9",
+      "exercise": false,
+      "description": "线性方程求解器、收敛容差，以及压力与速度耦合算法的设置。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    h\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1e-10;\n        relTol          0.01;\n    }\n\n    hFinal\n    {\n        $h;\n        tolerance       1e-10;\n        relTol          0;\n    }\n\n    hU\n    {\n        solver          smoothSolver;\n        smoother        GaussSeidel;\n        tolerance       1e-10;\n        relTol          0.1;\n    }\n\n    hUFinal\n    {\n        $hU;\n        tolerance       1e-10;\n        relTol          0;\n    }\n}\n\nPIMPLE\n{\n    nOuterCorrectors 3;\n    nCorrectors      1;\n    nNonOrthogonalCorrectors 0;\n\n    momentumPredictor yes;\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/setFieldsDict",
+      "bytes": 1218,
+      "sha256": "4b3ff3aa90307df3be7fb73c125288acd0a6b9b3b45dd3a05c682f4ae0087d5a",
+      "exercise": false,
+      "description": "初始化指定区域的场值。先设置默认值，再覆盖选定单元区域。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      setFieldsDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndefaultFieldValues\n(\n    volScalarFieldValue h0 0\n    volScalarFieldValue h 0.01\n    volVectorFieldValue hU (0.001 0 0)\n);\n\nregions\n(\n    boxToCell\n    {\n        box (0.45 0.45 0) (0.55 0.55 0.1);\n\n        fieldValues\n        (\n            volScalarFieldValue h0 0.001\n            volScalarFieldValue h  0.009\n            volVectorFieldValue hU  (0.0009 0 0)\n        );\n    }\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    }
+  ],
+  "gaps": 18,
+  "xp": 40,
+  "bamboo": 12,
+  "boundaryImage": "/assets/town/province-cases/zhejiang-boundaries.svg"
+}

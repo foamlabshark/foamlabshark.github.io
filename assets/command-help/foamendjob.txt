@@ -1,0 +1,25 @@
+OpenFOAM v2512 script source evidence
+Command: foamEndJob
+Source: https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/foamEndJob
+
+以下为源码中的帮助文本（保留 shell 占位符），并非本机运行输出。
+
+Usage: foamEndJob [OPTION] <pid>
+Usage: foamEndJob [OPTION] -c
+
+options:
+  -clear            clear any outstanding foamEndJob for the case
+  -case <dir>       specify alternative case directory, default is the cwd
+  -now              stop at next time step
+  -help             print the usage
+
+Tries to end running OpenFOAM application at next write (or optionally
+at the next time step). It needs runTimeModifiable switched on in the
+controlDict. It changes stopAt in the controlDict and waits for the
+job to finish. Restores original controlDict if
+
+    - job has finished
+    - controlDict gets modified (by user)
+    - foamEndJob gets killed.
+
+The -clear option clears any outstanding foamEndJob for the case.

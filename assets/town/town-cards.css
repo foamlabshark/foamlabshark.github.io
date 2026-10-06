@@ -1,0 +1,152 @@
+/* 熊猫画卡 — illustrated panda cards (town-cards.js). */
+.tac{--tac-frame:#e9dcb7;--tac-edge:#b99a62;--tac-ink:#4a3c22;position:relative;display:flex;flex-direction:column;gap:7px;width:100%;aspect-ratio:300/402;padding:8px 8px 10px;border-radius:16px;background:linear-gradient(160deg,#f7eed4,var(--tac-frame) 55%,#dccaa0);border:2px solid var(--tac-edge);box-shadow:0 2px 0 #ffffff80 inset,0 6px 14px #3b2f1a2e;color:var(--tac-ink);text-align:left;overflow:hidden;isolation:isolate}
+.tac.is-rare{--tac-frame:#c9d9ec;--tac-edge:#6f8fb0;--tac-ink:#24364a;background:linear-gradient(135deg,#eef4fb,#b8cde6 30%,#f2f7fc 52%,#a7bfdc 74%,#e3edf8)}
+.tac.is-legend{--tac-frame:#f0cf7a;--tac-edge:#a87a26;--tac-ink:#4a3410;background:linear-gradient(135deg,#fff3c4,#e5b24c 28%,#fff7d8 50%,#c99232 72%,#ffe6a0);box-shadow:0 2px 0 #fff6d080 inset,0 0 0 1px #fff3c4 inset,0 8px 20px #8a5d1a40}
+.tac-art{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#dfe9d2;box-shadow:0 0 0 2px #00000014,0 0 0 4px #ffffff70}
+.tac-bg,.tac-fg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tac-fg{pointer-events:none}
+.tac-pose{position:absolute;pointer-events:none}
+.tac-pose>svg,.tac-pose .panda-art{display:block;width:100%!important;height:auto!important;overflow:visible;filter:drop-shadow(0 3px 2px #2a2d3830)}
+.tac-pose.is-extra{opacity:.98}
+.tac-plate{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px;padding:2px 5px 0}
+.tac-plate h3{grid-column:1/-1;margin:0;font-size:clamp(13px,6.4cqw,22px);font-weight:800;letter-spacing:.06em;line-height:1.3}
+.tac-plate p{grid-column:1/-1;margin:0;font-size:clamp(10.5px,4.5cqw,15px);line-height:1.45;opacity:.85;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tac{container-type:inline-size}
+.tac-no{font:700 clamp(9.5px,3.8cqw,12.5px)/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;opacity:.7}
+.tac-rarity{display:inline-flex;align-items:center;gap:4px;font-size:clamp(9.5px,3.8cqw,12.5px);font-weight:700;opacity:.85}
+.tac-rarity i{width:8px;height:8px;border-radius:2px;transform:rotate(45deg);box-shadow:0 0 0 1px #00000030}
+.tac-new{position:absolute;right:-30px;top:14px;transform:rotate(38deg);padding:3px 34px;background:#d4563f;color:#fff8e8;font:800 11px/1 system-ui,sans-serif;letter-spacing:.14em;box-shadow:0 2px 4px #0003;z-index:3}
+.tac-shine{position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit;opacity:0}
+.tac.is-rare .tac-shine,.tac.is-legend .tac-shine{opacity:1;background:linear-gradient(115deg,transparent 35%,#ffffff8c 48%,#ffffff20 54%,transparent 62%);background-size:260% 100%;mix-blend-mode:soft-light;animation:tac-sheen 3.6s ease-in-out infinite}
+.tac.is-legend .tac-art::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(125deg,#ff8fb133,#ffd16633 25%,#7fd1c333 50%,#9b8cf033 75%,#ff8fb133);background-size:300% 300%;mix-blend-mode:color-dodge;animation:tac-holo 6s linear infinite}
+@keyframes tac-sheen{0%,20%{background-position:120% 0}70%,100%{background-position:-60% 0}}
+@keyframes tac-holo{to{background-position:300% 300%}}
+
+/* back of a card */
+.tac-back{position:relative;isolation:isolate;container-type:inline-size;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:100%;aspect-ratio:300/402;padding:28px 10px;border-radius:16px;border:2px solid #bba774;background:radial-gradient(ellipse at 50% 42%,#426959,#244c43 80%);box-shadow:0 0 0 4px #e3d1a1 inset,0 6px 14px #263e3329;color:#fff4d4}
+.tac-back:before{content:'';position:absolute;inset:8px;border:1px solid #c8b77a99;border-radius:8px;pointer-events:none}
+.tac-back .tac-back-bamboo{position:absolute;inset:0;width:100%;height:100%;color:#d6c995;opacity:.42;pointer-events:none}
+.tac-back .tac-back-mascot{position:relative;display:block;width:70%;max-width:160px;aspect-ratio:1;flex-shrink:0;filter:drop-shadow(0 3px 2px #152c3040)}
+.tac-back b{position:relative;font-size:clamp(12px,8cqw,22px);line-height:1.4;letter-spacing:.18em;padding-left:.18em;color:#fff4d4;text-shadow:0 1px 1px #17372f}
+.tac-back .tac-back-number{position:absolute;bottom:8%;font:600 11px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.1em;padding:3px 8px;color:#fff4d4}
+
+/* scene motion — only in the large view and the reveal */
+.tac-art:not(.is-live) *{animation:none!important}
+/* scene layers only — never the panda, whose arms turn about the shoulder in the panda's own coordinates */
+:is(.tac-bg,.tac-fg) [class]{transform-box:fill-box;transform-origin:center}
+.tac-fall{animation:tac-fall 8s linear infinite}
+@keyframes tac-fall{0%{translate:0 -40px;rotate:0deg;opacity:0}10%{opacity:1}90%{opacity:1}100%{translate:-30px 320px;rotate:300deg;opacity:0}}
+.tac-snow{animation:tac-snow 9s linear infinite}
+@keyframes tac-snow{0%{translate:0 -30px;opacity:0}10%{opacity:1}100%{translate:14px 320px;opacity:.9}}
+.tac-still{animation:none}
+.tac-rain{animation:tac-rain 1.1s linear infinite}
+@keyframes tac-rain{from{translate:0 -40px}to{translate:-14px 40px}}
+.tac-firefly{animation:tac-firefly 5s ease-in-out infinite}
+@keyframes tac-firefly{0%,100%{translate:0 0;opacity:.3}30%{opacity:1}50%{translate:8px -10px;opacity:.9}80%{translate:-6px -4px;opacity:.5}}
+.tac-twinkle{animation:tac-twinkle 3.4s ease-in-out infinite}
+@keyframes tac-twinkle{0%,100%{opacity:.4;scale:.7}50%{opacity:1;scale:1.1}}
+.tac-ripple{animation:tac-ripple 3.5s ease-in-out infinite}
+@keyframes tac-ripple{0%,100%{translate:-4px 0;opacity:.3}50%{translate:6px 0;opacity:.8}}
+.tac-flow{animation:tac-flow 1.6s linear infinite}
+@keyframes tac-flow{to{stroke-dashoffset:-26}}
+.tac-spin{animation:tac-spin 3s linear infinite}
+@keyframes tac-spin{to{rotate:360deg}}
+.tac-bob{animation:tac-bob 2.6s ease-in-out infinite}
+@keyframes tac-bob{0%,100%{translate:0 0}50%{translate:3px -8px}}
+.tac-burst{animation:tac-burst 2.4s ease-out infinite}
+.tac-burst.d1{animation-delay:.8s}.tac-burst.d2{animation-delay:1.5s}
+@keyframes tac-burst{0%{scale:.1;opacity:0}12%{opacity:1}55%{scale:1;opacity:1}100%{scale:1.15;opacity:0}}
+.tac-aurora{animation:tac-aurora 6s ease-in-out infinite}
+@keyframes tac-aurora{0%,100%{translate:0 0;opacity:.7}50%{translate:-12px 6px;opacity:1}}
+.tac-meteor{animation:tac-meteor 4s ease-in infinite;opacity:0}
+@keyframes tac-meteor{0%,70%{opacity:0;translate:0 0}75%{opacity:1}100%{opacity:0;translate:120px 54px}}
+.tac-steam{animation:tac-steam 2.2s ease-in-out infinite}
+@keyframes tac-steam{0%{translate:0 2px;opacity:0}40%{opacity:.8}100%{translate:0 -8px;opacity:0}}
+.tac-sparkle{animation:tac-sparkle 2.4s ease-in-out infinite}
+@keyframes tac-sparkle{0%,100%{scale:.4;opacity:.2}50%{scale:1.2;opacity:1}}
+
+/* dialogs */
+.tac-dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none;overflow:visible;color:#3b3424}
+.tac-dialog::backdrop{background:#1b1a14b8;backdrop-filter:blur(3px)}
+.tac-dialog[open]{display:flex;flex-direction:column;align-items:center}
+.tac-x{position:absolute;right:-6px;top:-6px;width:38px;height:38px;border-radius:50%;border:2px solid #c9b27a;background:#fffaf0;color:#5a4a2a;font-size:22px;line-height:1;cursor:pointer;box-shadow:0 3px 0 #0002;z-index:5}
+.tac-x:hover{background:#fff3cf}
+.tac-hint{margin:12px 0 0;color:#f6efd8;font-size:13px;opacity:.85;text-align:center}
+
+/* flip */
+.tac-flip{position:relative;width:min(330px,82vw);perspective:1200px;cursor:pointer;outline:none}
+.tac-flip>.tac-face{transition:transform .7s cubic-bezier(.3,.7,.3,1);backface-visibility:hidden;transform-style:preserve-3d}
+.tac-flip>.tac-face-back{position:absolute;inset:0;transform:rotateY(180deg)}
+.tac-flip.is-flipped>.tac-face:first-child{transform:rotateY(-180deg)}
+.tac-flip.is-flipped>.tac-face-back{transform:rotateY(0)}
+.tac-flip:focus-visible{outline:3px solid #f2c440;outline-offset:6px;border-radius:18px}
+.is-view .tac{min-height:430px}
+.tac-face-back>.tac-back{height:100%;aspect-ratio:auto;justify-content:flex-start;gap:8px;padding:18px 16px}
+.tac-face-back .tac-back-mascot{width:46%;max-width:118px}
+.tac-face-back .tac-back b{font-size:17px}
+.tac-face-back dl{position:relative;box-sizing:border-box;width:100%;margin:auto 0 0;padding:10px 12px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;border-radius:10px;background:#fffbe8;color:#3b3424;font-size:12.5px;line-height:1.6;flex-shrink:0}
+.tac-face-back dt{font-weight:700;opacity:.7}.tac-face-back dd{margin:0}
+.is-view .tac-panel,.tac-dialog.is-view{position:relative}
+
+/* album */
+.tac-dialog.is-album{width:min(940px,94vw);max-height:90vh;padding:18px 20px 22px;border-radius:20px;background:#fbf6e6;border:3px solid #c9b27a;box-shadow:0 18px 50px #0006;overflow:auto;display:block}
+.tac-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tac-head h2{margin:0;font-size:22px;letter-spacing:.06em}
+.tac-head p{margin:4px 0 0;font-size:13px;color:#6b5a38}
+.tac-head .tac-x{position:static;flex:none}
+.tac-meter{height:8px;margin:12px 0;border-radius:999px;background:#e6dcc0;overflow:hidden}
+.tac-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#7aa35a,#e2b04a)}
+.tac-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tac-tabs button{border:2px solid #d8c99e;background:#fffaf0;border-radius:999px;padding:5px 14px;font-weight:700;color:#5a4a2a;cursor:pointer}
+.tac-tabs button[aria-selected=true]{background:#7aa35a;border-color:#5f8a45;color:#fffbe8}
+.tac-note{margin:10px 0 14px;font-size:12.5px;color:#7a6a48}
+.tac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tac-slot{position:relative;display:block;padding:0;border:0;background:none;border-radius:16px;cursor:pointer;transition:transform .15s,filter .15s}
+.tac-slot:hover,.tac-slot:focus-visible{transform:translateY(-4px) rotate(-.6deg);filter:drop-shadow(0 8px 8px #3b2f1a30);outline:none}
+.tac-slot.is-locked{cursor:default;filter:none}
+.tac-slot.is-locked:hover{transform:none;filter:none}
+.tac-lock-r{position:absolute;left:50%;top:10px;translate:-50% 0;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;background:#fffbe8;color:#5a4a2a}
+.tac-lock-r.is-rare{background:#dbe8f6;color:#24364a}.tac-lock-r.is-legend{background:#f6dc8f;color:#4a3410}
+
+/* reveal */
+.tac-dialog.is-reveal{gap:16px;padding:10px}
+.tac-reveal-head{text-align:center;color:#fff8e4}
+.tac-reveal-head small{display:block;font-size:13px;opacity:.8;letter-spacing:.12em}
+.tac-reveal-head h2{margin:4px 0 0;font-size:24px;letter-spacing:.08em;text-shadow:0 2px 0 #0005}
+.tac-flip.is-dealing{animation:tac-deal .6s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes tac-deal{from{transform:translateY(60px) scale(.6) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.tac-rays{position:absolute;left:50%;top:50%;width:640px;height:640px;margin:-320px 0 0 -320px;z-index:-1;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg,#fff6c820 0 9deg,transparent 9deg 22deg);border-radius:50%;mask:radial-gradient(circle,#000 30%,transparent 68%)}
+.tac-dialog.is-open .tac-rays{opacity:1;animation:tac-rays 14s linear infinite}
+.tac-dialog.is-rare .tac-rays{background:repeating-conic-gradient(from 0deg,#bfe0ff38 0 9deg,transparent 9deg 22deg)}
+.tac-dialog.is-legend .tac-rays{background:repeating-conic-gradient(from 0deg,#ffe28a55 0 9deg,transparent 9deg 22deg)}
+@keyframes tac-rays{to{rotate:360deg}}
+.tac-actions{display:flex;gap:10px;justify-content:center}
+.tac-actions button{border:2px solid #c9b27a;background:#fffaf0;color:#4a3c22;border-radius:12px;padding:9px 18px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #0003}
+.tac-actions .tac-primary{background:#7aa35a;border-color:#5f8a45;color:#fffbe8}
+
+/* entry points */
+.town-cards-entry{display:inline-flex;align-items:center;gap:6px}
+.town-cards-entry .tac-mini{width:16px;height:22px;border-radius:3px;background:linear-gradient(160deg,#9cc47a,#5f8f4a);box-shadow:0 0 0 1.5px #fffbe8 inset,0 1px 0 #0003;flex:none}
+
+@media (max-width:700px){.tac-grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}.tac-dialog.is-album{padding:14px 12px 18px}.tac-head h2{font-size:19px}}
+@media (prefers-reduced-motion:reduce){.tac *,.tac-flip>.tac-face,.tac-rays,.tac-flip{animation:none!important;transition:none!important}}
+
+/* arms in illustrations: the default bamboo only when munching; per-card angles win over pose and animation */
+.tac-pose:not([data-action=munch]) .pa-carry{display:none!important}
+.tac-pose[data-arm-l] .pa-arm-l{transform:rotate(var(--arm-l))!important;animation:none!important}
+.tac-pose[data-arm-r] .pa-arm-r{transform:rotate(var(--arm-r))!important;animation:none!important}
+.tac-pose[data-no-carry] :is(.pa-carry,.pa-p-munch){display:none!important}
+
+/* The site styles every <dialog> and every town <button>; card dialogs keep their own look. */
+html[data-theme] dialog.tac-dialog,dialog.tac-dialog{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0;width:auto;max-height:none;color:#3b3424}
+html[data-theme] dialog.tac-dialog.is-album,dialog.tac-dialog.is-album{width:min(940px,94vw);max-height:90vh;padding:18px 20px 22px;border-radius:20px;background:#fbf6e6;border:3px solid #c9b27a;box-shadow:0 18px 50px #0006;color:#3b3424}
+.tac-dialog .tac-slot{padding:0;border:0;background:none;min-height:0;border-radius:16px;box-shadow:none;color:inherit;display:block;width:100%}
+.tac-dialog .tac-slot:hover{background:none}
+.tac-dialog .tac-x{padding:0;min-height:0;width:38px;height:38px;border-radius:50%;border:2px solid #c9b27a;background:#fffaf0;color:#5a4a2a;font-size:22px;line-height:1}
+.tac-dialog .tac-tabs button{min-height:0;padding:5px 14px;border-radius:999px;border:2px solid #d8c99e;background:#fffaf0;color:#5a4a2a;font-weight:700}
+.tac-dialog .tac-tabs button[aria-selected=true]{background:#3d6a3e;border-color:#284a29;color:#fffbe8}
+.tac-dialog .tac-actions button{min-height:0}
+.tac-dialog .tac-actions .tac-primary{background:#3d6a3e;border-color:#284a29;color:#fffbe8}
+.tac-dialog .tac-flip:focus-visible{outline:3px solid #f2c440}
+.tac-dialog .tac-reveal-head,.tac-dialog .tac-reveal-head h2,.tac-dialog .tac-reveal-head small{color:#fff8e4}
+.tac-dialog .tac-hint{color:#f6efd8}

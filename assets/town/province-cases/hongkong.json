@@ -1,0 +1,557 @@
+{
+  "id": "hongkong",
+  "name": "香港",
+  "difficulty": "advanced",
+  "story": "香港维多利亚港的船舶与海上设施使运动物体周围的流动成为常见场景。数值计算中，物体移动时必须持续描述它与流体之间的边界。本关用沿轴向运动的锥体，学习让网格随边界一起伸缩。",
+  "files": [
+    {
+      "path": "0/U",
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "o790328704621"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "of88f4268b8fe"
+        },
+        ";\n\nboundaryField\n{\n    ",
+        {
+          "gap": "odc48fd084e42"
+        },
+        "\n    {\n        type            movingWallVelocity;\n        value           $internalField;\n    }\n\n    farFieldMoving\n    {\n        type            noSlip;\n    }\n\n    fixedWall\n    {\n        type            noSlip;\n    }\n\n    left\n    {\n        type            pressureInletOutletVelocity;\n        value           $internalField;\n    }\n\n    farField\n    {\n        type            noSlip;\n    }\n\n    back\n    {\n        type            wedge;\n    }\n\n    front\n    {\n        type            wedge;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o790328704621",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "of88f4268b8fe",
+          "type": "vector",
+          "label": "internalField",
+          "source": "0/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "odc48fd084e42",
+          "type": "name",
+          "label": "boundaryField/movingWall/name",
+          "source": "0/U 这一段对应的网格边界名是 movingWall；从示意图的边界分组中选择，保持大小写一致。",
+          "options": [
+            "back",
+            "farField",
+            "farFieldMoving",
+            "fixedWall",
+            "left",
+            "movingWall"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0/p",
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "oab1ca82cc4ed"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "oa3da72111868"
+        },
+        ";\n\nboundaryField\n{\n    movingWall\n    {\n        type            ",
+        {
+          "gap": "o3a0ee6b12c55"
+        },
+        ";\n    }\n\n    farFieldMoving\n    {\n        type            ",
+        {
+          "gap": "o5ca68bf2b621"
+        },
+        ";\n    }\n\n    fixedWall\n    {\n        type            ",
+        {
+          "gap": "o09884d8ac609"
+        },
+        ";\n    }\n\n    left\n    {\n        type            ",
+        {
+          "gap": "o1f93901f8089"
+        },
+        ";\n        p0              $internalField;\n    }\n\n    farField\n    {\n        type            ",
+        {
+          "gap": "oc87fb75b13e4"
+        },
+        ";\n    }\n\n    back\n    {\n        type            ",
+        {
+          "gap": "o82f63eba7002"
+        },
+        ";\n    }\n\n    front\n    {\n        type            ",
+        {
+          "gap": "ob5569c208e4e"
+        },
+        ";\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "oab1ca82cc4ed",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "oa3da72111868",
+          "type": "number",
+          "label": "internalField",
+          "source": "0/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "o3a0ee6b12c55",
+          "type": "select",
+          "label": "boundaryField/movingWall/type",
+          "source": "0/p 的 movingWall：边界法向梯度为零。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o5ca68bf2b621",
+          "type": "select",
+          "label": "boundaryField/farFieldMoving/type",
+          "source": "0/p 的 farFieldMoving：边界法向梯度为零。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o09884d8ac609",
+          "type": "select",
+          "label": "boundaryField/fixedWall/type",
+          "source": "0/p 的 fixedWall：边界法向梯度为零。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o1f93901f8089",
+          "type": "select",
+          "label": "boundaryField/left/type",
+          "source": "0/p 的 left：边界模型采用 totalPressure。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "totalPressure",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "oc87fb75b13e4",
+          "type": "select",
+          "label": "boundaryField/farField/type",
+          "source": "0/p 的 farField：边界法向梯度为零。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o82f63eba7002",
+          "type": "select",
+          "label": "boundaryField/back/type",
+          "source": "0/p 的 back：绕轴对称的薄楔形边界。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "wedge",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "ob5569c208e4e",
+          "type": "select",
+          "label": "boundaryField/front/type",
+          "source": "0/p 的 front：绕轴对称的薄楔形边界。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "wedge",
+            "zeroGradient"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0/pointMotionUx",
+      "description": "网格点沿 x 方向运动的边界条件，与 dynamicMeshDict 配合。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       pointScalarField;\n    object      pointMotionUx;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "o4102c7eb8057"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "o036500bb78f6"
+        },
+        ";\n\nboundaryField\n{\n    movingWall\n    {\n        type            ",
+        {
+          "gap": "od99ffc2fe990"
+        },
+        ";\n        uniformValue    constant 1;\n    }\n\n    farFieldMoving\n    {\n        type            ",
+        {
+          "gap": "o7c70b585fd77"
+        },
+        ";\n    }\n\n    fixedWall\n    {\n        type            uniformFixedValue;\n        uniformValue    constant 0;\n    }\n\n    left\n    {\n        type            uniformFixedValue;\n        uniformValue    constant 0;\n    }\n\n    farField\n    {\n        type            slip;\n    }\n\n    back\n    {\n        type            wedge;\n    }\n\n    front\n    {\n        type            wedge;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o4102c7eb8057",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0/pointMotionUx 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "o036500bb78f6",
+          "type": "number",
+          "label": "internalField",
+          "source": "0/pointMotionUx 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "od99ffc2fe990",
+          "type": "select",
+          "label": "boundaryField/movingWall/type",
+          "source": "0/pointMotionUx 的 movingWall：边界模型采用 uniformFixedValue。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "uniformFixedValue",
+            "zeroGradient"
+          ]
+        },
+        {
+          "id": "o7c70b585fd77",
+          "type": "select",
+          "label": "boundaryField/farFieldMoving/type",
+          "source": "0/pointMotionUx 的 farFieldMoving：法向速度为零，切向采用无摩擦滑移。",
+          "options": [
+            "empty",
+            "fixedValue",
+            "noSlip",
+            "slip",
+            "zeroGradient"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "constant/transportProperties",
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  ",
+        {
+          "gap": "o387c34083ff4"
+        },
+        ";\n\nnu              ",
+        {
+          "gap": "o0f2b0b1f7f87"
+        },
+        ";\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o387c34083ff4",
+          "type": "select",
+          "label": "transportModel",
+          "source": "constant/transportProperties 中 transportModel 取 Newtonian。",
+          "options": [
+            "BirdCarreau",
+            "CrossPowerLaw",
+            "HerschelBulkley",
+            "Newtonian",
+            "powerLaw"
+          ]
+        },
+        {
+          "id": "o0f2b0b1f7f87",
+          "type": "number",
+          "label": "nu",
+          "source": "constant/transportProperties 中 nu 取 1e-05 m²/s。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "system/controlDict",
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     ",
+        {
+          "gap": "o0195ae8d31cc"
+        },
+        ";\n\nstartFrom       startTime;\n\nstartTime       0;\n\nstopAt          endTime;\n\nendTime         ",
+        {
+          "gap": "occ0837b689b3"
+        },
+        ";\n\ndeltaT          ",
+        {
+          "gap": "o2a18fc22e9fd"
+        },
+        ";\n\nwriteControl    timeStep;\n\nwriteInterval   ",
+        {
+          "gap": "o0a2e698b7797"
+        },
+        ";\n\npurgeWrite      0;\n\nwriteFormat     binary;\n\nwritePrecision  6;\n\nwriteCompression off;\n\ntimeFormat      general;\n\ntimePrecision   6;\n\nrunTimeModifiable true;\n\nadjustTimeStep  no;\n\nmaxCo           0.2;\n\nfunctions\n{\n    #include \"cuttingPlane\"\n    #include \"vtkWrite\"\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o0195ae8d31cc",
+          "type": "select",
+          "label": "application",
+          "source": "求解器使用 pimpleFoam。",
+          "options": [
+            "icoFoam",
+            "interFoam",
+            "pimpleFoam",
+            "rhoCentralFoam",
+            "simpleFoam"
+          ]
+        },
+        {
+          "id": "occ0837b689b3",
+          "type": "number",
+          "label": "endTime",
+          "source": "终止时间/迭代编号为 0.003。",
+          "options": []
+        },
+        {
+          "id": "o2a18fc22e9fd",
+          "type": "number",
+          "label": "deltaT",
+          "source": "初始时间步（稳态求解时为迭代步长）为 5e-06。",
+          "options": []
+        },
+        {
+          "id": "o0a2e698b7797",
+          "type": "number",
+          "label": "writeInterval",
+          "source": "结果写出间隔（单位由文件中的 writeControl 决定）为 40。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "run.sh",
+      "kind": "workflow",
+      "title": "运行步骤 · 命令排序",
+      "parts": [
+        "# 在算例目录中执行；先加载 OpenFOAM 环境及教程辅助函数\n. \"${WM_PROJECT_DIR:?}/bin/tools/RunFunctions\"\n",
+        {
+          "gap": "original-run-order"
+        }
+      ],
+      "gaps": [
+        {
+          "id": "original-run-order",
+          "type": "commands",
+          "label": "命令顺序",
+          "source": "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：blockMesh → pimpleFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。",
+          "options": [
+            "blockMesh",
+            "checkMesh",
+            "decomposePar",
+            "foamToVTK -latestTime",
+            "pimpleFoam",
+            "reconstructPar"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceArchive": "/downloads/town/originals/hongkong-v2512.zip",
+  "dependencies": [],
+  "revision": "original-v2512-1",
+  "title": "运动锥体驱动的变形网格流动",
+  "solver": "pimpleFoam",
+  "source": "incompressible/pimpleFoam/laminar/movingCone",
+  "meshImage": "/assets/town/province-cases/hongkong-mesh.png",
+  "patches": [
+    "movingWall",
+    "farFieldMoving",
+    "fixedWall",
+    "left",
+    "farField",
+    "back",
+    "front"
+  ],
+  "statement": {
+    "physical": [
+      "香港维多利亚港的船舶与海上设施使运动物体周围的流动成为常见场景。数值计算中，物体移动时必须持续描述它与流体之间的边界。本关用沿轴向运动的锥体，学习让网格随边界一起伸缩。"
+    ],
+    "geometry": [
+      "1,900 个单元。网格由本页原始文件和运行步骤生成，所有长度使用 SI 米。",
+      "在示意图中核对边界名称；初始化文件和附带几何可在完整原始目录中查看。",
+      "网格外包络沿 x、y、z 的长度依次为 0.0075 × 0.0025 × 0.0002183 m。点击图可放大查看实际 patch 名称及位置；同一边界可包含多处面。"
+    ],
+    "properties": [
+      "constant/transportProperties 中 transportModel 取 Newtonian。",
+      "constant/transportProperties 中 nu 取 1e-05 m²/s。"
+    ],
+    "boundary": [
+      "0/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+      "0/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+      "0/U 这一段对应的网格边界名是 movingWall；从示意图的边界分组中选择，保持大小写一致。",
+      "0/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+      "0/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+      "0/p 的 movingWall：边界法向梯度为零。",
+      "0/p 的 farFieldMoving：边界法向梯度为零。",
+      "0/p 的 fixedWall：边界法向梯度为零。",
+      "0/p 的 left：边界模型采用 totalPressure。",
+      "0/p 的 farField：边界法向梯度为零。",
+      "0/p 的 back：绕轴对称的薄楔形边界。",
+      "0/p 的 front：绕轴对称的薄楔形边界。",
+      "0/pointMotionUx 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+      "0/pointMotionUx 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+      "0/pointMotionUx 的 movingWall：边界模型采用 uniformFixedValue。",
+      "0/pointMotionUx 的 farFieldMoving：法向速度为零，切向采用无摩擦滑移。"
+    ],
+    "control": [
+      "求解器使用 pimpleFoam。",
+      "终止时间/迭代编号为 0.003。",
+      "初始时间步（稳态求解时为迭代步长）为 5e-06。",
+      "结果写出间隔（单位由文件中的 writeControl 决定）为 40。"
+    ],
+    "numerics": [],
+    "run": [
+      "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：blockMesh → pimpleFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。"
+    ]
+  },
+  "referenceFiles": [
+    {
+      "path": "0/U",
+      "bytes": 1432,
+      "sha256": "5fdaeae6839cdb76591f6338a3d47f1e6efb375d72df9362a2e8a5ebedeb22fc",
+      "exercise": true,
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。"
+    },
+    {
+      "path": "0/p",
+      "bytes": 1384,
+      "sha256": "aa61c05f9862df43c689a0257ba66da6fe3d5c28e1153aeaf39361814e2ae585",
+      "exercise": true,
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。"
+    },
+    {
+      "path": "0/pointMotionUx",
+      "bytes": 1464,
+      "sha256": "0fb29560043af81fbb1b713060a78945d7256a7b168ff79d962edeca343caefb",
+      "exercise": true,
+      "description": "网格点沿 x 方向运动的边界条件，与 dynamicMeshDict 配合。"
+    },
+    {
+      "path": "constant/dynamicMeshDict",
+      "bytes": 1025,
+      "sha256": "ac53f633a2f879a74c8167a5029d0a234732550d970d033966f433aa4de48937",
+      "exercise": false,
+      "description": "动网格类型及边界运动或网格变形方法。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      dynamicMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndynamicFvMesh   dynamicMotionSolverFvMesh;\n\nmotionSolverLibs (fvMotionSolvers);\n\nmotionSolver    velocityComponentLaplacian;\n\ncomponent       x;\ndiffusivity     directional (1 200 0);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "constant/transportProperties",
+      "bytes": 896,
+      "sha256": "fa08e7aeb72d7eb3acfbd23cd99156c148c2b4b1212b82437812510bb81ab377",
+      "exercise": true,
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。"
+    },
+    {
+      "path": "constant/turbulenceProperties",
+      "bytes": 871,
+      "sha256": "bc668616e6cbae9a6f0185d98077eb281cac3eb26ac918347273bdf5d5a6f854",
+      "exercise": false,
+      "description": "选择层流、RAS 或 LES，以及相应模型名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType  laminar;\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/blockMeshDict",
+      "bytes": 2964,
+      "sha256": "73e0c31c94fe9859da2eb4836c85dd5b5529e3961352a3eb9a10bab35465cfeb",
+      "exercise": false,
+      "description": "网格顶点、块、单元数、加密比例及边界名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      blockMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nmergeType points;   // Wedge geometry - Merge points instead of topology\n\n#message \"Using mergeType: ${mergeType:-default}\"\n\nscale   0.001;\n\nvertices\n(\n    (-7.5 0 0)\n    (-7 0 0)\n    (-3.5 0 0)\n    (0 0 0)\n    (-7.5 0.75 -0.032745707)\n    (-7 0.75 -0.032745707)\n    (-3.5 2 -0.087321886)\n    (0 2 -0.087321886)\n    (-7.5 2.5 -0.10915236)\n    (-7 2.5 -0.10915236)\n    (-3.5 2.5 -0.10915236)\n    (0 2.5 -0.10915236)\n    (-7.5 0.75 0.032745707)\n    (-7 0.75 0.032745707)\n    (-3.5 2 0.087321886)\n    (0 2 0.087321886)\n    (-7.5 2.5 0.10915236)\n    (-7 2.5 0.10915236)\n    (-3.5 2.5 0.10915236)\n    (0 2.5 0.10915236)\n);\n\nblocks\n(\n    hex (0 1 5 4 0 1 13 12) (15 15 1) simpleGrading (1 1 1)\n    hex (2 3 7 6 2 3 15 14) (20 20 1) simpleGrading (2 0.25 1)\n    hex (4 5 9 8 12 13 17 16) (15 15 1) simpleGrading (1 1 1)\n    hex (5 6 10 9 13 14 18 17) (50 15 1) simpleGrading (1 1 1)\n    hex (6 7 11 10 14 15 19 18) (20 15 1) simpleGrading (2 1 1)\n);\n\nedges\n(\n);\n\nboundary\n(\n    movingWall\n    {\n        type wall;\n        faces\n        (\n            (1 5 13 1)\n            (5 6 14 13)\n            (2 2 14 6)\n        );\n    }\n    farFieldMoving\n    {\n        type patch;\n        faces\n        (\n            (9 17 18 10)\n        );\n    }\n    fixedWall\n    {\n        type wall;\n        faces\n        (\n            (3 7 15 3)\n            (7 11 19 15)\n        );\n    }\n    axis\n    {\n        type empty;\n        faces\n        (\n            (0 1 1 0)\n            (2 3 3 2)\n        );\n    }\n    left\n    {\n        type patch;\n        faces\n        (\n            (0 0 12 4)\n            (4 12 16 8)\n        );\n    }\n    farField\n    {\n        type patch;\n        faces\n        (\n            (8 16 17 9)\n            (10 18 19 11)\n        );\n    }\n    back\n    {\n        type wedge;\n        faces\n        (\n            (0 4 5 1)\n            (2 6 7 3)\n            (4 8 9 5)\n            (5 9 10 6)\n            (6 10 11 7)\n        );\n    }\n    front\n    {\n        type wedge;\n        faces\n        (\n            (0 1 13 12)\n            (2 3 15 14)\n            (12 13 17 16)\n            (13 14 18 17)\n            (14 15 19 18)\n        );\n    }\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/controlDict",
+      "bytes": 1304,
+      "sha256": "9340eaeb123748a7baed60b9fd1b36f632f64df8bcff93c5c5247dadba652827",
+      "exercise": true,
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。"
+    },
+    {
+      "path": "system/cuttingPlane",
+      "bytes": 1041,
+      "sha256": "43c0759d799708bf75ebb81bd1d1b198f4ee35532b64821eb4e52910e5e08179",
+      "exercise": false,
+      "description": "该教程使用的计算或预处理字典，按原始内容保留。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\n\ncuttingPlane\n{\n    type            surfaces;\n    libs            (sampling);\n\n    writeControl    writeTime;\n\n    surfaceFormat   vtk;\n    fields          ( p U );\n\n    interpolationScheme cellPoint;\n\n    surfaces\n    {\n        zNormal\n        {\n            type        cuttingPlane;\n            point       (0 0 0);\n            normal      (0 0 1);\n            interpolate true;\n        }\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/fvSchemes",
+      "bytes": 1289,
+      "sha256": "1dad9427fed23b2eb76afc04c3b55e43fba8922463f709521bb7976b25aa3eb8",
+      "exercise": false,
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         Euler;\n}\n\ngradSchemes\n{\n    default         Gauss linear;\n}\n\ndivSchemes\n{\n    default         none;\n\n    div(phi,U)      Gauss linear;\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         Gauss linear corrected;\n\n    laplacian(diffusivity,cellMotionU) Gauss linear uncorrected;\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/fvSolution",
+      "bytes": 1901,
+      "sha256": "92dffec7d561a352e0747d9f9ae3645f798741218aeb50edb29722878094ff68",
+      "exercise": false,
+      "description": "线性方程求解器、收敛容差，以及压力与速度耦合算法的设置。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          GAMG;\n        tolerance       0;\n        relTol          0.01;\n        smoother        GaussSeidel;\n        cacheAgglomeration yes; // Store agglomeration\n        updateInterval  2;      // Redo agglomeration occasionally\n    }\n\n    pFinal\n    {\n        $p;\n        tolerance       1e-06;\n        relTol          0;\n    }\n\n    \"pcorr.*\"\n    {\n        $p\n        tolerance       0.02;\n        relTol          0;\n    }\n\n    U\n    {\n        solver          smoothSolver;\n        smoother        symGaussSeidel;\n        tolerance       1e-05;\n        relTol          0.1;\n    }\n\n    UFinal\n    {\n        $U;\n        tolerance       1e-05;\n        relTol          0;\n    }\n\n    cellMotionUx\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1e-08;\n        relTol          0;\n    }\n}\n\nPIMPLE\n{\n    correctPhi          yes;\n    nOuterCorrectors    2;\n    nCorrectors         1;\n    nNonOrthogonalCorrectors 0;\n}\n\nrelaxationFactors\n{\n    equations\n    {\n        \"U.*\"           1;\n    }\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/vtkWrite",
+      "bytes": 362,
+      "sha256": "c7dbed355a6869e667df9e0646b75e0983e0d8469edd649c3356f8e8be81f3e1",
+      "exercise": false,
+      "description": "该教程使用的计算或预处理字典，按原始内容保留。",
+      "text": "// -*- C++ -*-\n// Minimal example of using the vtkWrite function object.\nvtkWrite\n{\n    type    vtkWrite;\n    libs    (utilityFunctionObjects);\n    writeControl    writeTime;\n\n    boundary false;\n\n    // Fields to output (words or regex)\n    fields  (U p \"(k|epsilon|omega)\");\n\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    }
+  ],
+  "gaps": 23,
+  "xp": 60,
+  "bamboo": 20,
+  "boundaryImage": "/assets/town/province-cases/hongkong-boundaries.svg"
+}

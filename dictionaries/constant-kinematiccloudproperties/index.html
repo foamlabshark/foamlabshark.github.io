@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>kinematicCloudProperties · FoamLab</title>
+  <meta name="description" content="运动学颗粒云的离散相控制文件，包含载体耦合、积分格式、注入方式、阻力与碰撞等子模型。">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
+  
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <script>document.documentElement.classList.add('has-js');</script>
+  <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
+  <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
+  <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
+  <link rel="stylesheet" href="/assets/vendor/katex/katex.min.css?v=b8511ee880e4">
+  <link rel="stylesheet" href="/assets/site.css?v=c9436b07f0b6">
+  <link rel="stylesheet" href="/assets/presentation.css?v=0a4b43abaf2a">
+  <link rel="stylesheet" href="/assets/lab.css?v=b4bd27e80647">
+  <link rel="stylesheet" href="/assets/home.css?v=1e9045bdd7fe">
+  <link rel="stylesheet" href="/assets/support.css?v=2fda77e04e0a">
+  <link rel="stylesheet" href="/assets/lesson-navigation.css?v=e594155bde34">
+  <link rel="stylesheet" href="/assets/refinements.css?v=ffcaf1a61f77">
+  <link rel="stylesheet" href="/assets/typography.css?v=cc7a143418cc">
+  <link rel="stylesheet" href="/assets/courses.css?v=7ed9e32abe69">
+  <link rel="stylesheet" href="/assets/topics.css?v=48d3cb68e07e">
+  <link rel="stylesheet" href="/assets/reader.css?v=18399e3cdaca">
+  <link rel="stylesheet" href="/assets/page-outline.css?v=a3351f409a31">
+  <link rel="stylesheet" href="/assets/navigation.css?v=26a2903cfb99">
+  <link rel="stylesheet" href="/assets/panda-pet.css?v=5a427ff1f7e7">
+  <link rel="stylesheet" href="/assets/panda-animation.css?v=5ca989401b34">
+  <link rel="stylesheet" href="/assets/panda-character.css?v=fb36839c6577">
+  <link rel="stylesheet" href="/assets/foamlab-theme.css?v=453d12209a49">
+  <link rel="stylesheet" href="/assets/account-menu.css?v=d4267bf8b0c5">
+  <link rel="stylesheet" href="/assets/profile-avatars.css?v=123b79d9e2ee">
+  <link rel="stylesheet" href="/assets/site-stats.css?v=c831994c1bea">
+  <link rel="stylesheet" href="/assets/community-byline.css?v=1170eb05f36c">
+  <link rel="stylesheet" href="/assets/reply-notifications.css?v=a13c40d2cef1">
+  <link rel="stylesheet" href="/assets/directory.css?v=ba5c86e022c5"><link rel="stylesheet" href="/assets/resources-hub.css?v=9265fb1ace48">
+  <link rel="stylesheet" href="/assets/sidebar-resize.css?v=2fabd941e782">
+  
+  
+  <script src="/assets/vendor/supabase.js?v=59d39487c358" defer></script>
+  <script src="/assets/account.js?v=2de5234c4f81" defer></script>
+  <script src="/assets/site-stats.js?v=52ce533698a7" defer></script>
+  <script src="/assets/pagination.js?v=43bad8487a1a" defer></script>
+  
+  <link rel="stylesheet" href="/assets/search-matches.css?v=4ead546e3929">
+  <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
+  <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
+  
+  
+  <script src="/assets/vendor/purify.min.js?v=2c90a9b46d64" defer></script>
+  <script src="/assets/vendor/marked.js?v=d7931d1cd7bf" defer></script>
+  <script src="/assets/vendor/katex/katex.min.js?v=607cb26db8e2" defer></script>
+  <script src="/assets/inline-terms.js?v=e6158dbc99cc" defer></script><script src="/assets/inline-code.js?v=7ddc9200f257" defer></script><script src="/assets/math-source.js?v=063830a172a0" defer></script>
+  <script src="/assets/community-replies.js?v=d6d744ea7f01" defer></script>
+  <script src="/assets/resources-hub.js?v=b691a5e88d18" defer></script><script src="/assets/lab.js?v=6c50c7d5553a" defer></script>
+  <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
+  <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
+  <script src="/assets/directory.js?v=340241ffd033" defer></script>
+  <script src="/assets/account-menu.js?v=75b1e3efbe95" defer></script>
+  <script src="/assets/reply-notifications.js?v=60de4ed0ce39" defer></script>
+  <script src="/assets/browser-code.js?v=d31252dd14c2" defer></script>
+  <script src="/assets/support.js?v=6bde0283e11d" defer></script>
+  <script src="/assets/refinements.js?v=6afcc2d21d54" defer></script>
+  <script src="/assets/topics.js?v=ee4eb4df7674" defer></script>
+  <script src="/assets/figure-viewer.js?v=390ef8429950" defer></script>
+  <script src="/assets/page-outline.js?v=547c16399251" defer></script>
+  <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
+  <script src="/assets/panda-art.js?v=a56110c5947e" defer></script>
+  <script src="/assets/profile-avatars.js?v=f87400f00d52" defer></script>
+  <script src="/assets/town/panda-expansion.js?v=078387e17680" defer></script>
+  <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
+  <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <script src="/assets/panda-motion.js?v=b1617010e851" defer></script>
+  <script src="/assets/panda-particles.js?v=0d1b16fde9a2" defer></script>
+  <script src="/assets/panda-pet.js?v=ba2471e3961a" defer></script>
+  <script src="/assets/panda-notes.js?v=cf5ae199b5d9" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
+  <script src="/assets/town/town-egg-fx.js?v=fe7d938158b8" defer></script>
+  <script src="/assets/collection-time.js?v=7e27ab0a7094" defer></script>
+  <script src="/assets/town/town-eggs.js?v=e0a7f52932d3" defer></script>
+  <script src="/assets/town/town-egg-events.js?v=724139738768" defer></script>
+  <script src="/assets/town/town-egg-rewards.js?v=59d25be34bee" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body data-section="reference" data-lesson="">
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar" id="sidebar">
+  <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
+  <a class="brand" href="/"><span class="brand-mark"><svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char"><g class="pa-head">
+  <circle class="pk" cx="44" cy="40" r="15"/><circle class="pk" cx="116" cy="40" r="15"/><circle class="pa-ear-in" cx="45" cy="41" r="7"/><circle class="pa-ear-in" cx="115" cy="41" r="7"/>
+  <g class="pa-o pa-o-headphones pa-hp-band"><path class="pa-hp" d="M38 64c0-34 84-34 84 0" fill="none"/></g>
+  <path class="pw pa-line" d="M80 30c-30 0-48 18-48 42 0 22 20 36 48 36s48-14 48-36c0-24-18-42-48-42z"/>
+  <path class="ps" d="M118 82c-4 14-18 22-38 22 24 4 44-6 46-22 0-4-2-6-8 0z"/>
+  <path class="pk" d="M50 64c4-10 16-12 20-4 4 7 2 18-6 22-8 3-18-6-14-18z"/><path class="pk" d="M110 64c-4-10-16-12-20-4-4 7-2 18 6 22 8 3 18-6 14-18z"/>
+  <g class="pa-eyes pa-eyes-open"><g class="pa-pupils"><circle class="pa-eye-white" cx="62" cy="70" r="6.4"/><circle class="pa-pupil" cx="62.6" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="64.4" cy="68.4" r="1.8"/><circle class="pa-eye-white" cx="98" cy="70" r="6.4"/><circle class="pa-pupil" cx="97.4" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="99.2" cy="68.4" r="1.8"/></g></g>
+  <g class="pa-eyes pa-eyes-happy"><path class="pa-eye-arc" d="M55 72q7-8 14 0M91 72q7-8 14 0"/></g>
+  <g class="pa-eyes pa-eyes-closed"><path class="pa-eye-arc" d="M55 70q7 6 14 0M91 70q7 6 14 0"/></g>
+  <ellipse class="pa-cheek" cx="50" cy="88" rx="7" ry="4.2"/><ellipse class="pa-cheek" cx="110" cy="88" rx="7" ry="4.2"/>
+  <path class="pk" d="M74.5 81.5c0-2 2-3 5.5-3s5.5 1 5.5 3c0 2.5-3 4.6-5.5 4.6s-5.5-2.1-5.5-4.6z"/>
+  <g class="pa-mouth pa-mouth-smile"><path class="pa-mouth-line" d="M80 86v2.6M73.5 88c2 3 5 3 6.5.6 1.5 2.4 4.5 2.4 6.5-.6"/></g>
+  <g class="pa-mouth pa-mouth-open"><path class="pa-mouth-fill" d="M74 89c0 6 3 9 6 9s6-3 6-9c-3 1.6-9 1.6-12 0z"/><path class="pa-tongue" d="M76.6 95c1.6-1.6 5.2-1.6 6.8 0-1 1.6-2.2 2.2-3.4 2.2s-2.4-.6-3.4-2.2z"/></g>
+  <g class="pa-f pa-f-master"><path class="pa-tuft" d="M72 34c0-9 10-13 16-8-6 1-8 4-6 9-4-4-7-3-10-1z"/><g class="pa-glasses"><circle cx="62" cy="71" r="11"/><circle cx="98" cy="71" r="11"/><path d="M73 70q7-4 14 0M51 68l-12-4M109 68l12-4"/></g></g>
+  <g class="pa-o pa-o-goggles"><path class="pa-goggle-band" d="M33 50c30-10 64-10 94 0"/><circle class="pa-goggle pa-line" cx="66" cy="44" r="10"/><circle class="pa-goggle pa-line" cx="94" cy="44" r="10"/><path class="pa-goggle-glint" d="M61 40q3-3 7-2M89 40q3-3 7-2"/></g>
+  <g class="pa-o pa-o-headphones"><rect class="pa-hp-cup" x="26" y="58" width="14" height="24" rx="7"/><rect class="pa-hp-cup" x="120" y="58" width="14" height="24" rx="7"/></g>
+  <g class="pa-o pa-o-flower"><g transform="translate(112 30)"><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(0)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(72)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(144)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(216)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(288)"/><circle class="pa-gold" r="3.4"/></g></g>
+  <g class="pa-hat pa-f pa-f-engineer pa-hat-hard"><path class="pa-hardhat pa-line" d="M46 40c0-20 16-30 34-30s34 10 34 30z"/><rect class="pa-hardhat pa-line" x="40" y="37" width="80" height="7" rx="3.5"/><path class="pa-hardhat-ridge" d="M80 12v24"/></g>
+  <g class="pa-hat pa-o pa-o-cap"><path class="pa-capbase pa-line" d="M56 34c0-8 48-8 48 0v8c-14-4-34-4-48 0z"/><path class="pa-capboard pa-line" d="M80 14l40 12-40 12-40-12z"/><path class="pa-tassel" d="M114 27v18"/><circle class="pa-gold" cx="114" cy="47" r="3"/></g>
+  <g class="pa-hat pa-o pa-o-strawhat"><ellipse class="pa-straw pa-line" cx="80" cy="36" rx="50" ry="10"/><path class="pa-straw pa-line" d="M58 34c0-16 10-24 22-24s22 8 22 24c-14 3-30 3-44 0z"/><path class="pa-straw-band" d="M58 30c14 3 30 3 44 0"/></g>
+  <g class="pa-hat pa-o pa-o-raincoat"><path class="pa-rain pa-line" d="M40 38c4-16 20-26 40-26s36 10 40 26c-24-6-56-6-80 0z"/><path class="pa-rain pa-line" d="M34 40c28-8 64-8 92 0l-4 6c-26-6-58-6-84 0z"/></g>
+  <g class="pa-hat pa-o pa-o-wizard"><path class="pa-wizard pa-line" d="M54 36c8-12 16-28 34-34-4 10-2 20 18 34z"/><ellipse class="pa-wizard pa-line" cx="80" cy="37" rx="34" ry="6"/><path class="pa-gold" d="M84 16l2 4.4 4.8.6-3.5 3.3.9 4.8-4.2-2.3-4.2 2.3.9-4.8-3.5-3.3 4.8-.6z"/></g>
+  </g></g></svg></span><span>FoamLab<small>熊猫带你学 OpenFOAM</small></span></a>
+  <div class="version"><span class="status-dot"></span> OpenFOAM <strong>v2512</strong></div>
+  <nav aria-label="主要导航">
+    <a class="town-entry town-nav-entry" href="/town/"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>熊猫小镇</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>
+    <div class="nav-label">学习空间</div>
+    
+<div class="nav-group" data-nav-section="home">
+ <div class="nav-parent"><a href="/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>学习概览</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="start">
+ <div class="nav-parent"><a href="/start/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span>快速开始</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-start" aria-label="快速开始子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-start" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=cfd-and-openfoam"><span>认识 CFD 与 OpenFOAM</span></a><a class="nav-item nav-subitem" href="/read/?slug=start-openfoam-v2512"><span>安装与环境配置</span></a><a class="nav-item nav-subitem" href="/read/?slug=first-cavity-result"><span>运行第一个算例</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="courses">
+ <div class="nav-parent"><a href="/courses/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>系统学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-courses" aria-label="系统学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-courses" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/courses/?track=%E8%B5%B7%E6%AD%A5%E4%B8%8E%E7%AE%97%E4%BE%8B"><span>起步与算例</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E5%87%A0%E4%BD%95%E4%B8%8E%E7%BD%91%E6%A0%BC"><span>几何与网格</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>离散与求解</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span>计算与数据分析</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E9%AA%8C%E8%AF%81%E4%B8%8E%E7%A0%94%E7%A9%B6%E6%96%B9%E6%B3%95"><span>验证与研究方法</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="topics">
+ <div class="nav-parent"><a href="/topics/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>专题学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-topics" aria-label="专题学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-topics" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/topics/finite-volume/"><span>有限体积法</span></a><a class="nav-item nav-subitem" href="/topics/turbulence/"><span>湍流</span></a><a class="nav-item nav-subitem" href="/topics/multiphase/"><span>多相流</span></a><a class="nav-item nav-subitem" href="/topics/meshing/"><span>网格划分</span></a><a class="nav-item nav-subitem" href="/topics/dynamic-mesh/"><span>动网格</span></a><a class="nav-item nav-subitem" href="/topics/function-objects/"><span>functionObject</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="quick-reference">
+ <div class="nav-parent"><a href="/quick-reference/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>速查手册</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-quick-reference" aria-label="速查手册子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-quick-reference" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="commands">
+ <div class="nav-parent"><a href="/commands/" class="nav-item nav-subitem " ><span>命令速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-commands" aria-label="命令速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-commands" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/commands/?category=%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7"><span>系统工具</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%89%8D%E5%A4%84%E7%90%86"><span>前处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E6%B1%82%E8%A7%A3%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span>求解与并行</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E7%8E%AF%E5%A2%83%E4%B8%8E%E7%BC%96%E8%AF%91"><span>环境与编译</span></a><a class="nav-item nav-subitem" href="/commands/?category=Linux"><span>Linux</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="dictionaries">
+ <div class="nav-parent"><a href="/dictionaries/" class="nav-item nav-subitem active" aria-current="page"><span>配置与字典速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-dictionaries" aria-label="配置与字典速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-dictionaries" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BD%91%E6%A0%BC"><span>网格</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%8C%96"><span>初始化</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%9C%BA"><span>初始场</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E8%AE%A1%E7%AE%97%E6%8E%A7%E5%88%B6"><span>计算控制</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>数值方法</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97"><span>并行计算</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span>函数对象</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BC%96%E8%AF%91"><span>编译</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="function-objects">
+ <div class="nav-parent"><a href="/function-objects/" class="nav-item nav-subitem " ><span>函数对象速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-function-objects" aria-label="函数对象速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-function-objects" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%9C%BA%E8%BF%90%E7%AE%97"><span>场运算</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%87%87%E6%A0%B7%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span>采样与统计</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6"><span>湍流与声学</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%8A%9B%E4%B8%8E%E7%89%A9%E7%90%86%E9%87%8F"><span>力与物理量</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8"><span>颗粒与两相</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%96%87%E4%BB%B6%E4%B8%8E%E6%8E%A7%E5%88%B6"><span>文件与控制</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="boundary-conditions">
+ <div class="nav-parent"><a href="/boundary-conditions/" class="nav-item nav-subitem " ><span>边界条件速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-boundary-conditions" aria-label="边界条件速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-boundary-conditions" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/boundary-conditions/?field=velocity"><span>速度 U</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=pressure"><span>压力 p / p_rgh</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=temperature"><span>温度 T</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=turbulence"><span>湍流字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=phase"><span>相分数 α</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=geometry"><span>几何与耦合</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="reference">
+ <div class="nav-parent"><a href="/reference/" class="nav-item nav-subitem " ><span>参考手册</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="programming">
+ <div class="nav-parent"><a href="/programming/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/?q=%E7%BC%96%E7%A8%8B"><span>基础编程实例</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-solver"><span>开发求解器</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-boundary"><span>开发边界条件</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-utility"><span>开发后处理工具</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="tools">
+ <div class="nav-parent"><a href="/tools/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工具生态</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-tools" aria-label="工具生态子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-tools" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=tool-paraview"><span>ParaView 可视化</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-gmsh"><span>Gmsh 网格生成</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-salome"><span>SALOME 几何与网格</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyvista"><span>PyVista 数据分析</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyfoam"><span>PyFoam 运行管理</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-freecad-geometry"><span>FreeCAD 几何建模</span></a></div>
+</div>
+
+
+    <div class="nav-label">资源与社区</div>
+    
+<div class="nav-group" data-nav-section="resources">
+ <div class="nav-parent"><a href="/resources/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M3 16v6h18v-6"/></svg><span>资料中心</span></a><button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-resources" aria-label="资料中心子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-resources" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/resources/?kind=resource"><span>算例与源码</span></a><a class="nav-item nav-subitem" href="/resources/?kind=recommendation"><span>资源推荐</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="sharing">
+ <div class="nav-parent"><a href="/sharing/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>实践与分享</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="community">
+ <div class="nav-parent"><a href="/community/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z"/><path d="M7 9h9m-9 5h6"/></svg><span>讨论中心</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="assignments">
+ <div class="nav-parent"><a href="/assignments/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2m-7 8 2 2 5-5M9 18h7"/></svg><span>作业与实践</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="announcements">
+ <div class="nav-parent"><a href="/announcements/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M9 21h6"/></svg><span>网站公告</span></a></div>
+</div>
+
+
+  </nav>
+  <script src="/assets/navigation.js?v=3f7c823fe009"></script>
+  <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/dictionaries/">配置与字典速查</a> <span>/</span> <strong>kinematicCloudProperties</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
+ <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
+ <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
+ <div id="account-panel-member" hidden>
+  <a class="account-panel-growth" href="/account/#my-panda"><div><span>我的熊猫</span><strong id="account-panel-level">等级读取中…</strong></div><div class="account-panel-xp"><span id="account-panel-xp-bar"></span></div><p id="account-panel-xp">正在读取成长记录</p></a>
+  <nav class="account-panel-links" aria-label="账号常用入口"><a href="/account/#notifications">消息提醒 <span class="reply-count" data-reply-count hidden></span></a><a href="/account/#profile-form">个人资料 <span>→</span></a><a href="/account/#my-panda">我的熊猫 <span>→</span></a><a href="/account/#account-progress-state">学习进度 <span>→</span></a><a href="/studio/">作者工作台 <span>→</span></a><a href="/admin/" data-management-link hidden>管理平台 <span>→</span></a></nav>
+  <div class="account-panel-footer"><a href="/account/">打开个人中心 →</a><button type="button" class="account-sign-out" data-account-sign-out>退出登录</button></div>
+ </div>
+ <div id="account-panel-guest" hidden><p>登录后保存学习进度，查看熊猫等级并参与讨论。</p><button type="button" class="button" id="account-panel-sign-in"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg> 使用 GitHub 登录</button></div>
+ <p id="account-panel-message" role="status" hidden></p>
+</section>
+
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-kinematiccloudproperties"><div class="eyebrow">OpenFOAM v2512</div><h1>kinematicCloudProperties</h1><div class="prose"><p>运动学颗粒云的离散相控制文件，包含载体耦合、积分格式、注入方式、阻力与碰撞等子模型。</p><!-- reference-introduction -->
+<h2 id="brief-introduction">简要介绍</h2>
+<p>运动学颗粒云通过这个字典定义注入、运动积分和阻力、碰撞等子模型，并指定与载体的耦合方式。它决定颗粒从哪里进入、怎样受力以及如何向流体反馈动量。</p>
+<!-- /reference-introduction -->
+<p>位置：<code>constant/kinematicCloudProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>solution</code></td><td>颗粒云的求解控制，包含稳态/瞬态、载体耦合、源项与时间积分等。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>coupled</code></td><td>是否向连续相反馈颗粒源项。</td></tr><tr><td><code>transient</code></td><td>选择瞬态或稳态颗粒云控制方式，必须与求解器匹配。</td></tr><tr><td><code>rho</code></td><td>密度或密度场引用；是否为量纲标量、常量或场名由模型定义。</td></tr><tr><td><code>constantProperties</code></td><td>单个颗粒或材料的基本属性，例如密度、温度和热容；具体键由云类型决定。</td></tr><tr><td><code>subModels</code></td><td>颗粒云注入、力、传热、碰撞和相变等子模型集合。</td></tr><tr><td><code>particleForces</code></td><td>作用于颗粒的力模型列表，例如阻力和重力，实际可选模型由云类型决定。</td></tr><tr><td><code>injectionModels</code></td><td>注入时间、位置、流量与粒径分布等设置；需要同时满足总注入质量与统计分辨率要求。</td></tr><tr><td><code>patchInteractionModel</code></td><td>颗粒与边界接触时的反弹、粘附或逸出处理。</td></tr><tr><td><code>surfaceFilmModel</code></td><td>表面液膜模型选择，需与液膜区域和主流体耦合条件配套。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>cloudFunctions</code></td><td>按自定义对象名添加颗粒统计。<code>GName</code> 指定热或辐射模型引用的辐射场。</td></tr><tr><td><code>mu</code></td><td>通常表示动力黏度，也可能在特定模型中表示其他系数；必须结合量纲和源码语境确认。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
+<h2 id="model-configuration">模型选择与嵌套参数</h2><p>按 <code>solution</code>、<code>constantProperties</code>、<code>subModels</code> 和注入器子字典分别设置求解、物性、物理模型与注入参数。</p><p>物种和固体组分按计算对象命名，例如 <code>H2O</code>、<code>C7H16</code>、<code>CH4</code>、<code>CO2</code>、<code>H2</code>、<code>ash</code>、<code>C</code>。<code>U</code>、<code>h</code>、<code>Yi</code> 表示交换量，<code>model1</code> 为可自定的实例名。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>solution.active / coupled / transient</code></td><td>启用颗粒云、开启双向耦合、选择瞬态跟踪。<code>coupled</code> <code>false</code> 仍可跟踪颗粒，但不把交换源项反馈给载体。</td></tr><tr><td><code>solution.cellValueSourceCorrection / maxCo</code></td><td>是否在跟踪过程中修正单元内载体源项，以及限制颗粒跟踪子步的 Courant 数。</td></tr><tr><td><code>solution.sourceTerms.schemes</code></td><td>按 <code>U</code>、<code>h</code>、<code>Yi</code> 等交换量选择源项处理方案与松弛参数；这些字段键必须对应所用云类型。</td></tr><tr><td><code>solution.interpolationSchemes</code></td><td>载体字段到颗粒位置的插值方式，按云模型选用 <code>rho</code>、<code>U</code>、<code>T</code>、<code>p</code>、<code>thermo:mu</code>、<code>Cp</code>、<code>kappa</code>、<code>G</code> 等字段；<code>G</code> 为辐射入射量。</td></tr><tr><td><code>solution.integrationSchemes</code></td><td>按 <code>U</code>、<code>T</code> 等颗粒变量选择 Euler、analytical 等时间积分方案；选择取决于变量方程。</td></tr><tr><td><code>constantProperties.rho0 / T0 / Cp0</code></td><td>初始密度、温度与比热容。热物性型云可能随后按组成、压力和温度更新这些量。</td></tr><tr><td><code>constantProperties.constantVolume</code></td><td>指定相应颗粒模型是否维持体积，需与其质量与密度更新方式配套。</td></tr><tr><td><code>constantProperties.epsilon0 / f0</code></td><td>颗粒辐射发射率与散射因子；只在支持相应辐射模型的云中使用。</td></tr><tr><td><code>subModels.injectionModels.&lt;名称&gt;</code></td><td>每个注入器自己的 <code>type</code> 与系数字典；<code>model1</code> 是自定义注入器名。多个注入器可并列。</td></tr><tr><td><code>SOI / duration / massTotal</code></td><td>注入器内的开始时刻、持续时间与总注入质量；某些从已有液滴记录导入的模型会重新计算 <code>massTotal</code>。</td></tr><tr><td><code>parcelBasisType / nParticle</code></td><td>用 <code>mass</code>、number 或 <code>fixed</code> 等方式确定每个计算包代表的真实颗粒数；<code>fixed</code> 模式明确给出 <code>nParticle</code>。</td></tr><tr><td><code>positionsFile / U0 / patch</code></td><td>按注入器填写几何和初始速度：<code>manualInjection</code> 使用位置文件，<code>patchInjection</code> 使用注入边界。</td></tr><tr><td><code>parcelsPerSecond / flowRateProfile</code></td><td>计算包抽样率与注入流量的时间分布。抽样率控制统计分辨率，不等于真实粒子数流率。</td></tr><tr><td><code>sizeDistribution</code></td><td>注入粒径分布子字典：<code>type</code> 选择模型。RosinRammler 使用 <code>RosinRammlerDistribution</code>，<code>uniform</code> 使用 <code>uniformDistribution</code>。</td></tr><tr><td><code>RosinRammlerDistribution.minValue / maxValue / lambda / n</code></td><td>粒径上下限、尺度参数与形状指数。长度与网格采用相同单位；使用米制时，将微米数值乘以 1e-6。</td></tr><tr><td><code>dispersionModel / stochasticCollisionModel</code></td><td>选择湍流弥散和随机碰撞模型，<code>none</code> 关闭相应过程。使用 <code>collisionModel</code> 的云按其碰撞模型配置。</td></tr><tr><td><code>standardWallInteractionCoeffs.type / e / mu</code></td><td>标准壁面相互作用的处理方式、恢复系数与摩擦系数；rebound、stick、escape 的含义不同。</td></tr><tr><td><code>heatTransferModel / RanzMarshallCoeffs.BirdCorrection</code></td><td>RanzMarshall 换热模型的 Bird 修正开关，用于考虑传质对换热的影响。</td></tr><tr><td><code>compositionModel / phaseChangeModel</code></td><td>选择颗粒组成与相变模型，在 <code>singlePhaseMixtureCoeffs</code> 或 <code>singleMixtureFractionCoeffs</code> 的 <code>phases</code> 中填写组分。</td></tr><tr><td><code>liquidEvaporationCoeffs / liquidEvaporationBoilCoeffs</code></td><td>相变模型的 <code>activeLiquids</code> 指定可蒸发液体；<code>enthalpyTransfer</code> 选择焓交换的计算方式。</td></tr></tbody></table></div><h2 id="additional-configuration">模型参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>muc / thermo:mu</code></td><td>载体动力黏度字段名，填写求解器提供的字段名称。</td></tr><tr><td><code>kinematicSurfaceFilmCoeffs</code></td><td>运动学颗粒云与表面液膜相互作用模型的系数字典。</td></tr><tr><td><code>UrMax</code></td><td>碰撞模型的相对速度上限。</td></tr></tbody></table></div>
+<!-- /reference-configuration-supplement -->
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/kinematicParcelFoam/drippingChair</summary><p><code>drippingChair</code> 将液膜与离散液滴连接起来：液滴在空间中运动，与液膜区域相遇后可转入膜内。</p>
+<ul>
+<li><code>active true</code>、<code>transient yes</code> 启用非定常颗粒跟踪；<code>coupled yes</code> 让颗粒对连续相产生反作用，动量源项采用 <code>semiImplicit 1</code>。</li>
+<li><code>maxCo 0.3</code> 限制颗粒跟踪子步相对单元尺度的移动程度；流体时间步仍由运行设置控制。</li>
+<li><code>rho0 1000</code> kg/m³ 给出水滴密度。<code>sphereDrag</code> 与 <code>gravity</code> 分别考虑球形颗粒阻力和重力。</li>
+<li><code>injectionModels</code> 为空，当前云没有独立的常规喷射器。与液膜的颗粒交换由 <code>kinematicSurfaceFilm</code> 及液膜端模型配合处理。</li>
+<li><code>interactionType absorb</code> 表示液滴撞到适用液膜区域后被吸收；其他壁面使用 <code>standardWallInteraction</code> 的 <code>rebound</code> 设置。</li>
+</ul>
+<p>可先降低 <code>maxCo</code> 比较液滴撞击位置，再改变液膜侧的脱落设置观察滴落频率。若加入独立喷嘴，则需要补充注入模型、流量、粒径和速度，并检查两种液滴来源的质量收支。</p>
+<p><a href="/assets/examples/v2512/kinematiccloudproperties/1-kinematicCloudProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/kinematicParcelFoam/drippingChair/constant/kinematicCloudProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/kinematicParcelFoam/drippingChair">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">88 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/</span>
+<span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      kinematicCloudProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solution
+{
+    active          <span class="hljs-literal">true</span>;
+    coupled         <span class="hljs-literal">yes</span>;
+    transient       <span class="hljs-literal">yes</span>;
+    cellValueSourceCorrection <span class="hljs-literal">no</span>;
+    maxCo           <span class="hljs-number">0.3</span>;
+
+    sourceTerms
+    {
+        schemes
+        {
+            U               semiImplicit <span class="hljs-number">1</span>;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        muc             cell;
+        p               cell;
+    }
+
+    integrationSchemes
+    {
+        U               <span class="hljs-built_in">Euler</span>;
+    }
+}
+
+constantProperties
+{
+    rho0            <span class="hljs-number">1000</span>;
+}
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;
+        gravity;
+    }
+
+    injectionModels
+    {
+    }
+
+    dispersionModel none;
+
+    patchInteractionModel standardWallInteraction;
+
+    stochasticCollisionModel none;
+
+    surfaceFilmModel kinematicSurfaceFilm;
+
+    standardWallInteractionCoeffs
+    {
+        <span class="hljs-keyword">type</span>            rebound;
+    }
+
+    kinematicSurfaceFilmCoeffs
+    {
+        interactionType absorb;
+    }
+}
+
+
+cloudFunctions
+{}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/kinematicParcelFoam/windshield</summary><p><code>windshield</code> 从入口释放液滴，展示液滴与挡风玻璃表面液膜的相互作用。</p>
+<ul>
+<li><code>coupled no</code> 采用单向耦合，颗粒不会把动量反馈给连续相。本文件中的 <code>sphereDrag</code> 和 <code>gravity</code> 行均被注释，当前受力列表为空，适合观察按给定初速度到达壁面的几何过程。</li>
+<li><code>patchInjection</code> 从 <code>inlet</code> 注入，<code>SOI 0</code>、<code>duration 1000</code> 表示从零时刻开始、持续 1000 s；<code>massTotal 1</code> kg 对应整个注入时段的总质量。</li>
+<li><code>parcelsPerSecond 100</code> 控制每秒注入的计算包数量；<code>U0 (0 0 -1)</code> 给出沿负 <code>z</code> 方向的 1 m/s 初速度。</li>
+<li>Rosin–Rammler 分布的直径范围为 1–3 mm，<code>lambda 7.5e-05</code>、<code>n 0.5</code> 决定被该范围截取的分布形状。粒径统计应结合上下限理解。</li>
+<li><code>kinematicSurfaceFilm</code> 的 <code>absorb</code> 把落在液膜区域的液滴转入膜内；普通壁面使用反弹模型。</li>
+</ul>
+<p>加入空气阻力或重力时，取消相应力项的注释，再比较落点与撞击速度。改变采样包数量时保持总质量和粒径分布一致，可以观察随机抽样误差。</p>
+<p><a href="/assets/examples/v2512/kinematiccloudproperties/2-kinematicCloudProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/kinematicParcelFoam/windshield/constant/kinematicCloudProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/kinematicParcelFoam/windshield">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">111 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/</span>
+<span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      kinematicCloudProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solution
+{
+    active          <span class="hljs-literal">true</span>;
+    coupled         <span class="hljs-literal">no</span>;
+    transient       <span class="hljs-literal">yes</span>;
+    cellValueSourceCorrection <span class="hljs-literal">no</span>;
+    maxCo           <span class="hljs-number">0.3</span>;
+
+    sourceTerms
+    {
+        schemes
+        {
+            U               explicit <span class="hljs-number">1</span>;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        muc             cell;
+        p               cell;
+    }
+
+    integrationSchemes
+    {
+        U               <span class="hljs-built_in">Euler</span>;
+    }
+}
+
+constantProperties
+{
+    rho0            <span class="hljs-number">1000</span>;
+}
+
+subModels
+{
+    particleForces
+    {
+<span class="hljs-comment">//        sphereDrag;</span>
+<span class="hljs-comment">//        gravity;</span>
+    }
+
+    injectionModels
+    {
+        model1
+        {
+            <span class="hljs-keyword">type</span>            patchInjection;
+            SOI             <span class="hljs-number">0</span>;
+            duration        <span class="hljs-number">1000.000</span>;
+            parcelBasisType mass;
+            massTotal       <span class="hljs-number">1</span>;
+            patch           inlet;
+            parcelsPerSecond <span class="hljs-number">100</span>;
+            U0              (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span>);
+            flowRateProfile <span class="hljs-number">1</span>;
+            sizeDistribution
+            {
+                <span class="hljs-keyword">type</span>         RosinRammler;
+                RosinRammlerDistribution
+                {
+                    minValue        <span class="hljs-number">0.001</span>;
+                    maxValue        <span class="hljs-number">0.003</span>;
+                    lambda          <span class="hljs-number">7.5e-05</span>;
+                    n               <span class="hljs-number">0.5</span>;
+                }
+            }
+        }
+    }
+
+    dispersionModel none;
+
+    patchInteractionModel standardWallInteraction;
+
+    stochasticCollisionModel none;
+
+    surfaceFilmModel kinematicSurfaceFilm;
+
+    standardWallInteractionCoeffs
+    {
+        <span class="hljs-keyword">type</span>            rebound;
+    }
+
+    kinematicSurfaceFilmCoeffs
+    {
+        interactionType absorb;
+    }
+}
+
+
+cloudFunctions
+{}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI</summary><p><code>rotor2DAMI</code> 用旋转网格与 AMI 接口测试颗粒跨区域跟踪。注入发生在一个很短的时间窗内，便于观察一批颗粒穿过旋转区域。</p>
+<ul>
+<li><code>coupled false</code> 采用单向耦合，<code>particleForces</code> 中的阻力和重力被注释；初始颗粒速度设为 <code>U0 (0.1 0 0)</code> m/s。</li>
+<li><code>patchInjection</code> 在 <code>inlet</code> 注入，<code>SOI 0</code>、<code>duration 0.00001</code> s 与 <code>parcelsPerSecond 20000000</code> 对应名义约 200 个计算包。</li>
+<li><code>parcelBasisType fixed</code>、<code>nParticle 1</code> 指定每个计算包代表一个真实颗粒，粒径为固定 50 μm。统计权重在这里由 <code>nParticle</code> 决定。</li>
+<li><code>maxCo 0.3</code> 控制颗粒跟踪子步。AMI 传递与旋转网格运动还依赖配套网格和动网格文件。</li>
+<li>文件末尾给出 <code>standardWallInteraction</code>：<code>e 0.9</code> 控制法向反弹，<code>mu 0.09</code> 控制切向衰减。整理自己的配置时，将文件中重复出现的 <code>patchInteractionModel</code> 合并为一次明确选择。</li>
+</ul>
+<p>改变旋转速度后，可追踪同一批颗粒的穿越位置与数量。提高 <code>parcelsPerSecond</code> 会增加这次短脉冲中的样本数；延长 <code>duration</code> 则把单批穿越实验扩展为连续注入。</p>
+<p><a href="/assets/examples/v2512/kinematiccloudproperties/3-kinematicCloudProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI/constant/kinematicCloudProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">115 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/</span>
+<span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      kinematicCloudProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solution
+{
+    active          <span class="hljs-literal">true</span>;
+    coupled         <span class="hljs-literal">false</span>;
+    transient       <span class="hljs-literal">yes</span>;
+    cellValueSourceCorrection <span class="hljs-literal">off</span>;
+    maxCo           <span class="hljs-number">0.3</span>;
+
+    sourceTerms
+    {
+        schemes
+        {
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        thermo:mu       cell;
+    }
+
+    integrationSchemes
+    {
+        U               <span class="hljs-built_in">Euler</span>;
+    }
+}
+
+constantProperties
+{
+
+    rho0            <span class="hljs-number">1000</span>;
+    constantVolume  <span class="hljs-literal">true</span>;
+
+}
+
+subModels
+{
+    particleForces
+    {
+        <span class="hljs-comment">//sphereDrag;</span>
+        <span class="hljs-comment">//gravity;</span>
+    }
+
+    injectionModels
+    {
+         model1
+        {
+            <span class="hljs-keyword">type</span>            patchInjection;
+            parcelBasisType fixed;
+            patch           inlet;
+            U0              (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+            nParticle       <span class="hljs-number">1</span>;
+            parcelsPerSecond  <span class="hljs-number">20000000</span>;
+
+            sizeDistribution
+            {
+                <span class="hljs-keyword">type</span> <span class="hljs-keyword">uniform</span>;
+                uniformDistribution
+                {
+                    minValue        <span class="hljs-number">50e-06</span>;
+                    maxValue        <span class="hljs-number">50e-06</span>;
+                }
+            }
+
+            flowRateProfile constant <span class="hljs-number">1</span>;
+            massTotal       <span class="hljs-number">2000000</span>;
+            SOI             <span class="hljs-number">0</span>;
+            duration        <span class="hljs-number">0.00001</span>;
+        }
+    }
+
+    dispersionModel none;
+
+    patchInteractionModel none;
+
+    surfaceFilmModel none;
+
+    collisionModel none;
+
+    patchInteractionModel standardWallInteraction;
+
+    standardWallInteractionCoeffs
+    {
+        <span class="hljs-keyword">type</span>        rebound;    <span class="hljs-comment">// stick, escape</span>
+        e           <span class="hljs-number">0.9</span>;        <span class="hljs-comment">// optional - elasticity coeff</span>
+        mu          <span class="hljs-number">0.09</span>;       <span class="hljs-comment">// optional - restitution coeff</span>
+        UrMax       <span class="hljs-number">1e-4</span>;
+    }
+
+    stochasticCollisionModel none;
+}
+
+
+cloudFunctions
+{}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/kinematicparcelfoam/">kinematicParcelFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
+</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</main>
+  <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
+</div>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<div class="toast" role="status" hidden></div>
+</body></html>

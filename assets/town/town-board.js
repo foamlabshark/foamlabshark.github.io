@@ -1,0 +1,15 @@
+'use strict';
+(() => {
+ const E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let provinces=[];fetch('/assets/town/provinces.json').then(r=>r.json()).then(d=>provinces=Array.isArray(d)?d:d.provinces||[]).catch(()=>{});
+ const name=id=>provinces.find(p=>p.id===id)?.name||id;
+ async function render(host,province,page=0){
+  const result=await window.FoamTownNet.rpc('foamlab_town_board',{operation:'list',payload:{province,page}});if(!host.isConnected)return;
+  const total=Math.ceil(result.total/20),p=result.page;const member=!!window.foamAuth?.user&&!window.FoamTownGame?.active?.config.guest;
+  host.innerHTML=`<div class="town-board-head"><h3>${E(name(province))} · 小镇留言</h3><p>写给这条街道的邻居。留言保存在本镇留言板。</p></div>${member?'<form class="town-board-form"><label>留句话<textarea name="body" rows="3" minlength="1" maxlength="500" required placeholder="今天在小镇发现了什么？"></textarea></label><button type="submit" class="tb-primary">贴上留言</button><p role="status"></p></form>':'<p class="town-note">登录并入住后，就能在这里留言。</p>'}<div class="town-board-notes">${result.items.map(m=>`<article class="town-board-note"><header><strong>${E(m.author_name)}</strong><span>Lv.${Number(m.author_level)}</span><small>${E(name(m.author_province))}</small></header><p>${E(m.body)}</p><footer><time>${E(new Date(m.created_at).toLocaleString('zh-CN'))}</time>${m.can_delete?`<button type="button" data-board-delete="${E(m.id)}">删除</button>`:''}</footer></article>`).join('')||'<p class="town-note">留言板还是空的，来贴上第一张便笺吧。</p>'}</div>${total>1?`<nav class="town-board-pages" aria-label="留言分页"><button data-board-page="0" ${p===0?'disabled':''}>第一页</button><button data-board-page="${p-1}" ${p===0?'disabled':''}>上一页</button><span>${p+1} / ${total}</span><button data-board-page="${p+1}" ${p===total-1?'disabled':''}>下一页</button><button data-board-page="${total-1}" ${p===total-1?'disabled':''}>最后一页</button></nav>`:''}<p class="town-board-status" role="status"></p>`;
+  const form=host.querySelector('form');if(form){let request=crypto.randomUUID();form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;try{await window.FoamTownNet.rpc('foamlab_town_board',{operation:'post',payload:{province,body:form.elements.body.value,request_id:request}});await render(host,province,0);}catch(error){form.querySelector('[role=status]').textContent=error.message;button.disabled=false;}};form.elements.body.oninput=()=>request=crypto.randomUUID();}
+  host.querySelectorAll('[data-board-page]').forEach(b=>b.onclick=()=>render(host,province,Number(b.dataset.boardPage)).catch(e=>host.querySelector('.town-board-status').textContent=e.message));
+  host.querySelectorAll('[data-board-delete]').forEach(b=>b.onclick=async()=>{if(!confirm('删除这条小镇留言？'))return;b.disabled=true;try{await window.FoamTownNet.rpc('foamlab_town_board',{operation:'delete',payload:{province,id:b.dataset.boardDelete}});await render(host,province,p);}catch(error){host.querySelector('.town-board-status').textContent=error.message;b.disabled=false;}});
+ }
+ window.FoamTownBoard={render};
+})();

@@ -1,0 +1,50 @@
+OpenFOAM v2512 script source evidence
+Command: foamLog
+Source: https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/foamLog
+
+以下为源码中的帮助文本（保留 shell 占位符），并非本机运行输出。
+
+Usage: foamLog [OPTIONS] <log>
+  -case <dir>           specify alternate case directory, default is the cwd
+  -list | -l            lists but does not extract
+  -n                    create single column files with extracted data only
+  -quiet | -q           quiet operation
+  -local | -localDB     only use the local database file
+  -help                 print the usage
+
+foamLog - extracts xy files from OpenFOAM logs.
+
+-----------------------------------------------------------------------------
+    The default is to extract the initial residual, the final residual and
+    the number of iterations for all 'Solved for' variables.
+    Additionally, a (user editable) database is used to extract data for
+    standard non-solved for variables like Courant number, and execution time.
+
+    option -list : lists the possible variables without extracting them.
+
+    The program will generate and run an awk script that writes a set of files,
+    logs/<var>_<subIter>, for every <var> specified, for every occurrence inside
+    a time step.
+
+    For variables that are 'Solved for', the initial residual name will be
+    <var>, the final residual receive the name <var>FinalRes,
+
+    The files are output in a simple xy format with the first column Time
+    (default) and the second the extracted values.
+    Option -n creates single column files with the extracted data only.
+
+    The query database is a simple text format with three entries per line,
+    separated by '/' :
+        Column 1 is the name of the variable (cannot contain spaces).
+        Column 2 is the extended regular expression (egrep) to select the line.
+        Column 3 is the string (fgrep) to select the column inside the line.
+    The value taken will be the first (non-space)word after this column.
+
+    The database (foamLog.db) will taken from these locations:
+      ./
+$(foamEtcFile -list | sed -e 's#^#      #')
+      $toolsDir
+
+    option -quiet : suppresses the default information and only prints the
+    extracted variables.
+-----------------------------------------------------------------------------

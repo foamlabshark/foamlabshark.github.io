@@ -1,0 +1,321 @@
+/* Panda Town actions. During an action the walking sprite is swapped for a jointed version of the same
+ * panda (panda-pose.webp, cut by tools/town/build-panda-pose.py): torso, head, two arms and two legs,
+ * each turning about its own joint. Props and effects are small SVG drawings added by town-actions.js.
+ * Body motion uses the individual translate/rotate/scale properties, so it never fights the inline
+ * transform that town-game.js writes on .town-body every frame. */
+
+.town-pose{display:none;position:absolute;inset:0;width:72px;height:72px;pointer-events:none}
+.town-game-world .town-resident[data-action]:not([data-action=walk]) .town-pose{display:block;animation:tp-in .2s ease-out}
+.town-game-world .town-resident[data-action]:not([data-action=walk]) .town-pixel-panda{visibility:hidden}
+@keyframes tp-in{from{opacity:.4;scale:.9}to{opacity:1;scale:1}}
+
+.tp-root{position:absolute;inset:0;transform-origin:36px var(--tp-oy,69px);filter:drop-shadow(0 2px 0 #33432e1f)}
+.tp-front,.tp-back,.tp-backview,.tp-fx,.tp-props{position:absolute;inset:0}
+.tp-back{z-index:0}.tp-front{z-index:1}.tp-backview{z-index:1;opacity:0}.tp-fx{z-index:2}
+.tp{position:absolute;inset:0;background:url('/assets/town/panda-pose.webp') no-repeat;background-size:300% 300%}
+.tp-head{background:none}
+.tp-leg-l{background-position:50% 100%;z-index:1;transform-origin:41.25% 87.5%}
+.tp-leg-r{background-position:100% 100%;z-index:1;transform-origin:58.75% 87.5%}
+.tp-torso{background-position:0 0;z-index:2}
+.tp-head{z-index:3;transform-origin:50% 57.5%}
+.tp-face{background-position:50% 0;animation:tp-blink 3.6s steps(1,end) infinite}
+.tp-props{z-index:4}
+.tp-arm,.tp-held{position:absolute;inset:0}
+.tp-arm{z-index:5}
+.tp-arm-l{transform-origin:29.375% 63.75%}
+.tp-arm-r{transform-origin:70.625% 63.75%}
+.tp-arm-l .tp-limb{background-position:100% 50%}
+.tp-arm-r .tp-limb{background-position:0 100%}
+.tp-backview{background:url('/assets/town/panda-walk-v2.webp') no-repeat 33.3333% 66.6667%/400% 400%}
+/* (beats the generic resident svg sizing in town-game.css) */
+.town-game-world .town-resident .town-pose svg,.town-pose svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible;filter:none}
+.town-pose svg [class]{transform-box:fill-box;transform-origin:center}
+
+/* Faces: 50% 0 open, 100% 0 closed, 0 50% happy, 50% 50% singing. */
+@keyframes tp-blink{0%{background-position:50% 0}93%{background-position:100% 0}97%{background-position:50% 0}}
+.town-resident:is([data-action=sleep],[data-action=meditate],[data-action=taichi],[data-action=stretch]) .tp-face{animation:none;background-position:100% 0}
+.town-resident:is([data-action=jump],[data-action=roll],[data-action=dance],[data-action=cheer],[data-action=munch],[data-action=firework],[data-action=hug],[data-action=selfie],[data-action=duet],[data-action=spin],[data-action=highfive],[data-action=sway]) .tp-face{animation:none;background-position:0 50%}
+.town-resident[data-action=bubbles] .tp-face{animation:none;background-position:50% 50%}
+.town-resident[data-action=sing] .tp-face{animation:tp-sing .46s steps(1,end) infinite}
+@keyframes tp-sing{0%{background-position:50% 50%}50%{background-position:50% 0}}
+
+/* The vector outfit layer follows the whole-body motion; its own props and choreography step aside. */
+.town-game-world .town-resident[data-action]:not([data-action=walk]) .town-body>.panda-art{opacity:1;transform-origin:32px calc(var(--tp-oy,69px) - 8px)}
+.town-game-world .town-resident[data-action]:not([data-action=walk]) .panda-art :is(.pa-p,.pa-town-prop){visibility:hidden!important}
+.town-game-world .town-resident[data-action] .panda-art .pa-char{animation:none!important}
+
+/* Wave: the paw swings beside the head. */
+.town-resident[data-action=wave] :is(.tp-root,.town-body>.panda-art){animation:tp-bob .6s ease-in-out infinite alternate}
+.town-resident[data-action=wave] .tp-arm-r{rotate:-118deg;animation:tp-wave .3s ease-in-out infinite alternate}
+.town-resident[data-action=wave] .tp-arm-l{animation:tp-swing-l 1.2s ease-in-out infinite alternate}
+.town-resident[data-action=wave] .tp-head{rotate:6deg}
+@keyframes tp-bob{to{translate:0 -2px}}
+@keyframes tp-wave{from{rotate:-96deg}to{rotate:-130deg}}
+@keyframes tp-swing-l{from{rotate:0deg}to{rotate:8deg}}
+
+/* Sleep: slumped, slow breathing, head nodding. */
+.town-resident[data-action=sleep] :is(.tp-root,.town-body>.panda-art){translate:0 2px;animation:tp-breathe 2.6s ease-in-out infinite}
+.town-resident[data-action=sleep] .tp-head{translate:0 3px;rotate:11deg;animation:tp-doze 2.6s ease-in-out infinite}
+.town-resident[data-action=sleep] .tp-arm-l{rotate:-28deg}.town-resident[data-action=sleep] .tp-arm-r{rotate:28deg}
+@keyframes tp-breathe{50%{scale:1.02 .975}}
+@keyframes tp-doze{0%,100%{rotate:9deg}50%{rotate:14deg}}
+
+/* Jump and cheer: squash, leap, arms up at the top. */
+.town-resident[data-action=jump] :is(.tp-root,.town-body>.panda-art){animation:tp-jump .9s cubic-bezier(.3,.7,.4,1) infinite}
+.town-resident[data-action=cheer] :is(.tp-root,.town-body>.panda-art){animation:tp-jump .95s cubic-bezier(.3,.7,.4,1) infinite}
+.town-resident:is([data-action=jump],[data-action=cheer]) .town-shadow{animation:tp-shadow .9s cubic-bezier(.3,.7,.4,1) infinite}
+.town-resident[data-action=jump] .tp-arm-l{rotate:122deg;animation:tp-up-l .9s ease-in-out infinite}
+.town-resident[data-action=jump] .tp-arm-r{rotate:-122deg;animation:tp-up-r .9s ease-in-out infinite}
+.town-resident[data-action=cheer] .tp-arm-l{rotate:124deg;animation:tp-cheer-l .32s ease-in-out infinite alternate}
+.town-resident[data-action=cheer] .tp-arm-r{rotate:-124deg;animation:tp-cheer-r .32s ease-in-out infinite alternate}
+@keyframes tp-jump{0%{translate:0 0;scale:1.08 .9}16%{translate:0 -5px;scale:.94 1.08}45%{translate:0 -16px;scale:1 1}70%{translate:0 0;scale:1.1 .88}84%{translate:0 0;scale:.98 1.02}100%{translate:0 0;scale:1 1}}
+@keyframes tp-shadow{0%,100%{scale:1}45%{scale:.6;opacity:.6}70%{scale:1.08}}
+@keyframes tp-up-l{0%,72%,100%{rotate:18deg}28%,52%{rotate:122deg}}
+@keyframes tp-up-r{0%,72%,100%{rotate:-18deg}28%,52%{rotate:-122deg}}
+@keyframes tp-cheer-l{from{rotate:112deg}to{rotate:134deg}}
+@keyframes tp-cheer-r{from{rotate:-112deg}to{rotate:-134deg}}
+
+/* Roll: tuck into a ball, roll over to the right and back. */
+.town-resident[data-action=roll]{--tp-oy:50px}
+.town-resident[data-action=roll] :is(.tp-root,.town-body>.panda-art){animation:tp-roll 2.2s ease-in-out infinite}
+.town-resident[data-action=roll] .tp-arm-l{rotate:-62deg}.town-resident[data-action=roll] .tp-arm-r{rotate:62deg}
+.town-resident[data-action=roll] :is(.tp-leg-l,.tp-leg-r){translate:0 -6px}
+.town-resident[data-action=roll] .tp-head{translate:0 4px}
+@keyframes tp-roll{0%,100%{rotate:0deg;translate:0 0}20%{rotate:180deg;translate:9px -7px}40%,50%{rotate:360deg;translate:18px 0}70%{rotate:180deg;translate:9px -7px}90%{rotate:0deg;translate:0 0}}
+
+/* Tap dance (and the duet): body bounces, feet tap in turn, arms swing in turn. */
+.town-resident:is([data-action=dance],[data-action=duet]) :is(.tp-root,.town-body>.panda-art){animation:tp-dance .8s ease-in-out infinite}
+.town-resident:is([data-action=dance],[data-action=duet]) .tp-leg-l{animation:tp-tap .8s ease-in-out infinite}
+.town-resident:is([data-action=dance],[data-action=duet]) .tp-leg-r{animation:tp-tap .8s .4s ease-in-out infinite}
+.town-resident:is([data-action=dance],[data-action=duet]) .tp-arm-l{rotate:110deg;animation:tp-dance-l .8s ease-in-out infinite}
+.town-resident:is([data-action=dance],[data-action=duet]) .tp-arm-r{rotate:-24deg;animation:tp-dance-r .8s ease-in-out infinite}
+.town-resident:is([data-action=dance],[data-action=duet]) .tp-head{animation:tp-nod .4s ease-in-out infinite alternate}
+@keyframes tp-dance{0%,100%{rotate:-5deg;translate:-2px 0}25%,75%{translate:0 -3px}50%{rotate:5deg;translate:2px 0}}
+@keyframes tp-tap{0%,45%,100%{translate:0 0;rotate:0deg}18%{translate:0 -5px;rotate:-12deg}}
+@keyframes tp-dance-l{0%,100%{rotate:24deg}50%{rotate:118deg}}
+@keyframes tp-dance-r{0%,100%{rotate:-118deg}50%{rotate:-24deg}}
+@keyframes tp-nod{from{rotate:-4deg}to{rotate:4deg}}
+
+/* Crawl: low on all fours, paws reaching in turn. */
+.town-resident[data-action=crawl] :is(.tp-root,.town-body>.panda-art){translate:0 7px;scale:1.06 .9;animation:tp-crawl 1.4s ease-in-out infinite}
+.town-resident[data-action=crawl] .tp-arm-l{rotate:-16deg;animation:tp-reach-l 1.4s ease-in-out infinite}
+.town-resident[data-action=crawl] .tp-arm-r{rotate:16deg;animation:tp-reach-r 1.4s ease-in-out infinite}
+.town-resident[data-action=crawl] .tp-leg-l{animation:tp-tap 1.4s .7s ease-in-out infinite}
+.town-resident[data-action=crawl] .tp-leg-r{animation:tp-tap 1.4s ease-in-out infinite}
+.town-resident[data-action=crawl] .tp-head{animation:tp-nod .7s ease-in-out infinite alternate}
+@keyframes tp-crawl{0%,100%{translate:-3px 7px;scale:1.06 .9}50%{translate:3px 6px;scale:1.06 .91}}
+@keyframes tp-reach-l{0%,100%{rotate:-6deg;translate:0 0}50%{rotate:-26deg;translate:0 4px}}
+@keyframes tp-reach-r{0%,100%{rotate:26deg;translate:0 4px}50%{rotate:6deg;translate:0 0}}
+
+/* Sing: arms open, swaying, mouth moving with the notes. */
+.town-resident[data-action=sing] :is(.tp-root,.town-body>.panda-art){animation:tp-sway 1.6s ease-in-out infinite alternate}
+.town-resident[data-action=sing] .tp-arm-l{rotate:58deg;animation:tp-open-l .8s ease-in-out infinite alternate}
+.town-resident[data-action=sing] .tp-arm-r{rotate:-58deg;animation:tp-open-r .8s ease-in-out infinite alternate}
+.town-resident[data-action=sing] .tp-head{animation:tp-nod .8s ease-in-out infinite alternate}
+@keyframes tp-sway{from{rotate:-4deg}to{rotate:4deg}}
+@keyframes tp-open-l{from{rotate:46deg}to{rotate:70deg}}
+@keyframes tp-open-r{from{rotate:-70deg}to{rotate:-46deg}}
+
+/* Sway dance: a slow lean from side to side, arms trailing. */
+.town-resident[data-action=sway] :is(.tp-root,.town-body>.panda-art){animation:tp-sway-wide 2s ease-in-out infinite alternate}
+.town-resident[data-action=sway] .tp-arm-l{rotate:30deg;animation:tp-trail-l 2s ease-in-out infinite alternate}
+.town-resident[data-action=sway] .tp-arm-r{rotate:-30deg;animation:tp-trail-r 2s ease-in-out infinite alternate}
+.town-resident[data-action=sway] .tp-head{animation:tp-counter 2s ease-in-out infinite alternate}
+@keyframes tp-sway-wide{from{rotate:-8deg;translate:-2px 0}to{rotate:8deg;translate:2px 0}}
+@keyframes tp-trail-l{from{rotate:14deg}to{rotate:44deg}}
+@keyframes tp-trail-r{from{rotate:-44deg}to{rotate:-14deg}}
+@keyframes tp-counter{from{rotate:5deg}to{rotate:-5deg}}
+
+/* Spin: the body turns round; the back view shows while facing away. */
+.town-resident[data-action=spin] :is(.tp-root,.town-body>.panda-art){animation:tp-spin 1s linear infinite}
+.town-resident[data-action=spin] .tp-front{animation:tp-front 1s steps(1,end) infinite}
+.town-resident[data-action=spin] .tp-backview{animation:tp-backside 1s steps(1,end) infinite}
+.town-resident[data-action=spin] .town-body>.panda-art{animation:tp-spin 1s linear infinite,tp-front 1s steps(1,end) infinite}
+.town-resident[data-action=spin] .tp-arm-l{rotate:72deg}.town-resident[data-action=spin] .tp-arm-r{rotate:-72deg}
+@keyframes tp-spin{0%{scale:1 1;translate:0 0}25%{scale:.08 1;translate:0 -3px}50%{scale:-1 1;translate:0 0}75%{scale:-.08 1;translate:0 -3px}100%{scale:1 1;translate:0 0}}
+@keyframes tp-front{0%{opacity:1}25%{opacity:0}75%{opacity:1}}
+@keyframes tp-backside{0%{opacity:0}25%{opacity:1}75%{opacity:0}}
+
+/* Stretch: rise up, arms high, then relax. */
+.town-resident[data-action=stretch] :is(.tp-root,.town-body>.panda-art){scale:.96 1.08;animation:tp-stretch 3.3s ease-in-out infinite}
+.town-resident[data-action=stretch] .tp-arm-l{rotate:146deg;animation:tp-stretch-l 3.3s ease-in-out infinite}
+.town-resident[data-action=stretch] .tp-arm-r{rotate:-146deg;animation:tp-stretch-r 3.3s ease-in-out infinite}
+.town-resident[data-action=stretch] .tp-head{animation:tp-stretch-head 3.3s ease-in-out infinite}
+@keyframes tp-stretch{0%,100%{scale:1 1;translate:0 0}30%,70%{scale:.96 1.08;translate:0 -2px}}
+@keyframes tp-stretch-l{0%,100%{rotate:0deg}30%,70%{rotate:146deg}}
+@keyframes tp-stretch-r{0%,100%{rotate:0deg}30%,70%{rotate:-146deg}}
+@keyframes tp-stretch-head{0%,100%{translate:0 0;rotate:0deg}30%,70%{translate:0 -2px;rotate:-4deg}}
+
+/* Munch: paw brings the bamboo to the mouth; head nods with each bite. */
+.town-resident[data-action=munch] .tp-arm-r{rotate:119deg;animation:tp-bite .5s ease-in-out infinite alternate}
+.town-resident[data-action=munch] .tp-arm-l{rotate:-30deg}
+.town-resident[data-action=munch] .tp-head{animation:tp-chew .5s ease-in-out infinite alternate}
+@keyframes tp-bite{from{rotate:114deg}to{rotate:124deg}}
+@keyframes tp-chew{from{rotate:-2deg;translate:0 0}to{rotate:2deg;translate:0 1px}}
+
+/* Read: book held in front; a page turns now and then. */
+.town-resident[data-action=read] .tp-arm-l{rotate:-56deg}
+.town-resident[data-action=read] .tp-arm-r{rotate:56deg;animation:tp-turn-page 2.5s ease-in-out infinite}
+.town-resident[data-action=read] .tp-head{translate:0 2px;animation:tp-read 2.5s ease-in-out infinite}
+@keyframes tp-turn-page{0%,55%,100%{rotate:56deg}70%{rotate:38deg}}
+@keyframes tp-read{0%,100%{rotate:-3deg}50%{rotate:3deg}}
+
+/* Water the flowers: watering can tilts, drops fall, a sprout grows. */
+.town-resident[data-action=water] .tp-arm-r{rotate:-60deg;animation:tp-pour-arm 2.2s ease-in-out infinite}
+@keyframes tp-pour-arm{0%,100%{rotate:-62deg}30%,75%{rotate:-46deg}}
+.town-resident[data-action=water] .tp-arm-l{rotate:-10deg}
+.town-resident[data-action=water] .tp-head{rotate:7deg}
+
+/* Fishing by the pond. */
+.town-resident[data-action=fish] .tp-arm-r{rotate:-36deg;animation:tp-rod 3s ease-in-out infinite}
+.town-resident[data-action=fish] .tp-arm-l{rotate:-34deg}
+.town-resident[data-action=fish] .tp-head{rotate:8deg}
+@keyframes tp-rod{0%,78%,100%{rotate:-36deg}84%{rotate:-46deg}}
+
+/* Meditate: floating gently inside a soft glow. */
+.town-resident[data-action=meditate] :is(.tp-root,.town-body>.panda-art){animation:tp-float 2s ease-in-out infinite alternate}
+.town-resident[data-action=meditate] .tp-arm-l{rotate:30deg}.town-resident[data-action=meditate] .tp-arm-r{rotate:-30deg}
+.town-resident[data-action=meditate] :is(.tp-leg-l,.tp-leg-r){translate:0 -2px}
+.town-resident[data-action=meditate] .town-shadow{animation:tp-shadow-float 2s ease-in-out infinite alternate}
+@keyframes tp-float{to{translate:0 -5px}}
+@keyframes tp-shadow-float{to{scale:.8;opacity:.7}}
+
+/* Experiment: shaking a flask and watching it bubble. */
+.town-resident[data-action=experiment] .tp-arm-r{rotate:-94deg;animation:tp-shake .18s ease-in-out infinite alternate}
+.town-resident[data-action=experiment] .tp-arm-l{rotate:-22deg}
+.town-resident[data-action=experiment] .tp-head{rotate:8deg}
+@keyframes tp-shake{from{rotate:-90deg}to{rotate:-98deg}}
+
+/* Typing on a laptop. */
+.town-resident[data-action=typing] .tp-arm-l{rotate:-48deg;animation:tp-type-l .28s ease-in-out infinite alternate}
+.town-resident[data-action=typing] .tp-arm-r{rotate:48deg;animation:tp-type-r .28s .14s ease-in-out infinite alternate}
+.town-resident[data-action=typing] .tp-head{translate:0 2px}
+@keyframes tp-type-l{from{rotate:-52deg;translate:0 0}to{rotate:-44deg;translate:0 2px}}
+@keyframes tp-type-r{from{rotate:52deg;translate:0 0}to{rotate:44deg;translate:0 2px}}
+
+/* Kite, bubbles, photos and selfies. */
+.town-resident[data-action=kite] .tp-arm-r{rotate:-127deg;animation:tp-kite-arm 2.4s ease-in-out infinite alternate}
+.town-resident[data-action=kite] .tp-head{rotate:7deg;translate:0 -1px}
+@keyframes tp-kite-arm{from{rotate:-132deg}to{rotate:-122deg}}
+.town-resident[data-action=bubbles] .tp-arm-r{rotate:-98deg;animation:tp-wand 1.25s ease-in-out infinite alternate}
+.town-resident[data-action=bubbles] .tp-head{rotate:5deg}
+@keyframes tp-wand{from{rotate:-102deg}to{rotate:-94deg}}
+.town-resident[data-action=photo] .tp-arm-l{rotate:-124deg}
+.town-resident[data-action=photo] .tp-arm-r{rotate:124deg;animation:tp-shutter 1.5s ease-in-out infinite}
+.town-resident[data-action=photo] :is(.tp-root,.town-body>.panda-art){animation:tp-recoil 1.5s ease-in-out infinite}
+@keyframes tp-shutter{0%,60%,100%{rotate:124deg}68%{rotate:118deg}}
+@keyframes tp-recoil{0%,62%,100%{translate:0 0}68%{translate:0 1px}}
+.town-resident[data-action=selfie] .tp-arm-r{rotate:-146deg;animation:tp-selfie 1.6s ease-in-out infinite alternate}
+.town-resident[data-action=selfie] .tp-arm-l{rotate:30deg}
+.town-resident[data-action=selfie] .tp-head{rotate:9deg}
+@keyframes tp-selfie{from{rotate:-150deg}to{rotate:-142deg}}
+
+/* Tai chi: slow circles of the arms, weight shifting from foot to foot. */
+.town-resident[data-action=taichi] :is(.tp-root,.town-body>.panda-art){animation:tp-taichi 3s ease-in-out infinite}
+.town-resident[data-action=taichi] .tp-arm-l{rotate:64deg;animation:tp-taichi-l 3s ease-in-out infinite}
+.town-resident[data-action=taichi] .tp-arm-r{rotate:-64deg;animation:tp-taichi-r 3s ease-in-out infinite}
+.town-resident[data-action=taichi] .tp-leg-l{animation:tp-taichi-leg 3s ease-in-out infinite}
+@keyframes tp-taichi{0%,100%{translate:-3px 0;rotate:-3deg}50%{translate:3px 0;rotate:3deg}}
+@keyframes tp-taichi-l{0%,100%{rotate:24deg}50%{rotate:104deg}}
+@keyframes tp-taichi-r{0%,100%{rotate:-104deg}50%{rotate:-24deg}}
+@keyframes tp-taichi-leg{0%,40%,100%{translate:0 0}55%,70%{translate:-1px -4px}}
+
+/* Streamlines: the paw sketches the flow and the lines run downstream. */
+.town-resident[data-action=streamline] .tp-arm-r{rotate:-77deg;animation:tp-sketch 1s ease-in-out infinite alternate}
+.town-resident[data-action=streamline] .tp-head{rotate:6deg}
+@keyframes tp-sketch{from{rotate:-88deg}to{rotate:-66deg}}
+
+/* Fireworks: one paw points up as the sky lights. */
+.town-resident[data-action=firework] .tp-arm-l{rotate:130deg;animation:tp-point 1.6s ease-in-out infinite}
+.town-resident[data-action=firework] .tp-arm-r{rotate:-24deg}
+.town-resident[data-action=firework] :is(.tp-root,.town-body>.panda-art){animation:tp-hop-small 1.6s ease-out infinite}
+@keyframes tp-point{0%,100%{rotate:126deg}45%{rotate:138deg}}
+@keyframes tp-hop-small{0%,40%,100%{translate:0 0}50%{translate:0 -4px}60%{translate:0 0}}
+
+/* Duo actions. */
+.town-resident[data-action=highfive] .tp-arm-r{rotate:-150deg;animation:tp-highfive 1.2s ease-out infinite}
+.town-resident[data-action=highfive] .tp-head{rotate:6deg}
+@keyframes tp-highfive{0%{rotate:-100deg}40%,100%{rotate:-152deg}48%{rotate:-140deg}}
+.town-resident[data-action=hug] :is(.tp-root,.town-body>.panda-art){animation:tp-squeeze 1.6s ease-in-out infinite}
+.town-resident[data-action=hug] .tp-arm-l{rotate:-78deg;animation:tp-hug-l 1.6s ease-in-out infinite}
+.town-resident[data-action=hug] .tp-arm-r{rotate:78deg;animation:tp-hug-r 1.6s ease-in-out infinite}
+@keyframes tp-squeeze{0%,100%{scale:1 1}50%{scale:1.04 .96}}
+@keyframes tp-hug-l{0%,100%{rotate:-70deg}50%{rotate:-84deg}}
+@keyframes tp-hug-r{0%,100%{rotate:70deg}50%{rotate:84deg}}
+
+/* Props and effects (SVG inside .tp-props / .tp-fx). */
+.tp-rise{animation:tp-rise 2s ease-out infinite;opacity:0}
+.tp-rise.d1{animation-delay:.65s}.tp-rise.d2{animation-delay:1.3s}
+@keyframes tp-rise{0%{opacity:0;translate:0 6px;scale:.6}15%{opacity:1}80%{opacity:1}100%{opacity:0;translate:10px -30px;scale:1.05}}
+.tp-rise.left{animation-name:tp-rise-left}
+@keyframes tp-rise-left{0%{opacity:0;translate:0 6px;scale:.6}15%{opacity:1}80%{opacity:1}100%{opacity:0;translate:-10px -30px;scale:1.05}}
+.tp-pop{animation:tp-pop 1.2s ease-out infinite;opacity:0}
+.tp-pop.d1{animation-delay:.4s}.tp-pop.d2{animation-delay:.8s}
+@keyframes tp-pop{0%{opacity:0;scale:.2}25%{opacity:1;scale:1.15}60%{opacity:1;scale:1}100%{opacity:0;scale:.8}}
+.tp-dust{animation:tp-dust .9s ease-out infinite;opacity:0}
+@keyframes tp-dust{0%,66%{opacity:0;scale:.3}74%{opacity:.85;scale:.8}100%{opacity:0;scale:1.4;translate:0 -2px}}
+.tp-dust.slow{animation-duration:1.4s;animation-name:tp-dust-slow}.tp-dust.slow.d1{animation-delay:.7s}
+@keyframes tp-dust-slow{0%{opacity:0;scale:.3}20%{opacity:.7;scale:.8}60%,100%{opacity:0;scale:1.4}}
+.tp-lines{animation:tp-lines .3s ease-in-out infinite alternate}
+@keyframes tp-lines{from{opacity:.3;translate:-1px 0}to{opacity:1;translate:2px -1px}}
+.tp-page{transform-box:view-box!important;transform-origin:80px 124px!important;animation:tp-page 2.5s ease-in-out infinite}
+@keyframes tp-page{0%,55%{scale:1 1}72%,100%{scale:-1 1}}
+.town-pose .tp-bamboo{transform-origin:100% 50%;animation:tp-eat 3.7s steps(4,end) infinite}
+@keyframes tp-eat{from{scale:1 1}to{scale:.45 1}}
+.tp-crumb{animation:tp-crumb .9s ease-in infinite;opacity:0}.tp-crumb.d1{animation-delay:.45s}
+@keyframes tp-crumb{0%{opacity:0;translate:0 0}15%{opacity:1}100%{opacity:0;translate:-4px 26px}}
+.tp-pouring{animation:tp-pouring 2.2s linear infinite}
+@keyframes tp-pouring{0%,26%{opacity:0}34%,74%{opacity:1}82%,100%{opacity:0}}
+.tp-drop{animation:tp-drop .7s linear infinite;opacity:0}.tp-drop.d1{animation-delay:.23s}.tp-drop.d2{animation-delay:.46s}
+@keyframes tp-drop{0%{opacity:0;translate:0 0}20%{opacity:1}100%{opacity:0;translate:3px 30px}}
+.tp-sprout{transform-box:view-box!important;transform-origin:174px 156px!important;animation:tp-grow 4.4s ease-out forwards}
+@keyframes tp-grow{0%,20%{scale:0}70%{scale:1.15}100%{scale:1}}
+.tp-bob{animation:tp-bobber 1.2s ease-in-out infinite alternate}
+@keyframes tp-bobber{from{translate:0 -1px}to{translate:0 2px}}
+.tp-ripple{animation:tp-ripple 1.8s ease-out infinite;opacity:0}.tp-ripple.d1{animation-delay:.9s}
+@keyframes tp-ripple{0%{opacity:.9;scale:.3}100%{opacity:0;scale:1.4}}
+.tp-glow{animation:tp-glow 2s ease-in-out infinite alternate}
+@keyframes tp-glow{from{opacity:.45;scale:.92}to{opacity:.9;scale:1.06}}
+.tp-orbit{transform-box:view-box!important;transform-origin:80px 90px!important;animation:tp-orbit 6s linear infinite}
+@keyframes tp-orbit{to{rotate:360deg}}
+.tp-bubble{animation:tp-bubble 1.8s ease-out infinite;opacity:0}.tp-bubble.d1{animation-delay:.45s}.tp-bubble.d2{animation-delay:.9s}.tp-bubble.d3{animation-delay:1.35s}
+@keyframes tp-bubble{0%{opacity:0;scale:.3;translate:0 0}15%{opacity:.95}85%{opacity:.85}100%{opacity:0;scale:1.1;translate:24px -46px}}
+.tp-bubble.up{animation-name:tp-bubble-up}
+@keyframes tp-bubble-up{0%{opacity:0;scale:.3;translate:0 0}15%{opacity:1}100%{opacity:0;scale:1;translate:-3px -24px}}
+.tp-liquid{animation:tp-liquid 2.4s linear infinite}
+@keyframes tp-liquid{0%,100%{fill:#7ad3c4}33%{fill:#b79cf0}66%{fill:#f2b35e}}
+.tp-flash{animation:tp-flash 1.5s ease-out infinite;opacity:0}
+@keyframes tp-flash{0%,62%{opacity:0;scale:.3}68%{opacity:1;scale:1.2}90%,100%{opacity:0;scale:1.4}}
+.tp-tail{animation:tp-tail .6s ease-in-out infinite alternate}
+@keyframes tp-tail{from{translate:-1px 0}to{translate:2px 1px}}
+.tp-flow{stroke-dasharray:10 8;animation:tp-flow .9s linear infinite}
+.tp-flow.d1{animation-duration:1.1s}.tp-flow.d2{animation-duration:1.3s}
+@keyframes tp-flow{to{stroke-dashoffset:-36}}
+.tp-burst{animation:tp-burst 1.6s ease-out infinite;opacity:0}.tp-burst.d1{animation-delay:.55s}.tp-burst.d2{animation-delay:1.05s}
+.town-resident[data-action=firework] .tp-fx{filter:drop-shadow(0 0 3px #ffe6a080)}
+@keyframes tp-burst{0%{opacity:0;scale:.1}12%{opacity:1}55%{opacity:1;scale:1}100%{opacity:0;scale:1.2}}
+.tp-rocket{animation:tp-rocket 1.6s ease-in infinite;opacity:0}
+@keyframes tp-rocket{0%{opacity:1;translate:0 0}40%{opacity:1;translate:0 -46px}48%,100%{opacity:0;translate:0 -50px}}
+.tp-spark{animation:tp-pop 1.2s ease-out infinite;animation-delay:.42s;opacity:0}
+.tp-yinyang{animation:tp-orbit-self 5s linear infinite}
+@keyframes tp-orbit-self{to{rotate:360deg}}
+.tp-swirl{animation:tp-swirl 3s ease-in-out infinite;opacity:0}
+.tp-swirl.d1{animation-delay:1.5s}
+@keyframes tp-swirl{0%{opacity:0;scale:.7}40%{opacity:.8}100%{opacity:0;scale:1.2}}
+.tp-code{animation:tp-rise 1.6s ease-out infinite;opacity:0}.tp-code.d1{animation-delay:.8s}
+
+/* Reduced motion: the town turns animations off, so each action shows as its still key pose (the
+ * static rotate/translate values above) with its props and effects in view. */
+@media (prefers-reduced-motion:reduce){.town-game-world .town-pose svg [class]{opacity:1!important}}
+
+/* Emote bubbles sit above the name tag, never over the panda, then drift up and fade. */
+.town-game-world .town-resident>.town-emote,.town-resident>.town-emote{position:absolute;left:50%;top:auto;bottom:calc(100% + 30px);z-index:7;display:grid;place-items:center;min-width:0;width:max-content;height:auto;padding:3px 7px 2px;border-radius:12px;background:#fffdf2;color:#433a26;border:2px solid var(--ui-frame,#6b5a32);box-shadow:0 3px 0 #2c2a1a2e;font:800 16px/1.25 system-ui,"Segoe UI Emoji","Apple Color Emoji",sans-serif;pointer-events:none;translate:-50% 0;transform:none;animation:town-emote 2.8s ease-out forwards}
+.town-resident>.town-emote::after{content:'';position:absolute;left:50%;bottom:-6px;width:8px;height:8px;background:#fffdf2;border-right:2px solid var(--ui-frame,#6b5a32);border-bottom:2px solid var(--ui-frame,#6b5a32);translate:-50% 0;rotate:45deg}
+.town-resident>.town-emote.is-text{font-size:13px;letter-spacing:.02em}
+@keyframes town-emote{0%{opacity:0;scale:.4;translate:-50% 8px}12%{opacity:1;scale:1.12;translate:-50% 0}20%{scale:1}75%{opacity:1;translate:-50% -4px}100%{opacity:0;translate:-50% -14px}}
+@media (prefers-reduced-motion:reduce){.town-resident>.town-emote{animation:town-emote-still 2.8s steps(1,end) forwards}@keyframes town-emote-still{0%{opacity:1}100%{opacity:0}}}
+
+/* outfit, form and ride pieces on the jointed panda (town-npc-looks.js → FoamTownLook) */
+.tp-look{position:absolute;inset:0;background-repeat:no-repeat;background-size:400% 100%;pointer-events:none}
+.tp-look-under{z-index:0}
+.tp-look-body{z-index:2}

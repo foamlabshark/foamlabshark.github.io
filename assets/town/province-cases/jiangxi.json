@@ -1,0 +1,421 @@
+{
+  "id": "jiangxi",
+  "name": "江西",
+  "difficulty": "basic",
+  "story": "江西景德镇的陶瓷制作离不开瓷泥与浆料，不同剪切状态下的流动阻力会影响成形和混合。用偏心圆柱构造宽窄不一的间隙，可以在同一模型中形成不同的剪切速率。本关借此研究非牛顿流体的黏度变化。",
+  "files": [
+    {
+      "path": "0/U",
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "o790328704621"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "of88f4268b8fe"
+        },
+        ";\n\nboundaryField\n{\n    ",
+        {
+          "gap": "o168576aa4239"
+        },
+        "\n    {\n        type            fixedValue;\n        value           uniform (1 0 0);\n    }\n\n    right\n    {\n        type            zeroGradient;\n    }\n\n    down\n    {\n        type            noSlip;\n    }\n\n    up\n    {\n        type            noSlip;\n    }\n\n    cylinder\n    {\n        type            noSlip;\n    }\n\n    defaultFaces\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o790328704621",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "of88f4268b8fe",
+          "type": "vector",
+          "label": "internalField",
+          "source": "0/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "o168576aa4239",
+          "type": "name",
+          "label": "boundaryField/left/name",
+          "source": "0/U 这一段对应的网格边界名是 left；从示意图的边界分组中选择，保持大小写一致。",
+          "options": [
+            "cylinder",
+            "defaultFaces",
+            "down",
+            "left",
+            "right",
+            "up"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0/p",
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "oab1ca82cc4ed"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "oa3da72111868"
+        },
+        ";\n\nboundaryField\n{\n    left\n    {\n        type            zeroGradient;\n    }\n\n    right\n    {\n        type            fixedValue;\n        value           uniform 0;\n    }\n\n    down\n    {\n        type            zeroGradient;\n    }\n\n    up\n    {\n        type            zeroGradient;\n    }\n\n    cylinder\n    {\n        type            zeroGradient;\n    }\n\n    defaultFaces\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "oab1ca82cc4ed",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "oa3da72111868",
+          "type": "number",
+          "label": "internalField",
+          "source": "0/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "constant/transportProperties",
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  ",
+        {
+          "gap": "o387c34083ff4"
+        },
+        ";\n\nCrossPowerLawCoeffs\n{\n    nu0         ",
+        {
+          "gap": "o0b2a1c4afaf9"
+        },
+        ";\n    nuInf       ",
+        {
+          "gap": "od31c0dc377b1"
+        },
+        ";\n    m           ",
+        {
+          "gap": "o0eb285601a2d"
+        },
+        ";\n    n           ",
+        {
+          "gap": "o64cb1bf381aa"
+        },
+        ";\n}\n\nBirdCarreauCoeffs\n{\n    nu0         1e-06;\n    nuInf       1e-06;\n    k           0;\n    n           1;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o387c34083ff4",
+          "type": "select",
+          "label": "transportModel",
+          "source": "constant/transportProperties 中 transportModel 取 CrossPowerLaw。",
+          "options": [
+            "BirdCarreau",
+            "CrossPowerLaw",
+            "HerschelBulkley",
+            "Newtonian",
+            "powerLaw"
+          ]
+        },
+        {
+          "id": "o0b2a1c4afaf9",
+          "type": "number",
+          "label": "CrossPowerLawCoeffs/nu0",
+          "source": "constant/transportProperties 中 CrossPowerLawCoeffs/nu0 取 0.01 m²/s。",
+          "options": []
+        },
+        {
+          "id": "od31c0dc377b1",
+          "type": "number",
+          "label": "CrossPowerLawCoeffs/nuInf",
+          "source": "constant/transportProperties 中 CrossPowerLawCoeffs/nuInf 取 10 m²/s。",
+          "options": []
+        },
+        {
+          "id": "o0eb285601a2d",
+          "type": "number",
+          "label": "CrossPowerLawCoeffs/m",
+          "source": "constant/transportProperties 中 CrossPowerLawCoeffs/m 取 0.4。",
+          "options": []
+        },
+        {
+          "id": "o64cb1bf381aa",
+          "type": "number",
+          "label": "CrossPowerLawCoeffs/n",
+          "source": "constant/transportProperties 中 CrossPowerLawCoeffs/n 取 3。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "system/fvSchemes",
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         ",
+        {
+          "gap": "od2b19c431655"
+        },
+        ";\n}\n\ngradSchemes\n{\n    default         ",
+        {
+          "gap": "o0b573d822e26"
+        },
+        ";\n    grad(p)         leastSquares;\n}\n\ndivSchemes\n{\n    default         ",
+        {
+          "gap": "oe5a39a51e2dd"
+        },
+        ";\n    div(phi,U)      Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         ",
+        {
+          "gap": "oaa66884dd5d8"
+        },
+        ";\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "od2b19c431655",
+          "type": "select",
+          "label": "ddtSchemes/default",
+          "source": "system/fvSchemes 中 ddtSchemes/default 取 Euler。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "o0b573d822e26",
+          "type": "select",
+          "label": "gradSchemes/default",
+          "source": "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oe5a39a51e2dd",
+          "type": "select",
+          "label": "divSchemes/default",
+          "source": "system/fvSchemes 中 divSchemes/default 取 none。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "none",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oaa66884dd5d8",
+          "type": "select",
+          "label": "laplacianSchemes/default",
+          "source": "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear corrected",
+            "backward",
+            "steadyState"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/controlDict",
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     ",
+        {
+          "gap": "o0195ae8d31cc"
+        },
+        ";\n\nstartFrom       startTime;\n\nstartTime       0;\n\nstopAt          endTime;\n\nendTime         ",
+        {
+          "gap": "occ0837b689b3"
+        },
+        ";\n\ndeltaT          ",
+        {
+          "gap": "o2a18fc22e9fd"
+        },
+        ";\n\nwriteControl    runTime;\n\nwriteInterval   0.05;\n\npurgeWrite      0;\n\nwriteFormat     ascii;\n\nwritePrecision  6;\n\nwriteCompression off;\n\ntimeFormat      general;\n\ntimePrecision   6;\n\nrunTimeModifiable true;\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o0195ae8d31cc",
+          "type": "select",
+          "label": "application",
+          "source": "求解器使用 nonNewtonianIcoFoam。",
+          "options": [
+            "icoFoam",
+            "interFoam",
+            "nonNewtonianIcoFoam",
+            "pimpleFoam",
+            "simpleFoam"
+          ]
+        },
+        {
+          "id": "occ0837b689b3",
+          "type": "number",
+          "label": "endTime",
+          "source": "终止时间/迭代编号为 2。",
+          "options": []
+        },
+        {
+          "id": "o2a18fc22e9fd",
+          "type": "number",
+          "label": "deltaT",
+          "source": "初始时间步（稳态求解时为迭代步长）为 0.0025。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "run.sh",
+      "kind": "workflow",
+      "title": "运行步骤 · 命令排序",
+      "parts": [
+        "# 在算例目录中执行；先加载 OpenFOAM 环境及教程辅助函数\n. \"${WM_PROJECT_DIR:?}/bin/tools/RunFunctions\"\n",
+        {
+          "gap": "original-run-order"
+        }
+      ],
+      "gaps": [
+        {
+          "id": "original-run-order",
+          "type": "commands",
+          "label": "命令顺序",
+          "source": "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：blockMesh → nonNewtonianIcoFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。",
+          "options": [
+            "blockMesh",
+            "checkMesh",
+            "decomposePar",
+            "foamToVTK -latestTime",
+            "nonNewtonianIcoFoam",
+            "reconstructPar"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceArchive": "/downloads/town/originals/jiangxi-v2512.zip",
+  "dependencies": [],
+  "revision": "original-v2512-1",
+  "title": "偏心圆柱周围的非牛顿流动",
+  "solver": "nonNewtonianIcoFoam",
+  "source": "incompressible/nonNewtonianIcoFoam/offsetCylinder",
+  "meshImage": "/assets/town/province-cases/jiangxi-mesh.png",
+  "patches": [
+    "left",
+    "right",
+    "down",
+    "up",
+    "cylinder",
+    "defaultFaces"
+  ],
+  "statement": {
+    "physical": [
+      "江西景德镇的陶瓷制作离不开瓷泥与浆料，不同剪切状态下的流动阻力会影响成形和混合。用偏心圆柱构造宽窄不一的间隙，可以在同一模型中形成不同的剪切速率。本关借此研究非牛顿流体的黏度变化。"
+    ],
+    "geometry": [
+      "1,800 个单元。网格由本页原始文件和运行步骤生成，所有长度使用 SI 米。",
+      "在示意图中核对边界名称；初始化文件和附带几何可在完整原始目录中查看。",
+      "网格外包络沿 x、y、z 的长度依次为 10 × 4 × 2 m。点击图可放大查看实际 patch 名称及位置；同一边界可包含多处面。"
+    ],
+    "properties": [
+      "constant/transportProperties 中 transportModel 取 CrossPowerLaw。",
+      "constant/transportProperties 中 CrossPowerLawCoeffs/nu0 取 0.01 m²/s。",
+      "constant/transportProperties 中 CrossPowerLawCoeffs/nuInf 取 10 m²/s。",
+      "constant/transportProperties 中 CrossPowerLawCoeffs/m 取 0.4。",
+      "constant/transportProperties 中 CrossPowerLawCoeffs/n 取 3。"
+    ],
+    "boundary": [
+      "0/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+      "0/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+      "0/U 这一段对应的网格边界名是 left；从示意图的边界分组中选择，保持大小写一致。",
+      "0/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+      "0/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。"
+    ],
+    "control": [
+      "求解器使用 nonNewtonianIcoFoam。",
+      "终止时间/迭代编号为 2。",
+      "初始时间步（稳态求解时为迭代步长）为 0.0025。"
+    ],
+    "numerics": [
+      "system/fvSchemes 中 ddtSchemes/default 取 Euler。",
+      "system/fvSchemes 中 gradSchemes/default 取 Gauss linear。",
+      "system/fvSchemes 中 divSchemes/default 取 none。",
+      "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。"
+    ],
+    "run": [
+      "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：blockMesh → nonNewtonianIcoFoam。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。"
+    ]
+  },
+  "referenceFiles": [
+    {
+      "path": "0/U",
+      "bytes": 1302,
+      "sha256": "21dc57761fd48d237d9506958b78cd9181754f1d6e660c8a24826fbe1f478c43",
+      "exercise": true,
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。"
+    },
+    {
+      "path": "0/p",
+      "bytes": 1308,
+      "sha256": "05cbf8372cb3e052721b3afcb9db779565b45f5ab5f93793db57de5aa2f1d2f7",
+      "exercise": true,
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。"
+    },
+    {
+      "path": "constant/transportProperties",
+      "bytes": 1090,
+      "sha256": "678b220282471f37f6072083f9d4bd5370b1fdede0e3bb2c72d7f54641c5858c",
+      "exercise": true,
+      "description": "流体输运模型和物性，例如黏度、扩散系数或相间表面张力。"
+    },
+    {
+      "path": "system/blockMeshDict",
+      "bytes": 5723,
+      "sha256": "aca15833bbba6c6ec24957c41177a8398e0a4d4a92ab305fa7d07e94be8a7ba5",
+      "exercise": false,
+      "description": "网格顶点、块、单元数、加密比例及边界名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      blockMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nscale   1;\n\nzmin    -1;\nzmax    1;\n\nvertices\n(\n    (1 0 $zmin)\n    (1.4 0 $zmin)\n    (5 0 $zmin)\n    (5 0.989949 $zmin)\n    (0.989949 0.989949 $zmin)\n    (0.707107 0.707107 $zmin)\n    (5 2.5 $zmin)\n    (0.989949 2.5 $zmin)\n    (0 2.5 $zmin)\n    (0 1.4 $zmin)\n    (0 1 $zmin)\n    (-1 0 $zmin)\n    (-1.4 0 $zmin)\n    (-5 0 $zmin)\n    (-5 0.989949 $zmin)\n    (-0.989949 0.989949 $zmin)\n    (-0.707107 0.707107 $zmin)\n    (-5 2.5 $zmin)\n    (-0.989949 2.5 $zmin)\n    (5 -0.989949 $zmin)\n    (0.989949 -0.989949 $zmin)\n    (0.707107 -0.707107 $zmin)\n    (5 -1.5 $zmin)\n    (0.989949 -1.5 $zmin)\n    (0 -1.5 $zmin)\n    (0 -1.4 $zmin)\n    (0 -1 $zmin)\n    (-5 -0.989949 $zmin)\n    (-0.989949 -0.989949 $zmin)\n    (-0.707107 -0.707107 $zmin)\n    (-5 -1.5 $zmin)\n    (-0.989949 -1.5 $zmin)\n    (1 0 $zmax)\n    (1.4 0 $zmax)\n    (5 0 $zmax)\n    (5 0.989949 $zmax)\n    (0.989949 0.989949 $zmax)\n    (0.707107 0.707107 $zmax)\n    (5 2.5 $zmax)\n    (0.989949 2.5 $zmax)\n    (0 2.5 $zmax)\n    (0 1.4 $zmax)\n    (0 1 $zmax)\n    (-1 0 $zmax)\n    (-1.4 0 $zmax)\n    (-5 0 $zmax)\n    (-5 0.989949 $zmax)\n    (-0.989949 0.989949 $zmax)\n    (-0.707107 0.707107 $zmax)\n    (-5 2.5 $zmax)\n    (-0.989949 2.5 $zmax)\n    (5 -0.989949 $zmax)\n    (0.989949 -0.989949 $zmax)\n    (0.707107 -0.707107 $zmax)\n    (5 -1.5 $zmax)\n    (0.989949 -1.5 $zmax)\n    (0 -1.5 $zmax)\n    (0 -1.4 $zmax)\n    (0 -1 $zmax)\n    (-5 -0.989949 $zmax)\n    (-0.989949 -0.989949 $zmax)\n    (-0.707107 -0.707107 $zmax)\n    (-5 -1.5 $zmax)\n    (-0.989949 -1.5 $zmax)\n);\n\nblocks\n(\n    hex (5 4 9 10 37 36 41 42) (10 10 1) simpleGrading (1 1 1)\n    hex (0 1 4 5 32 33 36 37) (10 10 1) simpleGrading (1 1 1)\n    hex (1 2 3 4 33 34 35 36) (10 10 1) simpleGrading (1 1 1)\n    hex (4 3 6 7 36 35 38 39) (10 10 1) simpleGrading (1 1 1)\n    hex (9 4 7 8 41 36 39 40) (10 10 1) simpleGrading (1 1 1)\n    hex (15 16 10 9 47 48 42 41) (10 10 1) simpleGrading (1 1 1)\n    hex (12 11 16 15 44 43 48 47) (10 10 1) simpleGrading (1 1 1)\n    hex (13 12 15 14 45 44 47 46) (10 10 1) simpleGrading (1 1 1)\n    hex (14 15 18 17 46 47 50 49) (10 10 1) simpleGrading (1 1 1)\n    hex (15 9 8 18 47 41 40 50) (10 10 1) simpleGrading (1 1 1)\n    hex (26 25 20 21 58 57 52 53) (10 10 1) simpleGrading (1 1 1)\n    hex (21 20 1 0 53 52 33 32) (10 10 1) simpleGrading (1 1 1)\n    hex (20 19 2 1 52 51 34 33) (10 10 1) simpleGrading (1 1 1)\n    hex (23 22 19 20 55 54 51 52) (10 5 1) simpleGrading (1 1 1)\n    hex (24 23 20 25 56 55 52 57) (10 5 1) simpleGrading (1 1 1)\n    hex (28 29 11 12 60 61 43 44) (10 10 1) simpleGrading (1 1 1)\n    hex (25 26 29 28 57 58 61 60) (10 10 1) simpleGrading (1 1 1)\n    hex (27 28 12 13 59 60 44 45) (10 10 1) simpleGrading (1 1 1)\n    hex (30 31 28 27 62 63 60 59) (10 5 1) simpleGrading (1 1 1)\n    hex (31 24 25 28 63 56 57 60) (10 5 1) simpleGrading (1 1 1)\n);\n\nedges\n(\n    arc 5 0 origin (0 0 $zmin)\n    arc 5 10 origin (0 0 $zmin)\n    arc 1 4 origin (0 0 $zmin)\n    arc 4 9 origin (0 0 $zmin)\n    arc 32 37 origin (0 0 $zmax)\n    arc 37 42 origin (0 0 $zmax)\n    arc 33 36 origin (0 0 $zmax)\n    arc 36 41 origin (0 0 $zmax)\n    arc 11 16 origin (0 0 $zmin)\n    arc 16 10 origin (0 0 $zmin)\n    arc 12 15 origin (0 0 $zmin)\n    arc 15 9 origin (0 0 $zmin)\n    arc 43 48 origin (0 0 $zmax)\n    arc 48 42 origin (0 0 $zmax)\n    arc 44 47 origin (0 0 $zmax)\n    arc 47 41 origin (0 0 $zmax)\n    arc 0 21 origin (0 0 $zmin)\n    arc 21 26 origin (0 0 $zmin)\n    arc 1 20 origin (0 0 $zmin)\n    arc 20 25 origin (0 0 $zmin)\n    arc 32 53 origin (0 0 $zmax)\n    arc 53 58 origin (0 0 $zmax)\n    arc 33 52 origin (0 0 $zmax)\n    arc 52 57 origin (0 0 $zmax)\n    arc 11 29 origin (0 0 $zmin)\n    arc 29 26 origin (0 0 $zmin)\n    arc 12 28 origin (0 0 $zmin)\n    arc 28 25 origin (0 0 $zmin)\n    arc 43 61 origin (0 0 $zmax)\n    arc 61 58 origin (0 0 $zmax)\n    arc 44 60 origin (0 0 $zmax)\n    arc 60 57 origin (0 0 $zmax)\n);\n\nboundary\n(\n    left\n    {\n        type patch;\n        faces\n        (\n            (17 14 46 49)\n            (14 13 45 46)\n            (13 27 59 45)\n            (27 30 62 59)\n        );\n    }\n    right\n    {\n        type patch;\n        faces\n        (\n            (22 19 51 54)\n            (19 2 34 51)\n            (2 3 35 34)\n            (3 6 38 35)\n        );\n    }\n    down\n    {\n        type wall;\n        faces\n        (\n            (30 31 63 62)\n            (31 24 56 63)\n            (24 23 55 56)\n            (23 22 54 55)\n        );\n    }\n    up\n    {\n        type wall;\n        faces\n        (\n            (6 7 39 38)\n            (7 8 40 39)\n            (8 18 50 40)\n            (18 17 49 50)\n        );\n    }\n    cylinder\n    {\n        type wall;\n        faces\n        (\n            (0 5 37 32)\n            (5 10 42 37)\n            (10 16 48 42)\n            (16 11 43 48)\n            (11 29 61 43)\n            (29 26 58 61)\n            (26 21 53 58)\n            (21 0 32 53)\n        );\n    }\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/controlDict",
+      "bytes": 1200,
+      "sha256": "d86545a9f43ab17238913492fdefaabfe33fd59caf8988caaa61e7a80a281fa6",
+      "exercise": true,
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。"
+    },
+    {
+      "path": "system/fvSchemes",
+      "bytes": 1208,
+      "sha256": "10389fb8d705684962b7b6d4757ca2b2f10a4fe7075d8fce87e6c601247dba50",
+      "exercise": true,
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。"
+    },
+    {
+      "path": "system/fvSolution",
+      "bytes": 1275,
+      "sha256": "36fe016a19184ed1ae6780172dc88107f5a45a91627c7e1195b6b044f35234cb",
+      "exercise": false,
+      "description": "线性方程求解器、收敛容差，以及压力与速度耦合算法的设置。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          GAMG;\n        tolerance       1e-6;\n        relTol          0.1;\n        smoother        GaussSeidel;\n    }\n\n    pFinal\n    {\n        $p;\n        relTol          0;\n    }\n\n    U\n    {\n        solver          smoothSolver;\n        smoother        symGaussSeidel;\n        tolerance       1e-05;\n        relTol          0;\n    }\n}\n\nPISO\n{\n    nCorrectors     5;\n    nNonOrthogonalCorrectors 0;\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    }
+  ],
+  "gaps": 18,
+  "xp": 40,
+  "bamboo": 12,
+  "boundaryImage": "/assets/town/province-cases/jiangxi-boundaries.svg"
+}

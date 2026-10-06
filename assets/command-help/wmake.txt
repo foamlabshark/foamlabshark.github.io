@@ -1,0 +1,80 @@
+OpenFOAM v2512 script source evidence
+Command: wmake
+Source: https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/wmake/wmake
+
+以下为源码中的帮助文本（保留 shell 占位符），并非本机运行输出。
+
+Usage: wmake [OPTION] [dir]
+       wmake [OPTION] target [dir [MakeDir]]
+       wmake -subcommand ...
+
+options:
+  -s | -silent      Silent mode (do not echo commands)
+  -a | -all         wmake all sub-directories, runs Allwmake if present
+  -q | -queue       Collect as single Makefile, runs Allwmake if present
+  -k | -keep-going  Keep going even when errors occur (-non-stop)
+  -j | -jN | -j N   Compile using all or specified N cores/hyperthreads
+  -update           Update lnInclude, dep files, remove deprecated files/dirs
+
+  -all=FILE         Runs specified file (in pwd) instead of Allwmake
+  -debug            Add '-g -DFULLDEBUG' flags
+  -debug-O[g0123]   Add '-g -DFULLDEBUG' flags and optimization level
+  -strict           More deprecation warnings ('+strict' WM_COMPILE_CONTROL)
+  -build-root=PATH      Specify FOAM_BUILDROOT for compilation intermediates
+  -module-prefix=PATH   Specify FOAM_MODULE_PREFIX as absolute/relative path
+  -module-prefix=TYPE   Specify FOAM_MODULE_PREFIX as predefined type
+                        (u,user | g,group | o,openfoam)
+  -no-openfoam      Disable OpenFOAM linking ('~openfoam' WM_COMPILE_CONTROL)
+  -openmp           Compile/link with openmp ('+openmp' WM_COMPILE_CONTROL)
+  -no-openmp        Disable openmp ('~openmp' WM_COMPILE_CONTROL)
+
+  -no-scheduler     Disable scheduled parallel compilation
+
+  -show-api         Print api value (from Make rules)
+  -show-ext-so      Print shared library extension (with '.' separator)
+  -show-c           Print C compiler value
+  -show-cflags      Print C compiler flags
+  -show-cxx         Print C++ compiler value
+  -show-cxxflags    Print C++ compiler flags
+  -show-cflags-arch     The C compiler arch flag (eg, -m64 etc)
+  -show-cxxflags-arch   The C++ compiler arch flag (eg, -m64 etc)
+  -show-compile-c   Same as '-show-c -show-cflags'
+  -show-compile-cxx Same as '-show-cxx -show-cxxflags'
+  -show-path-c      Print path to C compiler
+  -show-path-cxx    Print path to C++ compiler
+  -show-mpi-compile Print mpi-related flags used when compiling
+  -show-mpi-link    Print mpi-related flags used when linking
+  -show-openmp-compile  Print openmp flags used when compiling
+  -show-openmp-link     Print openmp flags used when compiling
+
+  -build-info       Query/manage status of {api,branch,build} information
+  -check-dir        Check directory equality
+  -with-bear        Call wmake via 'bear' to create json output
+
+  -build-info -check-dir -with-bear
+
+
+General, wrapped make system for multi-platform development.
+
+
+Makefile targets:   platforms/linux64GccDPInt32Opt/.../fvMesh.o (for example)
+Special targets:
+  all | queue       Same as -all | -queue options
+  exe               Create executable
+  lib               Create statically linked archive lib (.a)
+  libo              Create statically linked lib (.o)
+  libso             Create dynamically linked lib (.so)
+  dep               Create lnInclude and dependencies only
+  updatedep         Create dependencies only (in case of broken dependencies)
+  objects           Compile but not link
+
+Environment
+  FOAM_BUILDROOT
+  FOAM_EXTRA_CFLAGS FOAM_EXTRA_CXXFLAGS FOAM_EXTRA_LDFLAGS
+  FOAM_MODULE_PREFIX
+
+
+Some special targets (see -help-full for details):
+  all | queue       Same as -all | -queue options
+  exe               Executable
+  lib libo libso    Libraries (.a .o .so)

@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>03 前处理命令 · FoamLab</title>
+  <meta name="description" content="前处理命令：用法与配置实例。">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
+  
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <script>document.documentElement.classList.add('has-js');</script>
+  <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
+  <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
+  <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
+  <link rel="stylesheet" href="/assets/vendor/katex/katex.min.css?v=b8511ee880e4">
+  <link rel="stylesheet" href="/assets/site.css?v=c9436b07f0b6">
+  <link rel="stylesheet" href="/assets/presentation.css?v=0a4b43abaf2a">
+  <link rel="stylesheet" href="/assets/lab.css?v=b4bd27e80647">
+  <link rel="stylesheet" href="/assets/home.css?v=1e9045bdd7fe">
+  <link rel="stylesheet" href="/assets/support.css?v=2fda77e04e0a">
+  <link rel="stylesheet" href="/assets/lesson-navigation.css?v=e594155bde34">
+  <link rel="stylesheet" href="/assets/refinements.css?v=ffcaf1a61f77">
+  <link rel="stylesheet" href="/assets/typography.css?v=cc7a143418cc">
+  <link rel="stylesheet" href="/assets/courses.css?v=7ed9e32abe69">
+  <link rel="stylesheet" href="/assets/topics.css?v=48d3cb68e07e">
+  <link rel="stylesheet" href="/assets/reader.css?v=18399e3cdaca">
+  <link rel="stylesheet" href="/assets/page-outline.css?v=a3351f409a31">
+  <link rel="stylesheet" href="/assets/navigation.css?v=26a2903cfb99">
+  <link rel="stylesheet" href="/assets/panda-pet.css?v=5a427ff1f7e7">
+  <link rel="stylesheet" href="/assets/panda-animation.css?v=5ca989401b34">
+  <link rel="stylesheet" href="/assets/panda-character.css?v=fb36839c6577">
+  <link rel="stylesheet" href="/assets/foamlab-theme.css?v=453d12209a49">
+  <link rel="stylesheet" href="/assets/account-menu.css?v=d4267bf8b0c5">
+  <link rel="stylesheet" href="/assets/profile-avatars.css?v=123b79d9e2ee">
+  <link rel="stylesheet" href="/assets/site-stats.css?v=c831994c1bea">
+  <link rel="stylesheet" href="/assets/community-byline.css?v=1170eb05f36c">
+  <link rel="stylesheet" href="/assets/reply-notifications.css?v=a13c40d2cef1">
+  <link rel="stylesheet" href="/assets/directory.css?v=ba5c86e022c5"><link rel="stylesheet" href="/assets/resources-hub.css?v=9265fb1ace48">
+  <link rel="stylesheet" href="/assets/sidebar-resize.css?v=2fabd941e782">
+  
+  
+  <script src="/assets/vendor/supabase.js?v=59d39487c358" defer></script>
+  <script src="/assets/account.js?v=2de5234c4f81" defer></script>
+  <script src="/assets/site-stats.js?v=52ce533698a7" defer></script>
+  <script src="/assets/pagination.js?v=43bad8487a1a" defer></script>
+  
+  <link rel="stylesheet" href="/assets/search-matches.css?v=4ead546e3929">
+  <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
+  <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
+  
+  
+  <script src="/assets/vendor/purify.min.js?v=2c90a9b46d64" defer></script>
+  <script src="/assets/vendor/marked.js?v=d7931d1cd7bf" defer></script>
+  <script src="/assets/vendor/katex/katex.min.js?v=607cb26db8e2" defer></script>
+  <script src="/assets/inline-terms.js?v=e6158dbc99cc" defer></script><script src="/assets/inline-code.js?v=7ddc9200f257" defer></script><script src="/assets/math-source.js?v=063830a172a0" defer></script>
+  <script src="/assets/community-replies.js?v=d6d744ea7f01" defer></script>
+  <script src="/assets/resources-hub.js?v=b691a5e88d18" defer></script><script src="/assets/lab.js?v=6c50c7d5553a" defer></script>
+  <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
+  <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
+  <script src="/assets/directory.js?v=340241ffd033" defer></script>
+  <script src="/assets/account-menu.js?v=75b1e3efbe95" defer></script>
+  <script src="/assets/reply-notifications.js?v=60de4ed0ce39" defer></script>
+  <script src="/assets/browser-code.js?v=d31252dd14c2" defer></script>
+  <script src="/assets/support.js?v=6bde0283e11d" defer></script>
+  <script src="/assets/refinements.js?v=6afcc2d21d54" defer></script>
+  <script src="/assets/topics.js?v=ee4eb4df7674" defer></script>
+  <script src="/assets/figure-viewer.js?v=390ef8429950" defer></script>
+  <script src="/assets/page-outline.js?v=547c16399251" defer></script>
+  <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
+  <script src="/assets/panda-art.js?v=a56110c5947e" defer></script>
+  <script src="/assets/profile-avatars.js?v=f87400f00d52" defer></script>
+  <script src="/assets/town/panda-expansion.js?v=078387e17680" defer></script>
+  <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
+  <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <script src="/assets/panda-motion.js?v=b1617010e851" defer></script>
+  <script src="/assets/panda-particles.js?v=0d1b16fde9a2" defer></script>
+  <script src="/assets/panda-pet.js?v=ba2471e3961a" defer></script>
+  <script src="/assets/panda-notes.js?v=cf5ae199b5d9" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
+  <script src="/assets/town/town-egg-fx.js?v=fe7d938158b8" defer></script>
+  <script src="/assets/collection-time.js?v=7e27ab0a7094" defer></script>
+  <script src="/assets/town/town-eggs.js?v=e0a7f52932d3" defer></script>
+  <script src="/assets/town/town-egg-events.js?v=724139738768" defer></script>
+  <script src="/assets/town/town-egg-rewards.js?v=59d25be34bee" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body data-section="reference" data-lesson="">
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar" id="sidebar">
+  <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
+  <a class="brand" href="/"><span class="brand-mark"><svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char"><g class="pa-head">
+  <circle class="pk" cx="44" cy="40" r="15"/><circle class="pk" cx="116" cy="40" r="15"/><circle class="pa-ear-in" cx="45" cy="41" r="7"/><circle class="pa-ear-in" cx="115" cy="41" r="7"/>
+  <g class="pa-o pa-o-headphones pa-hp-band"><path class="pa-hp" d="M38 64c0-34 84-34 84 0" fill="none"/></g>
+  <path class="pw pa-line" d="M80 30c-30 0-48 18-48 42 0 22 20 36 48 36s48-14 48-36c0-24-18-42-48-42z"/>
+  <path class="ps" d="M118 82c-4 14-18 22-38 22 24 4 44-6 46-22 0-4-2-6-8 0z"/>
+  <path class="pk" d="M50 64c4-10 16-12 20-4 4 7 2 18-6 22-8 3-18-6-14-18z"/><path class="pk" d="M110 64c-4-10-16-12-20-4-4 7-2 18 6 22 8 3 18-6 14-18z"/>
+  <g class="pa-eyes pa-eyes-open"><g class="pa-pupils"><circle class="pa-eye-white" cx="62" cy="70" r="6.4"/><circle class="pa-pupil" cx="62.6" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="64.4" cy="68.4" r="1.8"/><circle class="pa-eye-white" cx="98" cy="70" r="6.4"/><circle class="pa-pupil" cx="97.4" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="99.2" cy="68.4" r="1.8"/></g></g>
+  <g class="pa-eyes pa-eyes-happy"><path class="pa-eye-arc" d="M55 72q7-8 14 0M91 72q7-8 14 0"/></g>
+  <g class="pa-eyes pa-eyes-closed"><path class="pa-eye-arc" d="M55 70q7 6 14 0M91 70q7 6 14 0"/></g>
+  <ellipse class="pa-cheek" cx="50" cy="88" rx="7" ry="4.2"/><ellipse class="pa-cheek" cx="110" cy="88" rx="7" ry="4.2"/>
+  <path class="pk" d="M74.5 81.5c0-2 2-3 5.5-3s5.5 1 5.5 3c0 2.5-3 4.6-5.5 4.6s-5.5-2.1-5.5-4.6z"/>
+  <g class="pa-mouth pa-mouth-smile"><path class="pa-mouth-line" d="M80 86v2.6M73.5 88c2 3 5 3 6.5.6 1.5 2.4 4.5 2.4 6.5-.6"/></g>
+  <g class="pa-mouth pa-mouth-open"><path class="pa-mouth-fill" d="M74 89c0 6 3 9 6 9s6-3 6-9c-3 1.6-9 1.6-12 0z"/><path class="pa-tongue" d="M76.6 95c1.6-1.6 5.2-1.6 6.8 0-1 1.6-2.2 2.2-3.4 2.2s-2.4-.6-3.4-2.2z"/></g>
+  <g class="pa-f pa-f-master"><path class="pa-tuft" d="M72 34c0-9 10-13 16-8-6 1-8 4-6 9-4-4-7-3-10-1z"/><g class="pa-glasses"><circle cx="62" cy="71" r="11"/><circle cx="98" cy="71" r="11"/><path d="M73 70q7-4 14 0M51 68l-12-4M109 68l12-4"/></g></g>
+  <g class="pa-o pa-o-goggles"><path class="pa-goggle-band" d="M33 50c30-10 64-10 94 0"/><circle class="pa-goggle pa-line" cx="66" cy="44" r="10"/><circle class="pa-goggle pa-line" cx="94" cy="44" r="10"/><path class="pa-goggle-glint" d="M61 40q3-3 7-2M89 40q3-3 7-2"/></g>
+  <g class="pa-o pa-o-headphones"><rect class="pa-hp-cup" x="26" y="58" width="14" height="24" rx="7"/><rect class="pa-hp-cup" x="120" y="58" width="14" height="24" rx="7"/></g>
+  <g class="pa-o pa-o-flower"><g transform="translate(112 30)"><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(0)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(72)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(144)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(216)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(288)"/><circle class="pa-gold" r="3.4"/></g></g>
+  <g class="pa-hat pa-f pa-f-engineer pa-hat-hard"><path class="pa-hardhat pa-line" d="M46 40c0-20 16-30 34-30s34 10 34 30z"/><rect class="pa-hardhat pa-line" x="40" y="37" width="80" height="7" rx="3.5"/><path class="pa-hardhat-ridge" d="M80 12v24"/></g>
+  <g class="pa-hat pa-o pa-o-cap"><path class="pa-capbase pa-line" d="M56 34c0-8 48-8 48 0v8c-14-4-34-4-48 0z"/><path class="pa-capboard pa-line" d="M80 14l40 12-40 12-40-12z"/><path class="pa-tassel" d="M114 27v18"/><circle class="pa-gold" cx="114" cy="47" r="3"/></g>
+  <g class="pa-hat pa-o pa-o-strawhat"><ellipse class="pa-straw pa-line" cx="80" cy="36" rx="50" ry="10"/><path class="pa-straw pa-line" d="M58 34c0-16 10-24 22-24s22 8 22 24c-14 3-30 3-44 0z"/><path class="pa-straw-band" d="M58 30c14 3 30 3 44 0"/></g>
+  <g class="pa-hat pa-o pa-o-raincoat"><path class="pa-rain pa-line" d="M40 38c4-16 20-26 40-26s36 10 40 26c-24-6-56-6-80 0z"/><path class="pa-rain pa-line" d="M34 40c28-8 64-8 92 0l-4 6c-26-6-58-6-84 0z"/></g>
+  <g class="pa-hat pa-o pa-o-wizard"><path class="pa-wizard pa-line" d="M54 36c8-12 16-28 34-34-4 10-2 20 18 34z"/><ellipse class="pa-wizard pa-line" cx="80" cy="37" rx="34" ry="6"/><path class="pa-gold" d="M84 16l2 4.4 4.8.6-3.5 3.3.9 4.8-4.2-2.3-4.2 2.3.9-4.8-3.5-3.3 4.8-.6z"/></g>
+  </g></g></svg></span><span>FoamLab<small>熊猫带你学 OpenFOAM</small></span></a>
+  <div class="version"><span class="status-dot"></span> OpenFOAM <strong>v2512</strong></div>
+  <nav aria-label="主要导航">
+    <a class="town-entry town-nav-entry" href="/town/"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>熊猫小镇</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>
+    <div class="nav-label">学习空间</div>
+    
+<div class="nav-group" data-nav-section="home">
+ <div class="nav-parent"><a href="/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>学习概览</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="start">
+ <div class="nav-parent"><a href="/start/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span>快速开始</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-start" aria-label="快速开始子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-start" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=cfd-and-openfoam"><span>认识 CFD 与 OpenFOAM</span></a><a class="nav-item nav-subitem" href="/read/?slug=start-openfoam-v2512"><span>安装与环境配置</span></a><a class="nav-item nav-subitem" href="/read/?slug=first-cavity-result"><span>运行第一个算例</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="courses">
+ <div class="nav-parent"><a href="/courses/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>系统学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-courses" aria-label="系统学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-courses" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/courses/?track=%E8%B5%B7%E6%AD%A5%E4%B8%8E%E7%AE%97%E4%BE%8B"><span>起步与算例</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E5%87%A0%E4%BD%95%E4%B8%8E%E7%BD%91%E6%A0%BC"><span>几何与网格</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>离散与求解</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span>计算与数据分析</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E9%AA%8C%E8%AF%81%E4%B8%8E%E7%A0%94%E7%A9%B6%E6%96%B9%E6%B3%95"><span>验证与研究方法</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="topics">
+ <div class="nav-parent"><a href="/topics/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>专题学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-topics" aria-label="专题学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-topics" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/topics/finite-volume/"><span>有限体积法</span></a><a class="nav-item nav-subitem" href="/topics/turbulence/"><span>湍流</span></a><a class="nav-item nav-subitem" href="/topics/multiphase/"><span>多相流</span></a><a class="nav-item nav-subitem" href="/topics/meshing/"><span>网格划分</span></a><a class="nav-item nav-subitem" href="/topics/dynamic-mesh/"><span>动网格</span></a><a class="nav-item nav-subitem" href="/topics/function-objects/"><span>functionObject</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="quick-reference">
+ <div class="nav-parent"><a href="/quick-reference/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>速查手册</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-quick-reference" aria-label="速查手册子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-quick-reference" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="commands">
+ <div class="nav-parent"><a href="/commands/" class="nav-item nav-subitem " ><span>命令速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-commands" aria-label="命令速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-commands" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/commands/?category=%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7"><span>系统工具</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%89%8D%E5%A4%84%E7%90%86"><span>前处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E6%B1%82%E8%A7%A3%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span>求解与并行</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E7%8E%AF%E5%A2%83%E4%B8%8E%E7%BC%96%E8%AF%91"><span>环境与编译</span></a><a class="nav-item nav-subitem" href="/commands/?category=Linux"><span>Linux</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="dictionaries">
+ <div class="nav-parent"><a href="/dictionaries/" class="nav-item nav-subitem " ><span>配置与字典速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-dictionaries" aria-label="配置与字典速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-dictionaries" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BD%91%E6%A0%BC"><span>网格</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%8C%96"><span>初始化</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%9C%BA"><span>初始场</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E8%AE%A1%E7%AE%97%E6%8E%A7%E5%88%B6"><span>计算控制</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>数值方法</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97"><span>并行计算</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span>函数对象</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BC%96%E8%AF%91"><span>编译</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="function-objects">
+ <div class="nav-parent"><a href="/function-objects/" class="nav-item nav-subitem " ><span>函数对象速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-function-objects" aria-label="函数对象速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-function-objects" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%9C%BA%E8%BF%90%E7%AE%97"><span>场运算</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%87%87%E6%A0%B7%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span>采样与统计</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6"><span>湍流与声学</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%8A%9B%E4%B8%8E%E7%89%A9%E7%90%86%E9%87%8F"><span>力与物理量</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8"><span>颗粒与两相</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%96%87%E4%BB%B6%E4%B8%8E%E6%8E%A7%E5%88%B6"><span>文件与控制</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="boundary-conditions">
+ <div class="nav-parent"><a href="/boundary-conditions/" class="nav-item nav-subitem " ><span>边界条件速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-boundary-conditions" aria-label="边界条件速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-boundary-conditions" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/boundary-conditions/?field=velocity"><span>速度 U</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=pressure"><span>压力 p / p_rgh</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=temperature"><span>温度 T</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=turbulence"><span>湍流字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=phase"><span>相分数 α</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=geometry"><span>几何与耦合</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="reference">
+ <div class="nav-parent"><a href="/reference/" class="nav-item nav-subitem active" aria-current="page"><span>参考手册</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="programming">
+ <div class="nav-parent"><a href="/programming/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/?q=%E7%BC%96%E7%A8%8B"><span>基础编程实例</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-solver"><span>开发求解器</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-boundary"><span>开发边界条件</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-utility"><span>开发后处理工具</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="tools">
+ <div class="nav-parent"><a href="/tools/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工具生态</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-tools" aria-label="工具生态子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-tools" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=tool-paraview"><span>ParaView 可视化</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-gmsh"><span>Gmsh 网格生成</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-salome"><span>SALOME 几何与网格</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyvista"><span>PyVista 数据分析</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyfoam"><span>PyFoam 运行管理</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-freecad-geometry"><span>FreeCAD 几何建模</span></a></div>
+</div>
+
+
+    <div class="nav-label">资源与社区</div>
+    
+<div class="nav-group" data-nav-section="resources">
+ <div class="nav-parent"><a href="/resources/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M3 16v6h18v-6"/></svg><span>资料中心</span></a><button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-resources" aria-label="资料中心子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-resources" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/resources/?kind=resource"><span>算例与源码</span></a><a class="nav-item nav-subitem" href="/resources/?kind=recommendation"><span>资源推荐</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="sharing">
+ <div class="nav-parent"><a href="/sharing/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>实践与分享</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="community">
+ <div class="nav-parent"><a href="/community/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z"/><path d="M7 9h9m-9 5h6"/></svg><span>讨论中心</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="assignments">
+ <div class="nav-parent"><a href="/assignments/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2m-7 8 2 2 5-5M9 18h7"/></svg><span>作业与实践</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="announcements">
+ <div class="nav-parent"><a href="/announcements/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M9 21h6"/></svg><span>网站公告</span></a></div>
+</div>
+
+
+  </nav>
+  <script src="/assets/navigation.js?v=3f7c823fe009"></script>
+  <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/reference/">参考手册</a> <span>/</span> <strong>03 前处理命令</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
+ <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
+ <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
+ <div id="account-panel-member" hidden>
+  <a class="account-panel-growth" href="/account/#my-panda"><div><span>我的熊猫</span><strong id="account-panel-level">等级读取中…</strong></div><div class="account-panel-xp"><span id="account-panel-xp-bar"></span></div><p id="account-panel-xp">正在读取成长记录</p></a>
+  <nav class="account-panel-links" aria-label="账号常用入口"><a href="/account/#notifications">消息提醒 <span class="reply-count" data-reply-count hidden></span></a><a href="/account/#profile-form">个人资料 <span>→</span></a><a href="/account/#my-panda">我的熊猫 <span>→</span></a><a href="/account/#account-progress-state">学习进度 <span>→</span></a><a href="/studio/">作者工作台 <span>→</span></a><a href="/admin/" data-management-link hidden>管理平台 <span>→</span></a></nav>
+  <div class="account-panel-footer"><a href="/account/">打开个人中心 →</a><button type="button" class="account-sign-out" data-account-sign-out>退出登录</button></div>
+ </div>
+ <div id="account-panel-guest" hidden><p>登录后保存学习进度，查看熊猫等级并参与讨论。</p><button type="button" class="button" id="account-panel-sign-in"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg> 使用 GitHub 登录</button></div>
+ <p id="account-panel-message" role="status" hidden></p>
+</section>
+
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/reference/">← 返回参考手册</a></div><div class="article-shell"><article class="article" data-cms-slug="reference-manual-03"><div class="eyebrow">OpenFOAM v2512</div><h1>03 前处理命令</h1><div class="prose"><p>前处理依次完成几何处理、网格生成或导入、质量检查、区域划分及初始场设置。改变网格拓扑后，应同步检查场文件中的边界和区域。配置方法见第 7 至 9 章。</p>
+<h2>3.1 网格生成与检查</h2>
+<h3>checkFaMesh  检查有限面积网格</h3>
+<p>检查对象为有限面积网格。</p>
+<p>用法：<code>checkFaMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：checkFaMesh</code></pre></div>
+<h3>makeFaMesh  从体网格面生成有限面积网格</h3>
+<p><code>v2512</code> 的常用字典位置为 system/finite-area/faMeshDefinition。</p>
+<p>用法：<code>makeFaMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：makeFaMesh</code></pre></div>
+<h3>PDRblockMesh  生成 PDR 专用直角单块网格</h3>
+<p>读取 <code>PDRblockMeshDict</code>。</p>
+<p>用法：<code>PDRblockMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：PDRblockMesh</code></pre></div>
+<h3>blockMesh  根据块拓扑生成六面体网格</h3>
+<p>读取 <code>system/blockMeshDict</code>，生成后使用 <code>checkMesh</code> 检查。</p>
+<p>用法：<code>blockMesh</code> [<code>-dict</code> 文件] [<code>-case</code> 目录]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：blockMesh</code></pre></div>
+<h3>extrudeMesh  沿指定模型挤出网格或表面</h3>
+<p>读取 <code>extrudeMeshDict</code>。</p>
+<p>用法：<code>extrudeMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：extrudeMesh</code></pre></div>
+<h3>extrudeToRegionMesh  将面集合挤出为独立区域</h3>
+<p>用于薄层或膜区域，源面和目标区域名称由字典指定。</p>
+<p>用法：<code>extrudeToRegionMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：extrudeToRegionMesh</code></pre></div>
+<h3>extrude2DMesh  将二维网格挤出为三维网格</h3>
+<p>读取 <code>system/extrude2DMeshDict</code>。polyMesh2D 输入为仅含顶点和边的二维网格。</p>
+<p>用法：<code>extrude2DMesh</code> polyMesh2D 或 MeshedSurface [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：extrude2DMesh polyMesh2D -overwrite</code></pre></div>
+<h3>cellSizeAndAlignmentGrid  生成网格尺寸和方向辅助场</h3>
+<p>用于 <code>foamyMesh</code> 网格生成流程。</p>
+<p>用法：<code>cellSizeAndAlignmentGrid</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：cellSizeAndAlignmentGrid</code></pre></div>
+<h3>foamyHexMesh  生成共形 Voronoi 体网格</h3>
+<p>读取 <code>foamyHexMeshDict</code> 和相关几何，运行需具备对应编译依赖。</p>
+<p>用法：<code>foamyHexMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamyHexMesh</code></pre></div>
+<h3>foamyHexMeshBackgroundMesh  生成 foamyHexMesh 背景网格</h3>
+<p>为 <code>foamyHexMesh</code> 提供背景网格。</p>
+<p>用法：<code>foamyHexMeshBackgroundMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamyHexMeshBackgroundMesh</code></pre></div>
+<h3>foamyHexMeshSurfaceSimplify  为 foamyHexMesh 简化表面</h3>
+<p>输出用于 <code>triSurface</code> 表面处理。</p>
+<p>用法：<code>foamyHexMeshSurfaceSimplify</code> 输出表面名</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamyHexMeshSurfaceSimplify simplified.stl</code></pre></div>
+<h3>foamyQuadMesh  生成以四边形为主的二维 Voronoi 网格</h3>
+<p>参数由专用字典定义，<code>-pointsFile</code> 可指定初始点。</p>
+<p>用法：<code>foamyQuadMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamyQuadMesh</code></pre></div>
+<h3>snappyHexMesh  细化背景网格并生成贴体网格和边界层</h3>
+<p>输入包括背景网格及 <code>constant/triSurface</code> 中的表面。并行运行通过 mpirun 启动，并使用 <code>-parallel</code>。</p>
+<p>用法：<code>snappyHexMesh</code> [<code>-dict</code> 文件] [<code>-overwrite</code>]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：snappyHexMesh -overwrite</code></pre></div>
+<h3>checkMesh  检查网格拓扑和几何质量</h3>
+<p><code>-meshQuality</code> 读取网格质量约束。</p>
+<p>用法：<code>checkMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：checkMesh -allTopology -allGeometry</code></pre></div>
+<h2>3.2 表面处理</h2>
+<h3>surfaceAdd  合并表面数据</h3>
+<p>连接两个表面数据集，不执行几何布尔并集。</p>
+<p>用法：<code>surfaceAdd</code> 表面1 表面2 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceAdd a.stl b.stl combined.stl</code></pre></div>
+<h3>surfaceBooleanFeatures  提取表面布尔运算特征线</h3>
+<p>支持 intersection、union 和 difference，相关构建可依赖 CGAL。</p>
+<p>用法：<code>surfaceBooleanFeatures</code> 操作 表面1 表面2</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceBooleanFeatures intersection a.stl b.stl</code></pre></div>
+<h3>surfaceCheck  检查表面网格闭合性和相交情况</h3>
+<p>用于检查 <code>snappyHexMesh</code> 等工具的输入表面。</p>
+<p>用法：<code>surfaceCheck</code> 表面文件 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceCheck constant/triSurface/body.stl -checkSelfIntersection</code></pre></div>
+<h3>surfaceClean  清理短边及低质量三角形</h3>
+<p>长度和质量阈值按几何尺度设置；清理会改变局部表面细节。</p>
+<p>用法：<code>surfaceClean</code> 输入 最短边 最低质量 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceClean body.stl 1e-6 0.01 bodyClean.stl</code></pre></div>
+<h3>surfaceCoarsen  简化表面三角网格</h3>
+<p>简化因子取值范围为 [0,1)，简化后检查几何完整性。</p>
+<p>用法：<code>surfaceCoarsen</code> 输入 简化因子 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceCoarsen body.stl 0.5 coarse.stl</code></pre></div>
+<h3>surfaceConvert  转换三角表面文件格式</h3>
+<p><code>-scale</code> 指定几何缩放系数，按输入与输出长度单位换算。</p>
+<p>用法：<code>surfaceConvert</code> 输入 输出 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceConvert body.obj body.stl</code></pre></div>
+<h3>surfaceFeatureConvert  转换边线和特征线文件格式</h3>
+<p>输入和输出采用该程序支持的边线格式。</p>
+<p>用法：<code>surfaceFeatureConvert</code> 输入 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceFeatureConvert body.eMesh body.obj</code></pre></div>
+<h3>surfaceFeatureExtract  提取几何表面特征线</h3>
+<p>读取 <code>surfaceFeatureExtractDict</code>，生成 <code>eMesh</code> 等特征文件。</p>
+<p>用法：<code>surfaceFeatureExtract</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceFeatureExtract</code></pre></div>
+<h3>surfaceFind  按坐标查询表面信息</h3>
+<p>用于定位和检查表面坐标。</p>
+<p>用法：<code>surfaceFind</code> 输入 [<code>-x</code> X] [<code>-y</code> Y] [<code>-z</code> Z]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceFind body.stl -x 0.1</code></pre></div>
+<h3>surfaceHookUp  按容差连接表面</h3>
+<p>连接规则和输入表面由相应字典指定。</p>
+<p>用法：<code>surfaceHookUp</code> 连接容差 [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceHookUp 1e-5</code></pre></div>
+<h3>surfaceInertia  计算封闭表面的惯性参数</h3>
+<p>按选项采用实体或薄壳模型，密度单位与几何长度单位保持一致。</p>
+<p>用法：<code>surfaceInertia</code> 输入 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceInertia body.stl -density 1000</code></pre></div>
+<h3>surfaceInflate  沿法向膨胀表面</h3>
+<p>安全因子范围为 [1,10]，膨胀后检查表面自相交。</p>
+<p>用法：<code>surfaceInflate</code> 输入 距离 安全因子</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceInflate body.stl 0.001 2</code></pre></div>
+<h3>surfaceLambdaMuSmooth  采用 lambda mu 算法平滑表面</h3>
+<p><code>lambda</code> 和 <code>mu</code> 均采用该程序定义的 [0,1] 系数。</p>
+<p>用法：<code>surfaceLambdaMuSmooth</code> 输入 <code>lambda</code> <code>mu</code> 迭代数 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceLambdaMuSmooth body.stl 0.5 0.5 10 smooth.stl</code></pre></div>
+<h3>surfaceMeshConvert  转换 surfaceMesh 格式和坐标</h3>
+<p>采用 surfaceMesh 读写接口。</p>
+<p>用法：<code>surfaceMeshConvert</code> 输入 输出 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceMeshConvert body.obj body.stl</code></pre></div>
+<h3>surfaceMeshExport  导出算例中的 surfaceMesh</h3>
+<p>输入为算例中已有的 surfaceMesh。</p>
+<p>用法：<code>surfaceMeshExport</code> 输出 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceMeshExport body.obj</code></pre></div>
+<h3>surfaceMeshExtract  提取体网格边界表面</h3>
+<p><code>-patches</code> 指定网格中已有的边界名称。</p>
+<p>用法：<code>surfaceMeshExtract</code> 输出 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceMeshExtract walls.stl -patches '(walls)'</code></pre></div>
+<h3>surfaceMeshImport  导入表面至算例的 surfaceMesh</h3>
+<p>导入对象为表面网格，<code>-name</code> 指定名称。</p>
+<p>用法：<code>surfaceMeshImport</code> 输入 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceMeshImport body.stl</code></pre></div>
+<h3>surfaceMeshInfo  输出表面网格统计信息</h3>
+<p><code>-areas</code> 输出面积统计，可用于核查几何尺度。</p>
+<p>用法：<code>surfaceMeshInfo</code> 输入 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceMeshInfo body.stl -areas</code></pre></div>
+<h3>surfaceOrient  统一表面法向</h3>
+<p>默认按物体外部观察点定向，<code>-inside</code> 将指定点按内部点处理。</p>
+<p>用法：<code>surfaceOrient</code> 输入 外部点 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceOrient body.stl '(10 10 10)' bodyOriented.stl</code></pre></div>
+<h3>surfacePatch  按几何规则重划表面区域</h3>
+<p>读取 surfacePatchDict。</p>
+<p>用法：<code>surfacePatch</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfacePatch</code></pre></div>
+<h3>surfacePointMerge  按距离阈值合并表面点</h3>
+<p>距离阈值采用表面坐标的长度单位。</p>
+<p>用法：<code>surfacePointMerge</code> 输入 距离 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfacePointMerge body.stl 1e-6 merged.stl</code></pre></div>
+<h3>surfaceRedistributePar  并行重分配三角表面</h3>
+<p>示例采用 4 个进程，并读取 <code>constant/triSurface/body.stl</code>。分配方式包括 follow、independent、distributed 和 frozen；follow 按网格包围盒划分。</p>
+<p>用法：<code>surfaceRedistributePar</code> 表面名 分配方式 <code>-parallel</code></p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mpirun -np 4 surfaceRedistributePar body.stl follow -parallel</code></pre></div>
+<h3>surfaceRefineRedGreen  采用红绿细分加密三角表面</h3>
+<p><code>-steps</code> 指定细分次数。</p>
+<p>用法：<code>surfaceRefineRedGreen</code> 输入 输出 [<code>-steps</code> N]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceRefineRedGreen body.stl fine.stl -steps 1</code></pre></div>
+<h3>surfaceSplitByPatch  按区域拆分表面文件</h3>
+<p><code>-patches</code> 指定待拆分区域。</p>
+<p>用法：<code>surfaceSplitByPatch</code> 输入 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceSplitByPatch body.stl</code></pre></div>
+<h3>surfaceSplitByTopology  按连通关系拆分表面</h3>
+<p>用于分离拓扑不连通的部件。</p>
+<p>用法：<code>surfaceSplitByTopology</code> 输入 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceSplitByTopology body.stl split.stl</code></pre></div>
+<h3>surfaceSplitNonManifolds  拆分表面非流形连接</h3>
+<p>拆分后使用 <code>surfaceCheck</code> 检查表面。</p>
+<p>用法：<code>surfaceSplitNonManifolds</code> 输入 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceSplitNonManifolds body.stl manifold.stl</code></pre></div>
+<h3>surfaceSubset  按字典选取表面子集</h3>
+<p>选择规则由输入字典定义。</p>
+<p>用法：<code>surfaceSubset</code> 字典 输入 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceSubset system/surfaceSubsetDict body.stl subset.stl</code></pre></div>
+<h3>surfaceToPatch  按给定表面重划体网格边界</h3>
+<p>修改后同步检查场文件中的边界条目。</p>
+<p>用法：<code>surfaceToPatch</code> 表面文件 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceToPatch body.stl</code></pre></div>
+<h3>surfaceTransformPoints  对表面进行平移旋转和缩放</h3>
+<p><code>-read-scale</code> 和 <code>-write-scale</code> 分别指定读取和写出时的缩放系数。</p>
+<p>用法：<code>surfaceTransformPoints</code> [选项] 输入 输出</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：surfaceTransformPoints -translate '(0 0 1)' body.stl bodyMoved.stl</code></pre></div>
+<h2>3.3 网格转换</h2>
+<h3>ansysToFoam  导入 ANSYS 网格输入文件</h3>
+<p>输入采用转换器支持的 ANSYS 文件格式。</p>
+<p>用法：<code>ansysToFoam</code> ANSYS文件</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：ansysToFoam mesh.ans</code></pre></div>
+<h3>ccmToFoam  导入 CCM 网格及数据</h3>
+<p>需编译 CCM 支持。<code>-list</code> 列出文件内容，移除该选项后执行转换。</p>
+<p>用法：<code>ccmToFoam</code> 输入.ccm [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：ccmToFoam mesh.ccm -list</code></pre></div>
+<h3>foamToCcm  导出 CCM 网格或结果</h3>
+<p>需编译 CCM 库支持。</p>
+<p>用法：<code>foamToCcm</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamToCcm</code></pre></div>
+<h3>cfx4ToFoam  导入 CFX4 几何网格</h3>
+<p>导入时用 <code>-scale</code> 将输入网格的长度单位换算为米。</p>
+<p>用法：<code>cfx4ToFoam</code> CFX几何文件 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：cfx4ToFoam mesh.geo</code></pre></div>
+<h3>datToFoam  导入特定 DAT 网格格式</h3>
+<p>输入内容须符合该转换器定义的 DAT 网格结构。</p>
+<p>用法：<code>datToFoam</code> DAT文件</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：datToFoam mesh.dat</code></pre></div>
+<h3>ensightToFoam  导入 EnSight 几何网格</h3>
+<p>转换范围为几何网格，物理模型在目标算例中配置。</p>
+<p>用法：<code>ensightToFoam</code> 几何.geo [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：ensightToFoam mesh.geo</code></pre></div>
+<h3>fireToFoam  导入 AVL FIRE 多面体网格</h3>
+<p>转换后检查长度单位。</p>
+<p>用法：<code>fireToFoam</code> FIRE网格 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：fireToFoam mesh.fpma</code></pre></div>
+<h3>fluent3DMeshToFoam  导入 Fluent 三维网格</h3>
+<p>用于 Fluent 三维网格的专用转换，按输入格式选择。</p>
+<p>用法：<code>fluent3DMeshToFoam</code> 网格.msh</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：fluent3DMeshToFoam mesh.msh</code></pre></div>
+<h3>fluentMeshToFoam  导入 Fluent 网格</h3>
+<p>输入采用 Fluent mesh 格式；Gmsh 文件使用 <code>gmshToFoam</code> 转换。</p>
+<p>用法：<code>fluentMeshToFoam</code> 网格.msh</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：fluentMeshToFoam mesh.msh</code></pre></div>
+<h3>foamMeshToFluent  导出 Fluent 格式网格</h3>
+<p>导出范围为网格数据，求解配置在 Fluent 中设置。</p>
+<p>用法：<code>foamMeshToFluent</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamMeshToFluent</code></pre></div>
+<h3>foamToFireMesh  导出 AVL FIRE 网格</h3>
+<p>用 <code>-scale</code> 设置此次格式转换的长度比例。</p>
+<p>用法：<code>foamToFireMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamToFireMesh</code></pre></div>
+<h3>foamToStarMesh  导出 STARCD PROSTAR 网格</h3>
+<p>输出 bnd、cel 和 vrt 等文件。</p>
+<p>用法：<code>foamToStarMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamToStarMesh</code></pre></div>
+<h3>foamToSurface  将体网格边界导出为表面文件</h3>
+<p>用于几何检查及外部软件数据交换。</p>
+<p>用法：<code>foamToSurface</code> 输出 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：foamToSurface boundary.stl</code></pre></div>
+<h3>gambitToFoam  导入 GAMBIT 中性网格</h3>
+<p>转换后运行 <code>checkMesh</code>。</p>
+<p>用法：<code>gambitToFoam</code> 中性网格文件</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：gambitToFoam mesh.neu</code></pre></div>
+<h3>gmshToFoam  导入 Gmsh 网格</h3>
+<p>常用输入为 ASCII MSH2。转换后检查物理组与边界名称。</p>
+<p>用法：<code>gmshToFoam</code> 网格.msh</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：gmshToFoam mesh.msh</code></pre></div>
+<h3>ideasUnvToFoam  导入 I-DEAS 通用网格</h3>
+<p>转换后检查边界、长度单位和单元类型。</p>
+<p>用法：<code>ideasUnvToFoam</code> 网格.unv</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：ideasUnvToFoam mesh.unv</code></pre></div>
+<h3>kivaToFoam  导入 KIVA3v 网格</h3>
+<p>输入为 KIVA3v 发动机网格。</p>
+<p>用法：<code>kivaToFoam</code> [<code>-file</code> 文件] [<code>-version</code> 版本]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：kivaToFoam -file otape17</code></pre></div>
+<h3>mshToFoam  导入该转换器支持的 MSH 网格</h3>
+<p>输入须符合该转换器定义的 MSH 结构；Gmsh 网格使用 <code>gmshToFoam</code>。</p>
+<p>用法：<code>mshToFoam</code> 输入.msh</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mshToFoam mesh.msh</code></pre></div>
+<h3>netgenNeutralToFoam  导入 Netgen 中性网格</h3>
+<p>转换后检查边界划分。</p>
+<p>用法：<code>netgenNeutralToFoam</code> 中性网格文件</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：netgenNeutralToFoam mesh.neutral</code></pre></div>
+<h3>plot3dToFoam  导入 PLOT3D 块网格</h3>
+<p><code>-singleBlock</code> 和 -2D 等选项用于指定输入网格形式。</p>
+<p>用法：<code>plot3dToFoam</code> 几何文件 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：plot3dToFoam mesh.xyz</code></pre></div>
+<h3>star4ToFoam  导入 PROSTAR v4 网格</h3>
+<p>按文件名前缀读取 mesh.vrt、mesh.cel 等配套文件。</p>
+<p>用法：<code>star4ToFoam</code> 文件名前缀</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：star4ToFoam mesh</code></pre></div>
+<h3>tetgenToFoam  导入 TetGen 网格</h3>
+<p>按前缀读取配套的 node、ele 和 <code>face</code> 等文件。</p>
+<p>用法：<code>tetgenToFoam</code> 文件名前缀</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：tetgenToFoam mesh</code></pre></div>
+<h3>vtkUnstructuredToFoam  导入旧式 ASCII 非结构 VTK 网格</h3>
+<p>输入采用旧式 ASCII VTK 格式。</p>
+<p>用法：<code>vtkUnstructuredToFoam</code> 输入.vtk</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：vtkUnstructuredToFoam mesh.vtk</code></pre></div>
+<h3>writeMeshObj  将网格几何信息导出为 OBJ</h3>
+<p><code>-cell</code>、<code>-face</code>、<code>-point</code> 和 <code>-cellSet</code> 等选项指定诊断对象。</p>
+<p>用法：<code>writeMeshObj</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：writeMeshObj -cell 10</code></pre></div>
+<h2>3.4 网格修改及区域选择</h2>
+<h3>PDRMesh  为 PDR 模型准备网格和区域</h3>
+<p>输入包括 <code>blockedCells</code>、<code>blockedFaces</code> 等集合。</p>
+<p>用法：<code>PDRMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：PDRMesh</code></pre></div>
+<h3>collapseEdges  按字典折叠短边和低质量面</h3>
+<p>读取 <code>collapseDict</code> 或指定字典，折叠操作可改变网格拓扑。</p>
+<p>用法：<code>collapseEdges</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：collapseEdges</code></pre></div>
+<h3>combinePatchFaces  合并近共面的边界面</h3>
+<p>通过 concaveAngle 及质量约束控制合并。</p>
+<p>用法：<code>combinePatchFaces</code> 特征角 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：combinePatchFaces 5 -overwrite</code></pre></div>
+<h3>modifyMesh  移动拆分或折叠网格元素</h3>
+<p>按配置字典执行拓扑修改。</p>
+<p>用法：<code>modifyMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：modifyMesh</code></pre></div>
+<h3>refineHexMesh  加密指定六面体集合</h3>
+<p>待细化集合可通过 <code>topoSet</code> 建立。</p>
+<p>用法：<code>refineHexMesh</code> <code>cellSet</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：refineHexMesh refineCells -overwrite</code></pre></div>
+<h3>refineWallLayer  细化近壁网格</h3>
+<p>输入比例指定边的细分位置。</p>
+<p>用法：<code>refineWallLayer</code> <code>patch</code>列表 边比例 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：refineWallLayer '(walls)' 0.3 -overwrite</code></pre></div>
+<h3>refinementLevel  估计笛卡尔网格细化级别</h3>
+<p>用于贴体变形前的网格。</p>
+<p>用法：<code>refinementLevel</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：refinementLevel</code></pre></div>
+<h3>removeFaces  删除指定面集合中的面</h3>
+<p>输入为预先建立的 <code>faceSet</code>。</p>
+<p>用法：<code>removeFaces</code> <code>faceSet</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：removeFaces removeFacesSet</code></pre></div>
+<h3>selectCells  按表面选取内部外部或相交单元</h3>
+<p>读取选择字典，生成 selected 集合。</p>
+<p>用法：<code>selectCells</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：selectCells</code></pre></div>
+<h3>snappyRefineMesh  在表面附近加密体网格</h3>
+<p>输入为待处理表面及细化字典。</p>
+<p>用法：<code>snappyRefineMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：snappyRefineMesh</code></pre></div>
+<h3>splitCells  按边角度拆分单元</h3>
+<p>用于网格单元的拓扑修复。</p>
+<p>用法：<code>splitCells</code> 边角度 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：splitCells 90</code></pre></div>
+<h3>attachMesh  通过网格修改器连接分离网格</h3>
+<p>用于相应的拓扑连接流程。</p>
+<p>用法：<code>attachMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：attachMesh</code></pre></div>
+<h3>autoPatch  按面夹角自动划分边界</h3>
+<p>重划边界后更新对应场边界。</p>
+<p>用法：<code>autoPatch</code> 特征角 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：autoPatch 45 -overwrite</code></pre></div>
+<h3>createBaffles  将内部面转换为成对边界</h3>
+<p>读取 <code>createBafflesDict</code>。边界面生成与点拆分属于不同操作。</p>
+<p>用法：<code>createBaffles</code> [<code>-dict</code> 文件] [<code>-overwrite</code>]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createBaffles -overwrite</code></pre></div>
+<h3>createPatch  创建或重组网格边界</h3>
+<p>读取 <code>createPatchDict</code>，修改后使场边界与新网格对应。</p>
+<p>用法：<code>createPatch</code> [<code>-dict</code> 文件] [<code>-overwrite</code>]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createPatch -overwrite</code></pre></div>
+<h3>deformedGeom  按位移场生成缩放后的变形几何</h3>
+<p>输入为已有位移结果场。</p>
+<p>用法：<code>deformedGeom</code> 缩放倍数</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：deformedGeom 1</code></pre></div>
+<h3>flattenMesh  压平二维网格前后平面</h3>
+<p>适用于相应的二维笛卡尔网格。</p>
+<p>用法：<code>flattenMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：flattenMesh</code></pre></div>
+<h3>insideCells  选取封闭表面内部单元</h3>
+<p>输入表面应具备明确的内外区域。</p>
+<p>用法：<code>insideCells</code> 表面文件 <code>cellSet</code></p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：insideCells body.stl innerCells</code></pre></div>
+<h3>mergeMeshes  合并两个算例网格</h3>
+<p>接合处需共形连接时，合并后继续执行缝合。</p>
+<p>用法：<code>mergeMeshes</code> 主算例 附加算例 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mergeMeshes ./mainCase ./extraCase -overwrite</code></pre></div>
+<h3>mergeOrSplitBaffles  检测合并或拆分挡板面</h3>
+<p><code>-detectOnly</code> 执行检测，<code>-split</code> 执行拆分。</p>
+<p>用法：<code>mergeOrSplitBaffles</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mergeOrSplitBaffles -detectOnly</code></pre></div>
+<h3>mirrorMesh  按平面对称复制网格</h3>
+<p>读取 <code>mirrorMeshDict</code>。</p>
+<p>用法：<code>mirrorMesh</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mirrorMesh</code></pre></div>
+<h3>moveDynamicMesh  执行网格运动</h3>
+<p>读取 <code>dynamicMeshDict</code>，可用于独立检查网格运动过程。</p>
+<p>用法：<code>moveDynamicMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：moveDynamicMesh</code></pre></div>
+<h3>moveEngineMesh  执行发动机网格运动</h3>
+<p>读取发动机网格及运动设置。</p>
+<p>用法：<code>moveEngineMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：moveEngineMesh</code></pre></div>
+<h3>moveMesh  求解网格运动</h3>
+<p>输入包括网格运动方程及边界条件。</p>
+<p>用法：<code>moveMesh</code> [<code>-deltaT</code> 值] [<code>-endTime</code> 值]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：moveMesh -deltaT 0.01 -endTime 1</code></pre></div>
+<h3>objToVTK  将 OBJ 线文件转成 VTK</h3>
+<p>用于线几何可视化。</p>
+<p>用法：<code>objToVTK</code> 输入.obj 输出.vtk</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：objToVTK edges.obj edges.vtk</code></pre></div>
+<h3>orientFaceZone  按外部参考点统一面区域方向</h3>
+<p>面方向用于通量计算及挡板处理。</p>
+<p>用法：<code>orientFaceZone</code> <code>faceZone</code> 外部点</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：orientFaceZone interface '(10 0 0)'</code></pre></div>
+<h3>polyDualMesh  生成多面体对偶网格</h3>
+<p>生成后检查网格拓扑及场映射。</p>
+<p>用法：<code>polyDualMesh</code> 特征角 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：polyDualMesh 60 -overwrite</code></pre></div>
+<h3>refineMesh  全局或按集合定向加密体网格</h3>
+<p>缺少 <code>refineMeshDict</code> 时可执行全域细化。</p>
+<p>用法：<code>refineMesh</code> [<code>-dict</code> 文件] [<code>-overwrite</code>]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：refineMesh -overwrite</code></pre></div>
+<h3>renumberMesh  重排网格编号以降低矩阵带宽</h3>
+<p><code>-write-maps</code> 输出新旧编号映射，供外部编号关联使用。</p>
+<p>用法：<code>renumberMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：renumberMesh -overwrite</code></pre></div>
+<h3>rotateMesh  按两个方向向量旋转网格</h3>
+<p>与几何方向关联的场和参数应同步检查。</p>
+<p>用法：<code>rotateMesh</code> 起始向量 目标向量</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：rotateMesh '(1 0 0)' '(0 1 0)'</code></pre></div>
+<h3>setSet  交互编辑单元面和点集合</h3>
+<p>批处理文件逐行定义集合操作。</p>
+<p>用法：<code>setSet</code> [<code>-batch</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setSet -batch system/sets.batch</code></pre></div>
+<h3>setsToZones  将集合转换为同名网格区域</h3>
+<p>转换面集合时需处理面方向信息。</p>
+<p>用法：<code>setsToZones</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setsToZones</code></pre></div>
+<h3>singleCellMesh  构建保留边界数据的单单元网格</h3>
+<p>用于边界数据处理。</p>
+<p>用法：<code>singleCellMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：singleCellMesh</code></pre></div>
+<h3>splitMesh  按面集合生成成对边界</h3>
+<p>输入为预先建立的 cutFaces 等面集合。</p>
+<p>用法：<code>splitMesh</code> <code>faceSet</code> 主<code>patch</code> 从<code>patch</code></p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：splitMesh cutFaces sideA sideB</code></pre></div>
+<h3>splitMeshRegions  按连通性或 cellZone 拆分网格区域</h3>
+<p>各目标区域分别配置字典和场文件。</p>
+<p>用法：<code>splitMeshRegions</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：splitMeshRegions -cellZones -overwrite</code></pre></div>
+<h3>stitchMesh  缝合两个网格边界</h3>
+<p><code>-perfect</code> 要求几何匹配；其余接口可按相应条件采用 <code>-partial</code> 或 <code>-integral</code>。</p>
+<p>用法：<code>stitchMesh</code> [选项] 主<code>patch</code> 从<code>patch</code></p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：stitchMesh -perfect sideA sideB -overwrite</code></pre></div>
+<h3>subsetMesh  提取指定单元集合或区域的子网格</h3>
+<p>默认读取已有单元集合，如 fluidCells；<code>-zone</code> 改为选择 <code>cellZone</code>。</p>
+<p>用法：<code>subsetMesh</code> 选择名 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：subsetMesh fluidCells -overwrite</code></pre></div>
+<h3>topoSet  按规则创建或修改集合及区域</h3>
+<p>读取 <code>topoSetDict</code>，按 <code>type</code> 选择 <code>cellSet</code>、<code>cellZoneSet</code> 等对象。</p>
+<p>用法：<code>topoSet</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：topoSet</code></pre></div>
+<h3>transformPoints  对体网格进行平移旋转和缩放</h3>
+<p>示例将毫米坐标换算为米。外部源项位置和参考点需同步换算。</p>
+<p>用法：<code>transformPoints</code> 变换选项</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：transformPoints -scale '(0.001 0.001 0.001)'</code></pre></div>
+<h3>zipUpMesh  修复悬挂顶点引起的单元不闭合</h3>
+<p>适用于网格转换产生的相应拓扑缺陷。</p>
+<p>用法：<code>zipUpMesh</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：zipUpMesh</code></pre></div>
+<h2>3.5 初始化与映射</h2>
+<h3>PDRsetFields  生成 PDRFoam 所需初始场</h3>
+<p>输入为 PDR 阻塞模型等专用数据。</p>
+<p>用法：<code>PDRsetFields</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：PDRsetFields</code></pre></div>
+<h3>applyBoundaryLayer  按七分之一次方律设置边界层初值</h3>
+<p>用于符合该速度分布近似的初始场设置。</p>
+<p>用法：<code>applyBoundaryLayer</code> [<code>-ybl</code> 厚度] [<code>-writeTurbulenceFields</code>]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：applyBoundaryLayer -ybl 0.01</code></pre></div>
+<h3>boxTurb  生成给定能谱的无散度湍流盒</h3>
+<p>通过专用配置指定湍流能谱。</p>
+<p>用法：<code>boxTurb</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：boxTurb</code></pre></div>
+<h3>changeDictionary  批量修改场和边界条目</h3>
+<p>读取 <code>changeDictionaryDict</code>，并将替换结果写回文件。</p>
+<p>用法：<code>changeDictionary</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：changeDictionary</code></pre></div>
+<h3>createBoxTurb  生成各向同性合成湍流盒</h3>
+<p>按配套配置生成湍流盒，并可输出 <code>blockMesh</code> 输入。</p>
+<p>用法：<code>createBoxTurb</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createBoxTurb -createBlockMesh</code></pre></div>
+<h3>createExternalCoupledPatchGeometry  输出外部耦合边界几何</h3>
+<p>组名和通信目录与耦合配置对应。</p>
+<p>用法：<code>createExternalCoupledPatchGeometry</code> <code>patch</code>组 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createExternalCoupledPatchGeometry coupledWalls</code></pre></div>
+<h3>createViewFactors  生成辐射视角因子</h3>
+<p>读取 <code>constant/viewFactorsDict</code> 等辐射配置。</p>
+<p>用法：<code>createViewFactors</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createViewFactors</code></pre></div>
+<h3>createZeroDirectory  按模板创建初始场</h3>
+<p>按 <code>solver</code>、<code>boundary</code> 等配置生成初始目录和场文件。</p>
+<p>用法：<code>createZeroDirectory</code> [<code>-templateDir</code> 目录]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：createZeroDirectory</code></pre></div>
+<h3>dsmcInitialise  初始化 DSMC 粒子算例</h3>
+<p>读取 <code>system/dsmcInitialise</code>。</p>
+<p>用法：<code>dsmcInitialise</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：dsmcInitialise</code></pre></div>
+<h3>engineSwirl  生成发动机旋流初场</h3>
+<p>读取发动机几何及旋流参数。</p>
+<p>用法：<code>engineSwirl</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：engineSwirl</code></pre></div>
+<h3>faceAgglomerate  聚合辐射边界面并输出映射</h3>
+<p>用于视角因子计算的前处理。</p>
+<p>用法：<code>faceAgglomerate</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：faceAgglomerate</code></pre></div>
+<h3>mapFields  将源算例场映射至目标算例</h3>
+<p><code>-consistent</code> 适用于边界拓扑匹配的情形；边界不一致时配置 <code>mapFieldsDict</code>。</p>
+<p>用法：<code>mapFields</code> 源算例 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mapFields ../coarseCase -sourceTime latestTime -consistent</code></pre></div>
+<h3>mapFieldsPar  执行并行算例场映射</h3>
+<p>通过 mpirun 启动，并添加 <code>-parallel</code>。其参数按自身接口设置。</p>
+<p>用法：<code>mapFieldsPar</code> 源算例 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mapFieldsPar ../sourceCase -sourceTime latestTime -consistent</code></pre></div>
+<h3>mdInitialise  初始化分子动力学算例</h3>
+<p>读取分子动力学初值字典。</p>
+<p>用法：<code>mdInitialise</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：mdInitialise</code></pre></div>
+<h3>writeMorpherCPs  导出 NURBS 变形控制点</h3>
+<p>读取 <code>dynamicMeshDict</code> 中的 NURBS3DVolume 配置。</p>
+<p>用法：<code>writeMorpherCPs</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：writeMorpherCPs</code></pre></div>
+<h3>setAlphaField  按几何切割设置体积分数</h3>
+<p>可用于平面、球面和圆柱面等界面的初始化。</p>
+<p>用法：<code>setAlphaField</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setAlphaField</code></pre></div>
+<h3>setExprBoundaryFields  按表达式设置边界场</h3>
+<p>读取边界表达式字典，<code>-backup</code> 保留原场。</p>
+<p>用法：<code>setExprBoundaryFields</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setExprBoundaryFields</code></pre></div>
+<h3>setExprFields  按表达式设置体场</h3>
+<p>示例修改已有 <code>T</code> 场；采用 <code>-create</code> 新建场时需设置 <code>dimensions</code>。</p>
+<p>用法：<code>setExprFields</code> [<code>-dict</code> 文件] 或表达式选项</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setExprFields -field T -expression '300 + 10*pos().x()'</code></pre></div>
+<h3>setFields  按几何区域初始化场</h3>
+<p>读取 <code>setFieldsDict</code>，通常在网格生成后、分区前执行。</p>
+<p>用法：<code>setFields</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setFields</code></pre></div>
+<h3>setTurbulenceFields  按经验关系初始化湍流量</h3>
+<p>模型和场名采用所用求解器的定义。</p>
+<p>用法：<code>setTurbulenceFields</code> [<code>-dict</code> 文件]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：setTurbulenceFields</code></pre></div>
+<h3>smoothSurfaceData  平滑表面数据字段</h3>
+<p>输入采用程序支持的表面数据格式。</p>
+<p>用法：<code>smoothSurfaceData</code> 输入 [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：smoothSurfaceData sample.vtp -radius 0.01</code></pre></div>
+<h3>viewFactorsGen  采用面积和线积分生成视角因子</h3>
+<p>参数由对应辐射模型及字典定义。</p>
+<p>用法：<code>viewFactorsGen</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：viewFactorsGen</code></pre></div>
+<h3>wallFunctionTable  生成表格式壁面函数数据</h3>
+<p>由字典指定壁面模型及数据范围。</p>
+<p>用法：<code>wallFunctionTable</code> [选项]</p>
+<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">示例：wallFunctionTable</code></pre></div>
+</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</main>
+  <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
+</div>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<div class="toast" role="status" hidden></div>
+</body></html>

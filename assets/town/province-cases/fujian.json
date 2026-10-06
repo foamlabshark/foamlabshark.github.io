@@ -1,0 +1,379 @@
+{
+  "id": "fujian",
+  "name": "福建",
+  "difficulty": "intro",
+  "story": "福建沿海分布着海湾与跨海通道，水流绕过桥墩时会改变方向和速度。先把桥墩简化成圆柱，可以清楚地观察绕流的基本几何特征。本关从无旋势流出发，研究圆柱周围的驻点与加速区域。",
+  "files": [
+    {
+      "path": "0.orig/U",
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "o99c656b004ed"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "odd699d38c1d2"
+        },
+        ";\n\nboundaryField\n{\n    ",
+        {
+          "gap": "o3edddd9872e0"
+        },
+        "\n    {\n        type            symmetryPlane;\n    }\n\n    right\n    {\n        type            zeroGradient;\n    }\n\n    up\n    {\n        type            symmetryPlane;\n    }\n\n    left\n    {\n        type            uniformFixedValue;\n        uniformValue    constant (1 0 0);\n    }\n\n    cylinder\n    {\n        type            symmetry;\n    }\n\n    defaultFaces\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o99c656b004ed",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "odd699d38c1d2",
+          "type": "vector",
+          "label": "internalField",
+          "source": "0.orig/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+          "options": []
+        },
+        {
+          "id": "o3edddd9872e0",
+          "type": "name",
+          "label": "boundaryField/down/name",
+          "source": "0.orig/U 这一段对应的网格边界名是 down；从示意图的边界分组中选择，保持大小写一致。",
+          "options": [
+            "cylinder",
+            "defaultFaces",
+            "down",
+            "left",
+            "right",
+            "up"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "0.orig/p",
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      ",
+        {
+          "gap": "oe102945240b0"
+        },
+        ";\n\ninternalField   uniform ",
+        {
+          "gap": "o777d6c4037da"
+        },
+        ";\n\nboundaryField\n{\n    down\n    {\n        type            symmetryPlane;\n    }\n\n    right\n    {\n        type            fixedValue;\n        value           uniform 0;\n    }\n\n    up\n    {\n        type            symmetryPlane;\n    }\n\n    left\n    {\n        type            zeroGradient;\n    }\n\n    cylinder\n    {\n        type            symmetry;\n    }\n\n    defaultFaces\n    {\n        type            empty;\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "oe102945240b0",
+          "type": "dimensions",
+          "label": "dimensions",
+          "source": "0.orig/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+          "options": []
+        },
+        {
+          "id": "o777d6c4037da",
+          "type": "number",
+          "label": "internalField",
+          "source": "0.orig/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "system/fvSchemes",
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         ",
+        {
+          "gap": "od2b19c431655"
+        },
+        ";\n}\n\ngradSchemes\n{\n    default         ",
+        {
+          "gap": "o0b573d822e26"
+        },
+        ";\n}\n\ndivSchemes\n{\n    default         ",
+        {
+          "gap": "oe5a39a51e2dd"
+        },
+        ";\n\n    div(phi,U)      bounded Gauss linear;\n\n    div(div(phi,U)) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         ",
+        {
+          "gap": "oaa66884dd5d8"
+        },
+        ";\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "od2b19c431655",
+          "type": "select",
+          "label": "ddtSchemes/default",
+          "source": "system/fvSchemes 中 ddtSchemes/default 取 steadyState。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "o0b573d822e26",
+          "type": "select",
+          "label": "gradSchemes/default",
+          "source": "system/fvSchemes 中 gradSchemes/default 取 leastSquares。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "leastSquares",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oe5a39a51e2dd",
+          "type": "select",
+          "label": "divSchemes/default",
+          "source": "system/fvSchemes 中 divSchemes/default 取 none。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "backward",
+            "none",
+            "steadyState"
+          ]
+        },
+        {
+          "id": "oaa66884dd5d8",
+          "type": "select",
+          "label": "laplacianSchemes/default",
+          "source": "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。",
+          "options": [
+            "CrankNicolson 0.9",
+            "Euler",
+            "Gauss linear corrected",
+            "backward",
+            "steadyState"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "system/controlDict",
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。",
+      "parts": [
+        "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     ",
+        {
+          "gap": "o0195ae8d31cc"
+        },
+        ";\n\nstartFrom       latestTime;\n\nstartTime       0;\n\nstopAt          nextWrite;\n\nendTime         ",
+        {
+          "gap": "occ0837b689b3"
+        },
+        ";\n\ndeltaT          ",
+        {
+          "gap": "o2a18fc22e9fd"
+        },
+        ";\n\nwriteControl    timeStep;\n\nwriteInterval   ",
+        {
+          "gap": "o0a2e698b7797"
+        },
+        ";\n\npurgeWrite      0;\n\nwriteFormat     ascii;\n\nwritePrecision  6;\n\nwriteCompression off;\n\ntimeFormat      general;\n\ntimePrecision   6;\n\nrunTimeModifiable true;\n\nfunctions\n{\n    error\n    {\n        name    error;\n        type    coded;\n        libs    (utilityFunctionObjects);\n\n        codeEnd\n        #{\n            // Lookup U\n            Info<< \"Looking up field U\\n\" << endl;\n            const auto& U = mesh().lookupObject<volVectorField>(\"U\");\n\n            Info<< \"Reading inlet velocity uInfX\\n\" << endl;\n\n            scalar ULeft = 0.0;\n            label leftI = mesh().boundaryMesh().findPatchID(\"left\");\n            const auto& fvp = U.boundaryField()[leftI];\n            if (fvp.size())\n            {\n                ULeft = fvp[0].x();\n            }\n            reduce(ULeft, maxOp<scalar>());\n\n            dimensionedScalar uInfX(\"uInfx\", dimVelocity, ULeft);\n\n            Info<< \"U at inlet = \" << uInfX.value() << \" m/s\" << endl;\n\n\n            scalar magCylinder = 0.0;\n            label cylI = mesh().boundaryMesh().findPatchID(\"cylinder\");\n            const auto& cylFvp = mesh().C().boundaryField()[cylI];\n            if (cylFvp.size())\n            {\n                magCylinder = mag(cylFvp[0]);\n            }\n            reduce(magCylinder, maxOp<scalar>());\n\n            dimensionedScalar radius(\"radius\", dimLength, magCylinder);\n\n            Info<< \"Cylinder radius = \" << radius.value() << \" m\" << endl;\n\n            volVectorField UA\n            (\n                IOobject\n                (\n                    \"UA\",\n                    mesh().time().timeName(),\n                    U.mesh(),\n                    IOobject::NO_READ,\n                    IOobject::AUTO_WRITE\n                ),\n                U\n            );\n\n            Info<< \"\\nEvaluating analytical solution\" << endl;\n\n            const volVectorField& centres = UA.mesh().C();\n            volScalarField magCentres(mag(centres));\n            volScalarField theta(acos((centres & vector(1,0,0))/magCentres));\n\n            volVectorField cs2theta\n            (\n                cos(2*theta)*vector(1,0,0)\n              + sin(2*theta)*vector(0,1,0)\n            );\n\n            UA = uInfX*(dimensionedVector(vector(1,0,0))\n              - pow((radius/magCentres),2)*cs2theta);\n\n            // Force writing of UA (since time has not changed)\n            UA.write();\n\n            volScalarField error(\"error\", mag(U-UA)/mag(UA));\n\n            Info<<\"Writing relative error in U to \" << error.objectPath()\n                << endl;\n\n            error.write();\n        #};\n    }\n}\n\n\n// ************************************************************************* //\n"
+      ],
+      "gaps": [
+        {
+          "id": "o0195ae8d31cc",
+          "type": "select",
+          "label": "application",
+          "source": "求解器使用 potentialFoam。",
+          "options": [
+            "icoFoam",
+            "interFoam",
+            "pimpleFoam",
+            "potentialFoam",
+            "simpleFoam"
+          ]
+        },
+        {
+          "id": "occ0837b689b3",
+          "type": "number",
+          "label": "endTime",
+          "source": "终止时间/迭代编号为 1。",
+          "options": []
+        },
+        {
+          "id": "o2a18fc22e9fd",
+          "type": "number",
+          "label": "deltaT",
+          "source": "初始时间步（稳态求解时为迭代步长）为 1。",
+          "options": []
+        },
+        {
+          "id": "o0a2e698b7797",
+          "type": "number",
+          "label": "writeInterval",
+          "source": "结果写出间隔（单位由文件中的 writeControl 决定）为 1。",
+          "options": []
+        }
+      ]
+    },
+    {
+      "path": "run.sh",
+      "kind": "workflow",
+      "title": "运行步骤 · 命令排序",
+      "parts": [
+        "# 在算例目录中执行；先加载 OpenFOAM 环境及教程辅助函数\n. \"${WM_PROJECT_DIR:?}/bin/tools/RunFunctions\"\n",
+        {
+          "gap": "original-run-order"
+        }
+      ],
+      "gaps": [
+        {
+          "id": "original-run-order",
+          "type": "commands",
+          "label": "命令顺序",
+          "source": "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → potentialFoam -withFunctionObjects -writePhi -writephi -writep。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。",
+          "options": [
+            "blockMesh",
+            "checkMesh",
+            "decomposePar",
+            "foamToVTK -latestTime",
+            "potentialFoam -withFunctionObjects -writePhi -writephi -writep",
+            "reconstructPar",
+            "restore0Dir"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceArchive": "/downloads/town/originals/fujian-v2512.zip",
+  "dependencies": [],
+  "revision": "original-v2512-1",
+  "title": "圆柱绕流的势流解",
+  "solver": "potentialFoam",
+  "source": "basic/potentialFoam/cylinder",
+  "meshImage": "/assets/town/province-cases/fujian-mesh.png",
+  "patches": [
+    "down",
+    "right",
+    "up",
+    "left",
+    "cylinder",
+    "defaultFaces"
+  ],
+  "statement": {
+    "physical": [
+      "福建沿海分布着海湾与跨海通道，水流绕过桥墩时会改变方向和速度。先把桥墩简化成圆柱，可以清楚地观察绕流的基本几何特征。本关从无旋势流出发，研究圆柱周围的驻点与加速区域。"
+    ],
+    "geometry": [
+      "2,000 个单元。网格由本页原始文件和运行步骤生成，所有长度使用 SI 米。",
+      "在示意图中核对边界名称；初始化文件和附带几何可在完整原始目录中查看。",
+      "网格外包络沿 x、y、z 的长度依次为 4 × 2 × 1 m。点击图可放大查看实际 patch 名称及位置；同一边界可包含多处面。"
+    ],
+    "properties": [],
+    "boundary": [
+      "0.orig 保存初始化前的原始场。运行 restore0Dir 后会复制为 0；若教程使用 setFields，再按初始化字典写入各单元的场值。请填写原始配置，逐单元列表由工具生成。",
+      "0.orig/U 中的场为速度，单位 m/s；填写七个基本量纲指数。",
+      "0.orig/U 的初始内部场均匀，数值为 (0, 0, 0)（采用该场的 SI 单位）。",
+      "0.orig/U 这一段对应的网格边界名是 down；从示意图的边界分组中选择，保持大小写一致。",
+      "0.orig/p 中的场为运动学压力，单位 m²/s²；填写七个基本量纲指数。",
+      "0.orig/p 的初始内部场均匀，数值为 0（采用该场的 SI 单位）。"
+    ],
+    "control": [
+      "求解器使用 potentialFoam。",
+      "终止时间/迭代编号为 1。",
+      "初始时间步（稳态求解时为迭代步长）为 1。",
+      "结果写出间隔（单位由文件中的 writeControl 决定）为 1。"
+    ],
+    "numerics": [
+      "system/fvSchemes 中 ddtSchemes/default 取 steadyState。",
+      "system/fvSchemes 中 gradSchemes/default 取 leastSquares。",
+      "system/fvSchemes 中 divSchemes/default 取 none。",
+      "system/fvSchemes 中 laplacianSchemes/default 取 Gauss linear corrected。"
+    ],
+    "run": [
+      "先加载 OpenFOAM 环境；下列步骤从官方原始目录开始，按顺序准备网格、初始场并启动求解。步骤为：restore0Dir → blockMesh → potentialFoam -withFunctionObjects -writePhi -writephi -writep。checkMesh 可在网格生成后执行，foamToVTK -latestTime 可在求解完成后导出结果。"
+    ]
+  },
+  "referenceFiles": [
+    {
+      "path": "0.orig/U",
+      "bytes": 1326,
+      "sha256": "8863d1b00997db024dc22d8052169768f7af99d688e5a9224f017ea83bd1d326",
+      "exercise": true,
+      "description": "速度矢量场，定义初始速度及各边界上的速度条件。"
+    },
+    {
+      "path": "0.orig/p",
+      "bytes": 1306,
+      "sha256": "1314a96dd2d96346b0c7329cb89c4cfeaa2ef43cd698121734f8d9c132f518b3",
+      "exercise": true,
+      "description": "压力场。具体量纲以文件中的 dimensions 为准。"
+    },
+    {
+      "path": "Allclean",
+      "bytes": 340,
+      "sha256": "b0638622510e7f58eb29f287328f82f1ea320c5c28c2a7cd281f792b0867899c",
+      "exercise": false,
+      "description": "官方清理脚本，用于清除教程运行生成的数据。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions      # Tutorial clean functions\n#------------------------------------------------------------------------------\n\ncleanCase0\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "Allrun",
+      "bytes": 537,
+      "sha256": "f1adf0c6bf790d6457a5cd5403c3dcb8b0f9952550b3fcd261e51c980efd5449",
+      "exercise": false,
+      "description": "官方运行脚本；包含该教程的准备、初始化与求解步骤。",
+      "text": "#!/bin/sh\ncd \"${0%/*}\" || exit                                # Run from this directory\n. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions\n#------------------------------------------------------------------------------\n\ncanCompile || exit 0    # Dynamic code\n\nrestore0Dir\n\nrunApplication blockMesh\n\nrunApplication $(getApplication) -withFunctionObjects -writePhi -writephi -writep\n\nrunApplication postProcess -func streamFunction\n\n#------------------------------------------------------------------------------\n",
+      "compressed": false
+    },
+    {
+      "path": "system/blockMeshDict",
+      "bytes": 4846,
+      "sha256": "0253b6207e5fc3facf33ee44ab0a71746c51dfabc98da4fc3acfcf6d74f63fab",
+      "exercise": false,
+      "description": "网格顶点、块、单元数、加密比例及边界名称。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      blockMeshDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nscale   1;\n\n// Geometric parameters\nrInner  0.5;\nrOuter  1;\nxmax    2;\nymax    2;\n\nzmin   -0.5;  // Back/front locations\nzmax    0.5;\n\n// Divisions: Radial, quarter circumference, outer region and z-directions.\nnRadial  10;\nnQuarter 10;\nnxOuter  20;\nnyOuter  20;\nnz       1;\n\n// ----------------\n\n// Derived quantities\nrInner45    ${{ $rInner * sqrt(0.5) }};\nrOuter45    ${{ $rOuter * sqrt(0.5) }};\n\nvertices #codeStream\n{\n    codeInclude\n    #{\n        #include \"pointField.H\"\n    #};\n\n    code\n    #{\n        pointField points\n        ({\n            /* 0*/ { $rInner, 0, $zmin },\n            /* 1*/ { $rOuter, 0, $zmin },\n            /* 2*/ { $xmax, 0, $zmin },\n            /* 3*/ { $xmax, $rOuter45, $zmin },\n            /* 4*/ { $rOuter45, $rOuter45, $zmin },\n            /* 5*/ { $rInner45, $rInner45, $zmin },\n            /* 6*/ { $xmax, $ymax, $zmin },\n            /* 7*/ { $rOuter45, $ymax, $zmin },\n            /* 8*/ { 0, $ymax, $zmin },\n            /* 9*/ { 0, $rOuter, $zmin },\n            /*10*/ { 0, $rInner, $zmin },\n            /*11*/ { -$rInner, 0, $zmin },\n            /*12*/ { -$rOuter, 0, $zmin },\n            /*13*/ { -$xmax, 0, $zmin },\n            /*14*/ { -$xmax, $rOuter45, $zmin },\n            /*15*/ { -$rOuter45, $rOuter45, $zmin },\n            /*16*/ { -$rInner45, $rInner45, $zmin },\n            /*17*/ { -$xmax, $ymax, $zmin },\n            /*18*/ { -$rOuter45, $ymax, $zmin }\n        });\n\n        // Duplicate z points for zmax\n        const label sz = points.size();\n        points.resize(2*sz);\n        for (label i = 0; i < sz; ++i)\n        {\n            const point& pt = points[i];\n            points[i + sz] = point(pt.x(), pt.y(), $zmax);\n        }\n\n        os  << points;\n    #};\n};\n\n// Can remove unneeded variables\n#remove ( \"r(Inner|Outer).*\"  \"[xy](min|max)\" )\n\nblocks\n(\n    hex (5 4 9 10 24 23 28 29)    ($nRadial  $nQuarter $nz) grading (1 1 1)\n    hex (0 1 4 5 19 20 23 24)     ($nRadial  $nQuarter $nz) grading (1 1 1)\n    hex (1 2 3 4 20 21 22 23)     ($nxOuter  $nQuarter $nz) grading (1 1 1)\n    hex (4 3 6 7 23 22 25 26)     ($nxOuter  $nyOuter  $nz) grading (1 1 1)\n    hex (9 4 7 8 28 23 26 27)     ($nQuarter $nyOuter  $nz) grading (1 1 1)\n    hex (15 16 10 9 34 35 29 28)  ($nRadial  $nQuarter $nz) grading (1 1 1)\n    hex (12 11 16 15 31 30 35 34) ($nRadial  $nQuarter $nz) grading (1 1 1)\n    hex (13 12 15 14 32 31 34 33) ($nxOuter  $nQuarter $nz) grading (1 1 1)\n    hex (14 15 18 17 33 34 37 36) ($nxOuter  $nyOuter  $nz) grading (1 1 1)\n    hex (15 9 8 18 34 28 27 37)   ($nQuarter $nyOuter  $nz) grading (1 1 1)\n);\n\nedges\n(\n    // Inner cylinder\n    arc  0  5 origin (0 0 $zmin)\n    arc  5 10 origin (0 0 $zmin)\n    arc  1  4 origin (0 0 $zmin)\n    arc  4  9 origin (0 0 $zmin)\n    arc 19 24 origin (0 0 $zmax)\n    arc 24 29 origin (0 0 $zmax)\n    arc 20 23 origin (0 0 $zmax)\n    arc 23 28 origin (0 0 $zmax)\n    // Intermediate cylinder\n    arc 11 16 origin (0 0 $zmin)\n    arc 16 10 origin (0 0 $zmin)\n    arc 12 15 origin (0 0 $zmin)\n    arc 15  9 origin (0 0 $zmin)\n    arc 30 35 origin (0 0 $zmax)\n    arc 35 29 origin (0 0 $zmax)\n    arc 31 34 origin (0 0 $zmax)\n    arc 34 28 origin (0 0 $zmax)\n);\n\nboundary\n(\n    down\n    {\n        type symmetryPlane;\n        faces\n        (\n            (0 1 20 19)\n            (1 2 21 20)\n            (12 11 30 31)\n            (13 12 31 32)\n        );\n    }\n    right\n    {\n        type patch;\n        faces\n        (\n            (2 3 22 21)\n            (3 6 25 22)\n        );\n    }\n    up\n    {\n        type symmetryPlane;\n        faces\n        (\n            (7 8 27 26)\n            (6 7 26 25)\n            (8 18 37 27)\n            (18 17 36 37)\n        );\n    }\n    left\n    {\n        type patch;\n        faces\n        (\n            (14 13 32 33)\n            (17 14 33 36)\n        );\n    }\n    cylinder\n    {\n        type symmetry;\n        faces\n        (\n            (10 5 24 29)\n            (5 0 19 24)\n            (16 10 29 35)\n            (11 16 35 30)\n        );\n    }\n);\n\nmergePatchPairs\n(\n);\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/controlDict",
+      "bytes": 3599,
+      "sha256": "464d98cbbbf33650b82d0197e948da2c24b7d175ff945666de56ed3c7535b62f",
+      "exercise": true,
+      "description": "求解器、起止时间、时间步长、结果写出频率和运行时函数对象。"
+    },
+    {
+      "path": "system/decomposeParDict",
+      "bytes": 920,
+      "sha256": "6d3bc5a4192b9d1ea24b14527adf2d3941db5be72da4a4b19afb7979f8e9e53c",
+      "exercise": false,
+      "description": "并行分区方法及进程数，供 decomposePar 与并行运行使用。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      decomposeParDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nnumberOfSubdomains 4;\n\nmethod      simple;\n\ncoeffs\n{\n    n       ( 2 2 1 );\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    },
+    {
+      "path": "system/fvSchemes",
+      "bytes": 1224,
+      "sha256": "f5a318581f99d853d9bbc592c5348f8eb89ca2732f8499963fc440ea1d2f1e04",
+      "exercise": true,
+      "description": "各方程中时间项、梯度、对流和扩散项的离散格式。"
+    },
+    {
+      "path": "system/fvSolution",
+      "bytes": 1072,
+      "sha256": "ed0065be8081818894c9483db8b0b57bc948d55a67462e1d4d2a196846c00c5c",
+      "exercise": false,
+      "description": "线性方程求解器、收敛容差，以及压力与速度耦合算法的设置。",
+      "text": "/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\\\    /   O peration     | Version:  v2512                                 |\n|   \\\\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\\\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    Phi\n    {\n        solver          GAMG;\n        smoother        DIC;\n        tolerance       1e-06;\n        relTol          0.01;\n    }\n\n    p\n    {\n        $Phi;\n    }\n}\n\npotentialFlow\n{\n    nNonOrthogonalCorrectors 3;\n}\n\n\n// ************************************************************************* //\n",
+      "compressed": false
+    }
+  ],
+  "gaps": 14,
+  "xp": 20,
+  "bamboo": 8,
+  "boundaryImage": "/assets/town/province-cases/fujian-boundaries.svg"
+}
