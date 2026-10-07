@@ -4,7 +4,7 @@
  const emoji=['😊','🐼','👋','👍','🎋','❤️','🎉','🤔','😂','🙌','☕','✨','💪','🙏','🎆','🌙'];
  const drafts=new Map(),pending=new Map();
  let root,panel,ctx,identity,scope='world',room='world',revision=0,request=0,channel,timer,populationTimer;
- let messages=new Map(),unread=0,collapsed=true,connected=false,loading=false,sending=false;
+ let messages=new Map(),unread=0,collapsed=true,connected=false,loading=false,sending=false,refreshing=null,reconnectTimer;
  const $=s=>panel.querySelector(s),me=()=>window.foamAuth?.user?.id||null;
  const label=id=>ctx?.provinces.find(p=>p.id===id)?.name||'未入住';
  const fullTime=new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
@@ -37,11 +37,16 @@
   if(!ordered.length){const empty=document.createElement('p');empty.className='town-chat-empty';empty.textContent=room==='world'?'还没有消息，来和大家打个招呼吧。':'这里还没有消息，来和邻居打个招呼吧。';log.append(empty);}
   if(initial||atBottom&&!collapsed)bottom();else {log.scrollTop=Math.max(0,oldTop+Math.min(0,log.scrollHeight-oldHeight));if(added){unread+=added;badge();$('[data-chat-latest]').hidden=collapsed;}}
  }
- async function refresh(initial=false){const rev=revision,req=++request,target=room;try{const rows=await N.rpc('foamlab_town_chat_history',{channel:target});if(rev!==revision||req!==request)return;merge(rows,initial||loading);loading=false;$('[data-chat-retry]').hidden=true;status(connected?'消息实时更新':'每隔 30 秒更新消息');}catch(error){if(rev===revision&&req===request){loading=false;status('消息暂时无法更新，点击重试。');$('[data-chat-retry]').hidden=false;}}}
- function stop(){revision++;request++;clearInterval(timer);timer=null;connected=false;if(channel){window.foamAuth?.client?.removeChannel(channel).catch(()=>{});channel=null;}}
+ async function refresh(initial=false){const rev=revision;if(refreshing===rev)return;refreshing=rev;const req=++request,target=room;try{const rows=await N.rpc('foamlab_town_chat_history',{channel:target});if(rev!==revision||req!==request)return;merge(rows,initial||loading);loading=false;$('[data-chat-retry]').hidden=true;status(connected?'消息实时更新':'正在恢复实时连接，消息自动更新');}catch(error){if(rev===revision&&req===request){loading=false;status('消息暂时无法更新，点击重试。');$('[data-chat-retry]').hidden=false;}}finally{if(refreshing===rev)refreshing=null;}}
+ function stop(){revision++;request++;clearInterval(timer);clearTimeout(reconnectTimer);timer=null;connected=false;if(channel){window.foamAuth?.client?.removeChannel(channel).catch(()=>{});channel=null;}}
  function listen(){stop();if(document.hidden||!ctx)return;const rev=revision;loading=true;status('正在读取消息…');$('[data-chat-retry]').hidden=true;
-  const client=window.foamAuth?.client;if(client){channel=client.channel('town-chat:'+room+':'+rev).on('postgres_changes',{event:'INSERT',schema:'public',table:'foamlab_town_chat_messages',filter:'channel=eq.'+room},event=>{if(rev===revision)merge([event.new]);}).subscribe(state=>{if(rev!==revision)return;connected=state==='SUBSCRIBED';if(connected){status('消息实时更新');void refresh();}else if(state==='CHANNEL_ERROR'||state==='TIMED_OUT'||state==='CLOSED')status('连接恢复中，每隔 30 秒更新消息');});}
-  void refresh(true);timer=setInterval(()=>{if(!document.hidden&&!connected)void refresh();},30000);
+  const client=window.foamAuth?.client;if(client){channel=client.channel('town-chat:'+room+':'+rev,{config:{postgres_changes_options:{wait:true}}})
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'foamlab_town_chat_messages',filter:'channel=eq.'+room},event=>{if(rev===revision)merge([event.new]);})
+   .on('system',{},event=>{if(rev!==revision||event.extension!=='postgres_changes')return;if(event.status==='error'){connected=false;status('正在恢复实时连接，消息自动更新');}else if(event.status==='ok'){connected=true;status('消息实时更新');void refresh();}})
+   .subscribe(state=>{if(rev!==revision)return;connected=state==='SUBSCRIBED';if(connected){clearTimeout(reconnectTimer);status('消息实时更新');void refresh();}else if(state==='CHANNEL_ERROR'||state==='TIMED_OUT'||state==='CLOSED'){status('正在恢复实时连接，消息自动更新');if(state==='CLOSED'){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(()=>{if(rev===revision&&!document.hidden)listen();},3000);}}});}
+  // Push delivers new messages immediately. Only a disconnected channel uses
+  // short catch-up reads; slow requests never pile up or cancel one another.
+  void refresh(true);timer=setInterval(()=>{if(!document.hidden&&!connected&&navigator.onLine)void refresh();},2000);
  }
  function select(next){drafts.set(room,$('textarea').value);scope=next;const target=scope==='town'&&ctx.province?ctx.province:'world';
   const changed=target!==room;room=target;for(const b of panel.querySelectorAll('[data-chat-tab]')){b.setAttribute('aria-selected',String(b.dataset.chatTab===scope));b.tabIndex=b.dataset.chatTab===scope?0:-1;}
@@ -109,6 +114,7 @@
   const local=$('[data-chat-tab=town]');local.disabled=!ctx.province;local.textContent=ctx.province?'当前小镇 · '+label(ctx.province):'当前小镇';local.title=ctx.province?'和正在这里的朋友聊天':'进入小镇后打开当前频道';
   if(scope==='town'&&!ctx.province)scope='world';select(scope);dock();if(!timer)listen();clearInterval(populationTimer);void population();populationTimer=setInterval(population,60000);
  }
+ window.addEventListener('online',()=>{if(ctx&&!document.hidden)listen();});
  document.addEventListener('visibilitychange',()=>{if(!ctx)return;if(document.hidden)stop();else{listen();void population();}});
  window.addEventListener('pagehide',()=>{stop();clearInterval(populationTimer);});
  window.addEventListener('pageshow',e=>{if(e.persisted&&ctx){listen();clearInterval(populationTimer);populationTimer=setInterval(population,60000);void population();}});
