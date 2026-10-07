@@ -18,7 +18,7 @@
  const NPCS=[
   {id:'mayor',name:'村长竹伯',x:300,y:535,radius:0,speed:0,stationary:true,lines:['欢迎来到小镇！我就在公告栏旁，随时可以找我问路。']},
   {id:'gardener',name:'园丁阿竹',x:760,y:1040,radius:180,speed:60,tint:'hue-rotate(70deg) saturate(1.3)',prop:'leaf',lines:['早上好！今天的竹笋藏在草丛和路边，走过去就能拾起来。','学堂里有“算例实训”：从准备算例到 ParaView 看结果，在小镇里把方腔算例完整跑一遍。','小地图上的绿色小点就是竹笋，去找找看吧。','竹子要长很久，学 OpenFOAM 也一样，一步一步来。']},
-  {id:'fisher',name:'钓鱼老伯',x:2070,y:470,radius:70,speed:45,tint:'hue-rotate(200deg) saturate(.9)',prop:'fish',lines:['湖里的鱼会叼来知识卡。站到湖边按 E 抛竿，看到“！”就赶快再按一次 E。','金色锦鲤很少见，它叼来的卡片也一样珍贵。','钓鱼和调松弛因子一样，急不得。']},
+  {id:'fisher',name:'钓鱼老伯',x:2070,y:470,radius:70,speed:45,tint:'hue-rotate(200deg) saturate(.9)',prop:'fish',lines:['湖里的鱼会叼来知识卡。走到任意水岸按 E 抛竿，看到“！”就赶快再按一次 E。','金色锦鲤很少见，它叼来的卡片也一样珍贵。','钓鱼和调松弛因子一样，急不得。']},
   {id:'postman',name:'邮差小白',x:1300,y:1010,radius:330,speed:95,tint:'hue-rotate(320deg) saturate(1.4)',prop:'mail',lines:['答疑医院和讨论中心是同一份数据：在医院里提的问题，网站上马上能看到。','走到邻居的小屋门口按 E，就能给他们留言、送竹子。','点击速度按钮或按 R，在 1 倍、2 倍、4 倍移动速度之间切换。','同时按 W 和 D，就能往右上方斜着走。也可以点击地面自动行走。','按 1 到 6 可以直接做快捷栏里的动作。']},
   {id:'merchant',name:'竹笋铺阿团',x:1550,y:880,radius:100,speed:48,tint:'hue-rotate(30deg)',prop:'bamboo',action:'shop',lines:['欢迎来竹笋铺！采集和实训得到的竹笋，都能在这里换收藏。']},
   {id:'librarian',name:'馆员墨墨',x:1100,y:520,radius:100,speed:44,tint:'hue-rotate(150deg)',prop:'read',lines:['知识卡点开会弹出阅读窗口，右上角的叉号可以关闭。','学堂里能按主题抽取实训，做过的每一步都可以再看。']},
@@ -64,7 +64,7 @@
    <dt>${k('W')}${k('A')}${k('S')}${k('D')} 或方向键</dt><dd>上下左右移动</dd>
    <dt>${k('W')}+${k('D')} 等两键同按</dt><dd>斜向移动：右上、左上、右下、左下</dd>
    <dt>按住 ${k('Shift')} / 按 ${k('R')}</dt><dd>临时至少 2 倍速 / 切换 1 倍、2 倍、4 倍速</dd>
-   <dt>${k('E')} 或 ${k('空格')}</dt><dd>和附近的建筑、邻居、NPC 互动，在湖边钓鱼</dd>
+   <dt>${k('E')} 或 ${k('空格')}</dt><dd>和附近的建筑、邻居、NPC 互动，在水边钓鱼</dd>
    <dt>${k('1')} – ${k('6')}</dt><dd>执行快捷栏里的动作和表情；主键盘与数字小键盘都可使用。击掌、递竹子等互动需要选择一位邻居。</dd>
    <dt>${k('+')} ${k('−')} 或滚轮</dt><dd>缩放画面</dd>
    <dt>J · 任务簿</dt><dd>查看当前目标、完成步骤和领取奖励。与居民交谈接取委托，沿道路走近路口即可切换场景。</dd>
@@ -77,8 +77,8 @@
  function detail(card,trigger){window.dispatchEvent(new CustomEvent('foamlab:knowledge-open',{detail:{id:card.id}}));const d=document.createElement('dialog');d.className='town-card-detail';d.setAttribute('aria-label',card.title+'知识卡');d.innerHTML=`<header><span>知识卡</span><button type="button" data-card-detail-close aria-label="关闭知识卡">×</button></header>${cardBody(card)}`;root.append(d);d.querySelector('[data-card-detail-close]').onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});d.addEventListener('close',()=>{d.remove();trigger?.focus({preventScroll:true});},{once:true});d.showModal();}
  function mountCollection(host){host.innerHTML=`<p class="town-note">100 张知识卡 · 75 张普通 / 20 张稀有 / 5 张隐藏。点击已收集的卡片，在弹窗中阅读。</p><div class="town-card-grid">${CARDS.map(c=>cards.includes(c.id)?`<button type="button" class="town-mini-card is-${c.rarity}" data-card-id="${c.id}">${window.FoamTownIcon(c.rarity==='hidden'?'gem':c.rarity==='rare'?'star':'card')}<strong>${E(c.title)}</strong><span>${rarityName(c)} · 点击阅读</span>${window.FoamCollectionTime?.(window.FoamTownProgress?.get()?.obtained_at?.['card:'+c.id])||''}</button>`:`<div class="town-mini-card is-locked" aria-label="未收集知识卡">${window.FoamTownIcon('lock')}<span>未收集</span></div>`).join('')}</div>`;host.querySelectorAll('[data-card-id]').forEach(b=>b.onclick=()=>detail(CARDS.find(c=>c.id===b.dataset.cardId),b));}
  function collection(){overlay('cards',`<header><h2>知识卡图鉴 <small>${cards.length}/${CARDS.length}</small></h2><button type="button" data-play-close aria-label="关闭图鉴">×</button></header><div data-knowledge-collection></div>`);mountCollection(ui.overlay.box.querySelector('[data-knowledge-collection]'));}
- function showCard(card,fish,fresh){overlay('card',`<header><h2>湖边的发现</h2><button type="button" data-play-close aria-label="关闭知识卡">×</button></header><div class="town-catch"><div class="town-catch-fish" aria-hidden="true">${fish[1]}</div><p>钓到了一条<strong>${fish[0]}</strong>，它叼着一张知识卡${fresh?'（新卡！）':''}</p></div>${cardBody(card)}<div class="town-overlay-actions"><button type="button" class="primary" data-play-close>收下 <kbd>E</kbd></button></div>`);}
- function welcome(){overlay('welcome',`<header><h2>村长竹伯 · 欢迎来到小镇</h2><button type="button" data-play-close aria-label="关闭">×</button></header><div class="town-welcome-portrait">${window.FoamTownNPCLook('mayor')}</div><section class="town-mayor-update"><strong>村长公告 · 10 月 5 日</strong><p>游乐园开门啦！在建筑目录选择“游乐园”，就能玩流光画布：全屏、小窗都可以，按 Esc 或右上角 × 返回。</p><p>彩蛋已增加到 126 项，发现与收藏会显示获得时间。终端就在底部操作提示栏；喷泉彩虹显示 20 秒后收起。夜间的倍速文字也更清楚了。</p></section><p>这里是和熊猫一起学习 OpenFOAM 的地方。沿着小路走，每栋建筑都有自己的用途。</p><ol class="town-welcome-steps"><li><b>先到学堂</b>按主题抽取实训，跟着五个步骤看懂计算过程，已完成的步骤可以回看。</li><li><b>有问题去答疑医院</b>带上配置、日志与结果，一起讨论。</li><li><b>在公告栏看每日任务与本镇留言</b>拾竹笋、参观、答题和实训都会留下进度。</li><li><b>到湖边钓知识卡</b>竹笋还可以在商店换收藏，稀有和隐藏卡等你发现。</li><li><b>在展览馆分享计算图片</b>给喜欢的作品点赞，作品与获赞会陈列在作者的小屋。</li></ol><p class="town-note">点击地面可以自动走过去；键盘 WASD 或方向键移动，点击速度按钮切换 1 倍 / 2 倍 / 4 倍速。随时回来找我聊聊。</p>`);}
+ function showCard(card,fish,fresh){overlay('card',`<header><h2>水边的发现</h2><button type="button" data-play-close aria-label="关闭知识卡">×</button></header><div class="town-catch"><div class="town-catch-fish" aria-hidden="true">${fish[1]}</div><p>钓到了一条<strong>${fish[0]}</strong>，它叼着一张知识卡${fresh?'（新卡！）':''}</p></div>${cardBody(card)}<div class="town-overlay-actions"><button type="button" class="primary" data-play-close>收下 <kbd>E</kbd></button></div>`);}
+ function welcome(){overlay('welcome',`<header><h2>村长竹伯 · 欢迎来到小镇</h2><button type="button" data-play-close aria-label="关闭">×</button></header><div class="town-welcome-portrait">${window.FoamTownNPCPortrait('mayor')}</div><section class="town-mayor-update"><strong>村长公告 · 10 月 5 日</strong><p>游乐园开门啦！在建筑目录选择“游乐园”，就能玩流光画布：全屏、小窗都可以，按 Esc 或右上角 × 返回。</p><p>彩蛋已增加到 126 项，发现与收藏会显示获得时间。终端就在底部操作提示栏；喷泉彩虹显示 20 秒后收起。夜间的倍速文字也更清楚了。</p></section><p>这里是和熊猫一起学习 OpenFOAM 的地方。沿着小路走，每栋建筑都有自己的用途。</p><ol class="town-welcome-steps"><li><b>先到学堂</b>按主题抽取实训，跟着五个步骤看懂计算过程，已完成的步骤可以回看。</li><li><b>有问题去答疑医院</b>带上配置、日志与结果，一起讨论。</li><li><b>在公告栏看每日任务与本镇留言</b>拾竹笋、参观、答题和实训都会留下进度。</li><li><b>到水边钓知识卡</b>竹笋还可以在商店换收藏，稀有和隐藏卡等你发现。</li><li><b>在展览馆分享计算图片</b>给喜欢的作品点赞，作品与获赞会陈列在作者的小屋。</li></ol><p class="town-note">点击地面可以自动走过去；键盘 WASD 或方向键移动，点击速度按钮切换 1 倍 / 2 倍 / 4 倍速。随时回来找我聊聊。</p>`);}
 
  /* NPCs ------------------------------------------------------------------------------- */
  function talk(npc,m){window.dispatchEvent(new CustomEvent('foamlab:town-npc',{detail:{id:npc.id,x:m.x,y:m.y}}));bump('greet');
@@ -88,7 +88,7 @@
   if(npc.id==='mayor')choices.push({label:'问问小镇里的事情',run:()=>{window.FoamTownDialogue.close();welcome();}},{label:'观测站有什么需要帮忙的？',run:()=>{window.FoamTownDialogue.close();window.FoamTownStory.npc('heng');}});
   if(npc.action)choices.push({label:npc.action==='shop'?'看看店里的东西':'看看本镇留言',run:()=>{window.FoamTownDialogue.close();window.dispatchEvent(new CustomEvent('foamlab:town-open-extra',{detail:{kind:npc.action}}));}});
   choices.push({label:'回头见',run:()=>window.FoamTownDialogue.close()});
-  window.FoamTownDialogue.show({name:npc.name,portrait:window.FoamTownNPCLook(npc.id),pages:[npc.lines?.[m.line]||'沿路走一走吧。大家各有各的忙处，也有不少故事想讲。'],choices});
+  window.FoamTownDialogue.show({npcId:npc.id,name:npc.name,pages:[npc.lines?.[m.line]||'沿路走一走吧。大家各有各的忙处，也有不少故事想讲。'],choices});
  }
  function speech(m,text){m.el.querySelector('.town-speech')?.remove();const b=document.createElement('b');b.className='town-speech';b.textContent=text;m.el.append(b);clearTimeout(m.speechTimer);m.speechTimer=setTimeout(()=>b.remove(),5200);}
 
@@ -99,24 +99,40 @@
   return list.filter(s=>s.el);}
 
  /* Fishing ------------------------------------------------------------------------------ */
- function fishing(g){const lake=g.lake,center={x:lake.x+lake.w/2,y:lake.y+lake.h/2},spots=[];
-  const ring=[];for(let y=lake.y+30;y<lake.y+lake.h-20;y+=46)ring.push({x:lake.x-26,y});for(let x=lake.x+20;x<lake.x+lake.w;x+=50)ring.push({x,y:lake.y+lake.h+18});
-  for(const p of ring)if(g.walkable(p.x,p.y)&&!spots.some(s=>Math.hypot(s.x-p.x,s.y-p.y)<90))spots.push(p);
+ function fishing(g){
+  const water=window.FoamTownWater.survey(g);g.fishing=water;
   let st=null;
-  const end=(message)=>{if(!st)return;st.bobber.remove();st.line.remove();g.avatar()?.classList.remove('is-fishing');st.alert?.remove();g.locked=false;g.lockFace=null;g.lockPrompt=null;st=null;if(message)toast(message);};
-  const start=spot=>{if(st||g.config.guest)return;const dx=center.x-spot.x,dy=center.y-spot.y,d=Math.hypot(dx,dy),tx=spot.x+dx/d*90,ty=spot.y+dy/d*70;g.locked=true;g.path=[];g.me.vx=g.me.vy=0;g.lockFace=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');g.avatar()?.classList.add('is-fishing');
+  const end=message=>{if(!st)return;st.bobber.remove();st.line.remove();st.ripple.remove();st.hud.remove();g.avatar()?.classList.remove('is-fishing');st.alert?.remove();g.locked=false;g.lockFace=null;g.lockPrompt=null;st=null;if(message)toast(message);};
+  const status=(title,tip,bite=false)=>{if(!st)return;st.hud.classList.toggle('is-bite',bite);st.hud.querySelector('strong').textContent=title;st.hud.querySelector('small').textContent=tip;st.hud.querySelector('button').textContent=bite?'收竿！':'收起鱼竿';};
+  const start=()=>{
+   const bank=water.nearest();if(st||g.config.guest||game!==g||!bank)return;
+   const spot={x:g.me.x,y:g.me.y},tx=bank.target.x,ty=bank.target.y,dx=tx-spot.x,dy=ty-spot.y;
+   g.stopMovement();g.locked=true;g.me.vx=g.me.vy=0;g.lockFace=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');g.avatar()?.classList.add('is-fishing');
    const bobber=document.createElement('i');bobber.className='town-bobber is-cast';bobber.style.left=tx-8+'px';bobber.style.top=ty-8+'px';g.world.append(bobber);
-   const line=document.createElementNS('http://www.w3.org/2000/svg','svg');line.classList.add('town-fishing-line');const minX=Math.min(spot.x,tx)-20,minY=Math.min(spot.y-60,ty)-20,w=Math.abs(tx-spot.x)+40,h=Math.abs(ty-spot.y+60)+40;line.setAttribute('viewBox',`0 0 ${w} ${h}`);line.style.left=minX+'px';line.style.top=minY+'px';line.style.width=w+'px';line.style.height=h+'px';const hx=spot.x+(g.lockFace==='left'?-22:g.lockFace==='right'?22:12)-minX,hy=spot.y-58-minY,bx=tx-minX,by=ty-minY;line.innerHTML=`<path d="M${hx} ${hy}Q${(hx+bx)/2} ${Math.max(hy,by)+26} ${bx} ${by}" fill="none" stroke="#f7f1dc" stroke-width="1.6" opacity=".9"/>`;g.world.append(line);
-   st={phase:'cast',t:.6,bobber,line,spot};g.lockPrompt={id:'fish-wait',x:spot.x,y:spot.y-104,label:'等待咬钩 · 点击收竿'};toast('抛竿……等鱼咬钩时会出现“！”');};
-  const use=async()=>{if(!st)return;if(st.phase==='bite'){const r=Math.random();let acc=0,fish=FISH[0];for(const f of FISH){acc+=f[2];if(r<=acc){fish=f;break;}}const previous=[...cards],request=crypto.randomUUID();end();try{const had=window.FoamPandaCards?.owned()||new Set(),result=await window.FoamTownProgress.call('activity',{kind:'fish',request_id:request}),card=CARDS.find(c=>'card:'+c.id===result.reward.item);if(card&&game===g)showCard(card,card.rarity==='rare'?FISH[3]:fish===FISH[3]?FISH[2]:fish,!previous.includes(card.id));const art=result.reward?.art;if(art&&game===g)window.FoamPandaCards?.reveal(art.slice(4),{fresh:!had.has(art.slice(4)),source:'湖边钓鱼 · 鱼篓里还有一张画卡'});}catch(error){toast(error.message);}}
-   else {void window.FoamTownEggs?.event('fish_miss').catch(()=>{});end('还没咬钩就收竿了，鱼都被吓跑了。');}};
+   const ripple=document.createElement('i');ripple.className='town-fishing-ripple';ripple.style.left=tx+'px';ripple.style.top=ty+'px';g.world.append(ripple);
+   const line=document.createElementNS('http://www.w3.org/2000/svg','svg');line.classList.add('town-fishing-line');const minX=Math.min(spot.x,tx)-30,minY=Math.min(spot.y-66,ty)-30,w=Math.abs(tx-spot.x)+60,h=Math.abs(ty-spot.y+66)+60;
+   line.setAttribute('viewBox',`0 0 ${w} ${h}`);line.style.left=minX+'px';line.style.top=minY+'px';line.style.width=w+'px';line.style.height=h+'px';
+   const hx=spot.x+(g.lockFace==='left'?-22:g.lockFace==='right'?22:12)-minX,hy=spot.y-58-minY,bx=tx-minX,by=ty-minY;
+   line.innerHTML=`<path d="M${hx} ${hy}Q${(hx+bx)/2} ${Math.max(hy,by)+26} ${bx} ${by}" fill="none" stroke="#f7f1dc" stroke-width="1.6" opacity=".9"/>`;g.world.append(line);
+   const hud=document.createElement('section');hud.className='town-fishing-hud';hud.setAttribute('aria-label','钓鱼操作');hud.innerHTML=`<span>${E(bank.area.name)}</span><strong role="status">正在抛竿</strong><small>等浮标下沉，再按 E 或点击收竿。</small><button type="button">收起鱼竿</button><p>移动或按 Esc 可以收竿离开</p>`;hud.querySelector('button').onclick=()=>void use();g.viewport.parentElement.append(hud);
+   st={phase:'cast',t:.6,bobber,line,ripple,hud,spot};g.lockPrompt={id:'fish-wait',x:spot.x,y:spot.y-104,label:'等待咬钩 · 点击收竿'};
+  };
+  const use=async()=>{if(!st)return;if(st.phase==='bite'){
+   const r=Math.random();let acc=0,fish=FISH[0];for(const f of FISH){acc+=f[2];if(r<=acc){fish=f;break;}}
+   const previous=[...cards],request=crypto.randomUUID();end();
+   try{const had=window.FoamPandaCards?.owned()||new Set(),result=await window.FoamTownProgress.call('activity',{kind:'fish',request_id:request}),card=CARDS.find(c=>'card:'+c.id===result.reward.item);
+    if(card&&game===g)showCard(card,card.rarity==='rare'?FISH[3]:fish===FISH[3]?FISH[2]:fish,!previous.includes(card.id));const art=result.reward?.art;
+    if(art&&game===g)window.FoamPandaCards?.reveal(art.slice(4),{fresh:!had.has(art.slice(4)),source:'水边钓鱼 · 鱼篓里还有一张画卡'});
+   }catch(error){toast(error.message);}
+  }else {void window.FoamTownEggs?.event('fish_miss').catch(()=>{});end('收起了鱼竿，随时可以再试一次。');}};
   g.listen('use',use);g.listen('cancel',()=>end());g.listen('escape',()=>{if(st){end();return true;}return false;});
-  return{spots:()=>st?[]:spots.map((s,i)=>({id:'fish'+i,at:s,x:s.x,y:s.y-104,range:58,label:'在湖边钓鱼',run:()=>start(s)})),
+  return {spots:()=>{const bank=!st&&water.nearest();return bank?[{id:'fish-'+bank.area.id,at:{x:bank.x,y:bank.y},x:g.me.x,y:g.me.y-108,range:64,label:'在'+bank.area.name+'钓鱼',run:start}]:[];},
    update(dt){if(!st)return;st.t-=dt;
-    if(st.phase==='cast'&&st.t<=0){st.phase='wait';st.t=1.6+Math.random()*2.8;st.bobber.classList.remove('is-cast');}
-    else if(st.phase==='wait'&&st.t<=0){st.phase='bite';st.t=1;g.lockPrompt={...g.lockPrompt,id:'fish-bite',label:'咬钩了！立即收竿'};st.bobber.classList.add('is-bite');const a=document.createElement('b');a.className='town-alert';a.textContent='！';g.avatar()?.append(a);st.alert=a;}
-    else if(st.phase==='bite'&&st.t<=0){void window.FoamTownEggs?.event('fish_miss').catch(()=>{});end('鱼溜走了……下次看到“！”要快一点。');}},
-   minimap:()=>spots.map(s=>`<circle cx="${Math.round(s.x)}" cy="${Math.round(s.y)}" r="24" fill="#5aa9c9" stroke="#fff" stroke-width="8"/>`).join(''),destroy:()=>end()};}
+    if(st.phase==='cast'&&st.t<=0){st.phase='wait';st.t=1.6+Math.random()*2.8;st.bobber.classList.remove('is-cast');status('浮标轻轻晃动','等咬钩时出现“！”，再按 E 或点击收竿。');}
+    else if(st.phase==='wait'&&st.t<=0){st.phase='bite';st.t=quiet()?3:1.8;g.lockPrompt={...g.lockPrompt,id:'fish-bite',label:'咬钩了！立即收竿'};st.bobber.classList.add('is-bite');st.ripple.classList.add('is-bite');const a=document.createElement('b');a.className='town-alert';a.textContent='！';g.avatar()?.append(a);st.alert=a;status('咬钩了！','按 E、空格或点击下面的按钮收竿。',true);}
+    else if(st.phase==='bite'&&st.t<=0){void window.FoamTownEggs?.event('fish_miss').catch(()=>{});end('鱼溜走了。留意浮标，下次看到“！”就收竿。');}
+   },
+   minimap:()=>water.areas.map(area=>{const bank=water.banks.find(b=>b.area===area);return bank?`<circle cx="${Math.round(bank.x)}" cy="${Math.round(bank.y)}" r="24" fill="#5aa9c9" stroke="#fff" stroke-width="8"/>`:'';}).join(''),destroy:()=>end()};}
 
  /* Wildlife is mounted by town-wildlife.js. Keep the existing slow cloud shadows. */
  function ambient(g){if(quiet())return{};for(let i=0;i<2;i++){const el=document.createElement('i');el.className='town-cloud-shadow';el.style.top=(300+i*700)+'px';el.style.animationDelay=(-i*45)+'s';g.world.append(el);}return{};}
@@ -151,7 +167,7 @@ const head=ui.tasks.querySelector('.town-quest-head');let open=store.get('foamla
   const syncShoots=()=>{if(g.config.scene||g.config.guest||game!==g)return;if(spawnDay!==day.date){for(const el of g.world.querySelectorAll('[data-shoot-id]'))el.remove();list=shoots(g);spawnDay=day.date;}for(const s of list)if(day.shoots.includes(s.id)||day.shoots.length>=8)s.el?.remove();};
   g.shootField={sync:syncShoots};const stored=window.FoamTownProgress?.get();if(stored){day=stored.day;syncShoots();}
   g.extras.push({update(){for(const s of list){if(!s.el||!s.el.isConnected||s.taken)continue;if(Math.hypot(s.x-g.me.x,s.y-g.me.y)<34){s.taken=true;s.el.classList.add('is-picked');const collectedDay=spawnDay;bump('shoots',s.id).then(ok=>{if(ok)float(s.x,s.y-50,'+1 竹笋');else if(game===g&&spawnDay===collectedDay){s.taken=false;s.el.classList.remove('is-picked');if(!day.shoots.includes(s.id)&&day.shoots.length<8&&s.el.parentNode===null)g.world.append(s.el);}});}}},minimap:()=>list.filter(s=>s.el?.isConnected&&!s.taken).map(s=>`<circle cx="${Math.round(s.x)}" cy="${Math.round(s.y)}" r="20" fill="#9fd46a" stroke="#3e6b2c" stroke-width="8"/>`).join('')});
-  if(!g.config.scene&&!g.config.guest)g.extras.push(fishing(g));
+  if(!g.config.guest)g.extras.push(fishing(g));
   g.extras.push({minimap:()=>{const B=window.FoamTownBuildings;if(!B)return'';const s=B.runState();if(s.done||s.empty)return'';const i=g.config.buildings.findIndex(b=>b[0]===B.RUN[s.step]?.at),d=i>=0?g.door(i):null;return d?`<circle cx="${Math.round(d.x)}" cy="${Math.round(d.y-110)}" r="90" fill="none" stroke="#e2563f" stroke-width="18" stroke-dasharray="40 26"/>`:'';}});
   if(!g.config.scene)g.extras.push(ambient(g));dust(g);
   // Daily learning visits accept these server-supported destinations only.

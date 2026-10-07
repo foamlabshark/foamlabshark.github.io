@@ -62,7 +62,7 @@
   host.querySelectorAll('[data-story-answer]').forEach(b=>b.onclick=()=>submit(+b.dataset.storyAnswer));if(s.game)window.FoamTownStoryGames[s.game](host.querySelector('[data-story-game]'),submit);
   if(complete){host.querySelector('[data-story-feedback]').innerHTML='<p>'+E(s.explanation)+'</p>';host.querySelectorAll('[data-story-answer]').forEach(b=>b.disabled=true);}
  }
- function portrait(id){const npc=D.npcs[id],bg=window.FoamTownLook?.({...npc,ride:'walk'}).background;return `<i class="town-npc-portrait" style="background-image:${bg}" aria-hidden="true"></i>`;}
+ function portrait(id){return window.FoamTownNPCPortrait(id);}
  const greetings={heng:'你来得正好。我把观测记录摊开了，正在找几处对不上的地方。坐下来聊聊？',muxi:'我刚从水渠回来，鞋子还没干。今天的水声和昨天有些不同，你听见了吗？',lan:'山口的风又转向了。先站稳，再看风向标——我小时候总把这个顺序弄反。',tie:'这张桌子上都是还没弄明白的仪器。你有空的话，陪我看一件？',cheng:'船模今天浮得很稳。水面看起来安静，尺子上的记录却一直在变。',yan:'望远镜先放一放。今天我想把我们看不见的风，画成能和别人讨论的图。'};
  const offers={
   'first-log':['暴雨过后，我从广场捡回这本记录。纸上的数字还看得清，表头却被水冲掉了。','你愿意帮我整理它吗？先认清算例里的文件，再去问沐溪和铁竹，看看这些记录能不能接起来。'],
@@ -86,7 +86,7 @@
   'airfoil-note':['小白想要一架能飞过溪流的滑翔机。我做好了模型，还想把受力弄清楚。','帮我检查升力方向，再请岚岚看看迎角和分离，好吗？'],
   'ship-note':['父亲留下的这只竹叶船模，舱里还压着我小时候画的航线。','我想让它重新试航。我们先让船浮稳，再记录波浪，最后比较小船和大船的速度。']
  };
- function say(id,pages,choices){const p=D.npcs[id];view++;window.FoamTownDialogue.show({name:p.name,portrait:portrait(id),role:E(W.scene(current()).name),pages,choices});}
+ function say(id,pages,choices){const p=D.npcs[id];view++;window.FoamTownDialogue.show({npcId:id,name:p.name,role:W.scene(current()).name,pages,choices});}
  const goodbye=()=>({label:'回头再聊',run:()=>window.FoamTownDialogue.close()});
  async function npc(id,near=false){
   const p=D.npcs[id];if(!p||!game)return;const captured=game,scene=current(),m=game.npcs.get('story-'+id);
@@ -149,7 +149,15 @@
   };
   if(g.config.guest||g.config.direct?.()||Math.hypot(g.me.x-at.x,g.me.y-at.y)<55)arrived();else {g.walkTo(at.x,at.y,arrived);g.emit('hint','正在前往'+(kind==='consult'?D.npcs[waiting(q).npc].name:kind==='clue'?q.trigger.label:kind==='npc'||step===q.steps.length?D.npcs[q.npc].name:q.steps[step].place));}
  }
- function drawMarkers(){if(!game)return;const g=game;g.world.querySelectorAll('.story-objective').forEach(n=>n.remove());markers=[];if(!atHome())return;
+ function drawMarkers(){if(!game)return;const g=game;g.world.querySelectorAll('.story-objective,.town-npc-quest-status').forEach(n=>n.remove());markers=[];if(!atHome())return;
+  const mainBusy=D.quests.some(q=>q.kind==='main'&&active(q));
+  for(const [id,m] of g.npcs){if(!id.startsWith('story-'))continue;const person=id.slice(6);
+   const report=D.quests.find(q=>active(q)&&q.npc===person&&q.scene===current()&&stage(q)===q.steps.length);
+   const consult=D.quests.find(q=>active(q)&&waiting(q)?.npc===person&&waiting(q)?.scene===current());
+   const offer=D.quests.find(q=>q.npc===person&&q.scene===current()&&!active(q)&&!done(q)&&unlocked(q)&&found(q)&&(q.kind==='side'||!mainBusy));
+   const label=report?'可以汇报调查':consult?'有待核对的线索':offer?'有新的委托':'';
+   if(label){const mark=document.createElement('b');mark.className='town-npc-quest-status'+(report?' is-ready':'');mark.textContent=report?'✓':consult?'?':'!';mark.setAttribute('aria-label',label);mark.title=label;m.el.append(mark);}
+  }
   const selected=D.quests.find(q=>q.id===tracked&&active(q))||D.quests.find(q=>q.kind==='main'&&active(q))||D.quests.find(active);
   const clues=D.quests.filter(q=>q.scene===current()&&q.trigger.kind==='inspect'&&unlocked(q)&&!found(q));
   const entries=clues.map(q=>({q,kind:'clue',label:q.trigger.label}));

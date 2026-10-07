@@ -3,6 +3,14 @@
 (() => {
  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let dialog, turn = 0, timer, generation = 0, busy = false, full = '', printed = 0, config;
+ // Painted dialogue heads are independent from the small walking sprite sheets.
+ const portraits = ['heng','muxi','lan','tie','cheng','yan','mayor','gardener','fisher','postman','merchant','librarian','engineer','tea','researcher'];
+ const portrait = id => {
+  const index = portraits.indexOf(String(id).replace(/^story-/,''));
+  if (index < 0) return '';
+  const col = index % 3, row = Math.floor(index / 3), xs = [0,324,647,971], ys = [0,323,642,955,1260,1619];
+  return `<svg class="town-npc-portrait town-rpg-portrait" data-npc-portrait="${portraits[index]}" viewBox="${xs[col]} ${ys[row]} ${xs[col+1]-xs[col]} ${ys[row+1]-ys[row]}" aria-hidden="true"><image href="/assets/town/story-npc-portraits.webp" width="971" height="1619"/></svg>`;
+ };
  const split = text => String(text).split(/\n\n+/).flatMap(p => {
   const parts = p.match(/[^。！？]+[。！？]?/g) || [p], pages = []; let line = '';
   for (const s of parts) { if (line.length + s.length > 105 && line) { pages.push(line); line = ''; } line += s; }
@@ -39,7 +47,7 @@
   clearInterval(timer); const page = config.pages[turn] || {text:''};
   full = page.text; printed = 0;
   const speaker = page.speaker || config.name;
-  dialog.innerHTML = `<div class="town-talk-portrait">${config.portrait || '<span aria-hidden="true">🐼</span>'}<strong id="town-conversation-name">${esc(speaker)}</strong><small>${esc(config.role || '小镇居民')}</small></div><div class="town-talk-content"><button type="button" data-talk-close aria-label="暂时结束交谈">×</button><p data-talk-text aria-hidden="true"></p><p class="town-talk-sr" role="status">${esc(full)}</p><div data-talk-choices hidden>${(config.choices||[]).map((c,i)=>`<button type="button" data-talk-choice="${i}" ${c.disabled?'disabled':''}>${esc(c.label)}</button>`).join('')}</div><p class="town-talk-error" role="alert"></p><footer><small>${turn+1} / ${config.pages.length} · 点击文字或按空格继续</small><button type="button" data-talk-advance>继续 ▾</button></footer></div>`;
+  dialog.innerHTML = `<div class="town-talk-portrait">${portrait(config.npcId) || config.portrait || '<span aria-hidden="true">🐼</span>'}<strong id="town-conversation-name">${esc(config.name)}</strong><small>${esc(config.role || '小镇居民')}</small></div><div class="town-talk-content"><button type="button" data-talk-close aria-label="暂时结束交谈">×</button>${speaker!==config.name?`<b class="town-talk-speaker">${esc(speaker)}：</b>`:''}<p data-talk-text aria-hidden="true"></p><p class="town-talk-sr" role="status">${esc(full)}</p><div data-talk-choices hidden>${(config.choices||[]).map((c,i)=>`<button type="button" data-talk-choice="${i}" ${c.disabled?'disabled':''}>${esc(c.label)}</button>`).join('')}</div><p class="town-talk-error" role="alert"></p><footer><small>${turn+1} / ${config.pages.length} · 点击文字或按空格继续</small><button type="button" data-talk-advance>继续 ▾</button></footer></div>`;
   dialog.querySelector('[data-talk-close]').onclick = close;
   dialog.querySelector('[data-talk-advance]').onclick = advance;
   dialog.querySelector('[data-talk-text]').onclick = advance;
@@ -56,5 +64,6 @@
  function close() { if (busy) return; dialog?.close(); window.FoamTownGame?.active?.viewport.focus({preventScroll:true}); }
  function dismiss() { busy = false; close(); }
  window.addEventListener('foam-auth-change', dismiss);
+ window.FoamTownNPCPortrait = portrait;
  window.FoamTownDialogue = {show, close:dismiss, get open(){return !!dialog?.open;}};
 })();
