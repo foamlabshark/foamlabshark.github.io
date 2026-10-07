@@ -151,7 +151,7 @@
   // Move with sub-steps; when blocked, slide along the free axis and nudge round corners.
   move(m,dx,dy,assist){const steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/5));let bx=false,by=false;
    for(let i=0;i<steps;i++){const sx=dx/steps,sy=dy/steps;
-    if(!this.walkable(m.x,m.y)){m.x=clamp(m.x+sx,64,this.width-64);m.y=clamp(m.y+sy,78,this.height-64);continue;}
+    if(!this.walkable(m.x,m.y)){const at=this.open(m.x,m.y);m.x=at.x;m.y=at.y;}
     if(this.walkable(m.x+sx,m.y+sy)){m.x+=sx;m.y+=sy;continue;}
     let moved=false;if(sx&&this.walkable(m.x+sx,m.y)){m.x+=sx;moved=true;}else if(sx)bx=true;if(sy&&this.walkable(m.x,m.y+sy)){m.y+=sy;moved=true;}else if(sy)by=true;
     if(!moved&&assist){const along=Math.abs(sx)>Math.abs(sy);for(const k of [3,6,9,12]){for(const s of [1,-1]){const ox=along?0:s*k,oy=along?s*k:0;if(this.walkable(m.x+sx+ox,m.y+sy+oy)){m.x+=ox?Math.sign(ox)*1.4:0;m.y+=oy?Math.sign(oy)*1.4:0;moved=true;break;}}if(moved)break;}}
@@ -160,7 +160,7 @@
   /* A* over a 24-px grid with diagonal moves, then line-of-sight smoothing. */
   findPath(x,y,from=this.me){const C=this.cols,cell=v=>Math.floor(v/TILE);let sc=cell(from.x),sr=cell(from.y),gc=cell(x),gr=cell(y);
    if(!this.cellOk(gc,gr)){let best=null;for(let r=1;r<10&&!best;r++)for(let dr=-r;dr<=r;dr++)for(let dc=-r;dc<=r;dc++){if(Math.max(Math.abs(dc),Math.abs(dr))!==r||!this.cellOk(gc+dc,gr+dr))continue;const d=Math.hypot(dc,dr);if(!best||d<best.d)best={c:gc+dc,r:gr+dr,d};}if(!best)return[];gc=best.c;gr=best.r;x=gc*TILE+TILE/2;y=gr*TILE+TILE/2;}
-   if(!this.cellOk(sc,sr)){const f=this.free(from.x,from.y);sc=cell(f.x);sr=cell(f.y);}
+   if(!this.cellOk(sc,sr)){let best=null;for(let r=1;r<=8&&!best;r++)for(let dr=-r;dr<=r;dr++)for(let dc=-r;dc<=r;dc++){if(!this.cellOk(sc+dc,sr+dr))continue;const p={x:(sc+dc)*TILE+TILE/2,y:(sr+dr)*TILE+TILE/2};if(this.clear(from,p)&&(!best||Math.hypot(p.x-from.x,p.y-from.y)<best.d))best={c:sc+dc,r:sr+dr,d:Math.hypot(p.x-from.x,p.y-from.y)};}if(!best)return[];sc=best.c;sr=best.r;}
    const N=C*this.rows,g=new Float32Array(N).fill(Infinity),came=new Int32Array(N).fill(-1),closed=new Uint8Array(N),heap=[],start=sr*C+sc,goal=gr*C+gc;
    const h=i=>{const dc=Math.abs(i%C-gc),dr=Math.abs((i/C|0)-gr);return Math.max(dc,dr)+.414*Math.min(dc,dr);};
    const push=(f,i)=>{heap.push([f,i]);let k=heap.length-1;while(k>0){const p=k-1>>1;if(heap[p][0]<=heap[k][0])break;[heap[p],heap[k]]=[heap[k],heap[p]];k=p;}};
@@ -168,7 +168,7 @@
    g[start]=0;push(h(start),start);let found=false,guard=0;
    while(heap.length&&guard++<30000){const[,i]=pop();if(closed[i])continue;if(i===goal){found=true;break;}closed[i]=1;const c=i%C,r=i/C|0;
     for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dc&&!dr)continue;const nc=c+dc,nr=r+dr;if(!this.cellOk(nc,nr))continue;if(dc&&dr&&(!this.cellOk(c+dc,r)||!this.cellOk(c,r+dr)))continue;const j=nr*C+nc,cost=g[i]+(dc&&dr?1.414:1);if(cost<g[j]){g[j]=cost;came[j]=i;push(cost+h(j),j);}}}
-   if(!found)return[];const cells=[];for(let i=goal;i!==-1&&i!==start;i=came[i])cells.push({x:i%C*TILE+TILE/2,y:(i/C|0)*TILE+TILE/2});cells.reverse();if(this.walkable(x,y))cells[cells.length-1]={x,y};else if(!cells.length)return[];
+   if(!found)return[];const cells=[];for(let i=goal;i!==-1&&i!==start;i=came[i])cells.push({x:i%C*TILE+TILE/2,y:(i/C|0)*TILE+TILE/2});cells.reverse();if(!cells.length){if(this.walkable(x,y)&&this.clear(from,{x,y}))return Math.hypot(x-from.x,y-from.y)>3?[{x,y}]:[];return[];}if(this.walkable(x,y))cells[cells.length-1]={x,y};
    const out=[];let cur={x:from.x,y:from.y},i=0;while(i<cells.length){let j=cells.length-1;while(j>i&&!this.clear(cur,cells[j]))j--;out.push(cells[j]);cur=cells[j];i=j+1;}return out;}
   /* Residents, NPCs ------------------------------------------------------------------------ */
   avatar(){return this.world.querySelector('.town-resident.is-me');}
@@ -207,7 +207,7 @@
   face(m){const dx=this.me.x-m.x,dy=this.me.y-m.y;m.forceFace=Math.abs(dx)>Math.abs(dy)*.55?(dx<0?'left':'right'):(dy<0?'up':'down');m.busy=true;if(m.ai)m.ai.wait=2.5;clearTimeout(m.faceTimer);m.faceTimer=setTimeout(()=>{m.forceFace=null;m.busy=false;m.faceTimer=null;},2500);}
   interact(){if(this.locked){this.emit('use');return;}const f=this.findFocus();if(f){this.emit('interact',f);f.run?.();}else this.emit('hint',this.config.playable?'走近建筑、邻居或湖边，出现互动提示后再按 E。':'登录并入住后，就能和小镇里的邻居互动。');}
   stopMovement(){this.keys.clear();this.pad=null;this.path=[];this.after=null;this.running=false;(this.viewport.closest('.town-game-shell')||document).querySelectorAll('[data-game-direction].is-held').forEach(b=>b.classList.remove('is-held'));}
-  setZoom(z){this.zoomTarget=clamp(z,.7,1.35);try{localStorage.setItem('foamlab.town.zoom',String(this.zoomTarget));}catch{}}
+  setZoom(z){const cover=Math.max((this.vw||this.viewport.clientWidth)/this.width,(this.vh||this.viewport.clientHeight)/this.height);this.zoomTarget=clamp(z,Math.max(.7,cover),Math.max(1.35,cover*1.35));try{localStorage.setItem('foamlab.town.zoom',String(this.zoomTarget));}catch{}}
   cycleSpeed(){this.speedMultiplier=this.speedMultiplier===1?2:this.speedMultiplier===2?4:1;try{localStorage.setItem('foamlab.town.speed',this.speedMultiplier);}catch{}this.emit('speed',this.speedMultiplier);}
   bind(){const v=this.viewport,shell=v.closest('.town-game-shell')||v.parentElement;v.tabIndex=0;v.setAttribute('aria-label','小镇地图。W A S D 或方向键移动，同时按两个方向键斜向移动，R 切换 1 倍、2 倍、4 倍速，Shift 临时至少 2 倍速，E 或空格互动，数字 1 到 6 执行动作，H 查看操作说明。');
    const blocked=e=>e.defaultPrevented||document.querySelector('dialog[open]')||this.viewport.closest('[data-overlay],.is-text-mode')||e.target.closest?.('[data-hotbar-grip],[data-view-grip]')||editing(e.target)||editing(document.activeElement)||e.ctrlKey||e.metaKey||e.altKey;
@@ -221,6 +221,7 @@
     if(e.code==='Space'||k===' '||e.code==='KeyE'||k==='e'||((e.code==='Enter'||k==='enter')&&document.activeElement===v)){e.preventDefault();this.interact();return;}
     const digit=/^(?:Digit|Numpad)([1-6])$/.exec(e.code)||(!e.code&&/^([1-6])$/.exec(k));if(digit){e.preventDefault();shell.querySelectorAll('.town-game-hotbar .town-action-button')[Number(digit[1])-1]?.click();return;}
     if(e.code==='KeyM'||k==='m'){location.hash='map';return;}
+    if(e.code==='KeyJ'||k==='j'){e.preventDefault();shell.querySelector('[data-town=story]')?.click();return;}
     if(e.code==='KeyH'||k==='h'||k==='?'){e.preventDefault();this.emit('help');return;}
     if(e.code==='KeyR'||k==='r'){e.preventDefault();this.cycleSpeed();return;}
     if(['Equal','NumpadAdd'].includes(e.code)||k==='+'||k==='='){this.setZoom(this.zoomTarget+.1);return;}
@@ -288,10 +289,10 @@
    for(const ex of this.extras)ex.update?.(dt,quiet);
    this.updateCamera(dt);if(now-(this.focusAt||0)>65){this.focusAt=now;this.updateFocus(now);}this.updateMinimap(now);
   }
-  updateCamera(dt){const target=this.config.playable?{x:this.me.x+this.me.vx*.22,y:this.me.y+this.me.vy*.16}:this.position;this.zoom=lerp(this.zoom,this.zoomTarget,damp(10,dt));// The viewport size is cached (ResizeObserver): reading clientWidth here, after every panda has moved,
+  updateCamera(dt){const target=this.config.playable?{x:this.me.x+this.me.vx*.22,y:this.me.y+this.me.vy*.16}:this.position;// The viewport size is cached (ResizeObserver): reading clientWidth here, after every panda has moved,
    // forced a full style and layout pass of the world on each frame.
    if(!this.sizeWatch){this.vw=this.viewport.clientWidth;this.vh=this.viewport.clientHeight;this.sizeWatch=new ResizeObserver(()=>{this.vw=this.viewport.clientWidth;this.vh=this.viewport.clientHeight;});this.sizeWatch.observe(this.viewport);this.handlers.push(()=>this.sizeWatch.disconnect());}
-   const z=this.zoom,vw=this.vw,vh=this.vh;
+   const vw=this.vw,vh=this.vh,cover=Math.max(vw/this.width,vh/this.height);this.zoom=Math.max(cover,lerp(this.zoom,Math.max(cover,this.zoomTarget),damp(10,dt)));const z=this.zoom;
    const fit=(view,size,focus,share)=>view>size*z?(view-size*z)/2:clamp(view*share-focus*z,view-size*z,0);const tx=fit(vw,this.width,target.x,.5),ty=fit(vh,this.height,target.y,.52);
    if(!this.camera.ready){this.camera.x=tx;this.camera.y=ty;this.camera.ready=true;}else{const k=damp(7,dt);this.camera.x=lerp(this.camera.x,tx,k);this.camera.y=lerp(this.camera.y,ty,k);}
    const t=`translate3d(${fmt(this.camera.x)}px,${fmt(this.camera.y)}px,0) scale(${z.toFixed(4)})`;if(t!==this.lastTransform){this.world.style.transform=t;this.lights.style.transform=t;this.lastTransform=t;}}

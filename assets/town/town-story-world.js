@@ -37,7 +37,8 @@
   }else if(id==='wetland'){
    water='<path d="M610 70h450l50 60v395l-70 61H670l-60-70z" fill="#698f77"/><path d="M630 92h415l45 53v364l-62 55H684l-54-60z" fill="#83b7b4"/><path d="M80 1190h670v170H80z" fill="#88b7ae"/>';
    g.obstacles.push({x:610,y:70,w:500,h:510},{x:80,y:1190,w:670,h:170});
-   details+=`<path d="M1020 554v99h166v-35h-119v-64z" fill="#af895f" stroke="#6e6850" stroke-width="5"/><path d="M1080 626v22m25-22v22m25-22v22m25-22v22" stroke="#d6b57d" stroke-width="5"/><g transform="translate(790 335)"><ellipse rx="97" ry="38" fill="#5d999f"/><path d="m-80-8 157 0-28 38h-99z" fill="#9b6f4f" stroke="#646652" stroke-width="5"/><path d="M0-90V10m3-97 47 72H3z" fill="#f4e5b7" stroke="#5c756c" stroke-width="4"/></g>`;
+   details+=`<image href="/assets/town/story-dock.webp" x="1002" y="507" width="242" height="182"/><image href="/assets/town/story-boat.webp" x="703" y="251" width="290" height="194"/>`;
+
    for(let i=0;i<20;i++){const x=641+(i*137)%416,y=121+(i*61)%348;details+=`<path d="m${x} ${y} 25 3 18-3" fill="none" stroke="#cde3c5" stroke-width="3"/>`;}
   }else{
    mountains=Array.from({length:6},(_,i)=>{const x=i*330-70;if(id==='valley'&&x<1610&&x+350>1390)return '';return `<image href="/assets/town/story-rocks.webp" x="${x}" y="-115" width="365" height="240"/>`;}).join('');
@@ -52,21 +53,39 @@
   for(let i=0;i<100;i++){const x=70+rand()*(W-140),y=180+rand()*(H-300);if(onRoad(x,y,65)||g.obstacles.some(o=>x>o.x-35&&x<o.x+o.w+35&&y>o.y-35&&y<o.y+o.h+35)||s.plots.some(([px,py])=>x>px-25&&x<px+225&&y>py-30&&y<py+260))continue;flora+=`<div class="town-game-flower" style="left:${Math.round(x)}px;top:${Math.round(y)}px;z-index:1;pointer-events:none">${window.FoamTownGameArt.flower(i)}</div>`;}
   if(id==='wetland')for(let i=0;i<36;i++){let x=615+i%12*42,y=i<12?600:i<24?75:1180;plants+=`<use href="#story-reed" transform="translate(${x} ${y})"/>`;}
   const textures=`<defs><pattern id="story-grass-texture" width="260" height="260" patternUnits="userSpaceOnUse"><image href="/assets/town/terrain-atlas.webp" width="520" height="520"/></pattern><pattern id="story-water-texture" width="210" height="210" patternUnits="userSpaceOnUse"><image href="/assets/town/terrain-atlas.webp" y="-210" width="420" height="420"/></pattern><pattern id="story-road-texture" width="210" height="210" patternUnits="userSpaceOnUse"><image href="/assets/town/terrain-atlas.webp" x="-210" width="420" height="420"/></pattern></defs>`;
-  const ground=document.createElement('div');ground.className='town-game-ground story-ground';ground.innerHTML=svg(`${defs}${textures}<rect width="${W}" height="${H}" fill="url(#story-grass-texture)"/><rect width="${W}" height="${H}" fill="${colors[0]}" opacity="${id==='forest'?.24:id==='valley'?.55:.4}"/>${mountains}${water.replace(/fill="#(?:81b8b7|83b7b4|88b7ae)"/g,'fill="url(#story-water-texture)"')}<g fill="none" stroke-linecap="round"><g stroke="#82916b" stroke-width="105">${path.map(d=>`<path d="${d}"/>`).join('')}</g><g stroke="#d3c39a" stroke-width="89">${path.map(d=>`<path d="${d}"/>`).join('')}</g><g stroke="url(#story-road-texture)" stroke-width="67" opacity=".6">${path.map(d=>`<path d="${d}"/>`).join('')}</g></g>${details}${plants}`,`0 0 ${W} ${H}`);w.prepend(ground);w.insertAdjacentHTML('beforeend',flora);if(id==='valley'){const model=document.createElement('div');model.className='story-airfoil';model.style.cssText='position:absolute;left:735px;top:390px;width:330px;height:220px;z-index:610;pointer-events:none';model.innerHTML='<img src="/assets/town/story-airfoil.webp" alt="前缘圆钝、后缘尖细的翼型模型，支撑在试验台上" width="330" height="220">';w.append(model);}
+  const ground=document.createElement('div');ground.className='town-game-ground story-ground';ground.innerHTML=svg(`${defs}${textures}<rect width="${W}" height="${H}" fill="url(#story-grass-texture)"/><rect width="${W}" height="${H}" fill="${colors[0]}" opacity="${id==='forest'?.24:id==='valley'?.55:.4}"/>${mountains}${water.replace(/fill="#(?:81b8b7|83b7b4|88b7ae)"/g,'fill="url(#story-water-texture)"')}<g fill="none" stroke-linecap="round"><g stroke="#8d9b6a" stroke-width="91">${path.map(d=>`<path d="${d}"/>`).join('')}</g><g stroke="#bcaa7d" stroke-width="81">${path.map(d=>`<path d="${d}"/>`).join('')}</g><g stroke="url(#story-road-texture)" stroke-width="76" opacity="1">${path.map(d=>`<path d="${d}"/>`).join('')}</g></g>${details}${plants}`,`0 0 ${W} ${H}`);w.prepend(ground);w.insertAdjacentHTML('beforeend',flora);if(id==='valley'){const model=document.createElement('div');model.className='story-airfoil';model.style.cssText='position:absolute;left:735px;top:390px;width:330px;height:220px;z-index:610;pointer-events:none';model.innerHTML='<img src="/assets/town/story-airfoil.webp" alt="前缘圆钝、后缘尖细的翼型模型，支撑在试验台上" width="330" height="220">';w.append(model);}
   w.querySelectorAll('[data-building]').forEach((el,i)=>{const p=g.positions[i];el.style.left=p.x+'px';el.style.top=p.y+'px';el.style.zIndex=String(p.y+194);el.querySelector('svg').outerHTML=building(id,i);el.dataset.doorX=p.x+100;el.dataset.doorY=p.y+216;g.obstacles.push({x:p.x+22,y:p.y+62,w:156,h:132});});
   g.lights=document.createElement('div');g.lights.className='town-game-lights';g.lights.style.width=W+'px';g.lights.style.height=H+'px';g.viewport.append(g.lights);g.lampPositions=[];g.buildMinimap();
   g.mini.querySelector('svg>path')?.remove();g.mini.querySelector('svg>ellipse')?.remove();g.mini.querySelector('svg>rect').setAttribute('fill',colors[0]);g.mini.querySelector('svg>rect').insertAdjacentHTML('afterend',water);
   g.mini.querySelector('.town-mini-head b').textContent=s.name;
  }
  function exits(g){return g.config.scene?.exits||[{to:'forest',edge:'south',x:720,y:g.height},{to:'valley',edge:'south',x:1640,y:g.height}];}
- function entrance(g,from){const e=exits(g).find(e=>e.to===from)||exits(g)[0];return g.free(Math.max(90,Math.min(g.width-90,e.x)),Math.max(120,Math.min(g.height-125,e.y)));}
+ function gate(g,e){return {x:Math.max(76,Math.min(g.width-76,e.x)),y:Math.max(88,Math.min(g.height-76,e.y))};}
+ function entrance(g,from){const e=exits(g).find(e=>e.to===from)||exits(g)[0],at={x:e.x,y:e.y};
+  if(e.edge==='west')at.x=210;if(e.edge==='east')at.x=g.width-210;if(e.edge==='north')at.y=215;if(e.edge==='south')at.y=g.height-215;
+  return g.open(at.x,at.y);
+ }
  function portals(g,go){
-  if(!g.config.scene){const connections=document.createElement('div');connections.className='story-edge-roads';connections.style.cssText=`position:absolute;inset:0;width:${g.width}px;height:${g.height}px;pointer-events:none;z-index:0`;connections.innerHTML=svg(`<g fill="none" stroke-linecap="square">${exits(g).map(e=>`<path d="M${e.x} ${g.height-240}V${g.height}" stroke="#9b9d70" stroke-width="102"/><path d="M${e.x} ${g.height-240}V${g.height}" stroke="#ccbd92" stroke-width="86"/>`).join('')}</g>`,`0 0 ${g.width} ${g.height}`);g.world.querySelector('.town-game-ground').after(connections);}
-  const spots=exits(g).map(e=>{const at=entrance(g,e.to),el=document.createElement('button'),side=e.edge==='north'||e.edge==='south',sx=side?at.x+(at.x>g.width/2?-100:100):at.x,sy=side?at.y-15:at.y-65;
-   el.type='button';el.className='story-waypost';el.dataset.edge=e.edge;el.style.left=Math.max(5,Math.min(g.width-145,sx-70))+'px';el.style.top=sy-72+'px';el.style.zIndex=String(Math.round(sy+1));el.innerHTML=`<b>${({west:'←',east:'→',north:'↑',south:'↓'})[e.edge]} ${esc(scene(e.to).name)}</b><small>沿道路离开此处</small>`;wAppend(g,el);
-   const run=()=>{if(g.config.guest||g.config.direct?.())go(e.to);else g.walkTo(at.x,at.y,()=>go(e.to));};g.on(el,'click',ev=>{ev.stopPropagation();run();});return{id:'story-'+e.to,x:sx,y:sy,at,range:105,label:'前往'+scene(e.to).name,run};
-  });g.extras.push({spots:()=>spots,minimap:()=>spots.map(p=>`<circle cx="${p.at.x}" cy="${p.at.y}" r="26" fill="#f3d896" stroke="#7f6542" stroke-width="9"/>`).join('')});return spots;
+  if(!g.config.scene){const connections=document.createElement('div');connections.className='story-edge-roads';connections.style.cssText=`position:absolute;inset:0;width:${g.width}px;height:${g.height}px;pointer-events:none;z-index:0`;
+   const roads=exits(g).map(e=>`M${e.x} ${g.height-260}Q${e.x-30} ${g.height-160} ${e.x} ${g.height-80}V${g.height+40}`);
+   connections.innerHTML=svg(`<defs><pattern id="story-edge-soil" width="210" height="210" patternUnits="userSpaceOnUse"><image href="/assets/town/terrain-atlas.webp" x="-210" width="420" height="420"/></pattern></defs><g fill="none" stroke-linecap="round">${roads.map(d=>`<path d="${d}" stroke="#8d9b6a" stroke-width="91"/><path d="${d}" stroke="#bcaa7d" stroke-width="81"/><path d="${d}" stroke="url(#story-edge-soil)" stroke-width="76"/>`).join('')}</g>`,`0 0 ${g.width} ${g.height}`);
+   g.world.querySelector('.town-game-ground').after(connections);
+  }
+  const gates=exits(g).map(e=>{const at=gate(g,e),el=document.createElement('div'),side=e.edge==='north'||e.edge==='south';
+   const sx=side?at.x+(at.x>g.width/2?-110:110):at.x,sy=side?at.y-25:at.y-80;
+   el.className='story-waypost';el.dataset.edge=e.edge;el.setAttribute('aria-label','路牌：'+scene(e.to).name);el.style.left=Math.max(5,Math.min(g.width-145,sx-70))+'px';el.style.top=Math.max(12,sy-65)+'px';el.style.zIndex=String(Math.round(sy+1));
+   el.innerHTML=`<b>${({west:'←',east:'→',north:'↑',south:'↓'})[e.edge]} ${esc(scene(e.to).name)}</b>`;wAppend(g,el);return {...e,at};
+  });
+  g.storyGates=gates;let switching=false,age=0,transitionTimer,recoveryTimer;
+  const arrival=document.createElement('div');arrival.className='story-scene-arrival';g.viewport.parentElement.append(arrival);setTimeout(()=>arrival.remove(),500);
+  g.extras.push({update(dt){age+=dt;if(switching||age<.8||!g.config.playable)return;
+   const edge=gates.find(e=>Math.hypot(g.me.x-e.at.x,g.me.y-e.at.y)<54);if(!edge)return;
+   switching=true;g.stopMovement();g.locked=true;
+   const cover=document.createElement('div');cover.className='story-scene-transition';cover.setAttribute('aria-label','正在前往'+scene(edge.to).name);g.viewport.parentElement.append(cover);
+   transitionTimer=setTimeout(()=>{if(window.FoamTownGame.active===g)go(edge.to);},260);
+   recoveryTimer=setTimeout(()=>{if(window.FoamTownGame.active!==g)return;cover.remove();g.locked=false;switching=false;age=-2;g.emit('hint','这条路暂时没能接通，稍后再往路口走试试。');},8000);
+  },destroy(){clearTimeout(transitionTimer);clearTimeout(recoveryTimer);},minimap:()=>gates.map(p=>`<circle cx="${p.at.x}" cy="${p.at.y}" r="26" fill="#f3d896" stroke="#7f6542" stroke-width="9"/>`).join('')});return gates;
  }
  function wAppend(g,e){g.world.append(e);}
- window.FoamTownStoryWorld={scene,decorate,portals,building,entrance};
+ window.FoamTownStoryWorld={scene,decorate,portals,building,entrance,exits};
 })();

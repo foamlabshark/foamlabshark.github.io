@@ -67,6 +67,7 @@
    <dt>${k('E')} 或 ${k('空格')}</dt><dd>和附近的建筑、邻居、NPC 互动，在湖边钓鱼</dd>
    <dt>${k('1')} – ${k('6')}</dt><dd>执行快捷栏里的动作和表情；主键盘与数字小键盘都可使用。击掌、递竹子等互动需要选择一位邻居。</dd>
    <dt>${k('+')} ${k('−')} 或滚轮</dt><dd>缩放画面</dd>
+   <dt>J · 任务簿</dt><dd>查看当前目标、完成步骤和领取奖励。与居民交谈接取委托，沿道路走近路口即可切换场景。</dd>
    <dt>点击地面 / 小地图</dt><dd>自动走过去，会绕开房子和树</dd>
    <dt>${k('M')} · ${k('H')}</dt><dd>回到省份地图 · 打开这份说明</dd>
    <dt>点击地面 / 速度按钮</dt><dd>点击地面自动寻路，用 1 倍 / 2 倍 / 4 倍按钮切换移动速度</dd></dl>
@@ -80,7 +81,15 @@
  function welcome(){overlay('welcome',`<header><h2>村长竹伯 · 欢迎来到小镇</h2><button type="button" data-play-close aria-label="关闭">×</button></header><div class="town-welcome-portrait">${window.FoamTownNPCLook('mayor')}</div><section class="town-mayor-update"><strong>村长公告 · 10 月 5 日</strong><p>游乐园开门啦！在建筑目录选择“游乐园”，就能玩流光画布：全屏、小窗都可以，按 Esc 或右上角 × 返回。</p><p>彩蛋已增加到 126 项，发现与收藏会显示获得时间。终端就在底部操作提示栏；喷泉彩虹显示 20 秒后收起。夜间的倍速文字也更清楚了。</p></section><p>这里是和熊猫一起学习 OpenFOAM 的地方。沿着小路走，每栋建筑都有自己的用途。</p><ol class="town-welcome-steps"><li><b>先到学堂</b>按主题抽取实训，跟着五个步骤看懂计算过程，已完成的步骤可以回看。</li><li><b>有问题去答疑医院</b>带上配置、日志与结果，一起讨论。</li><li><b>在公告栏看每日任务与本镇留言</b>拾竹笋、参观、答题和实训都会留下进度。</li><li><b>到湖边钓知识卡</b>竹笋还可以在商店换收藏，稀有和隐藏卡等你发现。</li><li><b>在展览馆分享计算图片</b>给喜欢的作品点赞，作品与获赞会陈列在作者的小屋。</li></ol><p class="town-note">点击地面可以自动走过去；键盘 WASD 或方向键移动，点击速度按钮切换 1 倍 / 2 倍 / 4 倍速。随时回来找我聊聊。</p>`);}
 
  /* NPCs ------------------------------------------------------------------------------- */
- function talk(npc,m){window.dispatchEvent(new CustomEvent('foamlab:town-npc',{detail:{id:npc.id,x:m.x,y:m.y}}));if(npc.id==='mayor'){welcome();bump('greet');return;}if(npc.action){window.dispatchEvent(new CustomEvent('foamlab:town-open-extra',{detail:{kind:npc.action}}));bump('greet');return;}m.line=((m.line??-1)+1)%npc.lines.length;speech(m,npc.lines[m.line]);bump('greet');}
+ function talk(npc,m){window.dispatchEvent(new CustomEvent('foamlab:town-npc',{detail:{id:npc.id,x:m.x,y:m.y}}));bump('greet');
+  if(!window.FoamTownDialogue){speech(m,npc.lines?.[0]||'欢迎来到小镇。');return;}
+  m.line=((m.line??-1)+1)%(npc.lines?.length||1);
+  const choices=[];
+  if(npc.id==='mayor')choices.push({label:'问问小镇里的事情',run:()=>{window.FoamTownDialogue.close();welcome();}},{label:'观测站有什么需要帮忙的？',run:()=>{window.FoamTownDialogue.close();window.FoamTownStory.npc('heng');}});
+  if(npc.action)choices.push({label:npc.action==='shop'?'看看店里的东西':'看看本镇留言',run:()=>{window.FoamTownDialogue.close();window.dispatchEvent(new CustomEvent('foamlab:town-open-extra',{detail:{kind:npc.action}}));}});
+  choices.push({label:'回头见',run:()=>window.FoamTownDialogue.close()});
+  window.FoamTownDialogue.show({name:npc.name,portrait:window.FoamTownNPCLook(npc.id),pages:[npc.lines?.[m.line]||'沿路走一走吧。大家各有各的忙处，也有不少故事想讲。'],choices});
+ }
  function speech(m,text){m.el.querySelector('.town-speech')?.remove();const b=document.createElement('b');b.className='town-speech';b.textContent=text;m.el.append(b);clearTimeout(m.speechTimer);m.speechTimer=setTimeout(()=>b.remove(),5200);}
 
  /* Bamboo shoots ------------------------------------------------------------------------ */
