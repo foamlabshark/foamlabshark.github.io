@@ -23,6 +23,7 @@
  };
 
  lab.error=(host,e)=>{host.innerHTML='<div class="lab-empty" role="alert"><strong>暂时无法完成请求</strong><p>'+esc(e.message||'请稍后重试。')+'</p><button class="button secondary" onclick="location.reload()">刷新页面</button></div>';};
+ lab.reveal=host=>{const page=host?.closest('[data-page-state]');if(page)page.dataset.pageState='ready';};
  lab.check=r=>{if(r.error)throw Error(r.error.message);return r.data;};
  lab.markdown=body=>{
   const math=[];
@@ -114,7 +115,7 @@
  if(kindFilters)kindFilters.onclick=e=>{const b=e.target.closest('[data-catalog-kind]');if(!b)return;window.foamListState?.write({q:search?.value||'',track:'全部',kind:b.dataset.catalogKind},true);restoreFilters();render();};
  function render(){const words=(search?.value||'').toLowerCase().split(/\s+/).filter(Boolean);const shown=rows.filter(r=>(!kind||r.kind===kind)&&(track==='全部'||r.track===track)&&words.every(w=>[r.title,r.summary,r.track,r.series].join(' ').toLowerCase().includes(w)));if(window.FoamResourcesHub?.render({listing,rows:shown,words,filtered:shown.length!==rows.length,mode,D}))return;listing.innerHTML=window.FoamPagination.slice(listing,shown,render,12).map(lab.card).join('')||'<div class="lab-empty">目前没有符合条件的内容。</div>';if($('#catalog-count'))$('#catalog-count').textContent=shown.length+' 项内容';}
  search?.addEventListener('input',()=>{window.foamListState?.write({q:search.value,track,...(kindFilters?{kind}:{})});render();});window.addEventListener('popstate',()=>{restoreFilters();render();});render();
- }catch(e){lab.error(listing,e);}})();
+ }catch(e){lab.error(listing,e);}finally{lab.reveal(listing);}})();
  // Static Hexo content remains readable while the CMS is unavailable. A successful
  // empty result is authoritative (archived/unpublished), not a network fallback.
  lab.restoreHash=()=>{if(!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}const move=()=>{const target=document.getElementById(id);if(!target)return false;requestAnimationFrame(()=>requestAnimationFrame(()=>target.scrollIntoView({block:'start',behavior:'instant'})));return true;};if(move())return;const observer=new MutationObserver(()=>{if(move())observer.disconnect();});observer.observe(document.querySelector('#main'),{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),5000);};
