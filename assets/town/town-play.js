@@ -137,14 +137,14 @@
   let folded=store.get('foamlab.town.side-collapsed',false);const fold=()=>{shell.classList.toggle('is-side-collapsed',folded);collapse.textContent=folded?'‹':'›';collapse.setAttribute('aria-expanded',String(!folded));collapse.setAttribute('aria-label',folded?'展开右侧界面':'收起右侧界面');right.forEach(el=>el.inert=folded);const chat=shell.querySelector('.town-chat');if(chat)chat.inert=folded;store.set('foamlab.town.side-collapsed',folded);};collapse.onclick=()=>{folded=!folded;fold();};fold();
 const head=ui.tasks.querySelector('.town-quest-head');let open=store.get('foamlab.town.tasks-open',innerWidth>=700);const setOpen=v=>{open=v;ui.tasks.classList.toggle('is-collapsed',!v);head.setAttribute('aria-expanded',String(v));store.set('foamlab.town.tasks-open',v);};setOpen(open);head.onclick=()=>setOpen(!open);
   ui.tasks.querySelector('[data-play=help]').onclick=help;drawTasks();
-  for(const npc of NPCS)g.addNPC({...npc,talk:m=>talk(npc,m)});
+  for(const npc of (g.config.scene?[]:NPCS))g.addNPC({...npc,talk:m=>talk(npc,m)});
   let list=[],spawnDay=null;
-  const syncShoots=()=>{if(g.config.guest||game!==g)return;if(spawnDay!==day.date){for(const el of g.world.querySelectorAll('[data-shoot-id]'))el.remove();list=shoots(g);spawnDay=day.date;}for(const s of list)if(day.shoots.includes(s.id)||day.shoots.length>=8)s.el?.remove();};
+  const syncShoots=()=>{if(g.config.scene||g.config.guest||game!==g)return;if(spawnDay!==day.date){for(const el of g.world.querySelectorAll('[data-shoot-id]'))el.remove();list=shoots(g);spawnDay=day.date;}for(const s of list)if(day.shoots.includes(s.id)||day.shoots.length>=8)s.el?.remove();};
   g.shootField={sync:syncShoots};const stored=window.FoamTownProgress?.get();if(stored){day=stored.day;syncShoots();}
   g.extras.push({update(){for(const s of list){if(!s.el||!s.el.isConnected||s.taken)continue;if(Math.hypot(s.x-g.me.x,s.y-g.me.y)<34){s.taken=true;s.el.classList.add('is-picked');const collectedDay=spawnDay;bump('shoots',s.id).then(ok=>{if(ok)float(s.x,s.y-50,'+1 竹笋');else if(game===g&&spawnDay===collectedDay){s.taken=false;s.el.classList.remove('is-picked');if(!day.shoots.includes(s.id)&&day.shoots.length<8&&s.el.parentNode===null)g.world.append(s.el);}});}}},minimap:()=>list.filter(s=>s.el?.isConnected&&!s.taken).map(s=>`<circle cx="${Math.round(s.x)}" cy="${Math.round(s.y)}" r="20" fill="#9fd46a" stroke="#3e6b2c" stroke-width="8"/>`).join('')});
-  if(!g.config.guest)g.extras.push(fishing(g));
+  if(!g.config.scene&&!g.config.guest)g.extras.push(fishing(g));
   g.extras.push({minimap:()=>{const B=window.FoamTownBuildings;if(!B)return'';const s=B.runState();if(s.done||s.empty)return'';const i=g.config.buildings.findIndex(b=>b[0]===B.RUN[s.step]?.at),d=i>=0?g.door(i):null;return d?`<circle cx="${Math.round(d.x)}" cy="${Math.round(d.y-110)}" r="90" fill="none" stroke="#e2563f" stroke-width="18" stroke-dasharray="40 26"/>`:'';}});
-  g.extras.push(ambient(g));dust(g);
+  if(!g.config.scene)g.extras.push(ambient(g));dust(g);
   // Daily learning visits accept these server-supported destinations only.
   const visitKinds=new Set(['school','workshop','hospital','library','gallery','notice','spot','institute','house']);
   g.listen('visit',i=>{const b=g.config.buildings[i],kind=b?.[3]?'house':b?.[0];if(visitKinds.has(kind))bump('visits',kind);});

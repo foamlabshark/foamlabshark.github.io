@@ -51,14 +51,15 @@
  }
 
  class TownGame{
-  constructor(viewport,config){active?.destroy();active=this;this.viewport=viewport;this.world=viewport.querySelector('.town-street-world');this.config=config;this.width=2460;this.height=1760;
+  constructor(viewport,config){active?.destroy();active=this;this.viewport=viewport;this.world=viewport.querySelector('.town-street-world');this.config=config;this.width=config.scene?1920:2460;this.height=config.scene?1440:1760;
    // Authored village plots: public buildings surround a clearing, houses follow the landscape.
    const publicPlots={notice:[58,348],school:[478,158],workshop:[1282,199],hospital:[1782,409],library:[883,113],gallery:[1322,736],spot:[963,683],playground:[1790,1175]};
    const homes=[[38,658],[612,765],[2054,578],[1888,977],[486,1176],[754,1194],[1022,1112],[1382,1206],[1636,1194],[1650,138]];
    let house=0,group=0;this.positions=config.buildings.map(b=>{let p;if(b[3])p=homes[house++%homes.length];else if(b[0]==='gate')p=[-500,-500];else if(b[0]==='institute'){const n=group++;p=[430+(n%4)*400,1730+Math.floor(n/4)*340];this.height=Math.max(this.height,p[1]+330);}else p=publicPlots[b[0]]||[2100,160];return{x:p[0],y:p[1],hidden:b[0]==='gate'};});
+   if(config.scene)this.positions=config.scene.plots.map(([x,y])=>({x,y,hidden:false}));
    this.keys=new Map();this.pad=null;this.path=[];this.camera={x:0,y:0,ready:false};this.zoom=1;this.zoomTarget=this.savedZoom();this.handlers=[];this.hooks={};this.movers=new Map();this.npcs=new Map();this.extras=[];this.running=false;this.speedMultiplier=1;try{const speed=Number(localStorage.getItem('foamlab.town.speed'));if([1,2,4].includes(speed))this.speedMultiplier=speed;}catch{}this.locked=false;this.focus=null;this.banner={id:null,at:0,shown:new Map()};
    this.decor();this.buildGrid();
-   const start=this.open(1035,954);this.position={x:start.x,y:start.y};this.me={x:start.x,y:start.y,vx:0,vy:0};
+   const start=this.open(config.scene?360:1035,config.scene?740:954);this.position={x:start.x,y:start.y};this.me={x:start.x,y:start.y,vx:0,vy:0};
    this.prompt=document.createElement('button');this.prompt.type='button';this.prompt.className='town-prompt';this.prompt.hidden=true;this.world.append(this.prompt);this.on(this.prompt,'click',e=>{e.stopPropagation();this.interact();});
    this.bannerEl=document.createElement('div');this.bannerEl.className='town-area-banner';this.bannerEl.setAttribute('aria-live','polite');this.viewport.parentElement.append(this.bannerEl);
    this.bind();this.last=performance.now();this.tick=this.tick.bind(this);this.frame=requestAnimationFrame(this.tick);}
@@ -66,7 +67,7 @@
   listen(name,fn){(this.hooks[name]||=[]).push(fn);}
   emit(name,detail){for(const fn of this.hooks[name]||[])try{fn(detail);}catch(error){console.error(error);}}
   savedZoom(){try{const z=Number(localStorage.getItem('foamlab.town.zoom'));if(z>=.7&&z<=1.35)return z;}catch{}return innerWidth<700?.83:1;}
-  decor(){const w=this.world;w.style.width=this.width+'px';w.style.height=this.height+'px';w.classList.add('town-game-world');w.dataset.quiet=String(this.config.muted?.()||false);w.querySelectorAll('.town-cloud').forEach(e=>e.remove());this.obstacles=[];
+  decor(){if(this.config.scene)return window.FoamTownStoryWorld.decorate(this);const w=this.world;w.style.width=this.width+'px';w.style.height=this.height+'px';w.classList.add('town-game-world');w.dataset.quiet=String(this.config.muted?.()||false);w.querySelectorAll('.town-cloud').forEach(e=>e.remove());this.obstacles=[];
    const ground=document.createElement('div');ground.className='town-game-ground';
    const pathData=[
     'M0 980 C260 860 430 905 660 1080 S1050 920 1180 945 S1490 1180 1690 1020 S2100 850 2460 1030',
