@@ -4,13 +4,13 @@
  const emoji=['😊','🐼','👋','👍','🎋','❤️','🎉','🤔','😂','🙌','☕','✨','💪','🙏','🎆','🌙'];
  const drafts=new Map(),pending=new Map();
  let root,panel,ctx,identity,scope='world',room='world',revision=0,request=0,channel,timer,populationTimer;
- let messages=new Map(),unread=0,collapsed=true,connected=false,loading=false,sending=false,refreshing=null,reconnectTimer;
+ let messages=new Map(),unread=0,collapsed=true,connected=false,loading=false,sending=false,refreshing=null,reconnectTimer,followLatest=true;
  const $=s=>panel.querySelector(s),me=()=>window.foamAuth?.user?.id||null;
  const label=id=>ctx?.provinces.find(p=>p.id===id)?.name||'未入住';
  const fullTime=new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
  function status(text){$('[data-chat-status]').textContent=text;}
  function badge(){const b=$('[data-chat-unread]');b.textContent=unread?String(Math.min(99,unread))+(unread>99?'+':''):'';b.hidden=!unread;}
- function bottom(){const log=$('[data-chat-log]');log.scrollTop=log.scrollHeight;unread=0;badge();$('[data-chat-latest]').hidden=true;}
+ function bottom(){const log=$('[data-chat-log]');followLatest=true;log.scrollTop=log.scrollHeight;unread=0;badge();$('[data-chat-latest]').hidden=true;}
  function nearBottom(){const log=$('[data-chat-log]');return log.scrollHeight-log.scrollTop-log.clientHeight<40;}
  function updateForm(){const input=$('textarea'),count=Array.from(input.value).length;
   $('[data-chat-count]').textContent=count+'/500';
@@ -79,7 +79,8 @@
   panel.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('[data-chat-emojis]').hidden){$('[data-chat-emojis]').hidden=true;$('[data-chat-emoji-toggle]').setAttribute('aria-expanded','false');}else{toggle(true);$('[data-chat-toggle]').focus();}e.preventDefault();}e.stopPropagation();});
   panel.addEventListener('focusin',()=>{window.FoamTownGame?.active?.stopMovement();fitKeyboard();});
   panel.addEventListener('focusout',()=>requestAnimationFrame(fitKeyboard));
-  $('[data-chat-log]').onscroll=()=>{if(nearBottom()){unread=0;badge();$('[data-chat-latest]').hidden=true;}};
+  $('[data-chat-log]').onscroll=()=>{followLatest=nearBottom();if(followLatest){unread=0;badge();$('[data-chat-latest]').hidden=true;}};
+  new ResizeObserver(()=>{if(followLatest&&!collapsed)bottom();}).observe($('[data-chat-log]'));
  }
  // The entry shares a normal-flow column with the minimap and daily tasks.
  // The desktop conversation opens beside that column, leaving both accessible.
