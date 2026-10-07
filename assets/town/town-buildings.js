@@ -19,7 +19,7 @@
   school:{icon:'🏫',sub:'学堂 · 课程、每日一题与算例实训',tabs:[['map','课程地图'],['run','算例实训'],['quiz','每日一题']],full:'/courses/'},
   workshop:{icon:'🛠️',sub:'网格工坊 · blockMesh 与 checkMesh 的家',tabs:[['bench','网格实验台'],['run','算例实训'],['lessons','网格课程'],['tools','网格工具']],full:'/topics/meshing/'},
   hospital:{icon:'🏥',sub:'答疑医院 · 与讨论中心同步的问答',tabs:[['forum','问诊大厅'],['clinic','报错诊室']],full:'/community/'},
-  library:{icon:'📚',sub:'图书馆 · 全站检索与资料书架',tabs:[['search','全站检索'],['shelf','资料书架']],full:'/resources/'},
+  library:{icon:'📚',sub:'图书馆 · 检索、资料与知识卡',tabs:[['search','全站检索'],['shelf','资料书架'],['knowledge','知识卡']],full:'/resources/'},
   gallery:{icon:'🖼️',sub:'展览馆 · 实践与分享、算例成果',tabs:[['images','图片展览'],['works','实践文章'],['run','实训成果']],full:'/sharing/'},
   spot:{icon:'⛲',sub:'小镇景点 · 街道里的 CFD',tabs:[['story','景点故事']],full:null},
   institute:{icon:'🔬',sub:'研究所 · 同一学校或团队的邻居',tabs:[['members','成员']],full:null},
@@ -156,7 +156,8 @@
     const list=document.createElement('div');list.className='tb-hits';results.append(list);
     for(const r of rows){const preview=window.FoamSearch.card({...r,kind:kinds[r.kind]||r.kind,url:'/read/?slug='+encodeURIComponent(r.slug)},q);if(!preview)continue;const button=document.createElement('button');button.type='button';button.className='search-hit';button.dataset.tb='read';button.dataset.slug=r.slug;button.style.cssText='width:100%;text-align:left';button.append(...preview.childNodes);list.append(button);}
 }catch(error){results.innerHTML=empty('暂时无法检索：'+error.message);}},
-  async 'library:shelf'(host){const rows=check(await contentQuery(['resource','recommendation']).order('sort_order').order('created_at',{ascending:false}).range(0,299));const tracks=[...new Set(rows.map(r=>r.track).filter(Boolean))];
+  'library:knowledge'(host){window.FoamTownPlay.mountCollection(host);},
+  async 'library:shelf'(host){const rows=check(await contentQuery(['resource','recommendation']).order('sort_order').order('created_at',{ascending:false}).range(0,299));if(ctx.kind!=='library'||tab!=='shelf'||host!==view())return;const tracks=[...new Set(rows.map(r=>r.track).filter(Boolean))];
    host.innerHTML=`<div class="tb-chips">${['全部',...tracks].map((t,i)=>`<button type="button" data-shelf="${E(t)}" aria-pressed="${!i}">${E(t)}</button>`).join('')}</div><div class="tb-shelf"></div>`;const shelf=host.querySelector('.tb-shelf'),draw=t=>{shelf.innerHTML=cards(rows.filter(r=>t==='全部'||r.track===t),{empty:'书架上还没有资料。'});};draw('全部');host.querySelectorAll('[data-shelf]').forEach(b=>b.onclick=()=>{host.querySelectorAll('[data-shelf]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw(b.dataset.shelf);});},
   async 'gallery:images'(host){await window.FoamTownGallery.render(host);},
   async 'gallery:works'(host){const rows=check(await contentQuery(['article','log']).order('created_at',{ascending:false}).range(0,119)).filter(r=>r.track!=='熊猫小镇');await L().names(rows.map(r=>r.author_id));

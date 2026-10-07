@@ -134,7 +134,7 @@
   shell.append(ui.tasks);
   const collapse=document.createElement('button');collapse.type='button';collapse.className='town-side-toggle';collapse.setAttribute('aria-label','收起右侧界面');shell.append(collapse);
   const right=[shell.querySelector('.town-game-top-tools'),shell.querySelector('.town-game-minimap'),ui.tasks,shell.querySelector('.town-game-tools')].filter(Boolean);
-  let folded=store.get('foamlab.town.side-collapsed',false);const fold=()=>{shell.classList.toggle('is-side-collapsed',folded);collapse.textContent=folded?'‹':'›';collapse.setAttribute('aria-expanded',String(!folded));collapse.setAttribute('aria-label',folded?'展开右侧界面':'收起右侧界面');right.forEach(el=>el.inert=folded);store.set('foamlab.town.side-collapsed',folded);};collapse.onclick=()=>{folded=!folded;fold();};fold();
+  let folded=store.get('foamlab.town.side-collapsed',false);const fold=()=>{shell.classList.toggle('is-side-collapsed',folded);collapse.textContent=folded?'‹':'›';collapse.setAttribute('aria-expanded',String(!folded));collapse.setAttribute('aria-label',folded?'展开右侧界面':'收起右侧界面');right.forEach(el=>el.inert=folded);const chat=shell.querySelector('.town-chat');if(chat)chat.inert=folded;store.set('foamlab.town.side-collapsed',folded);};collapse.onclick=()=>{folded=!folded;fold();};fold();
 const head=ui.tasks.querySelector('.town-quest-head');let open=store.get('foamlab.town.tasks-open',innerWidth>=700);const setOpen=v=>{open=v;ui.tasks.classList.toggle('is-collapsed',!v);head.setAttribute('aria-expanded',String(v));store.set('foamlab.town.tasks-open',v);};setOpen(open);head.onclick=()=>setOpen(!open);
   ui.tasks.querySelector('[data-play=help]').onclick=help;drawTasks();
   for(const npc of NPCS)g.addNPC({...npc,talk:m=>talk(npc,m)});

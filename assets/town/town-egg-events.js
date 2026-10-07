@@ -57,7 +57,7 @@
   void sync();
  });
  window.addEventListener('foamlab:town-npc',e=>{void event('talk',{id:e.detail.id});});
- window.addEventListener('foamlab:town-panel',e=>{if(e.detail.kind==='notice')panelPin();if(e.detail.kind==='library'){const tabs=document.querySelector('.tb-tabs');if(tabs&&!tabs.querySelector('[data-egg-library]')){const b=document.createElement('button');b.dataset.eggLibrary='';b.textContent='知识卡';b.type='button';b.onclick=()=>{window.FoamTownPlay.mountCollection(document.querySelector('.tb-view'));document.querySelector('.tb-view').dataset.eggLibrary='true';};tabs.append(b);}}});
+ window.addEventListener('foamlab:town-panel',e=>{if(e.detail.kind==='notice')panelPin();});
  window.addEventListener('foamlab:knowledge-open',e=>{if(document.querySelector('.tb[data-kind=library]'))void event('knowledge',{id:e.detail.id});});
  window.addEventListener('foamlab:art-flip',e=>{const d=e.detail;if(lastFlip!==d.id||d.flips===1){lastFlip=d.id;flipCount=0;}flipCount++;if(flipCount===7&&d.back){d.element.classList.add('egg-card-wink');F().toast('小熊猫悄悄说：翻过这一页，下一次相遇就在路上。');void unlock('K03');}});
  window.addEventListener('foamlab:egg-found',e=>show(e.detail.id));
