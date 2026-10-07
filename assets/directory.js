@@ -4,17 +4,35 @@
  const D=window.FoamDirectory={nodes:[],available:false};
  D.get=id=>D.nodes.find(n=>n.id===id);
  D.children=id=>D.nodes.filter(n=>n.parent_id===(id||null)).sort((a,b)=>a.sort_order-b.sort_order||a.name.localeCompare(b.name));
- D.descendants=id=>{const ids=new Set([id]);for(let i=0;i<D.nodes.length;i++)for(const n of D.nodes)if(ids.has(n.parent_id))ids.add(n.id);return [...ids];};
+ D.descendants=(id,nodes=D.nodes)=>{const ids=new Set([id]);for(let i=0;i<nodes.length;i++)for(const n of nodes)if(ids.has(n.parent_id))ids.add(n.id);return [...ids];};
  D.ancestors=id=>{const out=[],seen=new Set();for(let n=D.get(id);n&&!seen.has(n.id);n=D.get(n.parent_id)){seen.add(n.id);out.unshift(n);}return out;};
  D.path=id=>D.ancestors(id).map(n=>n.name).join(' / ');
  D.isVisible=n=>D.ancestors(n.id).every(x=>x.visible);
  D.url=n=>{if(n?.href&&!n.href.startsWith('/read/?')&&n.key!=='programming-examples'){try{const u=new URL(n.href,location.origin);if(u.origin===location.origin)return u.pathname+u.search+u.hash;}catch{}}return '/section/?id='+encodeURIComponent(n.id);};
  D.locations=row=>(row.section_ids||[]).map(D.path).filter(Boolean);
  D.options=(selected='',exclude=[])=>'<option value="">顶层模块</option>'+D.nodes.filter(n=>!exclude.includes(n.id)).map(n=>'<option value="'+n.id+'" '+(n.id===selected?'selected':'')+'>'+esc(D.path(n.id))+'</option>').join('');
- D.current=()=>{const u=new URL(location.href),id=u.searchParams.get('id');if(u.pathname==='/section/')return D.get(id);return D.nodes.filter(n=>n.href&&n.href!=='/admin/'&&(()=>{const v=new URL(n.href,location.origin);return v.pathname===u.pathname&&[...v.searchParams].every(([k,x])=>u.searchParams.get(k)===x);})()).sort((a,b)=>new URL(b.href,location.origin).search.length-new URL(a.href,location.origin).search.length)[0];};
- D.load=async()=>{await L.ready;const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('*').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;return D;};
+ D.current=(nodes=D.nodes)=>{const u=new URL(location.href),id=u.searchParams.get('id');if(u.pathname==='/section/')return nodes.find(n=>n.id===id);return nodes.filter(n=>n.href&&n.href!=='/admin/'&&(()=>{const v=new URL(n.href,location.origin);return v.pathname===u.pathname&&[...v.searchParams].every(([k,x])=>u.searchParams.get(k)===x);})()).sort((a,b)=>new URL(b.href,location.origin).search.length-new URL(a.href,location.origin).search.length)[0];};
+ const contentReads=new Map(),hintKey='foamlab.directory-hint.v1';
+ function readContent(ids){
+  const key=[...ids].sort().join(',');if(contentReads.has(key))return contentReads.get(key);
+  const pending=(async()=>{const rows=[];for(let start=0;;start+=500){const batch=L.check(await L.client.from('foamlab_content').select('id,slug,kind,title,summary,track,series,cover_url,metadata,section_ids,author_id,author_name,sort_order,pinned,published_at,created_at,updated_at').eq('status','published').overlaps('section_ids',ids).order('sort_order').order('id').range(start,start+499));rows.push(...batch);if(batch.length<500)return rows;}})().catch(error=>{contentReads.delete(key);throw error;});
+  contentReads.set(key,pending);return pending;
+ }
+ function prefetchCatalog(){
+  // Cached IDs only schedule a fresh request. Never render cached names or rows.
+  const catalog=document.querySelector('[data-lab-catalog]'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!hub&&!home)return;
+  try{const saved=JSON.parse(sessionStorage.getItem(hintKey)||'null');if(!saved||saved.user!==(L.user?.id||null)||Date.now()-saved.at>86400000||!Array.isArray(saved.nodes)||saved.nodes.length>2000)return;
+   const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||hub?.dataset.root||'topics',node=(!home&&D.current(nodes))||nodes.find(n=>n.key===key);
+   if(node)void readContent(D.descendants(node.id,nodes)).catch(()=>{});
+  }catch{}
+ }
+ D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('*').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;
+  try{sessionStorage.setItem(hintKey,JSON.stringify({user:L.user?.id||null,at:Date.now(),nodes:nodes.map(({id,key,href,parent_id})=>({id,key,href,parent_id}))}));}catch{}
+  return D;
+ };
  D.ready=D.load().catch(e=>{D.error=e;return D;});
- D.content=async node=>{const rows=[],ids=D.descendants(node.id);for(let start=0;;start+=200){const batch=L.check(await L.client.from('foamlab_content').select('id,slug,kind,title,summary,track,series,cover_url,metadata,section_ids,author_id,author_name,sort_order,pinned,published_at,created_at,updated_at').eq('status','published').overlaps('section_ids',ids).order('sort_order').order('id').range(start,start+199));rows.push(...batch);if(batch.length<200)return rows;}};
+ document.dispatchEvent(new Event('foamlab:directory-init'));
+ D.content=node=>readContent(D.descendants(node.id));
  D.picker=(host,ids=[],editable=true)=>{
   host.innerHTML='<h3>所在位置</h3><p class="cms-muted">可选择多个目录，同一篇正文会同时出现在这些位置。</p><div class="cms-selected-locations" role="status"></div><input type="search" class="cms-location-search" placeholder="查找模块或子模块" aria-label="查找发布位置"><div class="cms-location-picker">'+D.nodes.map(n=>'<label data-location-label="'+esc(D.path(n.id).toLowerCase())+'"><input type="checkbox" name="section_ids" value="'+n.id+'" '+(ids.includes(n.id)?'checked':'')+' '+(!editable?'disabled':'')+'><span>'+esc(D.path(n.id))+'</span></label>').join('')+'</div>';
   const selected=()=>{const paths=D.readPicker(host).map(D.path);host.querySelector('.cms-selected-locations').textContent=paths.length?'已选择：'+paths.join('；'):'未归类';};selected();host.addEventListener('change',selected);
