@@ -77,6 +77,13 @@
    if(this.height>1760){pathData.push(`M1100 1530 C1110 1690 310 1780 300 1990`);for(let y=1980;y<this.height;y+=340)pathData.push(`M300 ${y} C700 ${y-30} 1440 ${y+25} 2050 ${y} M300 ${y}v340`);}
    const sample=document.createElementNS('http://www.w3.org/2000/svg','svg');sample.setAttribute('viewBox',`0 0 ${this.width} ${this.height}`);
    const roadPoints=[];for(const d of pathData){const path=document.createElementNS(sample.namespaceURI,'path');path.setAttribute('d',d);sample.append(path);const length=path.getTotalLength();for(let n=0;n<length;n+=12){const p=path.getPointAtLength(n);roadPoints.push({x:p.x,y:p.y});}}
+   // Join each exit at the main road's centre, then paint all borders before all soil fills.
+   // Keeping these lanes in the road network also reserves them from buildings and scenery.
+   this.exitRoads=window.FoamTownStoryWorld.exits(this).map(e=>{
+    const start=roadPoints.reduce((best,p)=>Math.hypot(p.x-e.x,p.y-(this.height-260))<Math.hypot(best.x-e.x,best.y-(this.height-260))?p:best);
+    return `M${start.x} ${start.y} Q${e.x-30} ${this.height-160} ${e.x} ${this.height-80} V${this.height+40}`;
+   });
+   for(const d of this.exitRoads){pathData.push(d);const path=document.createElementNS(sample.namespaceURI,'path');path.setAttribute('d',d);const length=path.getTotalLength();for(let n=0;n<=length;n+=12){const p=path.getPointAtLength(n);roadPoints.push({x:p.x,y:p.y});}}
    const placed=[],reserved=[],lanes=[];
    const overlaps=(p,b,gap=25)=>p.x-13<b.x+213+gap&&p.x+213>b.x-13-gap&&p.y-15<b.y+210+gap&&p.y+210>b.y-15-gap;
    const touches=(point,p,r)=>Math.hypot(point.x-clamp(point.x,p.x-5,p.x+205),point.y-clamp(point.y,p.y,p.y+200))<r;

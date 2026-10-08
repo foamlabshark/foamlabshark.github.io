@@ -19,9 +19,23 @@
  function ensure() {
   if (dialog) return;
   dialog = document.createElement('dialog'); dialog.id = 'town-conversation'; dialog.setAttribute('aria-labelledby','town-conversation-name');
+  dialog.innerHTML = '<div class="town-talk-portrait"><div data-talk-head></div><strong id="town-conversation-name"></strong><small data-talk-role></small></div><div class="town-talk-content"><button type="button" data-talk-close aria-label="暂时结束交谈">×</button><b class="town-talk-speaker" hidden></b><div class="town-talk-line"><p data-talk-measure aria-hidden="true"></p><p data-talk-text aria-hidden="true"></p></div><p class="town-talk-sr" role="status"></p><div data-talk-choices hidden></div><p class="town-talk-error" role="alert"></p><footer><button type="button" data-talk-advance>继续 ▾</button></footer></div>';
   document.getElementById('town-app').append(dialog);
-  dialog.addEventListener('close', () => { clearInterval(timer); generation++; busy = false; config?.onClose?.(); });
-  dialog.addEventListener('cancel', e => { if (busy) e.preventDefault(); });
+  // Native close events are queued. A previous close must not cancel a newly opened conversation.
+  dialog.addEventListener('close', () => { if (!dialog.open) end(); });
+  dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+  dialog.querySelector('[data-talk-close]').onclick = close;
+  dialog.querySelector('[data-talk-advance]').onclick = advance;
+  dialog.querySelector('[data-talk-text]').onclick = advance;
+  dialog.querySelector('[data-talk-choices]').onclick = async e => {
+   const b=e.target.closest('[data-talk-choice]'); if (!b || b.disabled || busy || !config) return;
+   const choice=config.choices[+b.dataset.talkChoice], rev=generation; busy=true;
+   dialog.querySelector('.town-talk-error').textContent='';
+   dialog.querySelectorAll('button').forEach(n=>n.disabled=true);
+   try { await choice.run?.(); }
+   catch (error) { if (isCurrent(rev)) dialog.querySelector('.town-talk-error').textContent=error.message||String(error); }
+   finally { if (isCurrent(rev)) { busy=false; enableButtons(); } }
+  };
   dialog.addEventListener('keydown', e => {
    if (['Enter',' '].includes(e.key) && !e.target.closest('[data-talk-choice],[data-talk-close]')) {
     e.preventDefault(); e.stopPropagation(); if (!e.repeat && !busy) advance();
@@ -33,37 +47,54 @@
   config = {...options, pages: options.pages.flatMap(p => typeof p === 'string' ? split(p).map(text => ({text})) : split(p.text).map(text => ({...p,text})))};
   document.querySelector('#town-dialog[open]')?.close();
   window.FoamTownGame?.active?.stopMovement();
-  draw(); if (!dialog.open) dialog.showModal(); dialog.querySelector('[data-talk-advance]')?.focus({preventScroll:true});
+  const head=dialog.querySelector('[data-talk-head]'), markup=portrait(config.npcId)||config.portrait||'<span aria-hidden="true">🐼</span>';
+  if(head.dataset.markup!==markup){head.innerHTML=markup;head.dataset.markup=markup;}
+  dialog.querySelector('#town-conversation-name').textContent=config.name;
+  dialog.querySelector('[data-talk-role]').textContent=config.role||'小镇居民';
+  renderChoices(); enableButtons(); draw(); if (!dialog.open) dialog.showModal();
+  const next=dialog.querySelector('[data-talk-advance]');
+  (next.hidden?dialog.querySelector('[data-talk-choice]:not(:disabled)'):next)?.focus({preventScroll:true});
+  return generation;
+ }
+ function isCurrent(rev) { return !!dialog?.open && !!config && rev===generation; }
+ function enableButtons() { dialog.querySelectorAll('button').forEach(n=>n.disabled=n.hasAttribute('data-talk-choice')&&!!config.choices?.[+n.dataset.talkChoice]?.disabled); }
+ function renderChoices() {
+  const host=dialog.querySelector('[data-talk-choices]'), focused=host.contains(document.activeElement)?document.activeElement.textContent:null;
+  host.innerHTML=(config.choices||[]).map((c,i)=>`<button type="button" data-talk-choice="${i}" ${c.disabled?'disabled':''}>${esc(c.label)}</button>`).join('');
+  if(focused)[...host.children].find(b=>b.textContent===focused&&!b.disabled)?.focus({preventScroll:true});
+ }
+ function updateChoices(choices,rev) {
+  if(!isCurrent(rev)||busy)return false;
+  config.choices=choices;renderChoices();if(printed===full.length)reveal();return true;
  }
  function finishTyping() { clearInterval(timer); printed = full.length; dialog.querySelector('[data-talk-text]').textContent = full; reveal(); }
  function reveal() {
   const last = turn === config.pages.length - 1;
-  dialog.querySelector('[data-talk-choices]').hidden = !last;
+  const choices=dialog.querySelector('[data-talk-choices]');choices.hidden = !last;
   const b = dialog.querySelector('[data-talk-advance]'); b.hidden = last && !!config.choices?.length;
   b.textContent = last ? '结束交谈' : '继续 ▾';
+  if(b.hidden&&document.activeElement===b)choices.querySelector('button:not(:disabled)')?.focus({preventScroll:true});
  }
  function advance() { if (busy) return; if (printed < full.length) return finishTyping(); if (turn < config.pages.length - 1) { turn++; draw(); } else close(); }
  function draw() {
   clearInterval(timer); const page = config.pages[turn] || {text:''};
   full = page.text; printed = 0;
   const speaker = page.speaker || config.name;
-  dialog.innerHTML = `<div class="town-talk-portrait">${portrait(config.npcId) || config.portrait || '<span aria-hidden="true">🐼</span>'}<strong id="town-conversation-name">${esc(config.name)}</strong><small>${esc(config.role || '小镇居民')}</small></div><div class="town-talk-content"><button type="button" data-talk-close aria-label="暂时结束交谈">×</button>${speaker!==config.name?`<b class="town-talk-speaker">${esc(speaker)}：</b>`:''}<p data-talk-text aria-hidden="true"></p><p class="town-talk-sr" role="status">${esc(full)}</p><div data-talk-choices hidden>${(config.choices||[]).map((c,i)=>`<button type="button" data-talk-choice="${i}" ${c.disabled?'disabled':''}>${esc(c.label)}</button>`).join('')}</div><p class="town-talk-error" role="alert"></p><footer><small>${turn+1} / ${config.pages.length} · 点击文字或按空格继续</small><button type="button" data-talk-advance>继续 ▾</button></footer></div>`;
-  dialog.querySelector('[data-talk-close]').onclick = close;
-  dialog.querySelector('[data-talk-advance]').onclick = advance;
-  dialog.querySelector('[data-talk-text]').onclick = advance;
-  dialog.querySelectorAll('[data-talk-choice]').forEach(b => b.onclick = async () => {
-   if (busy) return; const rev = generation; busy = true;
-   dialog.querySelectorAll('button').forEach(n => n.disabled = true);
-   try { await config.choices[+b.dataset.talkChoice].run?.(); }
-   catch (e) { if (dialog.open && rev === generation) dialog.querySelector('.town-talk-error').textContent = e.message || String(e); }
-   finally { if (rev === generation) { busy = false; dialog.querySelectorAll('button').forEach(n => n.disabled = n.hasAttribute('data-talk-choice') && !!config.choices[+n.dataset.talkChoice].disabled); } }
-  });
+  const label=dialog.querySelector('.town-talk-speaker');label.hidden=speaker===config.name;label.textContent=speaker+'：';
+  dialog.querySelector('[data-talk-text]').textContent='';
+  // Reserve the complete line's space while typing so the frame and portrait stay still.
+  dialog.querySelector('[data-talk-measure]').textContent=full;
+  dialog.querySelector('.town-talk-sr').textContent=full;
+  dialog.querySelector('[data-talk-choices]').hidden=true;
+  dialog.querySelector('.town-talk-error').textContent='';
+  const next=dialog.querySelector('[data-talk-advance]');next.hidden=false;next.textContent='继续 ▾';
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) finishTyping();
   else timer = setInterval(() => { printed = Math.min(full.length,printed+2); dialog.querySelector('[data-talk-text]').textContent = full.slice(0,printed); if (printed === full.length) { clearInterval(timer); reveal(); } },24);
  }
- function close() { if (busy) return; dialog?.close(); window.FoamTownGame?.active?.viewport.focus({preventScroll:true}); }
+ function end() { if(!config)return;clearInterval(timer);generation++;busy=false;const previous=config;config=null;previous.onClose?.(); }
+ function close() { if (busy || !dialog?.open) return; dialog.close();end();window.FoamTownGame?.active?.viewport.focus({preventScroll:true}); }
  function dismiss() { busy = false; close(); }
  window.addEventListener('foam-auth-change', dismiss);
  window.FoamTownNPCPortrait = portrait;
- window.FoamTownDialogue = {show, close:dismiss, get open(){return !!dialog?.open;}};
+ window.FoamTownDialogue = {show, updateChoices, isCurrent, close:dismiss, get open(){return !!dialog?.open;}};
 })();

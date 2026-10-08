@@ -20,6 +20,9 @@
  const claimed=q=>state.awards.some(a=>a.id==='quest:'+q.id);
  const rewardable=()=>D.quests.filter(q=>done(q)&&!claimed(q)).map(q=>({id:'quest:'+q.id,title:q.title,reward:q.reward,q})).concat(D.achievements.filter(a=>a.need.every(id=>state.completed.includes(id))&&(a.visits||[]).every(id=>state.visited.includes(id))&&!state.awards.some(r=>r.id==='achievement:'+a.id)).map(a=>({id:'achievement:'+a.id,title:a.name,reward:a.reward})));
  const illustration=q=>{const i=D.quests.indexOf(q);return `<i class="story-illustration" role="img" aria-label="${E(q.title)}任务插画" style="background-position:${(i%4)*100/3}% ${Math.floor(i/4)*25}%"></i>`;};
+ // Crop the existing task paintings within their individual panels; keep the artwork undistorted.
+ const collectionArt=q=>{const i=D.quests.indexOf(q),col=i%4,row=Math.floor(i/4),xs=[0,280,561,841,1122],ys=[0,281,561,841,1093,1402];return `<svg class="story-collection-art" data-story-art="${q.id}" viewBox="${xs[col]+2} ${ys[row]+2} ${xs[col+1]-xs[col]-4} ${ys[row+1]-ys[row]-4}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><image href="/assets/town/story-quest-illustrations.webp" width="1122" height="1402"/></svg>`;};
+ const achievementCover={begin:'first-log',water:'sluice',boundary:'pressure-note',dimension:'dimension-fair',thermal:'heat-house',artist:'star-field',network:'opening',complete:'opening','four-stations':'dimension-fair',machines:'fan-note','water-route':'ship-note','config-reader':'mesh-note'};
  const nextAction=q=>done(q)?(claimed(q)?'故事已完成，手记已经收藏。':'调查已汇报，可在任务簿领取奖励。'):stage(q)===q.steps.length?'回到'+D.npcs[q.npc].name+'身边，汇报调查结果。':waiting(q)?'去'+W.scene(waiting(q).scene).name+'找'+D.npcs[waiting(q).npc].name+'，核对这一步的线索。':'去'+W.scene(q.scene).name+'的'+q.steps[stage(q)].place+'，'+q.steps[stage(q)].title+'。';
  const icon=id=>`<span class="story-seal" aria-hidden="true">${({forest:'水',valley:'风',wetland:'澜',summit:'星',village:'记'})[id]}</span>`;
  function identify(){if(owner!==uid()){owner=uid();state=empty();tracked='';loaded=false;request=null;epoch++;}}
@@ -86,22 +89,23 @@
   'airfoil-note':['小白想要一架能飞过溪流的滑翔机。我做好了模型，还想把受力弄清楚。','帮我检查升力方向，再请岚岚看看迎角和分离，好吗？'],
   'ship-note':['父亲留下的这只竹叶船模，舱里还压着我小时候画的航线。','我想让它重新试航。我们先让船浮稳，再记录波浪，最后比较小船和大船的速度。']
  };
- function say(id,pages,choices){const p=D.npcs[id];view++;window.FoamTownDialogue.show({npcId:id,name:p.name,role:W.scene(current()).name,pages,choices});}
+ function say(id,pages,choices){const p=D.npcs[id];view++;return window.FoamTownDialogue.show({npcId:id,name:p.name,role:W.scene(current()).name,pages,choices});}
  const goodbye=()=>({label:'回头再聊',run:()=>window.FoamTownDialogue.close()});
  async function npc(id,near=false){
   const p=D.npcs[id];if(!p||!game)return;const captured=game,scene=current(),m=game.npcs.get('story-'+id);
   if(!near&&m&&game.config.playable&&!game.config.direct?.()&&Math.hypot(m.x-game.me.x,m.y-game.me.y)>85){const at=game.open(m.x,m.y+44);ui.close();game.walkTo(at.x,at.y,()=>{if(game===captured)npc(id,true);});return;}
-  say(id,[greetings[id]],[goodbye()]);const rev=view;
+  const token=say(id,[greetings[id]],[goodbye()]),rev=view;
+  const valid=()=>captured===game&&scene===current()&&rev===view&&window.FoamTownDialogue.isCurrent(token);
   try{if(atHome()){await refresh();for(const q of D.quests.filter(q=>q.npc===id&&q.scene===scene&&q.kind==='side'&&q.trigger.kind==='talk'&&unlocked(q)&&!found(q)))await api('discover',{quest:q.id,trigger:'talk',npc:id});}
-   if(captured!==game||rev!==view||!window.FoamTownDialogue.open)return;
+   if(!valid())return;
    const choices=[];
    if(atHome()){
     for(const q of D.quests.filter(q=>active(q)&&waiting(q)?.npc===id&&waiting(q)?.scene===scene))choices.push({label:'问问「'+q.title+'」的线索',run:()=>conversation(q.id)});
     for(const q of D.quests.filter(q=>q.npc===id&&q.scene===scene&&unlocked(q)&&!done(q)&&found(q)))choices.push({label:(active(q)?stage(q)===q.steps.length?'汇报：':'聊聊进展：':'问起：')+q.title,run:()=>taskConversation(q)});
    }
    choices.push({label:p.personal_question,run:()=>say(id,[p.about],[{label:'还有件事想问你',run:()=>npc(id,true)},goodbye()])},goodbye());
-   say(id,[greetings[id]],choices);
-  }catch(e){say(id,['观测记录暂时没能取到。'+e.message],[{label:'再试一次',run:()=>npc(id,true)},goodbye()]);}
+   window.FoamTownDialogue.updateChoices(choices,token);
+  }catch(e){if(valid())say(id,['观测记录暂时没能取到。'+e.message],[{label:'再试一次',run:()=>npc(id,true)},goodbye()]);}
  }
  function taskConversation(q){
   if(!atHome())return npc(q.npc,true);
@@ -165,8 +169,18 @@
   else if(selected?.scene===current()&&!waiting(selected))entries.push({q:selected,kind:'objective',label:stage(selected)===selected.steps.length?'向'+D.npcs[selected.npc].name+'汇报':selected.steps[stage(selected)].place});
   entries.forEach(({q,kind,label})=>{const at=point(q,kind),el=document.createElement('button');el.type='button';el.className='story-objective '+(kind==='clue'?'is-clue':'');el.dataset.storyMarker=q.id;el.style.cssText=`left:${at.x-74}px;top:${at.y-90}px;z-index:${Math.round(at.y+1)}`;el.innerHTML=`<i aria-hidden="true">${kind==='clue'?'?':'!'}</i><span>${E(label)}</span>`;el.setAttribute('aria-label',label+'，点击前往');el.onclick=e=>{e.stopPropagation();seek(q.id,kind);};g.world.append(el);markers.push({id:'story-objective-'+q.id,at,x:at.x,y:at.y-75,range:55,label,run:()=>seek(q.id,kind)});});
  }
- function shelf(host){identify();const markup=()=>`<p>完成观测任务，收集与流体力学、OpenFOAM 有关的田野手记。已获得 ${completed().length} / ${D.quests.length} 份。</p><p data-story-error role="status"></p><div class="story-notes">${D.quests.map(q=>`<button type="button" data-story-quest="${q.id}" class="${done(q)?'':'is-locked'}">${icon(q.scene)}<strong>${E(q.note[0])}</strong><small>${done(q)?E(q.note[1]):'完成「'+E(q.title)+'」后获得'}</small></button>`).join('')}</div><h3>观测成就</h3><div class="story-achievements">${D.achievements.map(a=>{const n=a.need.filter(id=>done(D.quests.find(q=>q.id===id))).length+(a.visits||[]).filter(id=>state.visited.includes(id)).length,total=a.need.length+(a.visits||[]).length,award=state.awards.find(r=>r.id==='achievement:'+a.id);return`<div class="${award?'is-earned':''}"><b>${award?'◆':'◇'} ${E(a.name)}</b><small>${n} / ${total} 项${a.visits?'到访记录':'任务'} · ${a.reward.bamboo} 竹笋 · ${a.reward.xp} 经验</small><small>${a.need.map(title).concat((a.visits||[]).map(id=>W.scene(id).name)).map(E).join('、')}</small>${award?`<small>获得于 ${new Date(award.at).toLocaleDateString('zh-CN')}</small>`:''}</div>`;}).join('')}</div><h3>奖励记录</h3><p>累计获得 ${state.awards.reduce((n,a)=>n+a.bamboo,0)} 根竹笋、${state.awards.reduce((n,a)=>n+a.xp,0)} 点经验。竹笋可以在小镇商店使用，经验计入熊猫等级。</p><ul class="story-award-log">${state.awards.slice(-10).reverse().map(a=>`<li>${E(a.kind==='quest'?title(a.id.slice(6)):D.achievements.find(x=>'achievement:'+x.id===a.id)?.name||a.id)}<small>+${a.bamboo} 竹笋 · +${a.xp} 经验 · ${new Date(a.at).toLocaleDateString('zh-CN')}</small></li>`).join('')||'<li>完成任务或达成成就后，会在这里留下记录。</li>'}</ul>`;
-  if(!host){open('田野手记与观测成就',markup());host=document.querySelector('.story-book');}else host.innerHTML=markup();if(owner&&!game?.config.guest&&!loaded)refresh().then(()=>{if(host.isConnected)host.innerHTML=markup();}).catch(e=>{if(host.isConnected)error(host,e);});
+ function shelf(host){
+  identify();
+  const markup=()=>{
+   const notes=D.quests.map(q=>{const collected=done(q);return `<button type="button" data-story-quest="${q.id}" class="story-collection-card ${collected?'is-earned':'is-locked'}">${collectionArt(q)}<span class="story-card-state">${collected?'✓ 已收藏':'未获得'}</span><span class="story-card-copy"><strong>${E(q.note[0])}</strong><small>${collected?E(q.note[1]):'完成「'+E(q.title)+'」后获得'}</small></span></button>`;}).join('');
+   const achievements=D.achievements.map(a=>{
+    const n=a.need.filter(id=>done(D.quests.find(q=>q.id===id))).length+(a.visits||[]).filter(id=>state.visited.includes(id)).length,total=a.need.length+(a.visits||[]).length,award=state.awards.find(r=>r.id==='achievement:'+a.id),q=D.quests.find(q=>q.id===achievementCover[a.id])||D.quests.find(q=>q.id===a.need[0])||D.quests[0];
+    return `<div class="story-collection-card ${award?'is-earned':'is-locked'}" data-story-achievement="${a.id}">${collectionArt(q)}<span class="story-card-state">${award?'✓ 已获得':n===total?'待领奖':'未获得'}</span><div class="story-card-copy"><strong>${E(a.name)}</strong><small>${n} / ${total} 项${a.visits?'到访记录':'任务'} · ${a.reward.bamboo} 竹笋 · ${a.reward.xp} 经验</small><details><summary>查看达成条件</summary><small>${a.need.map(title).concat((a.visits||[]).map(id=>W.scene(id).name)).map(E).join('、')}</small></details>${award?`<small>获得于 ${new Date(award.at).toLocaleDateString('zh-CN')}</small>`:''}</div></div>`;
+   }).join('');
+   return `<p>完成观测任务，收集与流体力学、OpenFOAM 有关的田野手记。已获得 ${completed().length} / ${D.quests.length} 份。</p><p data-story-error role="status"></p><div class="story-notes">${notes}</div><h3>观测成就</h3><div class="story-achievements">${achievements}</div><h3>奖励记录</h3><p>累计获得 ${state.awards.reduce((n,a)=>n+a.bamboo,0)} 根竹笋、${state.awards.reduce((n,a)=>n+a.xp,0)} 点经验。竹笋可以在小镇商店使用，经验计入熊猫等级。</p><ul class="story-award-log">${state.awards.slice(-10).reverse().map(a=>`<li>${E(a.kind==='quest'?title(a.id.slice(6)):D.achievements.find(x=>'achievement:'+x.id===a.id)?.name||a.id)}<small>+${a.bamboo} 竹笋 · +${a.xp} 经验 · ${new Date(a.at).toLocaleDateString('zh-CN')}</small></li>`).join('')||'<li>完成任务或达成成就后，会在这里留下记录。</li>'}</ul>`;
+  };
+  if(!host){open('田野手记与观测成就',markup());host=document.querySelector('.story-book');}else host.innerHTML=markup();
+  if(owner&&!game?.config.guest&&!loaded)refresh().then(()=>{if(host.isConnected)host.innerHTML=markup();}).catch(e=>{if(host.isConnected)error(host,e);});
  }
  function tracker(){if(!game)return;const badge=game.viewport.closest('.town-game-shell').querySelector('.story-badge');if(badge){const n=rewardable().length;badge.hidden=!n;badge.textContent=n;}const el=game.viewport.closest('.town-game-shell').querySelector('[data-story-tracker]');if(!el)return;if(owner&&!atHome()){el.textContent='串门中 · 返回自己的小镇继续故事';el.onclick=()=>{location.hash=context().home||'map';};return;}const next=D.quests.find(q=>q.id===tracked&&active(q))||D.quests.find(q=>q.kind==='main'&&active(q))||D.quests.find(q=>q.kind==='main'&&!done(q)&&unlocked(q));el.textContent=next?(next.kind==='main'?'主线':'支线')+' · '+next.title+' · '+status(next):'观测站已重启 · 查看支线';el.onclick=()=>next?task(next.id):journal('side');}
  function mount(g){game=g;ui=g.config.story;if(!ui)return;identify();const captured=g;

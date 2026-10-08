@@ -67,11 +67,6 @@
   return g.open(at.x,at.y);
  }
  function portals(g,go){
-  if(!g.config.scene){const connections=document.createElement('div');connections.className='story-edge-roads';connections.style.cssText=`position:absolute;inset:0;width:${g.width}px;height:${g.height}px;pointer-events:none;z-index:0`;
-   const roads=exits(g).map(e=>`M${e.x} ${g.height-260}Q${e.x-30} ${g.height-160} ${e.x} ${g.height-80}V${g.height+40}`);
-   connections.innerHTML=svg(`<defs><pattern id="story-edge-soil" width="210" height="210" patternUnits="userSpaceOnUse"><image href="/assets/town/terrain-atlas.webp" x="-210" width="420" height="420"/></pattern></defs><g fill="none" stroke-linecap="round">${roads.map(d=>`<path d="${d}" stroke="#8d9b6a" stroke-width="91"/><path d="${d}" stroke="#bcaa7d" stroke-width="81"/><path d="${d}" stroke="url(#story-edge-soil)" stroke-width="76"/>`).join('')}</g>`,`0 0 ${g.width} ${g.height}`);
-   g.world.querySelector('.town-game-ground').after(connections);
-  }
   const gates=exits(g).map(e=>{const at=gate(g,e),el=document.createElement('div'),side=e.edge==='north'||e.edge==='south';
    const sx=side?at.x+(at.x>g.width/2?-110:110):at.x,sy=side?at.y-25:at.y-80;
    el.className='story-waypost';el.dataset.edge=e.edge;el.setAttribute('aria-label','路牌：'+scene(e.to).name);el.style.left=Math.max(5,Math.min(g.width-145,sx-70))+'px';el.style.top=Math.max(12,sy-65)+'px';el.style.zIndex=String(Math.round(sy+1));
