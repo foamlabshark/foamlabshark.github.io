@@ -210,7 +210,7 @@
  const quiet=()=>F()?.quiet(),china=()=>E()?.china()||{},ctx=()=>window.FoamTownEggContext?.get()||{};
  const seen=new Set(),timers=new Map();let owner='',rolls=0,kites=0,jumps=0,lastAction='',lastFlip='',flipCount=0,color='amber',lastGame=null,wasOverseas=false,querySlug='';
  const pending=new Set();
- async function event(kind,data={}){try{return await E()?.event(kind,data);}catch(error){if(!/登录|入住/.test(error.message||''))F()?.toast(error.message);return null;}}
+ async function event(kind,data={},background=false){try{return await E()?.event(kind,data);}catch(error){if(!background&&!/登录|入住/.test(error.message||''))F()?.toast(error.message);return null;}}
  async function unlock(id,effect){effect?.();return E()?.discover(id);}
  function spot(kind='spot'){const g=G(),i=g?.config.buildings.findIndex(b=>b[0]===kind);return i>=0?{...g.positions[i],door:g.door(i),index:i}:null;}
  function nearBuilding(kind,range=120){const p=spot(kind),g=G();return p&&g&&Math.hypot(g.me.x-p.door.x,g.me.y-p.door.y)<=range;}
@@ -324,10 +324,13 @@
  }
  function decorateCards(){const meta=E()?.meta||{},mirrors=new Set(meta.mirrors||[]);document.querySelectorAll('[data-art-card]').forEach(n=>{n.classList.toggle('egg-mirror-card',mirrors.has(n.dataset.artCard));});const grid=document.querySelector('.tac-grid'),owned=window.FoamPandaCards?.owned();if(grid&&owned){const seasons=['spring-blossom','summer-fireflies','autumn-leaves','snow-day'];if(seasons.every(id=>owned.has(id)))grid.classList.add('egg-seasons-panorama');const year=Number(meta.joined?.slice(0,4)),animal=['rat','ox','tiger','rabbit','dragon','snake','horse','sheep','monkey','rooster','dog','pig'][(year-4)%12];grid.querySelector(`[data-art-card="zodiac-${animal}"]`)?.classList.add('egg-birth-zodiac');}document.querySelectorAll('.tac[data-art-card]').forEach(n=>{if(n.querySelector('.collection-time'))return;const at=window.FoamTownProgress?.get()?.obtained_at?.['art:'+n.dataset.artCard];if(window.FoamPandaCards?.owned()?.has(n.dataset.artCard))n.insertAdjacentHTML('beforeend',window.FoamCollectionTime(at));});}
  function slug(){return document.querySelector('[data-cms-slug]')?.dataset.cmsSlug||new URLSearchParams(location.search).get('slug')||document.body.dataset.lesson||'';}
- function pageEggs(){const s=slug(),lesson=!!document.querySelector('.lesson-actions,#complete-lesson,#lab-complete')||document.body.dataset.section==='lesson';if(!s)return;if(lesson){if(document.querySelector('.katex')&&querySlug!==s){querySlug=s;void event('formula_page',{id:s});}}else if(location.pathname.startsWith('/commands/')||document.body.dataset.section==='reference'){if(querySlug!==s){querySlug=s;void event('command_page',{id:s});}}}
+ // Articles also contain .lesson-actions for the discussion link. Only an actual
+ // course completion control identifies a lesson for background discoveries.
+ const isLessonPage=()=>!!document.querySelector('#complete-lesson,#lab-complete')||document.body.dataset.section==='lesson';
+ function pageEggs(){const s=slug();if(!s)return;if(isLessonPage()){if(document.querySelector('.katex')&&querySlug!==s){querySlug=s;void event('formula_page',{id:s},true);}}else if(location.pathname.startsWith('/commands/')||document.body.dataset.section==='reference'){if(querySlug!==s){querySlug=s;void event('command_page',{id:s},true);}}}
  let nabla=null,nablaClicks=0;
  document.addEventListener('click',e=>{const n=e.target.closest('.katex .mord,.katex .mbin');if(n?.textContent==='∇'){nablaClicks=nabla===n?nablaClicks+1:1;nabla=n;if(nablaClicks===3){n.innerHTML=window.foamPandaArt?.(true)||'ʕ•ᴥ•ʔ';n.classList.add('egg-nabla');void unlock('W04');}}const house=e.target.closest('[data-house]');if(house)void event('house',{id:house.dataset.house});});
- window.addEventListener('foamlab:code-copied',()=>{if(slug())void event('copy',{id:slug()});});
+ window.addEventListener('foamlab:code-copied',()=>{if(isLessonPage()&&slug())void event('copy',{id:slug()},true);});
  let mapDrag=null;
  document.addEventListener('pointerdown',e=>{if(e.target.closest('.town-map-viewport'))mapDrag={x:e.clientX,y:e.clientY,points:[[e.clientX,e.clientY]],angle:0,last:null};});
  document.addEventListener('pointermove',e=>{if(!mapDrag)return;const p=mapDrag.points.at(-1),dx=e.clientX-p[0],dy=e.clientY-p[1];if(Math.hypot(dx,dy)<12)return;const a=Math.atan2(dy,dx);if(mapDrag.last!=null){let d=a-mapDrag.last;while(d>Math.PI)d-=2*Math.PI;while(d< -Math.PI)d+=2*Math.PI;mapDrag.angle+=d;}mapDrag.last=a;mapDrag.points.push([e.clientX,e.clientY]);});
