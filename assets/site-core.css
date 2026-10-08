@@ -614,6 +614,48 @@ html.has-page-outline{scroll-padding-top:calc(var(--page-topbar-height,72px) + v
 .panda-item>strong{font-size:14px}
 .panda-item>span:not(.panda-item-preview){margin:4px 0 8px;font-size:12px;line-height:1.6;color:var(--muted);text-align:center}
 .panda-item>small{margin-top:auto;font-size:12px;color:var(--accent)}
+/* Each learning achievement has its own collectible illustration. */
+.panda-badge-card{overflow:hidden;padding-top:0;gap:2px}
+.panda-badge-card>.panda-badge-picture{display:block;align-self:stretch;margin:0 -8px 10px;aspect-ratio:1;overflow:hidden;line-height:0}
+.panda-badge-picture img{display:block;width:100%;height:100%;object-fit:cover}
+.panda-badge-card.locked .panda-badge-picture{filter:grayscale(1);opacity:.58}
+.panda-badge-card.locked>small{color:var(--muted)}
+/* Keep travel previews local to collection cards, with no effect on town movement. */
+.panda-item-preview.panda-ride-preview{position:relative;width:128px;max-width:100%;height:136px;margin:3px 0 8px;--ride-step:1.2s}
+.panda-ride-preview[data-ride=jog]{--ride-step:.55s}
+.panda-ride-preview .pa-carry{display:none!important}
+.panda-ride-preview .panda-ride-wind{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;opacity:0;pointer-events:none}
+.panda-ride-preview .panda-ride-spokes{fill:none;stroke:#98b7ae;stroke-width:1.1;animation:panda-ride-wheel 1.8s linear infinite}
+.panda-ride-preview:is([data-ride=walk],[data-ride=jog]) .pa-char{animation:panda-ride-step var(--ride-step) ease-in-out infinite}
+.panda-ride-preview:is([data-ride=walk],[data-ride=jog]) .pa-leg-l{animation:panda-ride-leg var(--ride-step) ease-in-out infinite}
+.panda-ride-preview:is([data-ride=walk],[data-ride=jog]) .pa-leg-r{animation:panda-ride-leg var(--ride-step) ease-in-out calc(var(--ride-step)/-2) infinite}
+.panda-ride-preview:is([data-ride=walk],[data-ride=jog]) .pa-arm-l{animation:panda-ride-arm var(--ride-step) ease-in-out infinite;transform-origin:52px 110px}
+.panda-ride-preview:is([data-ride=walk],[data-ride=jog]) .pa-arm-r{animation:panda-ride-arm var(--ride-step) ease-in-out calc(var(--ride-step)/-2) infinite;transform-origin:108px 110px}
+.panda-ride-preview[data-ride=jog] .pa-mover{transform:rotate(-7deg);transform-origin:80px 150px}
+.panda-ride-preview[data-ride=skateboard] .pa-char{animation:panda-ride-glide 2.4s ease-in-out infinite;transform-origin:80px 166px}
+.panda-ride-preview[data-ride=skateboard] .pa-arm-l{transform:rotate(48deg);transform-origin:52px 110px}
+.panda-ride-preview[data-ride=skateboard] .pa-leg-r{animation:panda-ride-push 2.4s ease-in-out infinite}
+.panda-ride-preview:is([data-ride=jog],[data-ride=skateboard],[data-ride=bicycle]) .panda-ride-wind{opacity:.45;animation:panda-ride-wind 1.3s ease-out infinite}
+.panda-ride-preview[data-ride=bicycle] .pa-leg-l{animation:panda-ride-pedal 1s linear infinite}
+.panda-ride-preview[data-ride=bicycle] .pa-leg-r{animation:panda-ride-pedal 1s linear -.5s infinite}
+.panda-ride-preview[data-ride=bicycle] .pa-arm-l{transform:rotate(-24deg);transform-origin:52px 110px}
+.panda-ride-preview[data-ride=bicycle] .pa-arm-r{transform:rotate(-38deg);transform-origin:108px 110px}
+.panda-ride-preview[data-ride=balloon] .pa-mover{animation:panda-ride-float 3.2s ease-in-out infinite}
+.panda-ride-preview[data-ride=balloon] .pa-arm-r{transform:rotate(-100deg);transform-origin:108px 110px}
+.panda-ride-preview[data-ride=balloon] .pa-shadow{opacity:.07;transform:scaleX(.7);transform-origin:80px 167px}
+.panda-item.locked .panda-ride-preview{opacity:.5;filter:grayscale(1)}
+.panda-ride-preview[data-quiet=true] *{animation:none!important}
+.panda-ride-preview[data-quiet=true] .panda-ride-wind{opacity:0}
+@keyframes panda-ride-step{0%,50%,100%{translate:0 0}25%,75%{translate:0 -4px}}
+@keyframes panda-ride-leg{0%,100%{translate:0 -4px;rotate:-7deg}50%{translate:0 3px;rotate:7deg}}
+@keyframes panda-ride-arm{0%,100%{rotate:-17deg}50%{rotate:17deg}}
+@keyframes panda-ride-push{0%,25%,100%{translate:0 0}55%{translate:10px 7px}75%{translate:14px -3px}}
+@keyframes panda-ride-glide{0%,100%{translate:-5px 0;rotate:-2deg}50%{translate:5px -2px;rotate:2deg}}
+@keyframes panda-ride-pedal{0%,100%{translate:0 -5px}25%{translate:5px 0}50%{translate:0 5px}75%{translate:-5px 0}}
+@keyframes panda-ride-wheel{to{rotate:360deg}}
+@keyframes panda-ride-float{0%,100%{translate:-3px -2px;rotate:-2deg}50%{translate:3px -10px;rotate:2deg}}
+@keyframes panda-ride-wind{from{translate:8px 0;opacity:0}30%{opacity:.45}to{translate:-10px 0;opacity:0}}
+@media(prefers-reduced-motion:reduce){.panda-ride-preview *{animation:none!important}.panda-ride-preview .panda-ride-wind{display:none}}
 .panda-rules,.panda-history{margin-top:20px;padding-top:15px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
 .panda-rules summary,.panda-history summary{padding:4px 0;color:var(--ink);font-weight:600;cursor:pointer}
 .panda-rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding-top:10px;line-height:1.9}
