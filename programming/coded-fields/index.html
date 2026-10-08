@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>用代码设置初始与边界条件 · FoamLab</title>
-  <meta name="description" content="用 codeStream 生成初始场和固定边界，用 codedFixedValue 设置随时间变化的入口。六节教程、九个 v2512 算例，附代码说明、结果图和练习。">
+  <meta name="description" content="用 codeStream 设置空间分布，用 codedFixedValue 编写固定和时变入口，检查流量与续算结果。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -26,7 +26,7 @@
   <script src="/assets/runtime-content.js?v=e69c3b80eefb" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=1250f21dac50" defer></script>
+  <script src="/assets/runtime-ui.js?v=46ee79425f83" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -37,7 +37,7 @@
   <script src="/assets/runtime-panda-eggs.js?v=95b75f862282" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
 <meta name="generator" content="Hexo 8.1.2"></head>
-<body data-section="section" data-lesson="">
+<body data-section="programming" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
 <aside class="sidebar" id="sidebar">
   <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
@@ -132,7 +132,7 @@
 <div class="nav-group" data-nav-section="programming">
  <div class="nav-parent"><a href="/programming/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
  <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
- <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/?q=%E7%BC%96%E7%A8%8B"><span>基础编程实例</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-solver"><span>开发求解器</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-boundary"><span>开发边界条件</span></a><a class="nav-item nav-subitem" href="/read/?slug=development-utility"><span>开发后处理工具</span></a></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/basics/"><span>OpenFOAM 编程基础</span></a><a class="nav-item nav-subitem" href="/programming/coded-fields/"><span>用代码设置初始与边界条件</span></a><a class="nav-item nav-subitem" href="/programming/solvers/"><span>求解器开发</span></a><a class="nav-item nav-subitem" href="/programming/boundaries/"><span>边界条件开发</span></a><a class="nav-item nav-subitem" href="/programming/utilities/"><span>后处理工具开发</span></a><a class="nav-item nav-subitem" href="/programming/extensions/"><span>网格、格式与模型扩展</span></a><a class="nav-item nav-subitem" href="/programming/vibe-coding/"><span>Vibe Coding 实训</span></a></div>
 </div>
 
 <div class="nav-group" data-nav-section="tools">
@@ -171,7 +171,7 @@
   <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
 </aside>
 <div class="app-shell">
-  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/">学习概览</a> <span>/</span> <strong>用代码设置初始与边界条件</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/programming/">OpenFOAM 编程</a> <span>/</span> <strong>用代码设置初始与边界条件</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
   <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
  <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
  <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
@@ -184,7 +184,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/">← 返回学习概览</a></div><div class="page-wrap lab-catalog-page" data-page-state="loading"><div class="page-content-loading" role="status"><span>正在读取内容目录…</span><i></i><i></i><i></i></div><div class="eyebrow">OPENFOAM v2512 / CODESTREAM &amp; CODED BOUNDARIES</div><div class="catalog-header"><div class="page-heading"><h1>用代码设置初始与边界条件</h1><p>用 codeStream 生成初始场和固定边界，用 codedFixedValue 设置随时间变化的入口。六节教程、九个 v2512 算例，附代码说明、结果图和练习。</p></div></div><label class="search-field catalog-search"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="catalog-query" type="search" placeholder="搜索主题、标题或系列名称" aria-label="搜索内容"></label><div id="catalog-filters" class="filter-tabs" aria-label="主题筛选"></div><p id="catalog-count" class="result-count" role="status"></p><div class="lab-card-grid" data-lab-catalog="section"><div class="lab-loading"><span></span>正在读取内容目录…</div></div><noscript><p>课程目录需要 JavaScript 才能加载；命令和配置参考页不受影响，可以直接阅读。</p></noscript></div>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/programming/">← 返回OpenFOAM 编程</a></div><div class="page-wrap topics-page" id="topic-hub" data-page-state="loading" data-topic="" data-root="programming" data-collection-label="模块">
+  <div class="eyebrow">OPENFOAM / PROGRAMMING</div>
+  <div class="page-heading"><h1>用代码设置初始与边界条件</h1><p>用 codeStream 设置空间分布，用 codedFixedValue 编写固定和时变入口，检查流量与续算结果。</p></div>
+  <div class="page-content-loading" role="status"><span>正在读取模块课程…</span><i></i><i></i><i></i></div>
+  <noscript><p>请启用 JavaScript 后查看课程目录。</p></noscript>
+</div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>
