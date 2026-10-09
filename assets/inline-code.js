@@ -21,7 +21,7 @@
   if(offset<text.length)result.push({text:text.slice(offset),code:false});
   return result;
  }
- function isParameterHeader(header){return /^(?:参数(?:或结构)?|选项|命令(?:或函数)?|字段|条目|变量|属性|关键字|键|值|取值|类型|边界条件(?:类型)?|边界类型|场|字典|求解器|壁面函数|插值格式|预处理\/光顺器|模型(?:或功能)?|class|type|method)$/.test(String(header||'').trim());}
+ function isParameterHeader(header){return /^(?:参数(?:或结构)?|选项|命令(?:或函数)?|函数|别名|名称|词缀|写法|修正方式|字段|条目|变量|属性|关键字|键|值|取值|类型|边界条件(?:类型)?|边界类型|场|字典|求解器|壁面函数|插值格式|预处理\/光顺器|模型(?:或功能)?|class|type|method)$/.test(String(header||'').trim());}
  function parameterCell(cell){return !!cell&&cell.cellIndex===0&&isParameterHeader(cell.closest('table')?.querySelector('tr')?.cells[0]?.textContent);}
  function decorate(holder){
   const nodes=[],walker=document.createTreeWalker(holder,NodeFilter.SHOW_TEXT);
