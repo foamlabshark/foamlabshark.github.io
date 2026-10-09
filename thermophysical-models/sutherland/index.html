@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-thermophysical-models-sutherland"><div class="eyebrow">OpenFOAM v2512</div><h1>sutherland · 温度相关黏度</h1><div class="prose"><p>用 Sutherland 关系描述气体动力黏度随温度的变化。</p><h2 id="brief-introduction">简要介绍</h2><p>气体升温后，黏度往往随之变化。<code>sutherland</code> 用温度关联描述动力黏度，<code>As</code> 与 <code>Ts</code> 决定曲线；热容和状态方程仍由 <code>thermoType</code> 中的其他选项确定。</p><h2>设置位置与参数</h2><p>示例位置：compressible/rhoCentralFoam/LadenburgJet60psi/constant/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>transport</code></td><td>选择 <code>sutherland</code>。</td></tr><tr><td><code>As</code></td><td>Sutherland 黏度关系的系数，需与所用单位一致。</td></tr><tr><td><code>Ts</code></td><td>Sutherland 温度，单位 K。</td></tr><tr><td><code>thermo</code></td><td>比热模型与输运模型分别选择；改变黏度关系不会自动替换热容数据。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">41 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-thermophysical-models-sutherland" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>sutherland · 温度相关黏度</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>用 Sutherland 关系描述气体动力黏度随温度的变化。</p><h2 id="brief-introduction">简要介绍</h2><p>气体升温后，黏度往往随之变化。<code>sutherland</code> 用温度关联描述动力黏度，<code>As</code> 与 <code>Ts</code> 决定曲线；热容和状态方程仍由 <code>thermoType</code> 中的其他选项确定。</p><h2>设置位置与参数</h2><p>示例位置：compressible/rhoCentralFoam/LadenburgJet60psi/constant/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>transport</code></td><td>选择 <code>sutherland</code>。</td></tr><tr><td><code>As</code></td><td>Sutherland 黏度关系的系数，需与所用单位一致。</td></tr><tr><td><code>Ts</code></td><td>Sutherland 温度，单位 K。</td></tr><tr><td><code>thermo</code></td><td>比热模型与输运模型分别选择；改变黏度关系不会自动替换热容数据。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">41 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -359,7 +364,11 @@ runApplication blockMesh
 runApplication $(getApplication)
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoCentralFoam/LadenburgJet60psi/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>比较不同温度处的黏度及边界层变化，勿把 <code>As</code> 直接解释为常温黏度。</p><p><a href="/thermophysical-models/">返回热物性与状态方程</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

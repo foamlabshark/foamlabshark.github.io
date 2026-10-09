@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/fv-options/">← 返回源项、约束与修正</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-fv-options-porosity"><div class="eyebrow">OpenFOAM v2512</div><h1>explicitPorositySource · 多孔阻力</h1><div class="prose"><p>在指定区域中加入 Darcy–Forchheimer 等多孔阻力，用于滤芯、填充层和多孔障碍物。</p><h2 id="brief-introduction">简要介绍</h2><p>多孔结构内部无法逐孔建网时，可在选定单元区域中加入等效阻力。阻力系数分别表示黏性与惯性贡献，方向由局部坐标系确定，可用压降流量关系校核。</p><h2>设置位置与参数</h2><p>示例位置：incompressible/pisoFoam/laminar/porousBlockage/constant/fvOptions。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>cellZone</code></td><td>多孔区域的单元集合。</td></tr><tr><td><code>type</code></td><td>多孔阻力模型，如 <code>DarcyForchheimer</code>。</td></tr><tr><td><code>d / f</code></td><td>黏性与惯性阻力系数；分量表示局部坐标系方向。</td></tr><tr><td><code>coordinateSystem</code></td><td>定义各向异性阻力的主方向。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/fvOptions</code></h3><p>源项、约束与场修正。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/fv-options/">← 返回源项、约束与修正</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-fv-options-porosity" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>explicitPorositySource · 多孔阻力</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>在指定区域中加入 Darcy–Forchheimer 等多孔阻力，用于滤芯、填充层和多孔障碍物。</p><h2 id="brief-introduction">简要介绍</h2><p>多孔结构内部无法逐孔建网时，可在选定单元区域中加入等效阻力。阻力系数分别表示黏性与惯性贡献，方向由局部坐标系确定，可用压降流量关系校核。</p><h2>设置位置与参数</h2><p>示例位置：incompressible/pisoFoam/laminar/porousBlockage/constant/fvOptions。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>cellZone</code></td><td>多孔区域的单元集合。</td></tr><tr><td><code>type</code></td><td>多孔阻力模型，如 <code>DarcyForchheimer</code>。</td></tr><tr><td><code>d / f</code></td><td>黏性与惯性阻力系数；分量表示局部坐标系方向。</td></tr><tr><td><code>coordinateSystem</code></td><td>定义各向异性阻力的主方向。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/fvOptions</code></h3><p>源项、约束与场修正。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -430,7 +435,11 @@ runApplication topoSet
 runApplication $(getApplication)
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>topoSet</code> 按几何、网格属性和集合关系创建或修改 sets/zones。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/laminar/porousBlockage/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/pisoFoam/laminar/porousBlockage/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>检查多孔区前后的压降和流量；阻力系数应由渗透率或实验压降关系换算。</p><p><a href="/fv-options/">返回源项、约束与修正</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

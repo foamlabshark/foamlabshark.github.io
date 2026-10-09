@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/multiphase-models/">← 返回多相流与相间作用</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-multiphase-models-evaporation"><div class="eyebrow">OpenFOAM v2512</div><h1>蒸发、凝结与潜热</h1><div class="prose"><p>将界面质量交换与能量方程耦合，描述温度驱动的蒸发和凝结。</p><h2 id="brief-introduction">简要介绍</h2><p>热驱动的相变会同时改变各相质量和能量。选择质量交换模型后，应检查参与交换的组分、温度边界及焓数据，使相变速率与潜热处理一致。</p><h2>设置位置与参数</h2><p>示例位置：multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/constant/phaseProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>massTransferModel</code></td><td>指定相间质量交换方法。</td></tr><tr><td><code>species</code></td><td>参与交换的组分与其名称。</td></tr><tr><td><code>thermophysicalProperties</code></td><td>提供热物性和相变所需的焓等数据。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/phaseProperties</code></h3><p>相模型与相间交换闭合。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/multiphase-models/">← 返回多相流与相间作用</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-multiphase-models-evaporation" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>蒸发、凝结与潜热</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>将界面质量交换与能量方程耦合，描述温度驱动的蒸发和凝结。</p><h2 id="brief-introduction">简要介绍</h2><p>热驱动的相变会同时改变各相质量和能量。选择质量交换模型后，应检查参与交换的组分、温度边界及焓数据，使相变速率与潜热处理一致。</p><h2>设置位置与参数</h2><p>示例位置：multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/constant/phaseProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>massTransferModel</code></td><td>指定相间质量交换方法。</td></tr><tr><td><code>species</code></td><td>参与交换的组分与其名称。</td></tr><tr><td><code>thermophysicalProperties</code></td><td>提供热物性和相变所需的焓等数据。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/phaseProperties</code></h3><p>相模型与相间交换闭合。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -625,7 +630,11 @@ runParallel $(getApplication)
 runApplication reconstructPar
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>canCompile</code> 检查 <code>make</code>、<code>wmake</code> 和 <code>C</code>++ 编译器是否可用。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>setFields</code> 按几何选区或拓扑集合给已有场设置初值。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>同时检查温度、相质量和相变速率，使用质量与能量收支判断相变计算。</p><p><a href="/multiphase-models/">返回多相流与相间作用</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

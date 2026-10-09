@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/particle-models/">← 返回颗粒、喷雾与液膜</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-particle-models-cloud"><div class="eyebrow">OpenFOAM v2512</div><h1>颗粒云、跟踪与双向耦合</h1><div class="prose"><p>用计算颗粒包表示大量物理颗粒，配置颗粒跟踪、连续相插值和源项耦合。</p><h2 id="brief-introduction">简要介绍</h2><p>一个计算颗粒包代表一定数量的物理颗粒。颗粒云文件将跟踪、插值、注入和相间耦合集中配置；首先应明确颗粒是否向流体反馈，再选择相应子模型。</p><h2>设置位置与参数</h2><p>示例位置：lagrangian/kinematicParcelFoam/pitzDailyWithSprinklers/constant/kinematicCloudProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>active</code></td><td>启用颗粒云。</td></tr><tr><td><code>coupled</code></td><td>控制颗粒是否向连续相反馈源项。</td></tr><tr><td><code>cellValueSourceCorrection</code></td><td>跟踪时是否修正单元源项。</td></tr><tr><td><code>interpolationSchemes</code></td><td>决定颗粒位置处连续相物理量的插值。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/kinematicCloudProperties</code></h3><p>本算例的配套配置，字段和参数见文件正文。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">119 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/particle-models/">← 返回颗粒、喷雾与液膜</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-particle-models-cloud" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>颗粒云、跟踪与双向耦合</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>用计算颗粒包表示大量物理颗粒，配置颗粒跟踪、连续相插值和源项耦合。</p><h2 id="brief-introduction">简要介绍</h2><p>一个计算颗粒包代表一定数量的物理颗粒。颗粒云文件将跟踪、插值、注入和相间耦合集中配置；首先应明确颗粒是否向流体反馈，再选择相应子模型。</p><h2>设置位置与参数</h2><p>示例位置：lagrangian/kinematicParcelFoam/pitzDailyWithSprinklers/constant/kinematicCloudProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>active</code></td><td>启用颗粒云。</td></tr><tr><td><code>coupled</code></td><td>控制颗粒是否向连续相反馈源项。</td></tr><tr><td><code>cellValueSourceCorrection</code></td><td>跟踪时是否修正单元源项。</td></tr><tr><td><code>interpolationSchemes</code></td><td>决定颗粒位置处连续相物理量的插值。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/kinematicCloudProperties</code></h3><p>本算例的配套配置，字段和参数见文件正文。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">119 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -624,7 +629,11 @@ runParallel $(getApplication)
 runApplication reconstructPar
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>makeFaMesh</code> 从体网格中选取表面面片，生成有限面积网格。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/kinematicParcelFoam/pitzDailyWithSprinklers/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/kinematicParcelFoam/pitzDailyWithSprinklers/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>检查 <code>lagrangian</code> 颗粒位置、速度和粒径，并区分颗粒包数量与实际颗粒数量。</p><p><a href="/particle-models/">返回颗粒、喷雾与液膜</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

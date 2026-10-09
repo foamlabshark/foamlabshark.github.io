@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/linear-solvers/">← 返回线性与 ODE 求解方法</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-linear-solvers-pbicgstab"><div class="eyebrow">OpenFOAM v2512</div><h1>PBiCGStab 与 DILU</h1><div class="prose"><p>对含对流项等形成的非对称系统，使用稳定双共轭梯度法及不完全 LU 预条件。</p><h2 id="brief-introduction">简要介绍</h2><p>含对流的方程通常形成非对称矩阵，可使用 <code>PBiCGStab</code> 与 <code>DILU</code>。应分别检查迭代上限和残差阈值，避免把停止迭代误认为已经收敛。</p><h2>设置位置与参数</h2><p>示例位置：incompressible/pimpleFoam/LES/vortexShed/system/fvSolution。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>solver</code></td><td><code>PBiCGStab</code>。</td></tr><tr><td><code>preconditioner</code></td><td>常用 <code>DILU</code>。</td></tr><tr><td><code>maxIter</code></td><td>线性迭代上限。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>system/fvSolution</code></h3><p>线性求解器、耦合循环、容差与松弛。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/linear-solvers/">← 返回线性与 ODE 求解方法</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-linear-solvers-pbicgstab" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>PBiCGStab 与 DILU</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>对含对流项等形成的非对称系统，使用稳定双共轭梯度法及不完全 LU 预条件。</p><h2 id="brief-introduction">简要介绍</h2><p>含对流的方程通常形成非对称矩阵，可使用 <code>PBiCGStab</code> 与 <code>DILU</code>。应分别检查迭代上限和残差阈值，避免把停止迭代误认为已经收敛。</p><h2>设置位置与参数</h2><p>示例位置：incompressible/pimpleFoam/LES/vortexShed/system/fvSolution。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>solver</code></td><td><code>PBiCGStab</code>。</td></tr><tr><td><code>preconditioner</code></td><td>常用 <code>DILU</code>。</td></tr><tr><td><code>maxIter</code></td><td>线性迭代上限。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>system/fvSolution</code></h3><p>线性求解器、耦合循环、容差与松弛。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -489,7 +494,11 @@ runParallel $(getApplication)
 <span class="hljs-keyword">fi</span>
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li><li><code>notTest</code> 检查参数列表是否省略 <code>-test</code>。</li><li><code>noise</code> 对压力时间信号或表面压力数据做频谱与声压级分析。通过并行包装函数执行，进程数与分区设置配套。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/vortexShed/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/pimpleFoam/LES/vortexShed/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>检查非对称输运方程的收敛；达到 <code>maxIter</code> 不代表达到容差。</p><p><a href="/linear-solvers/">返回线性与 ODE 求解方法</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

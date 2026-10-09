@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/turbulence-models/">← 返回湍流模型速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-turbulence-models-wale"><div class="eyebrow">OpenFOAM v2512</div><h1>WALE · WALE 亚格子模型</h1><div class="prose"><p>通过速度梯度张量构造亚格子黏度，具有适合近壁区域的渐近行为。</p><h2 id="brief-introduction">简要介绍</h2><p><code>WALE</code> 由速度梯度张量计算亚格子黏度，不需要额外的亚格子动能输运方程。需要选择滤波宽度、设置 <code>nut</code> 边界，并检查近壁网格和时间分辨率。</p><h2>模型与所需字段</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>nut</code></td><td>由模型计算的运动学湍动黏度；仍需给定其边界类型。</td></tr></tbody></table></div><h2>模型选择与配置示例</h2><h3><code>constant/turbulenceProperties</code></h3><p>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">85 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/turbulence-models/">← 返回湍流模型速查</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-turbulence-models-wale" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>WALE · WALE 亚格子模型</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>通过速度梯度张量构造亚格子黏度，具有适合近壁区域的渐近行为。</p><h2 id="brief-introduction">简要介绍</h2><p><code>WALE</code> 由速度梯度张量计算亚格子黏度，不需要额外的亚格子动能输运方程。需要选择滤波宽度、设置 <code>nut</code> 边界，并检查近壁网格和时间分辨率。</p><h2>模型与所需字段</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>nut</code></td><td>由模型计算的运动学湍动黏度；仍需给定其边界类型。</td></tr></tbody></table></div><h2>模型选择与配置示例</h2><h3><code>constant/turbulenceProperties</code></h3><p>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">85 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -455,7 +460,11 @@ runApplication postChannel
 
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>renumberMesh</code> 重排单元与面编号以减小矩阵带宽，并同步重排场。结果覆盖当前网格。</li><li><code>checkMesh</code> 检查网格拓扑、几何形状与质量，并定位问题区域。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。</li><li><code>postChannel</code> 把通道湍流统计场沿均匀方向平均为壁法向剖面。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/pimpleFoam/LES/periodicPlaneChannel/Allrun.txt">下载此配置文件</a></p></details><h2>入口、壁面与计算检查</h2><p><code>LES</code> 和混合方法需要三维非定常计算。检查滤波宽度、网格各向异性、入口扰动、时间分辨率和统计时长；残差收敛不能代替湍流统计收敛。</p><p><a href="/boundary-conditions/?field=turbulence">查看湍流入口与壁面条件示例</a> · <a href="/function-objects/?q=yPlus">查看 yPlus 后处理</a></p><h2>版本与模型依据</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/TurbulenceModels/turbulenceModels/LES/WALE/WALE.H">WALE 的 v2512 模型说明</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/TurbulenceModels/turbulenceModels/LES/WALE/WALE.C">模型字段与系数读取位置</a></p><p><a href="/turbulence-models/">返回湍流模型速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

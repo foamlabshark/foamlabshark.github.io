@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-thermophysical-models-janaf"><div class="eyebrow">OpenFOAM v2512</div><h1>janaf · 分段热化学多项式</h1><div class="prose"><p>使用分段多项式计算比热、焓和熵，常用于燃烧与宽温区气体计算。</p><h2 id="brief-introduction">简要介绍</h2><p>燃烧计算中的温度跨度较大，需要随温度计算比热、焓和熵。<code>janaf</code> 使用两段热化学多项式；配置时应一起准备温度分界与整套系数，并保留主字典引用的组分文件。</p><h2>设置位置与参数</h2><p>示例位置：combustion/chemFoam/h2/constant/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>thermo</code></td><td>选择 <code>janaf</code>；数据常由独立的组分热物性文件提供。</td></tr><tr><td><code>Tlow / Thigh</code></td><td>热化学拟合的有效温度范围。</td></tr><tr><td><code>Tcommon</code></td><td>高、低温多项式的分界温度。</td></tr><tr><td><code>highCpCoeffs / lowCpCoeffs</code></td><td>两段多项式系数；应成套取自同一热化学数据集。</td></tr></tbody></table></div><p>本页展示主字典和它引用的文件位置；完整反应机理与组分数据应随算例一起复制。</p><h2>官方配置示例</h2><h3><code>constant/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-thermophysical-models-janaf" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>janaf · 分段热化学多项式</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>使用分段多项式计算比热、焓和熵，常用于燃烧与宽温区气体计算。</p><h2 id="brief-introduction">简要介绍</h2><p>燃烧计算中的温度跨度较大，需要随温度计算比热、焓和熵。<code>janaf</code> 使用两段热化学多项式；配置时应一起准备温度分界与整套系数，并保留主字典引用的组分文件。</p><h2>设置位置与参数</h2><p>示例位置：combustion/chemFoam/h2/constant/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>thermo</code></td><td>选择 <code>janaf</code>；数据常由独立的组分热物性文件提供。</td></tr><tr><td><code>Tlow / Thigh</code></td><td>热化学拟合的有效温度范围。</td></tr><tr><td><code>Tcommon</code></td><td>高、低温多项式的分界温度。</td></tr><tr><td><code>highCpCoeffs / lowCpCoeffs</code></td><td>两段多项式系数；应成套取自同一热化学数据集。</td></tr></tbody></table></div><p>本页展示主字典和它引用的文件位置；完整反应机理与组分数据应随算例一起复制。</p><h2>官方配置示例</h2><h3><code>constant/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -332,7 +337,11 @@ runApplication $(getApplication)
 <span class="hljs-keyword">fi</span>
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><code>cd</code> 切换当前工作目录。从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。<code>notTest</code> 检查参数列表是否省略 <code>-test</code>。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>观察点火过程中 <code>T</code> 和组分浓度的变化，核对温度是否位于物性数据区间。</p><p><a href="/thermophysical-models/">返回热物性与状态方程</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>

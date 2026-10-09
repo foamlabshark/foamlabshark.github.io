@@ -270,7 +270,12 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-thermophysical-models-solid"><div class="eyebrow">OpenFOAM v2512</div><h1>固体导热物性</h1><div class="prose"><p>在固体区域设置密度、比热和导热率，并通过区域接口与流体换热。</p><h2 id="brief-introduction">简要介绍</h2><p>共轭传热中，固体区域有自己的热物性文件。先给定密度、比热和导热率，再设置区域接口；这些参数分别控制热容量与热传导，接口负责与相邻流体交换热量。</p><h2>设置位置与参数</h2><p>示例位置：heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>heSolidThermo</code> 创建固体热力学模型。</td></tr><tr><td><code>transport</code></td><td><code>constIso</code> 表示各向同性常导热率。</td></tr><tr><td><code>rho</code></td><td>固体密度 kg/m³。</td></tr><tr><td><code>Cp / kappa</code></td><td>比热 J/(kg·K) 与导热率 W/(m·K)。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/heater/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/thermophysical-models/">← 返回热物性与状态方程</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="ref-thermophysical-models-solid" data-cms-state="loading">
+    <div class="eyebrow">OpenFOAM v2512</div>
+    <h1>固体导热物性</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>在固体区域设置密度、比热和导热率，并通过区域接口与流体换热。</p><h2 id="brief-introduction">简要介绍</h2><p>共轭传热中，固体区域有自己的热物性文件。先给定密度、比热和导热率，再设置区域接口；这些参数分别控制热容量与热传导，接口负责与相邻流体交换热量。</p><h2>设置位置与参数</h2><p>示例位置：heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties。先保留完整算例的其他配置，再按物理条件修改下表所列参数。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>heSolidThermo</code> 创建固体热力学模型。</td></tr><tr><td><code>transport</code></td><td><code>constIso</code> 表示各向同性常导热率。</td></tr><tr><td><code>rho</code></td><td>固体密度 kg/m³。</td></tr><tr><td><code>Cp / kappa</code></td><td>比热 J/(kg·K) 与导热率 W/(m·K)。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/heater/thermophysicalProperties</code></h3><p>热力学组合、状态方程与各物性系数。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -507,7 +512,11 @@ runParallel $(getApplication)
 runApplication reconstructPar -allRegions
 
 <span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。本行对所有区域执行。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。本行对所有区域执行。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/chtMultiRegionFoam/multiRegionHeater/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>检查各区域 <code>T</code> 和接口热流；同一接口两侧的热流应按相反外法向进行比较。</p><p><a href="/thermophysical-models/">返回热物性与状态方程</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
   <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>
