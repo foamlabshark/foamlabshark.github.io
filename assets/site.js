@@ -48,7 +48,7 @@
  const publicSearchItem=item=>{if(item.status&&item.status!=='published'||item.admin_only||item.metadata?.admin_only)return false;let url;try{url=new URL(item.url||'/',location.origin);}catch{return false;}const slug=item.slug||url.searchParams.get('slug');return !['site-maintenance','site-design'].includes(slug)&&!/^\/(?:admin|maintenance|design)(?:\/|$)/.test(url.pathname);};
 
  async function search(){
-  const version=++searchVersion,q=input.value.trim().toLowerCase().slice(0,120),current=()=>version===searchVersion&&input.value.trim().toLowerCase().slice(0,120)===q;
+  const version=++searchVersion,q=input.value.trim().toLowerCase().slice(0,120),scope=window.FoamSearchScope?.key()||'',current=()=>version===searchVersion&&input.value.trim().toLowerCase().slice(0,120)===q&&(window.FoamSearchScope?.key()||'')===scope;
   results.replaceChildren();
   if(!q){results.textContent='输入关键词，先查看正文或代码中的匹配内容。';return;}
   results.textContent='正在查找匹配内容…';
@@ -56,25 +56,26 @@
    let found=null;
    try{
     await window.FoamLab.ready;
-    const r=await window.FoamLab.client.rpc('foamlab_search_content_context',{query:q});
+    const r=await window.FoamLab.client.rpc('foamlab_search_content_scoped',{query:q,section_key:scope||null});
     if(!r.error&&Array.isArray(r.data))found=r.data.filter(publicSearchItem).map(x=>({...x,url:'/read/?slug='+encodeURIComponent(x.slug),kind:({lesson:'课程',tool:'工具',log:'日志',article:'分享',resource:'资料',module:'专题',reference:'参考'})[x.kind]||'参考',text:x.excerpt}));
    }catch{}
    const cached=found===null;
    if(cached){
     if(!index){const r=await fetch('/assets/search-live.json');if(!r.ok)throw Error();index=await r.json();}
     const tokens=window.FoamSearch.terms(q);
-    found=index.filter(publicSearchItem).filter(x=>tokens.every(t=>(x.title+' '+x.text).toLowerCase().includes(t))).map(x=>({...x,score:tokens.filter(t=>x.text.toLowerCase().includes(t)).length*10+(x.text.toLowerCase().includes(q)?20:0)+(x.title.toLowerCase().includes(q)?1:0)})).sort((a,b)=>b.score-a.score);
+    found=index.filter(publicSearchItem).filter(x=>window.FoamSearchScope?.matches(x,scope)??!scope).filter(x=>tokens.every(t=>(x.title+' '+x.text).toLowerCase().includes(t))).map(x=>({...x,score:tokens.filter(t=>x.text.toLowerCase().includes(t)).length*10+(x.text.toLowerCase().includes(q)?20:0)+(x.title.toLowerCase().includes(q)?1:0)})).sort((a,b)=>b.score-a.score);
    }
    await window.FoamDirectory?.ready;
    if(!current())return;
    results.replaceChildren();
    if(!found.length){results.textContent='没有找到匹配内容，试试更短的关键词。';return;}
-   const count=document.createElement('p');count.className='search-count';count.textContent=(cached?'当前显示本地索引 · ':'')+'显示 '+Math.min(found.length,40)+' 篇匹配内容'+(found.length>=40?'（最多 40 篇，可缩小关键词范围）':'')+' · 点击打开原文';results.append(count);
+   const count=document.createElement('p');count.className='search-count';count.textContent=(cached?'当前显示本地索引 · ':'')+(window.FoamSearchScope?.label()||'全站')+' · 显示 '+Math.min(found.length,40)+' 篇匹配内容'+(found.length>=40?'（最多 40 篇，可缩小查找范围或调整关键词）':'')+' · 点击打开原文';results.append(count);
    for(const item of found.slice(0,40)){const a=window.FoamSearch.card(item,q);if(a)results.append(a);}
   }catch{if(current())results.textContent='搜索索引暂时无法加载。请重试，或直接进入课程目录。';}
  }
- function openSearch(query=''){if(!dialog)return;if(!dialog.open)dialog.showModal();input.focus();if(typeof query==='string'&&query){input.value=query;void search();}}
+ async function openSearch(query='',scope){if(!dialog)return;if(!dialog.open)dialog.showModal();input.focus();if(typeof query==='string'&&query)input.value=query;if(typeof scope==='string'){await window.FoamSearchScope?.ready;window.FoamSearchScope?.set(scope);}if(input.value)void search();}
  window.foamOpenSearch=openSearch;
+ document.addEventListener('foamlab:search-scope',()=>{++searchVersion;clearTimeout(timer);void search();});
  $$('[data-open-search]').forEach(b=>b.addEventListener('click',openSearch));$('[data-close-dialog]')?.addEventListener('click',()=>dialog.close());dialog?.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
  input?.addEventListener('input',()=>{++searchVersion;clearTimeout(timer);timer=setTimeout(search,160);});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dialog?.open){e.preventDefault();dialog.close();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();}if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&$('#command-query')){e.preventDefault();$('#command-query').focus();}});
  // Successful CMS reads govern published visibility; cached indexes remain a network fallback.

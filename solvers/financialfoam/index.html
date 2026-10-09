@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>financialFoam · FoamLab</title>
+  <meta name="description" content="OpenFOAM v2512 中文学习站：系统课程、命令与配置速查、编程实例和公开讨论。">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
+  
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://nmkforbzmbstasnjxlid.supabase.co" crossorigin>
+  <link rel="preload" href="/assets/auth-config.json" as="fetch" crossorigin>
+  <script>document.documentElement.classList.add('has-js');</script>
+  <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
+  <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
+  <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
+  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
+  
+  <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
+  
+  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
+  <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
+  <script src="/assets/site.js?v=66430a5698e0" defer></script>
+  
+  
+  
+  <script src="/assets/runtime-content.js?v=b517064aa2ac" defer></script>
+  <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
+  <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
+  <script src="/assets/runtime-ui.js?v=058117b672e2" defer></script>
+  <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
+  <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
+  <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
+  <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
+  <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
+  <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body data-section="solvers" data-lesson="">
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar" id="sidebar">
+  <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
+  <a class="brand" href="/"><span class="brand-mark"><svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char"><g class="pa-head">
+  <circle class="pk" cx="44" cy="40" r="15"/><circle class="pk" cx="116" cy="40" r="15"/><circle class="pa-ear-in" cx="45" cy="41" r="7"/><circle class="pa-ear-in" cx="115" cy="41" r="7"/>
+  <g class="pa-o pa-o-headphones pa-hp-band"><path class="pa-hp" d="M38 64c0-34 84-34 84 0" fill="none"/></g>
+  <path class="pw pa-line" d="M80 30c-30 0-48 18-48 42 0 22 20 36 48 36s48-14 48-36c0-24-18-42-48-42z"/>
+  <path class="ps" d="M118 82c-4 14-18 22-38 22 24 4 44-6 46-22 0-4-2-6-8 0z"/>
+  <path class="pk" d="M50 64c4-10 16-12 20-4 4 7 2 18-6 22-8 3-18-6-14-18z"/><path class="pk" d="M110 64c-4-10-16-12-20-4-4 7-2 18 6 22 8 3 18-6 14-18z"/>
+  <g class="pa-eyes pa-eyes-open"><g class="pa-pupils"><circle class="pa-eye-white" cx="62" cy="70" r="6.4"/><circle class="pa-pupil" cx="62.6" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="64.4" cy="68.4" r="1.8"/><circle class="pa-eye-white" cx="98" cy="70" r="6.4"/><circle class="pa-pupil" cx="97.4" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="99.2" cy="68.4" r="1.8"/></g></g>
+  <g class="pa-eyes pa-eyes-happy"><path class="pa-eye-arc" d="M55 72q7-8 14 0M91 72q7-8 14 0"/></g>
+  <g class="pa-eyes pa-eyes-closed"><path class="pa-eye-arc" d="M55 70q7 6 14 0M91 70q7 6 14 0"/></g>
+  <ellipse class="pa-cheek" cx="50" cy="88" rx="7" ry="4.2"/><ellipse class="pa-cheek" cx="110" cy="88" rx="7" ry="4.2"/>
+  <path class="pk" d="M74.5 81.5c0-2 2-3 5.5-3s5.5 1 5.5 3c0 2.5-3 4.6-5.5 4.6s-5.5-2.1-5.5-4.6z"/>
+  <g class="pa-mouth pa-mouth-smile"><path class="pa-mouth-line" d="M80 86v2.6M73.5 88c2 3 5 3 6.5.6 1.5 2.4 4.5 2.4 6.5-.6"/></g>
+  <g class="pa-mouth pa-mouth-open"><path class="pa-mouth-fill" d="M74 89c0 6 3 9 6 9s6-3 6-9c-3 1.6-9 1.6-12 0z"/><path class="pa-tongue" d="M76.6 95c1.6-1.6 5.2-1.6 6.8 0-1 1.6-2.2 2.2-3.4 2.2s-2.4-.6-3.4-2.2z"/></g>
+  <g class="pa-f pa-f-master"><path class="pa-tuft" d="M72 34c0-9 10-13 16-8-6 1-8 4-6 9-4-4-7-3-10-1z"/><g class="pa-glasses"><circle cx="62" cy="71" r="11"/><circle cx="98" cy="71" r="11"/><path d="M73 70q7-4 14 0M51 68l-12-4M109 68l12-4"/></g></g>
+  <g class="pa-o pa-o-goggles"><path class="pa-goggle-band" d="M33 50c30-10 64-10 94 0"/><circle class="pa-goggle pa-line" cx="66" cy="44" r="10"/><circle class="pa-goggle pa-line" cx="94" cy="44" r="10"/><path class="pa-goggle-glint" d="M61 40q3-3 7-2M89 40q3-3 7-2"/></g>
+  <g class="pa-o pa-o-headphones"><rect class="pa-hp-cup" x="26" y="58" width="14" height="24" rx="7"/><rect class="pa-hp-cup" x="120" y="58" width="14" height="24" rx="7"/></g>
+  <g class="pa-o pa-o-flower"><g transform="translate(112 30)"><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(0)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(72)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(144)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(216)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(288)"/><circle class="pa-gold" r="3.4"/></g></g>
+  <g class="pa-hat pa-f pa-f-engineer pa-hat-hard"><path class="pa-hardhat pa-line" d="M46 40c0-20 16-30 34-30s34 10 34 30z"/><rect class="pa-hardhat pa-line" x="40" y="37" width="80" height="7" rx="3.5"/><path class="pa-hardhat-ridge" d="M80 12v24"/></g>
+  <g class="pa-hat pa-o pa-o-cap"><path class="pa-capbase pa-line" d="M56 34c0-8 48-8 48 0v8c-14-4-34-4-48 0z"/><path class="pa-capboard pa-line" d="M80 14l40 12-40 12-40-12z"/><path class="pa-tassel" d="M114 27v18"/><circle class="pa-gold" cx="114" cy="47" r="3"/></g>
+  <g class="pa-hat pa-o pa-o-strawhat"><ellipse class="pa-straw pa-line" cx="80" cy="36" rx="50" ry="10"/><path class="pa-straw pa-line" d="M58 34c0-16 10-24 22-24s22 8 22 24c-14 3-30 3-44 0z"/><path class="pa-straw-band" d="M58 30c14 3 30 3 44 0"/></g>
+  <g class="pa-hat pa-o pa-o-raincoat"><path class="pa-rain pa-line" d="M40 38c4-16 20-26 40-26s36 10 40 26c-24-6-56-6-80 0z"/><path class="pa-rain pa-line" d="M34 40c28-8 64-8 92 0l-4 6c-26-6-58-6-84 0z"/></g>
+  <g class="pa-hat pa-o pa-o-wizard"><path class="pa-wizard pa-line" d="M54 36c8-12 16-28 34-34-4 10-2 20 18 34z"/><ellipse class="pa-wizard pa-line" cx="80" cy="37" rx="34" ry="6"/><path class="pa-gold" d="M84 16l2 4.4 4.8.6-3.5 3.3.9 4.8-4.2-2.3-4.2 2.3.9-4.8-3.5-3.3 4.8-.6z"/></g>
+  </g></g></svg></span><span>FoamLab<small>熊猫带你学 OpenFOAM</small></span></a>
+  <div class="version"><span class="status-dot"></span> OpenFOAM <strong>v2512</strong></div>
+  <nav aria-label="主要导航">
+    <a class="town-entry town-nav-entry" href="/town/"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>熊猫小镇</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>
+    <div class="nav-label">学习空间</div>
+    
+<div class="nav-group" data-nav-section="home">
+ <div class="nav-parent"><a href="/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>学习概览</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="start">
+ <div class="nav-parent"><a href="/start/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span>快速开始</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-start" aria-label="快速开始子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-start" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=cfd-and-openfoam"><span>认识 CFD 与 OpenFOAM</span></a><a class="nav-item nav-subitem" href="/read/?slug=start-openfoam-v2512"><span>安装与环境配置</span></a><a class="nav-item nav-subitem" href="/read/?slug=first-cavity-result"><span>运行第一个算例</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="courses">
+ <div class="nav-parent"><a href="/courses/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>系统学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-courses" aria-label="系统学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-courses" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/courses/?track=%E8%B5%B7%E6%AD%A5%E4%B8%8E%E7%AE%97%E4%BE%8B"><span>起步与算例</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E5%87%A0%E4%BD%95%E4%B8%8E%E7%BD%91%E6%A0%BC"><span>几何与网格</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>离散与求解</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span>计算与数据分析</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E9%AA%8C%E8%AF%81%E4%B8%8E%E7%A0%94%E7%A9%B6%E6%96%B9%E6%B3%95"><span>验证与研究方法</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="topics">
+ <div class="nav-parent"><a href="/topics/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>专题学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-topics" aria-label="专题学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-topics" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/topics/finite-volume/"><span>有限体积法</span></a><a class="nav-item nav-subitem" href="/topics/turbulence/"><span>湍流</span></a><a class="nav-item nav-subitem" href="/topics/multiphase/"><span>多相流</span></a><a class="nav-item nav-subitem" href="/topics/heat-transfer/"><span>传热</span></a><a class="nav-item nav-subitem" href="/topics/electrochemistry/"><span>电化学</span></a><a class="nav-item nav-subitem" href="/topics/porous-media/"><span>渗流与多孔介质</span></a><a class="nav-item nav-subitem" href="/topics/meshing/"><span>网格划分</span></a><a class="nav-item nav-subitem" href="/topics/dynamic-mesh/"><span>动网格</span></a><a class="nav-item nav-subitem" href="/topics/function-objects/"><span>functionObject</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="quick-reference">
+ <div class="nav-parent"><a href="/quick-reference/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>速查手册</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-quick-reference" aria-label="速查手册子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-quick-reference" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="reference-general">
+ <div class="nav-parent"><a href="/quick-reference/#general" class="nav-item nav-subitem " ><span>通用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-general" aria-label="通用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-general" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="commands">
+ <div class="nav-parent"><a href="/commands/" class="nav-item nav-subitem " ><span>命令速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-commands" aria-label="命令速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-commands" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/commands/?category=%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7"><span>系统工具</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%89%8D%E5%A4%84%E7%90%86"><span>前处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E6%B1%82%E8%A7%A3%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span>求解与并行</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E7%8E%AF%E5%A2%83%E4%B8%8E%E7%BC%96%E8%AF%91"><span>环境与编译</span></a><a class="nav-item nav-subitem" href="/commands/?category=Linux"><span>Linux</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="dictionaries">
+ <div class="nav-parent"><a href="/dictionaries/" class="nav-item nav-subitem " ><span>配置与字典速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-dictionaries" aria-label="配置与字典速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-dictionaries" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BD%91%E6%A0%BC"><span>网格</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%8C%96"><span>初始化</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%9C%BA"><span>初始场</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E8%AE%A1%E7%AE%97%E6%8E%A7%E5%88%B6"><span>计算控制</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>数值方法</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97"><span>并行计算</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span>函数对象</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BC%96%E8%AF%91"><span>编译</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="function-objects">
+ <div class="nav-parent"><a href="/function-objects/" class="nav-item nav-subitem " ><span>函数对象速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-function-objects" aria-label="函数对象速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-function-objects" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%9C%BA%E8%BF%90%E7%AE%97"><span>场运算</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%87%87%E6%A0%B7%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span>采样与统计</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6"><span>湍流与声学</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%8A%9B%E4%B8%8E%E7%89%A9%E7%90%86%E9%87%8F"><span>力与物理量</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8"><span>颗粒与两相</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%96%87%E4%BB%B6%E4%B8%8E%E6%8E%A7%E5%88%B6"><span>文件与控制</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="boundary-conditions">
+ <div class="nav-parent"><a href="/boundary-conditions/" class="nav-item nav-subitem " ><span>边界条件速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-boundary-conditions" aria-label="边界条件速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-boundary-conditions" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/boundary-conditions/?field=velocity"><span>速度 U</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=pressure"><span>压力 p / p_rgh</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=temperature"><span>温度 T</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=turbulence"><span>湍流字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=phase"><span>相分数 α</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=geometry"><span>几何与耦合</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=generic"><span>通用条件</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=species"><span>组分与标量</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=radiation"><span>辐射字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=atmosphere"><span>大气边界层</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="solvers">
+ <div class="nav-parent"><a href="/solvers/" class="nav-item nav-subitem active" aria-current="page"><span>求解器速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="numerical-methods">
+ <div class="nav-parent"><a href="/numerical-methods/" class="nav-item nav-subitem " ><span>离散格式与算法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="linear-solvers">
+ <div class="nav-parent"><a href="/linear-solvers/" class="nav-item nav-subitem " ><span>线性与 ODE 求解方法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="reference">
+ <div class="nav-parent"><a href="/reference/" class="nav-item nav-subitem " ><span>参考手册</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="reference-specialized">
+ <div class="nav-parent"><a href="/quick-reference/#specialized" class="nav-item nav-subitem " ><span>专用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-specialized" aria-label="专用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-specialized" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="turbulence-models">
+ <div class="nav-parent"><a href="/turbulence-models/" class="nav-item nav-subitem " ><span>湍流模型速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="thermophysical-models">
+ <div class="nav-parent"><a href="/thermophysical-models/" class="nav-item nav-subitem " ><span>热物性与状态方程</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="transport-models">
+ <div class="nav-parent"><a href="/transport-models/" class="nav-item nav-subitem " ><span>黏度与流变模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="radiation-models">
+ <div class="nav-parent"><a href="/radiation-models/" class="nav-item nav-subitem " ><span>辐射模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="combustion-models">
+ <div class="nav-parent"><a href="/combustion-models/" class="nav-item nav-subitem " ><span>燃烧与化学反应</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="particle-models">
+ <div class="nav-parent"><a href="/particle-models/" class="nav-item nav-subitem " ><span>颗粒、喷雾与液膜</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="multiphase-models">
+ <div class="nav-parent"><a href="/multiphase-models/" class="nav-item nav-subitem " ><span>多相流与相间作用</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="mesh-motion">
+ <div class="nav-parent"><a href="/mesh-motion/" class="nav-item nav-subitem " ><span>动网格与刚体运动</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="fv-options">
+ <div class="nav-parent"><a href="/fv-options/" class="nav-item nav-subitem " ><span>源项、约束与修正</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="programming">
+ <div class="nav-parent"><a href="/programming/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/basics/"><span>OpenFOAM 编程基础</span></a><a class="nav-item nav-subitem" href="/programming/coded-fields/"><span>用代码设置初始与边界条件</span></a><a class="nav-item nav-subitem" href="/programming/solvers/"><span>求解器开发</span></a><a class="nav-item nav-subitem" href="/programming/boundaries/"><span>边界条件开发</span></a><a class="nav-item nav-subitem" href="/programming/utilities/"><span>后处理工具开发</span></a><a class="nav-item nav-subitem" href="/programming/extensions/"><span>网格、格式与模型扩展</span></a><a class="nav-item nav-subitem" href="/programming/vibe-coding/"><span>Vibe Coding 实训</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="tools">
+ <div class="nav-parent"><a href="/tools/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工具生态</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-tools" aria-label="工具生态子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-tools" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/tools/paraview/"><span>ParaView 可视化</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-gmsh"><span>Gmsh 网格生成</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-salome"><span>SALOME 几何与网格</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyvista"><span>PyVista 数据分析</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyfoam"><span>PyFoam 运行管理</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-freecad-geometry"><span>FreeCAD 几何建模</span></a></div>
+</div>
+
+
+    <div class="nav-label">资源与社区</div>
+    
+<div class="nav-group" data-nav-section="resources">
+ <div class="nav-parent"><a href="/resources/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M3 16v6h18v-6"/></svg><span>资料中心</span></a><button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-resources" aria-label="资料中心子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-resources" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/resources/?kind=resource"><span>算例与源码</span></a><a class="nav-item nav-subitem" href="/resources/?kind=recommendation"><span>资源推荐</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="sharing">
+ <div class="nav-parent"><a href="/sharing/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>实践与分享</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="community">
+ <div class="nav-parent"><a href="/community/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z"/><path d="M7 9h9m-9 5h6"/></svg><span>讨论中心</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="assignments">
+ <div class="nav-parent"><a href="/assignments/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2m-7 8 2 2 5-5M9 18h7"/></svg><span>作业与实践</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="announcements">
+ <div class="nav-parent"><a href="/announcements/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M9 21h6"/></svg><span>网站公告</span></a></div>
+</div>
+
+
+  </nav>
+  <script src="/assets/navigation.js?v=3f7c823fe009"></script>
+  <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/solvers/">求解器速查</a> <span>/</span> <strong>financialFoam</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
+ <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
+ <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
+ <div id="account-panel-member" hidden>
+  <a class="account-panel-growth" href="/account/#my-panda"><div><span>我的熊猫</span><strong id="account-panel-level">等级读取中…</strong></div><div class="account-panel-xp"><span id="account-panel-xp-bar"></span></div><p id="account-panel-xp">正在读取成长记录</p></a>
+  <nav class="account-panel-links" aria-label="账号常用入口"><a href="/account/#notifications">消息提醒 <span class="reply-count" data-reply-count hidden></span></a><a href="/account/#profile-form">个人资料 <span>→</span></a><a href="/account/#my-panda">我的熊猫 <span>→</span></a><a href="/account/#account-progress-state">学习进度 <span>→</span></a><a href="/studio/">作者工作台 <span>→</span></a><a href="/admin/" data-management-link hidden>管理平台 <span>→</span></a></nav>
+  <div class="account-panel-footer"><a href="/account/">打开个人中心 →</a><button type="button" class="account-sign-out" data-account-sign-out>退出登录</button></div>
+ </div>
+ <div id="account-panel-guest" hidden><p>登录后保存学习进度，查看熊猫等级并参与讨论。</p><button type="button" class="button" id="account-panel-sign-in"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg> 使用 GitHub 登录</button></div>
+ <p id="account-panel-message" role="status" hidden></p>
+</section>
+
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-financialfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>financialFoam</h1><div class="prose"><p>求解 Black–Scholes 方程，计算金融衍生品价格。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">financialFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/financialfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/financial/financialFoam/financialFoam.C">查看 v2512 程序说明</a></p><h2>算例中的计算控制</h2><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      controlDict;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+<span class="hljs-keyword">application</span>     financialFoam;
+
+startFrom       startTime;
+
+startTime       <span class="hljs-number">0</span>;
+
+stopAt          endTime;
+
+endTime         <span class="hljs-number">0.5</span>;
+
+deltaT          <span class="hljs-number">0.002</span>;
+
+writeControl    timeStep;
+
+writeInterval   <span class="hljs-number">50</span>;
+
+purgeWrite      <span class="hljs-number">0</span>;
+
+writeFormat     ascii;
+
+writePrecision  <span class="hljs-number">6</span>;
+
+writeCompression <span class="hljs-literal">off</span>;
+
+timeFormat      general;
+
+timePrecision   <span class="hljs-number">6</span>;
+
+runTimeModifiable <span class="hljs-literal">true</span>;
+
+graphFormat     raw;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/financial/financialFoam/europeanCall/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/financial/financialFoam/europeanCall/system/controlDict.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0/V</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary><code>V</code>：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/V</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       volScalarField;
+    <span class="hljs-keyword">object</span>      V;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+
+<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">boundaryField</span>
+{
+    lowValue
+    {
+        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+    }
+
+    highValue
+    {
+        <span class="hljs-keyword">type</span>            fixedGradient;
+        gradient        <span class="hljs-keyword">uniform</span> <span class="hljs-number">60</span>;
+    }
+
+    defaultFaces
+    {
+        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+    }
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/financial/financialFoam/europeanCall/0/V">查看官方原文件</a> · <a href="/downloads/reference-v2512/financial/financialFoam/europeanCall/0/V.txt">下载此配置文件</a></p></details><details><summary><code>fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      fvSchemes;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+ddtSchemes
+{
+    default         <span class="hljs-built_in">Euler</span>;
+}
+
+gradSchemes
+{
+    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    grad(V)         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+}
+
+divSchemes
+{
+    default         none;
+    div(phi,V)      <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+}
+
+laplacianSchemes
+{
+    default         none;
+    laplacian(DV,V) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
+}
+
+interpolationSchemes
+{
+    default         <span class="hljs-built_in">linear</span>;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/financial/financialFoam/europeanCall/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/financial/financialFoam/europeanCall/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      fvSolution;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solvers
+{
+    V
+    {
+        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner  DILU;
+        tolerance       <span class="hljs-number">1e-05</span>;
+        relTol          <span class="hljs-number">0</span>;
+    }
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/financial/financialFoam/europeanCall/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/financial/financialFoam/europeanCall/system/fvSolution.txt">下载此配置文件</a></p></details><h2>运行入口</h2><p>此配置来自组合算例或模型对照目录。先复制并查看其上级算例的 <code>Allrun</code>，按该脚本准备网格和初始场；本页的单个配置文件用于对照参数。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/financial/financialFoam/europeanCall">打开官方算例目录</a></p><h2>运行后查看什么</h2><p>按 <code>controlDict</code> 的写出设置检查时间目录与求解日志。初始场中的 <code>V</code> 是对照结果的起点；部分热力学、通量或辅助场由求解器创建，是否写出取决于各字段设置。</p><p>对瞬态算例，比较不同时刻的物理量；对稳态算例，结合残差、连续性误差和监测量判断收敛。<code>Allrun</code> 中的后处理步骤还可能生成 postProcessing、采样文件或专用统计结果。</p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+</div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
+</main>
+  <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
+  <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>
+  <div class="footer-contact-panel" id="footer-contact-panel" role="region" aria-label="QQ 群与小红书" hidden>
+    <div class="footer-contact-cards">
+      <div class="footer-contact-card">
+        <strong>QQ 学习交流群</strong>
+        <a class="footer-contact-code footer-contact-qq" href="/assets/contact/qq-group.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看 QQ 群二维码原图">
+          <img src="/assets/contact/qq-group.jpg" alt="FoamLab QQ 群二维码，群号 537804875" width="1284" height="2283" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">群号：<b>537804875</b></span>
+      </div>
+      <div class="footer-contact-card">
+        <strong>小红书 · 夕阳下的奔跑</strong>
+        <a class="footer-contact-code footer-contact-xhs" href="/assets/contact/xiaohongshu.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看小红书二维码原图">
+          <img src="/assets/contact/xiaohongshu.jpg" alt="夕阳下的奔跑的小红书二维码，小红书号 8436161477" width="987" height="1347" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">小红书号：<b>8436161477</b></span>
+      </div>
+    </div>
+    <small>点击二维码查看原图</small>
+  </div>
+</span>
+ <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
+</div>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<div class="toast" role="status" hidden></div>
+</body></html>

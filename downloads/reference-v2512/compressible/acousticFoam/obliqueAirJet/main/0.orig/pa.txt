@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      pa;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+__vibrationShell
+{
+    vibrationShellModel KirchhoffShell;
+
+    // Mechanical properties
+    solid
+    {
+        rho     2500;
+        E       7e10;
+        nu      0.22;
+    }
+
+    // Pressure field (volume)
+    p       pa;
+}
+
+
+boundaryField
+{
+    box
+    {
+        type            acousticWaveTransmissive;
+        advectiveSpeed  340;
+        value           $internalField;
+    }
+
+    window
+    {
+        type            vibrationShell;
+        value           $internalField;
+
+        active          true;
+        region          vibration;
+
+        ${__vibrationShell}
+
+        // Thickness (default and/or as field)
+        h       hs;
+
+        // Damping coefficients
+        f0      0.04;
+        f1      0;
+        f2      0;
+    }
+
+    wall
+    {
+        type            zeroGradient;
+    }
+}
+
+
+#remove __vibrationShell
+
+
+// ************************************************************************* //

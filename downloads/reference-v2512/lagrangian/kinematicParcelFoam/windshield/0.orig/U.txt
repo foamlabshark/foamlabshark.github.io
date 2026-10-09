@@ -1,0 +1,68 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        type            noSlip;
+    }
+
+    "(top|sides)"
+    {
+        type            noSlip;
+    }
+
+    windshield
+    {
+        type            velocityFilmShell;
+        active          true;
+        infoOutput      true;
+        U               U;
+        pRef            1e5; // Reference pressure for thermo
+        T0              300; // Reference temperature for thermo
+
+        thermo
+        {
+            H2O;
+        }
+
+        turbulence          laminar;
+
+        laminarCoeffs
+        {
+            shearStress     simple;
+            friction        ManningStrickler; // Wall friction model
+            n               0.005;  // Manning number
+            Cf              0;      // Gas friction
+        }
+
+        injectionModels ();
+
+        forces ();
+
+        region              film;
+        liquidFilmModel     kinematicThinFilmIBM;
+        value               uniform (0 0 0);
+    }
+}
+
+
+// ************************************************************************* //

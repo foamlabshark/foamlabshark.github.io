@@ -84,7 +84,7 @@
   }
   // Home, quick start and functional pages can host newly placed content too.
   const current=D.current();
-  if(current&&!reference&&!document.querySelector('[data-lab-catalog],#topic-hub,#fo-list,.quick-reference-hub,#live-article,.article[data-cms-slug],#cms-root,#town-app')&&!location.pathname.startsWith('/admin/')){
+  if(current&&!reference&&!document.querySelector('[data-lab-catalog],#topic-hub,#fo-list,#model-list,.quick-reference-hub,#live-article,.article[data-cms-slug],#cms-root,#town-app')&&!location.pathname.startsWith('/admin/')){
    try{
     const host=document.querySelector('main .page-wrap')||document.querySelector('main'),links=new Set([...host.querySelectorAll('a[href]')].map(a=>new URL(a.href).pathname+new URL(a.href).search));
     const children=D.children(current.id).filter(n=>D.isVisible(n)&&!links.has(n.href)&&!links.has(D.url(n)));

@@ -7,7 +7,7 @@
   const count = document.querySelector('#fo-count');
   const filters = [...document.querySelectorAll('[data-fo-category]')];
   const common = ['U · fixedValue', 'U · noSlip', 'p · fixedValue', 'p · zeroGradient', 'T · fixedValue'];
-  const fields={velocity:'速度 U',pressure:'压力 p / p_rgh',temperature:'温度 T',turbulence:'湍流字段',phase:'相分数 α',geometry:'几何与耦合'};
+  const fields={velocity:'速度 U',pressure:'压力 p / p_rgh',temperature:'温度 T',turbulence:'湍流字段',phase:'相分数 α',geometry:'几何与耦合',generic:'通用条件',species:'组分与标量',radiation:'辐射字段',atmosphere:'大气边界层'};
   let entries = [], category = '全部';
   function restore() {
     const params = new URLSearchParams(location.search);
@@ -53,7 +53,7 @@
       const rank = name => common.includes(name) ? common.indexOf(name) : common.length;
       return rank(a.name) - rank(b.name) || names;
     });
-    count.textContent = '找到 ' + found.length + ' 种边界条件';
+    count.textContent = '找到 ' + found.length + ' 个配置条目';
     host.replaceChildren();
     if (!found.length) host.append(el('p', '没有匹配的边界条件。请调整关键词或选择“全部”。', 'empty-state'));
     window.FoamPagination.slice(host, found, render, 12).forEach(item => host.append(card(item)));
@@ -73,7 +73,7 @@
     if (!response.ok) throw new Error('Index unavailable');
     return response.json();
   }).then(async data => {
-    entries = data;
+    entries = data; render();
     // Published reference records supply edits, visibility and new entries.
     // The static index remains available when the content service is offline.
     try {
