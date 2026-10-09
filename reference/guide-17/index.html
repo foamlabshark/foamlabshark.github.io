@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=7be2999a2e24" defer></script>
+  <script src="/assets/runtime-content.js?v=b517064aa2ac" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -238,7 +238,7 @@ regions                          // 再覆盖指定区域
         fieldValues ( volScalarFieldValue p 1e6 );
     }
 );</code></pre></div>
-<p>常用区域类型：<code>boxToCell</code>、<code>sphereToCell</code>、<code>cylinderToCell</code>、rotatedBoxToCell、surfaceToCell（用 STL 划区）、cellToCell（用已有 <code>cellSet</code>）、<code>zoneToCell</code>。</p>
+<p>常用区域类型：<code>boxToCell</code>、<code>sphereToCell</code>、<code>cylinderToCell</code>、<code>rotatedBoxToCell</code>、<code>surfaceToCell</code>（用 STL 划区）、<code>cellToCell</code>（用已有 <code>cellSet</code>）、<code>zoneToCell</code>。</p>
 <p>注意：<code>setFields</code> 直接修改 0/ 里的文件。跑之前先 <code>cp</code> <code>-r</code> 0.orig 0，否则第二次运行是在被改过的场上再改一次。</p>
 <h2>17.3 topoSetDict（选择集合）</h2>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">actions
@@ -261,17 +261,17 @@ regions                          // 再覆盖指定区域
 <p>常用 <code>source</code> 一览</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>类别</th><th><code>source</code></th><th>关键参数</th></tr>
-<tr><td>几何选单元</td><td><code>boxToCell</code></td><td><code>box</code> (<code>min</code>) (<code>max</code>) 或 boxes ((..)(..))</td></tr>
-<tr><td></td><td>rotatedBoxToCell</td><td><code>origin</code>, <code>i</code>, <code>j</code>, <code>k</code></td></tr>
+<tr><td>几何选单元</td><td><code>boxToCell</code></td><td><code>box</code> (<code>min</code>) (<code>max</code>) 或 <code>boxes</code> ((..)(..))</td></tr>
+<tr><td></td><td><code>rotatedBoxToCell</code></td><td><code>origin</code>, <code>i</code>, <code>j</code>, <code>k</code></td></tr>
 <tr><td></td><td><code>sphereToCell</code></td><td><code>origin</code>, <code>radius</code></td></tr>
 <tr><td></td><td><code>cylinderToCell</code></td><td><code>p1</code>, <code>p2</code>, <code>radius</code></td></tr>
-<tr><td></td><td>surfaceToCell</td><td><code>file</code> "x.stl", <code>outsidePoints</code>, includeCut</td></tr>
-<tr><td>拓扑选单元</td><td><code>zoneToCell</code> / setToCell / labelToCell</td><td>zone/set/value</td></tr>
-<tr><td></td><td>cellToCell</td><td><code>set</code></td></tr>
-<tr><td>选面</td><td><code>boxToFace</code>、patchToFace、normalToFace、cellToFace</td><td></td></tr>
-<tr><td></td><td>boundaryToFace</td><td>全部边界面</td></tr>
-<tr><td>选点</td><td>boxToPoint、labelToPoint、surfaceToPoint</td><td></td></tr>
-<tr><td>转 <code>zone</code></td><td><code>setToCellZone</code>、setsToFaceZone、setToPointZone</td><td></td></tr>
+<tr><td></td><td><code>surfaceToCell</code></td><td><code>file</code> "<code>x.stl</code>", <code>outsidePoints</code>, <code>includeCut</code></td></tr>
+<tr><td>拓扑选单元</td><td><code>zoneToCell</code> / <code>setToCell</code> / <code>labelToCell</code></td><td><code>zone/set/value</code></td></tr>
+<tr><td></td><td><code>cellToCell</code></td><td><code>set</code></td></tr>
+<tr><td>选面</td><td><code>boxToFace</code>、<code>patchToFace</code>、<code>normalToFace</code>、<code>cellToFace</code></td><td></td></tr>
+<tr><td></td><td><code>boundaryToFace</code></td><td>全部边界面</td></tr>
+<tr><td>选点</td><td><code>boxToPoint</code>、<code>labelToPoint</code>、<code>surfaceToPoint</code></td><td></td></tr>
+<tr><td>转 <code>zone</code></td><td><code>setToCellZone</code>、<code>setsToFaceZone</code>、<code>setToPointZone</code></td><td></td></tr>
 </tbody></table></div>
 <p>Set 与 Zone 的区别（重要）：Set 是临时选择结果，写在 constant/polyMesh/sets/；Zone 是网格的正式组成部分，写进 cellZones/faceZones。求解器里的多孔介质、<code>MRF</code>、<code>fvOptions</code>、动网格全都认 Zone 不认 Set，所以典型流程是”先 xxxToCell 造 Set，再 <code>setToCellZone</code> 转 Zone”。</p>
 <h2>17.4 fvOptions（源项与区域模型）</h2>
