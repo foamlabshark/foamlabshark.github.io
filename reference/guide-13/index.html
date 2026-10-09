@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -278,7 +278,7 @@ divSchemes          { }   <span class="hljs-comment">// 对流项 ∇·( )   ←
 laplacianSchemes    { }   <span class="hljs-comment">// 扩散项 ∇²</span>
 interpolationSchemes{ }   <span class="hljs-comment">// 单元中心 → 面 的插值</span>
 snGradSchemes       { }   <span class="hljs-comment">// 面法向梯度</span>
-wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍流模型需要）</span></code></pre></div>
+wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍流模型需要）</span></code></pre></div><!-- example-reading --><p>这些空子字典展示 <code>fvSchemes</code> 的组织结构，还没有给出可运行的离散设置。<code>ddtSchemes</code> 处理时间导数，<code>gradSchemes</code> 和 <code>snGradSchemes</code> 分别处理体梯度与面法向梯度，<code>divSchemes</code> 处理散度项，<code>laplacianSchemes</code> 处理扩散项；后面的小节分别给出填入各子字典的格式。</p><!-- /example-reading -->
 <h2>13.2 ddtSchemes</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>写法</th><th>精度/性质</th><th>何时用</th></tr>
@@ -358,7 +358,8 @@ snGradSchemes    { default corrected; }</code></pre></div>
 <p>怎么选：跑一次 <code>checkMesh</code> 看最大非正交角，按上表挑。这就是 6.5 节强调 <code>checkMesh</code> 的原因之一——它的输出直接决定这里怎么填。</p>
 <h2>13.6 其余两项</h2>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">interpolationSchemes { default linear; }
-wallDist             { method meshWave; }</code></pre></div>
+wallDist             { method meshWave; }</code></pre></div><!-- example-reading --><p><code>fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>wallDist/method</code></td><td><code>meshWave</code></td><td>到壁面的距离算法，从壁面传播距离信息。</td></tr></tbody></table></div><!-- /example-reading -->
+
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

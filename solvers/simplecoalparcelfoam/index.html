@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,79 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-simplecoalparcelfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>simpleCoalParcelFoam</h1><div class="prose"><p>求解含煤颗粒的稳态可压缩反应流。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleCoalParcelFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/simplecoalparcelfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/simpleCoalParcelFoam/simpleCoalParcelFoam.C">查看 v2512 程序说明</a></p><h2>调用示例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleCoalParcelFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>先准备与此程序匹配的 myCase 目录。当前 <code>v2512</code> 教程中未检索到直接以该程序为 <code>application</code> 的独立算例；本页保留其命令入口，并链接所属物理模块的完整算例供配置对照。</p><p><a href="/solvers/?category=%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E9%A2%97%E7%B2%92">查看拉格朗日颗粒的其他算例</a></p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-simplecoalparcelfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>simpleCoalParcelFoam</h1><div class="prose"><p>求解含煤颗粒的稳态可压缩反应流。</p><h2 id="brief-introduction">简要介绍</h2><p>稳定供煤条件下，可研究颗粒燃尽和气相温度的平均分布。算例需要煤的组成、注入、热解和表面反应参数，并与连续相的燃烧设置配合。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleCoalParcelFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>simpleCoalParcelFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/simplecoalparcelfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/simpleCoalParcelFoam/simpleCoalParcelFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与参考算例</h2><p><code>v2512</code> 教程中没有直接以 <code>simpleCoalParcelFoam</code> 为 <code>application</code> 的独立算例。下面以 <code>coalChemistryFoam</code> 的同族配置为参考，按本程序实际读取的字段和模型说明搭建方法。</p><p><a href="/solvers/coalchemistryfoam/">查看 coalChemistryFoam 的完整文件与运行流程</a></p><h2>初始场与边界条件</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>配置方法</th></tr></thead><tbody><tr><td><code>U、p、T 与气相组分</code></td><td>稳态可压缩反应连续相；压力为 Pa。</td></tr><tr><td><code>煤颗粒状态</code></td><td>配置初始温度、气/液/固组成及粒径分布，由煤云模型管理。</td></tr><tr><td><code>湍流与辐射字段</code></td><td>与燃烧气体和颗粒换热模型配套。</td></tr></tbody></table></div><h2>物性、模型与数值设置</h2><div class="table-scroll"><table><thead><tr><th>文件或位置</th><th>配置方法</th></tr></thead><tbody><tr><td><code>constant/coalCloudProperties</code></td><td>设置煤颗粒组成、热解、表面反应、传热与注入；不能直接用普通惰性颗粒云代替。</td></tr><tr><td><code>constant/thermophysicalProperties、chemistryProperties、combustionProperties</code></td><td>气相热力学及燃烧；气相组分须覆盖煤颗粒释放和表面反应产生的组分。</td></tr><tr><td><code>system/fvSolution、fvSchemes</code></td><td>由瞬态改为 SIMPLE/steadyState，并设置 <code>U</code>、能量和组分的松弛与残差要求；颗粒云的 <code>solution</code> 也采用稳态迭代所需的耦合设置。</td></tr></tbody></table></div><h2>搭建步骤</h2><ol><li>从煤颗粒算例保留煤组成、热解与焦炭反应数据，先核对气相与颗粒交换的物种名称。</li><li>把连续相改为 <code>steadyState</code> 与 <code>SIMPLE</code>，按稳态注入流率配置颗粒云；瞬态的一次投放不能直接解释为稳定煤粉给料。</li><li>设置连续相和颗粒源项松弛，观察煤粉注入、逸出、燃尽率及温度是否随迭代稳定。</li></ol><h2>配置示例与解读</h2><h3><code>system/fvSchemes 中的时间格式</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">ddtSchemes
+{
+    default steadyState;
+}</code></pre></div><p>连续相不再解析物理时间变化。它必须与 <code>SIMPLE</code>、稳态颗粒注入和源项迭代一起配置；单独修改此条目不能把瞬态煤燃烧过程变成一个定义完整的稳态工况。</p><h3>同族算例的物性配置</h3><p>以下是 <code>coalChemistryFoam</code> 的原文件，用于核对文件结构与参数位置。按上面的搭建步骤调整模型组合、材料参数和相名后，再用于 <code>simpleCoalParcelFoam</code>。</p><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">49 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            hePsiThermo;
+    mixture         reactingMixture;
+    transport       sutherland;
+    thermo          janaf;
+    energy          sensibleEnthalpy;
+    equationOfState perfectGas;
+    specie          specie;
+}
+
+chemistryReader foamChemistryReader;
+
+foamChemistryThermoFile <span class="hljs-string">"&lt;constant&gt;/foam.dat"</span>;
+
+foamChemistryFile <span class="hljs-string">"&lt;constant&gt;/foam.inp"</span>;
+
+inertSpecie     N2;
+
+liquids
+{
+    H2O;
+}
+
+solids
+{
+    C
+    {
+        rho             <span class="hljs-number">2010</span>;
+        Cp              <span class="hljs-number">710</span>;
+        kappa           <span class="hljs-number">0.04</span>;
+        Hf              <span class="hljs-number">0</span>;
+        emissivity      <span class="hljs-number">1.0</span>;
+    }
+
+    ash;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>hePsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>reactingMixture</code>：规定纯物质或组分混合方式，同时读取组分和反应机理。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>energy</code> = <code>sensibleEnthalpy</code>：选择能量变量，求解显焓 <code>h</code>。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>solids/C/rho</code> 设为 <code>2010</code>：密度，单位 kg/m³。</li><li><code>solids/C/Cp</code> 设为 <code>710</code>：定压比热，单位 J/(kg·K)。</li><li><code>solids/C/kappa</code> 设为 <code>0.04</code>：导热率，单位 W/(m·K)。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      turbulenceProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+simulationType  <span class="hljs-built_in">RAS</span>;
+
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel        kEpsilon;
+
+    turbulence      <span class="hljs-literal">on</span>;
+
+    printCoeffs     <span class="hljs-literal">yes</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilon</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>yes</code>：决定是否在日志中列出实际模型系数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>运行与结果检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleCoalParcelFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>完成网格、初始场和上述模型配置后，在 myCase 中运行本程序。此命令只启动求解，不会代替生成网格、建立区域或初始化颗粒；这些步骤应在运行前完成。</p><p>在 <code>lagrangian</code> 输出中观察颗粒位置、速度和模型写出的粒径、温度等属性。结合注入、逸出、沉积与域内存量核对颗粒质量；有双向耦合时比较连续相变化。</p><blockquote><p>熊猫说：本程序使用煤云模型。煤中挥发分、焦炭和灰分的定义，以及相应的反应和物性数据，决定颗粒燃尽和热释放，不能省略为一个密度参数。</p></blockquote><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

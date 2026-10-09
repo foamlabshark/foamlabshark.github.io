@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,65 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-simplesprayfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>simpleSprayFoam</h1><div class="prose"><p>求解可压缩流体与喷雾液滴的稳态耦合运动。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleSprayFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/simplesprayfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/sprayFoam/simpleSprayFoam/simpleSprayFoam.C">查看 v2512 程序说明</a></p><h2>调用示例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleSprayFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>先准备与此程序匹配的 myCase 目录。当前 <code>v2512</code> 教程中未检索到直接以该程序为 <code>application</code> 的独立算例；本页保留其命令入口，并链接所属物理模块的完整算例供配置对照。</p><p><a href="/solvers/?category=%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E9%A2%97%E7%B2%92">查看拉格朗日颗粒的其他算例</a></p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-simplesprayfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>simpleSprayFoam</h1><div class="prose"><p>求解可压缩流体与喷雾液滴的稳态耦合运动。</p><h2 id="brief-introduction">简要介绍</h2><p>持续喷射且关注平均稳定分布时，可进行稳态喷雾计算。注入条件、液滴子模型和气相边界共同决定喷雾形态，应检查相间质量和能量交换。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleSprayFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>simpleSprayFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/simplesprayfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/sprayFoam/simpleSprayFoam/simpleSprayFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与参考算例</h2><p><code>v2512</code> 教程中没有直接以 <code>simpleSprayFoam</code> 为 <code>application</code> 的独立算例。下面以 <code>simpleReactingParcelFoam</code> 的同族配置为参考，按本程序实际读取的字段和模型说明搭建方法。</p><p><a href="/solvers/simplereactingparcelfoam/">查看 simpleReactingParcelFoam 的完整文件与运行流程</a></p><h2>初始场与边界条件</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>配置方法</th></tr></thead><tbody><tr><td><code>U、p、T 与组分</code></td><td>稳态连续相流动、传热及燃料蒸气输运。</td></tr><tr><td><code>喷雾云属性</code></td><td>液滴材料、温度、粒径、注入流率与雾化破碎子模型。</td></tr></tbody></table></div><h2>物性、模型与数值设置</h2><div class="table-scroll"><table><thead><tr><th>文件或位置</th><th>配置方法</th></tr></thead><tbody><tr><td><code>constant/thermophysicalProperties</code></td><td>采用稳态反应颗粒框架支持的 rhoReactionThermo 组合。</td></tr><tr><td><code>constant/&lt;云名&gt;Properties</code></td><td>在稳态颗粒云配置基础上增加喷雾所需的 <code>atomizationModel</code>、<code>breakupModel</code> 及其系数，液体燃料物性和气相蒸气组分应一致。</td></tr><tr><td><code>system/fvSchemes 与 fvSolution</code></td><td>连续相采用 <code>steadyState</code> 和 <code>SIMPLE</code>，颗粒源项按稳态迭代耦合。</td></tr></tbody></table></div><h2>搭建步骤</h2><ol><li>以 <code>simpleReactingParcelFoam</code> 的连续相目录为基础，保留稳态耦合方式。</li><li>从 <code>sprayFoam</code> 对照喷雾模型和液体物性，但将注入规律按目标稳态给料设置，不能直接照搬短时脉冲喷射。</li><li>先检查稳定注入及蒸发，再加入雾化与破碎，并通过粒径分布和总蒸发量比较模型影响。</li></ol><h2>配置示例与解读</h2><h3><code>system/controlDict 中选择程序</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">application</span> simpleSprayFoam;</code></pre></div><p>这一条目指定稳态喷雾程序。它复用稳态反应颗粒求解框架并创建喷雾云；仍需完成上面的喷雾物性、模型和稳态注入设置。</p><h3>同族算例的物性配置</h3><p>以下是 <code>simpleReactingParcelFoam</code> 的原文件，用于核对文件结构与参数位置。按上面的搭建步骤调整模型组合、材料参数和相名后，再用于 <code>simpleSprayFoam</code>。</p><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            heRhoThermo;
+    mixture         reactingMixture;
+    transport       polynomial;
+    thermo          hPolynomial;
+    energy          sensibleEnthalpy;
+    equationOfState icoPolynomial;
+    specie          specie;
+}
+
+chemistryReader foamChemistryReader;
+
+foamChemistryFile <span class="hljs-string">"&lt;constant&gt;/reactions"</span>;
+
+foamChemistryThermoFile <span class="hljs-string">"&lt;constant&gt;/thermo.incompressiblePoly"</span>;
+
+inertSpecie     air;
+
+liquids
+{
+    H2O;
+}
+
+solids
+{}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heRhoThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>reactingMixture</code>：规定纯物质或组分混合方式，同时读取组分和反应机理。</li><li><code>transport</code> = <code>polynomial</code>：确定黏度及导热的物性关系。</li><li><code>thermo</code> = <code>hPolynomial</code>：确定比热、焓等热力学函数。</li><li><code>energy</code> = <code>sensibleEnthalpy</code>：选择能量变量，求解显焓 <code>h</code>。</li><li><code>equationOfState</code> = <code>icoPolynomial</code>：给出压力、温度与密度之间的关系。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/simpleReactingParcelFoam/verticalChannel/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      turbulenceProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+simulationType  <span class="hljs-built_in">RAS</span>;
+
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel            kOmegaSST;
+
+    turbulence          <span class="hljs-literal">on</span>;
+
+    printCoeffs         <span class="hljs-literal">on</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kOmegaSST</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/simpleReactingParcelFoam/verticalChannel/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>运行与结果检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleSprayFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>完成网格、初始场和上述模型配置后，在 myCase 中运行本程序。此命令只启动求解，不会代替生成网格、建立区域或初始化颗粒；这些步骤应在运行前完成。</p><p>在 <code>lagrangian</code> 输出中观察颗粒位置、速度和模型写出的粒径、温度等属性。结合注入、逸出、沉积与域内存量核对颗粒质量；有双向耦合时比较连续相变化。</p><blockquote><p>熊猫说：稳态喷雾计算描述迭代收敛后的平均工况，不能用输出迭代编号解释喷雾前沿随物理时间传播的过程。</p></blockquote><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

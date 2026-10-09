@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,81 +270,113 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-xienginefoam"><div class="eyebrow">OpenFOAM v2512</div><h1>XiEngineFoam</h1><div class="prose"><p>用 <code>b</code>–Xi 模型模拟内燃机中的预混燃烧。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">XiEngineFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/xienginefoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/combustion/XiFoam/XiEngineFoam/XiEngineFoam.C">查看 v2512 程序说明</a></p><h2>算例中的计算控制</h2><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">75 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-xienginefoam"><div class="eyebrow">OpenFOAM v2512</div><h1>XiEngineFoam</h1><div class="prose"><p>用 <code>b</code>–Xi 模型模拟内燃机中的预混燃烧。</p><h2 id="brief-introduction">简要介绍</h2><p>该程序在 <code>XiFoam</code> 所描述的物理问题中加入内燃机运动。需要将燃烧设置与气缸运动、初始热力学状态配合，使火焰传播对应发动机的运动过程。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">XiEngineFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>XiEngineFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/xienginefoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/combustion/XiFoam/XiEngineFoam/XiEngineFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与算例场景</h2><p>先确定组分名称、反应机理和热化学数据，再设置入口质量分数、温度与压力。组分质量分数应非负且总和为 1。随后分别选择化学积分方法、燃烧闭合和湍流模型；预混火焰模型与逐组分有限速率化学使用不同的输运变量。</p><p>本页采用官方算例 <code>combustion/XiEngineFoam/kivaTest</code>。</p><ol><li>复制完整算例，按 <code>Allrun</code> 准备网格与区域。</li><li>修改物性、模型和初始场，使它们对应同一物理工况。</li><li>分别检查入口、出口、壁面及区域接口的边界条件。</li><li>核对离散格式、线性求解设置、耦合循环及写出间隔，再启动计算。</li></ol><h2>物性与模型配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/combustionProperties</code></td><td>燃烧闭合模型；反应速率如何进入流动和能量方程由此确定。</td></tr><tr><td><code>constant/engineGeometry</code></td><td>发动机转速和几何运动参数；与曲轴角时间和网格运动配套。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr></tbody></table></div><details><summary><code>constant/combustionProperties</code>：燃烧闭合及模型系数。</summary><h3><code>constant/combustionProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">85 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
     <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">object</span>      combustionProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
 
-<span class="hljs-keyword">application</span>     XiEngineFoam;
+laminarFlameSpeedCorrelation Gulders;
 
-startFrom       startTime;
+fuel            IsoOctane;
 
-startTime       <span class="hljs-number">-180</span>;
+Su              Su [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0</span>;
 
-stopAt          endTime;
+SuModel         unstrained;
 
-endTime         <span class="hljs-number">60</span>;
+equivalenceRatio equivalenceRatio [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
 
-deltaT          <span class="hljs-number">0.25</span>;
+sigmaExt        sigmaExt [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">100000</span>;
 
-writeControl    runTime;
+XiModel         transport;
 
-writeInterval   <span class="hljs-number">5</span>;
+XiCoef          XiCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.62</span>;
 
-purgeWrite      <span class="hljs-number">0</span>;
+XiShapeCoef     XiShapeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
 
-writeFormat     ascii;
+uPrimeCoef      uPrimeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
 
-writePrecision  <span class="hljs-number">6</span>;
-
-writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
-runTimeModifiable <span class="hljs-literal">true</span>;
-
-adjustTimeStep  <span class="hljs-literal">no</span>;
-
-maxCo           <span class="hljs-number">0.2</span>;
-
-maxDeltaT       <span class="hljs-number">1</span>;
-
-<span class="hljs-keyword">functions</span>
+GuldersCoeffs
 {
-    timeStep
+    Methane
     {
-        <span class="hljs-keyword">name</span>    setDeltaT;
-        <span class="hljs-keyword">type</span>    coded;
-        <span class="hljs-keyword">libs</span>    (utilityFunctionObjects);
-
-        <span class="hljs-keyword">code</span>
-        <span class="hljs-meta">#{</span>
-        #};
-
-        codeExecute
-        <span class="hljs-meta">#{</span>
-            const Time&amp; runTime = mesh().time();
-            if (runTime.timeToUserTime(runTime.<span class="hljs-keyword">value</span>()) &gt;= <span class="hljs-number">-15.0</span>)
-            {
-                const_cast&lt;Time&amp;&gt;(runTime).setDeltaT
-                (
-                    runTime.userTimeToTime(<span class="hljs-number">0.025</span>)
-                );
-            }
-        #};
+        W               <span class="hljs-number">0.422</span>;
+        eta             <span class="hljs-number">0.15</span>;
+        xi              <span class="hljs-number">5.18</span>;
+        alpha           <span class="hljs-number">2</span>;
+        beta            <span class="hljs-number">-0.5</span>;
+        f               <span class="hljs-number">2.3</span>;
     }
 
-    <span class="hljs-meta">#include "momentum"</span>
+    Propane
+    {
+        W               <span class="hljs-number">0.446</span>;
+        eta             <span class="hljs-number">0.12</span>;
+        xi              <span class="hljs-number">4.95</span>;
+        alpha           <span class="hljs-number">1.77</span>;
+        beta            <span class="hljs-number">-0.2</span>;
+        f               <span class="hljs-number">2.3</span>;
+    }
+
+    IsoOctane
+    {
+        W               <span class="hljs-number">0.4658</span>;
+        eta             <span class="hljs-number">-0.326</span>;
+        xi              <span class="hljs-number">4.48</span>;
+        alpha           <span class="hljs-number">1.56</span>;
+        beta            <span class="hljs-number">-0.22</span>;
+        f               <span class="hljs-number">2.3</span>;
+    }
 }
 
+ignite          <span class="hljs-literal">yes</span>;
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/system/controlDict.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary><code>thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">87 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+ignitionSites
+(
+    {
+        <span class="hljs-keyword">location</span>        (<span class="hljs-number">0.03</span> <span class="hljs-number">0</span> <span class="hljs-number">0.091</span>);
+        diameter        <span class="hljs-number">0.002</span>;
+        start           <span class="hljs-number">-15</span>;
+        duration        <span class="hljs-number">20</span>;
+        strength        <span class="hljs-number">4</span>;
+    }
+);
+
+ignitionSphereFraction <span class="hljs-number">1</span>;
+
+ignitionThickness ignitionThickness [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0</span>;
+
+ignitionCircleFraction <span class="hljs-number">1</span>;
+
+ignitionKernelArea ignitionKernelArea [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0</span>;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/combustionProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>ignitionSites/条目/duration</code> 设为 <code>20</code>：给定注入持续时间。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/combustionProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/combustionProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/engineGeometry</code>：本算例的配套配置，字段和参数见文件正文。</summary><h3><code>constant/engineGeometry</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      engineGeometry;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+engineMesh      layered;
+
+conRodLength    conRodLength [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.147</span>;
+
+bore            bore [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.092</span>;
+
+stroke          stroke [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.08423</span>;
+
+clearance       clearance [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.00115</span>;
+
+rpm             rpm [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1500</span>;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>engineMesh=<code>layered</code> 选择发动机网格运动方式。conRodLength、bore、stroke 和 clearance 分别给定连杆长度、缸径、行程和余隙，带量纲数值均以 m 计。rpm=<code>rpm [0 0 -1 0 0 0 0] 1500</code> 给定转速，程序据此换算曲轴角与时间；修改几何后应核对整个运动周期的网格质量。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/engineGeometry">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/engineGeometry.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">87 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -430,7 +462,7 @@ burntProducts
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heheuPsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>inhomogeneousMixture</code>：规定纯物质或组分混合方式。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>absoluteEnthalpy</code>：选择能量变量。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>fuel/specie/molWeight</code> 设为 <code>114.23</code>：摩尔质量，单位 kg/kmol。</li><li><code>oxidant/specie/molWeight</code> 设为 <code>28.8504</code>：摩尔质量，单位 kg/kmol。</li><li><code>burntProducts/specie/molWeight</code> 设为 <code>28.6068</code>：摩尔质量，单位 kg/kmol。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -456,7 +488,7 @@ simulationType      <span class="hljs-built_in">RAS</span>;
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><details><summary><code>fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">69 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilon</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>离散格式与方程求解</h2><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">69 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -524,10 +556,148 @@ snGradSchemes
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/system/fvSchemes.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>在已加载 OpenFOAM <code>v2512</code> 环境的终端中执行。目标目录应为新目录；官方脚本包含本算例需要的网格、初始化和求解顺序。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,U)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phi,K)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phid,p)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(meshPhi,p)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phiv,p)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phi,R)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(R)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(phiXi,Xi)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phiXi,Su)</code></td><td><code>Gauss upwind</code></td><td>散度及对流项；括号内给出通量与所输运的量；采用一阶迎风插值，较稳健但数值扩散较大。</td></tr><tr><td><code>divSchemes/div(phiSt,b)</code></td><td><code>Gauss limitedLinear01 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/fu</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ft</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/b</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ha</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/hau</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ea</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/eau</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(U)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((Su*n))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((U+((Su*Xi)*n)))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(((rho*nuEff)*dev2(T(grad(U)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear limited corrected 0.5</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>limited corrected 0.5</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">65 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      fvSolution;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solvers
+{
+    p
+    {
+        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
+        preconditioner  DIC;
+        tolerance       <span class="hljs-number">1e-06</span>;
+        relTol          <span class="hljs-number">0.1</span>;
+    }
+
+    pFinal
+    {
+        <span class="hljs-variable">$p</span>;
+        tolerance       <span class="hljs-number">1e-06</span>;
+        relTol          <span class="hljs-number">0</span>;
+    }
+
+    rho
+    {
+        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
+        preconditioner  DIC;
+        tolerance       <span class="hljs-number">1e-05</span>;
+        relTol          <span class="hljs-number">0.1</span>;
+    }
+
+    rhoFinal
+    {
+        <span class="hljs-variable">$rho</span>;
+        tolerance       <span class="hljs-number">1e-05</span>;
+        relTol          <span class="hljs-number">0</span>;
+    }
+
+    <span class="hljs-string">"(U|Xi|hau|eau|ft|b|ha|ea|k|epsilon)"</span>
+    {
+        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner  DILU;
+        tolerance       <span class="hljs-number">1e-05</span>;
+        relTol          <span class="hljs-number">0.1</span>;
+    }
+    <span class="hljs-string">"(U|ft|Xi|hau|eau|b|ha|ea|k|epsilon)Final"</span>
+    {
+        <span class="hljs-variable">$U</span>;
+        tolerance       <span class="hljs-number">1e-05</span>;
+        relTol          <span class="hljs-number">0</span>;
+    }
+}
+
+<span class="hljs-built_in">PIMPLE</span>
+{
+    nCorrectors     <span class="hljs-number">2</span>;
+    nNonOrthogonalCorrectors <span class="hljs-number">1</span>;
+    momentumPredictor <span class="hljs-literal">yes</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>pFinal</code></td><td><code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>rho</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>rhoFinal</code></td><td><code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|Xi|hau|eau|ft|b|ha|ea|k|epsilon)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|ft|Xi|hau|eau|b|ha|ea|k|epsilon)Final"</code></td><td><code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/nCorrectors</code> = <code>2</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>1</code>：压力或扩散方程的非正交校正次数。</li><li><code>PIMPLE/momentumPredictor</code> = <code>yes</code>：控制是否单独求解动量预测步骤。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/system/fvSolution.txt">下载此配置文件</a></p></details><h2>时间、迭代与输出设置</h2><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">75 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      controlDict;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+<span class="hljs-keyword">application</span>     XiEngineFoam;
+
+startFrom       startTime;
+
+startTime       <span class="hljs-number">-180</span>;
+
+stopAt          endTime;
+
+endTime         <span class="hljs-number">60</span>;
+
+deltaT          <span class="hljs-number">0.25</span>;
+
+writeControl    runTime;
+
+writeInterval   <span class="hljs-number">5</span>;
+
+purgeWrite      <span class="hljs-number">0</span>;
+
+writeFormat     ascii;
+
+writePrecision  <span class="hljs-number">6</span>;
+
+writeCompression <span class="hljs-literal">off</span>;
+
+timeFormat      general;
+
+timePrecision   <span class="hljs-number">6</span>;
+
+runTimeModifiable <span class="hljs-literal">true</span>;
+
+adjustTimeStep  <span class="hljs-literal">no</span>;
+
+maxCo           <span class="hljs-number">0.2</span>;
+
+maxDeltaT       <span class="hljs-number">1</span>;
+
+<span class="hljs-keyword">functions</span>
+{
+    timeStep
+    {
+        <span class="hljs-keyword">name</span>    setDeltaT;
+        <span class="hljs-keyword">type</span>    coded;
+        <span class="hljs-keyword">libs</span>    (utilityFunctionObjects);
+
+        <span class="hljs-keyword">code</span>
+        <span class="hljs-meta">#{</span>
+        #};
+
+        codeExecute
+        <span class="hljs-meta">#{</span>
+            const Time&amp; runTime = mesh().time();
+            if (runTime.timeToUserTime(runTime.<span class="hljs-keyword">value</span>()) &gt;= <span class="hljs-number">-15.0</span>)
+            {
+                const_cast&lt;Time&amp;&gt;(runTime).setDeltaT
+                (
+                    runTime.userTimeToTime(<span class="hljs-number">0.025</span>)
+                );
+            }
+        #};
+    }
+
+    <span class="hljs-meta">#include "momentum"</span>
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>system/controlDict</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>application</code> 设为 <code>XiEngineFoam</code>：指定由 <code>Allrun</code> 等脚本调用的应用程序。</li><li><code>startFrom</code> 设为 <code>startTime</code>：决定从给定起始时刻还是已有结果继续计算。</li><li><code>startTime</code> 设为 <code>-180</code>：给定起始时刻。</li><li><code>endTime</code> 设为 <code>60</code>：规定计算结束的时间或稳态迭代终点。</li><li><code>deltaT</code> 设为 <code>0.25</code>：设置时间步；启用自动调步后它用于起步。</li><li><code>writeControl</code> 设为 <code>runTime</code>：选择按时间步、模拟时间等事件写出结果。</li><li><code>writeInterval</code> 设为 <code>5</code>：给出与 <code>writeControl</code> 配套的写出间隔。</li><li><code>purgeWrite</code> 设为 <code>0</code>：控制保留多少个结果时间目录；0 表示不自动清除。</li><li><code>runTimeModifiable</code> 设为 <code>true</code>：决定运行中是否重新读取可修改的字典。</li><li><code>adjustTimeStep</code> 设为 <code>no</code>：控制是否根据 Courant 数自动调整时间步。</li><li><code>maxCo</code> 设为 <code>0.2</code>：限制流动 Courant 数。</li><li><code>maxDeltaT</code> 设为 <code>1</code>：限定自动时间步的上限。</li></ul><p><code>system/controlDict</code>还读取<code>"momentum"</code>。相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/system/controlDict.txt">下载此配置文件</a></p><blockquote><p>熊猫说：本程序采用 engineTime。输入时间与曲轴转角按发动机转速换算；修改转速、起止角度和步长时，应同步核对 engineGeometry 及运行日志中的时间标记。</p></blockquote><h2>初始化与并行准备</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>执行作用</th></tr></thead><tbody><tr><td><code>system/decomposeParDict</code></td><td>并行分区数量和方法；运行进程数应与 <code>numberOfSubdomains</code> 一致。</td></tr></tbody></table></div><h2>复制与运行完整算例</h2><p>在已加载 OpenFOAM <code>v2512</code> 环境的终端中执行。目标目录应为新目录；官方脚本包含本算例需要的网格、初始化和求解顺序。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/combustion/XiEngineFoam/kivaTest"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/kivaTest-reference"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/kivaTest-reference"</span>
-./Allrun</code></pre></div><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
+./Allrun</code></pre></div><p>先创建工作目录，再复制完整教程并进入副本。./Allrun 执行该目录中的运行脚本；原始教程目录中的文件不会被改动。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
 . <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
 <span class="hljs-comment">#------------------------------------------------------------------------------</span>
@@ -538,7 +708,7 @@ runApplication kivaToFoam -file otape17
 
 runApplication $(getApplication)
 
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/Allrun.txt">下载此配置文件</a></p></details><h2>运行后查看什么</h2><p>按 <code>controlDict</code> 的写出设置检查时间目录与求解日志。初始场中的 求解字段 是对照结果的起点；部分热力学、通量或辅助场由求解器创建，是否写出取决于各字段设置。</p><p>对瞬态算例，比较不同时刻的物理量；对稳态算例，结合残差、连续性误差和监测量判断收敛。<code>Allrun</code> 中的后处理步骤还可能生成 postProcessing、采样文件或专用统计结果。</p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>canCompile</code> 检查 <code>make</code>、<code>wmake</code> 和 <code>C</code>++ 编译器是否可用。</li><li><code>kivaToFoam</code> 将 KIVA3v 发动机网格转换为 OpenFOAM 体网格。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiEngineFoam/kivaTest/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiEngineFoam/kivaTest/Allrun.txt">下载此配置文件</a></p></details><h2>运行后查看什么</h2><p>同时观察温度、主要组分、燃料消耗和热释放。检查组分质量分数范围，并结合质量、元素和能量收支判断反应过程。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

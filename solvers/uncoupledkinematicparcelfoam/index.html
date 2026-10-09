@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,58 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-uncoupledkinematicparcelfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>uncoupledKinematicParcelFoam</h1><div class="prose"><p>在给定流场中追踪颗粒云的运动。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">uncoupledKinematicParcelFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/uncoupledkinematicparcelfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/uncoupledKinematicParcelFoam/uncoupledKinematicParcelFoam.C">查看 v2512 程序说明</a></p><h2>调用示例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">uncoupledKinematicParcelFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>先准备与此程序匹配的 myCase 目录。当前 <code>v2512</code> 教程中未检索到直接以该程序为 <code>application</code> 的独立算例；本页保留其命令入口，并链接所属物理模块的完整算例供配置对照。</p><p><a href="/solvers/?category=%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E9%A2%97%E7%B2%92">查看拉格朗日颗粒的其他算例</a></p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-uncoupledkinematicparcelfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>uncoupledKinematicParcelFoam</h1><div class="prose"><p>在给定流场中追踪颗粒云的运动。</p><h2 id="brief-introduction">简要介绍</h2><p>已有流场能够代表颗粒所处环境时，可只推进颗粒运动。读取流体数据后，设置颗粒来源、受力和碰壁行为，得到轨迹及逃逸、滞留统计。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">uncoupledKinematicParcelFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>uncoupledKinematicParcelFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/uncoupledkinematicparcelfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/uncoupledKinematicParcelFoam/uncoupledKinematicParcelFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与参考算例</h2><p><code>v2512</code> 教程中没有直接以 <code>uncoupledKinematicParcelFoam</code> 为 <code>application</code> 的独立算例。下面以 <code>uncoupledKinematicParcelDyMFoam</code> 的同族配置为参考，按本程序实际读取的字段和模型说明搭建方法。</p><p><a href="/solvers/uncoupledkinematicparceldymfoam/">查看 uncoupledKinematicParcelDyMFoam 的完整文件与运行流程</a></p><h2>初始场与边界条件</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>配置方法</th></tr></thead><tbody><tr><td><code>U、p 与 T</code></td><td><code>U</code> 为给定载流速度；psiThermo 从 <code>p</code>、<code>T</code> 与物性组合建立密度等热力学量。</td></tr><tr><td><code>所选湍流模型字段</code></td><td>用于颗粒弥散或受力计算。</td></tr><tr><td><code>kinematicCloud 颗粒状态</code></td><td>注入和轨迹由颗粒云处理，不反馈修改载流场。</td></tr></tbody></table></div><h2>物性、模型与数值设置</h2><div class="table-scroll"><table><thead><tr><th>文件或位置</th><th>配置方法</th></tr></thead><tbody><tr><td><code>constant/thermophysicalProperties</code></td><td>选用 psiThermo 支持的物性组合；不是仅填 <code>nu</code> 的不可压缩颗粒算例。</td></tr><tr><td><code>constant/kinematicCloudProperties</code></td><td>配置单向耦合的颗粒云、注入、受力和壁面作用。</td></tr><tr><td><code>constant/g 与 turbulenceProperties</code></td><td>重力和载流湍流模型；与输入流场一致。</td></tr></tbody></table></div><h2>搭建步骤</h2><ol><li>取静止网格上的预计算 <code>U</code>、<code>p</code>、<code>T</code> 及所需湍流场，作为颗粒追踪的载流条件。</li><li>对照同族动网格算例的热物性和颗粒云配置，去除与实际静止几何无关的运动设置，并重新匹配 <code>patch</code> 名称。</li><li>按颗粒穿越单元的时间尺度设置追踪步长，检查注入量、逸出量、沉积和域内存量。</li></ol><h2>配置示例与解读</h2><h3><code>system/controlDict 中选择程序</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">application</span> uncoupledKinematicParcelFoam;</code></pre></div><p>该程序只推进颗粒云，不重新求解载流速度。若要使用不可压缩、常密度载流框架，应另行选择 <code>icoUncoupledKinematicParcelFoam</code>，并采用其对应的输运物性结构。</p><h3>同族算例的物性配置</h3><p>以下是 <code>uncoupledKinematicParcelDyMFoam</code> 的原文件，用于核对文件结构与参数位置。按上面的搭建步骤调整模型组合、材料参数和相名后，再用于 <code>uncoupledKinematicParcelFoam</code>。</p><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            hePsiThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          eConst;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleInternalEnergy;
+}
+
+mixture
+{
+    specie
+    {
+        molWeight   <span class="hljs-number">28.9</span>;
+    }
+    thermodynamics
+    {
+        Cv          <span class="hljs-number">712</span>;
+        Hf          <span class="hljs-number">0</span>;
+    }
+    transport
+    {
+        mu          <span class="hljs-number">1.8e-05</span>;
+        Pr          <span class="hljs-number">0.7</span>;
+    }
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>hePsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>pureMixture</code>：规定纯物质或组分混合方式，各处使用同一套物性。</li><li><code>transport</code> = <code>const</code>：确定黏度及导热的物性关系，采用常输运系数。</li><li><code>thermo</code> = <code>eConst</code>：确定比热、焓等热力学函数。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>sensibleInternalEnergy</code>：选择能量变量，求解显内能 <code>e</code>。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>mixture/specie/molWeight</code> 设为 <code>28.9</code>：摩尔质量，单位 kg/kmol。</li><li><code>mixture/thermodynamics/Cv</code> 设为 <code>712</code>：定容比热，单位 J/(kg·K)。</li><li><code>mixture/transport/mu</code> 设为 <code>1.8e-05</code>：动力黏度，单位 Pa·s。</li><li><code>mixture/transport/Pr</code> 设为 <code>0.7</code>：分子 Prandtl 数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      turbulenceProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+simulationType  <span class="hljs-built_in">laminar</span>;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>laminar</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/uncoupledKinematicParcelDyMFoam/rotor2DAMI/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>运行与结果检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">uncoupledKinematicParcelFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>完成网格、初始场和上述模型配置后，在 myCase 中运行本程序。此命令只启动求解，不会代替生成网格、建立区域或初始化颗粒；这些步骤应在运行前完成。</p><p>在 <code>lagrangian</code> 输出中观察颗粒位置、速度和模型写出的粒径、温度等属性。结合注入、逸出、沉积与域内存量核对颗粒质量；有双向耦合时比较连续相变化。</p><blockquote><p>熊猫说：uncoupled 表示不把颗粒作用反馈到连续相。若颗粒负荷足以显著改变流动，应改用具有相应双向耦合的模型和求解器。</p></blockquote><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -304,7 +304,7 @@ FOAM exiting</code></pre></div>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">Courant Number mean: 1.2e+15 max: 3.4e+18
 bounding k, min: -1.2e+03 max: 5.6e+05 average: 12.3
 #0  Foam::error::printStack(...)
-Floating point exception</code></pre></div>
+Floating point exception</code></pre></div><!-- example-reading --><p>日志中的 Courant 数已经极大，同时 <code>k</code> 出现负值并被限制，随后发生浮点异常。这说明数值解在报错前已经失稳。应从最早出现异常的时间步检查速度、网格质量、边界和时间步，单独放宽 <code>k</code> 的限制不会消除失稳原因。</p><!-- /example-reading -->
 <p>排查步骤</p>
 <p>网格：<code>checkMesh</code> <code>-allGeometry</code> <code>-allTopology</code> 有没有 ***？非正交角多少？</p>
 <p>边界条件：进出口是不是都定了？封闭腔体给了 <code>pRefCell</code> 吗？出口用 <code>inletOutlet</code> 了吗？</p>
@@ -354,6 +354,7 @@ Floating point exception</code></pre></div>
 <p>收敛了吗：稳态算例残差降到 1e-4 以下了吗？监测量（如阻力系数）平了吗？残差降下来 <span class="math-formula" data-tex="\ne"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo mathvariant="normal">≠</mo></mrow><annotation encoding="application/x-tex">\ne</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel"><span class="mrel"><span class="mord katex-vbox"><span class="katex-thinbox"><span class="rlap"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="katex-inner"><span class="mord"><span class="mrel"></span></span></span><span class="katex-fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span></span></span></span></span> 收敛，还要看物理量不再变化。</p>
 <p>网格无关性：加密一倍，结果变化超过 5% 吗？</p>
 <p>养成一个习惯：任何一个新算例，先用你知道答案的简化工况验证一遍（层流管流对比 Hagen–Poiseuille、圆柱绕流对比 <span class="math-formula" data-tex="\mathrm{Re}=100"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">\mathrm{Re}=100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">Re</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></span> 的 St 数）。这一步花半天，能省掉后面几周的怀疑。</p>
+
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

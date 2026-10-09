@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -297,17 +297,17 @@ postProcess -list                  <span class="hljs-comment"># 可用后处理�
 simpleFoam -listFunctionObjects    <span class="hljs-comment"># 可用 functionObject</span>
 <span class="hljs-built_in">ls</span> <span class="hljs-variable">$FOAM_APPBIN</span>                    <span class="hljs-comment"># 本机所有命令</span>
 grep -r <span class="hljs-string">"关键字"</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>   <span class="hljs-comment"># 别人怎么写的</span>
-foamDictionary &lt;文件&gt; -<span class="hljs-built_in">expand</span>      <span class="hljs-comment"># 字典最终展开成什么</span></code></pre></div>
+foamDictionary &lt;文件&gt; -<span class="hljs-built_in">expand</span>      <span class="hljs-comment"># 字典最终展开成什么</span></code></pre></div><!-- example-reading --><ol><li><code>foamHelp</code> 查询边界条件、函数对象和求解器的帮助。</li><li><code>postProcess</code> 在已有结果上执行功能对象。</li><li><code>simpleFoam</code> 使用 <code>SIMPLE</code> 算法求解不可压缩稳态流动。</li><li><code>ls</code> 列出文件与目录。</li><li><code>grep</code> 按文本模式检索文件。</li><li><code>foamDictionary</code> 读取、修改和展开 OpenFOAM 字典。</li></ol><!-- /example-reading -->
 <p>改设置</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -entry endTime -<span class="hljs-built_in">set</span> 5
 foamDictionary system/fvSolution  -entry solvers/p/tolerance -<span class="hljs-built_in">set</span> 1e-8
-foamDictionary 0/U -entry boundaryField/inlet/value -<span class="hljs-built_in">set</span> <span class="hljs-string">"uniform (5 0 0)"</span></code></pre></div>
+foamDictionary 0/U -entry boundaryField/inlet/value -<span class="hljs-built_in">set</span> <span class="hljs-string">"uniform (5 0 0)"</span></code></pre></div><!-- example-reading --><p><code>foamDictionary</code> 读取、修改和展开 OpenFOAM 字典。</p><!-- /example-reading -->
 <p>排错</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh -allGeometry -allTopology     <span class="hljs-comment"># 网格</span>
 solver -dry-run                         <span class="hljs-comment"># 设置语法</span>
 <span class="hljs-built_in">export</span> FOAM_SIGFPE=<span class="hljs-literal">true</span>                 <span class="hljs-comment"># 定位第一次浮点异常</span>
 grep -A5 <span class="hljs-string">"FOAM FATAL"</span> log.xxx           <span class="hljs-comment"># 抓错误</span>
-diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑的算例对比</span></code></pre></div>
+diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑的算例对比</span></code></pre></div><!-- example-reading --><ol><li><code>checkMesh</code> 检查网格拓扑、几何形状与质量，并定位问题区域。</li><li><code>run</code> 切换到个人算例目录。</li><li><code>grep</code> 按文本模式检索文件。</li><li><code>diff</code> 对比两份字典或日志。</li></ol><!-- /example-reading -->
 <h2>附录 B　各文件”必填项”清单</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>文件</th><th>必须有的关键字</th></tr>
@@ -347,6 +347,7 @@ diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑�
 <tr><td>各版本发布说明</td><td>openfoam.com/news</td></tr>
 </tbody></table></div>
 <p>一条最有用的建议：遇到问题时，先在 <code>$FOAM_TUTORIALS</code> 里搜有没有类似的官方算例。官方算例是被验证过、能成功执行的，比论坛帖子和博客可靠得多。<code>grep</code> <code>-rl</code> 加上一个关键字，通常十秒钟就能找到。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
+
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

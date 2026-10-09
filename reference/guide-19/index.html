@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -444,7 +444,7 @@ walls
     limit           gradient;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 }
-atmosphere { <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>; inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }</code></pre></div>
+atmosphere { <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>; inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。规定值为 <code>uniform 1</code>，求解中保持该值。</p><p><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>walls</code> 采用 <code>constantAlphaContactAngle</code>，通过固定接触角控制壁面附近的界面法向。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>atmosphere</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
 <h2>19.8 时变与外部数据</h2>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// ① 用表格给随时间变化的值</span>
 inlet
@@ -471,13 +471,14 @@ inlet
     average         (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     interpolationScheme cell;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}</code></pre></div>
+}</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>uniformFixedValue</code>，用时间函数设置整个入口的速度。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>inlet</code> 采用 <code>timeVaryingMappedFixedValue</code>，将离散位置和时刻给出的边界数据插值到计算边界。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
 <h2>19.9 边界条件查询方法</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamHelp boundary -field U | less          <span class="hljs-comment"># 本机所有可用类型</span>
 pimpleFoam -listVectorBCs                  <span class="hljs-comment"># 同上，另一个入口</span>
 find <span class="hljs-variable">$FOAM_SRC</span> -name <span class="hljs-string">"*inletOutlet*"</span>       <span class="hljs-comment"># 找源码</span>
 grep -rl <span class="hljs-string">"inletOutlet"</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible --include=U | <span class="hljs-built_in">head</span>   <span class="hljs-comment"># 找用例</span></code></pre></div>
 <p>找到使用该边界条件的官方算例，参考其中的完整配置，再调整字段名和参数值。</p>
+
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

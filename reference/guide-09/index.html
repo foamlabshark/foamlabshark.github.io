@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -324,7 +324,7 @@ mpirun -np 8  redistributePar -decompose -parallel      <span class="hljs-commen
 mpirun -np 8 snappyHexMesh -overwrite -parallel  <span class="hljs-comment"># 并行生成网格</span>
 mpirun -np 8 renumberMesh -overwrite -parallel
 mpirun -np 8 postProcess -func Q -latestTime -parallel
-foamListTimes -<span class="hljs-built_in">rm</span> -processor                     <span class="hljs-comment"># 清理 processor* 里的时间目录</span></code></pre></div>
+foamListTimes -<span class="hljs-built_in">rm</span> -processor                     <span class="hljs-comment"># 清理 processor* 里的时间目录</span></code></pre></div><!-- example-reading --><ol><li><code>checkMesh</code> 检查网格拓扑、几何形状与质量，并定位问题区域。</li><li><code>snappyHexMesh</code> 细化背景网格，贴合几何表面，并按设置生成边界层。结果覆盖当前网格。</li><li><code>renumberMesh</code> 重排单元与面编号以减小矩阵带宽，并同步重排场。结果覆盖当前网格。</li><li><code>postProcess</code> 在已有结果上执行功能对象。只读取最新结果时刻。</li><li><code>foamListTimes</code> 列出符合条件的案例时间目录；<code>rm</code> 删除指定的文件或目录。</li></ol><!-- /example-reading -->
 <h2>9.8 集群作业脚本模板</h2>
 <p>SLURM</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/bash</span>
@@ -339,12 +339,12 @@ foamListTimes -<span class="hljs-built_in">rm</span> -processor                 
 <span class="hljs-built_in">cd</span> <span class="hljs-variable">$SLURM_SUBMIT_DIR</span>
 decomposePar -force &gt; log.decomposePar 2&gt;&amp;1
 srun --mpi=pmi2 simpleFoam -parallel -fileHandler collated &gt; log.simpleFoam 2&gt;&amp;1
-reconstructPar -latestTime &gt; log.reconstructPar 2&gt;&amp;1</code></pre></div>
+reconstructPar -latestTime &gt; log.reconstructPar 2&gt;&amp;1</code></pre></div><!-- example-reading --><ol><li><code>source</code> 在当前终端执行脚本，使脚本设置的环境变量和函数立即生效。</li><li><code>cd</code> 切换当前工作目录。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li><code>simpleFoam</code> 使用 <code>SIMPLE</code> 算法求解不可压缩稳态流动。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。只读取最新结果时刻。</li></ol><!-- /example-reading -->
 <p>提交与查看：</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">sbatch job.sh          # 提交
 squeue -u $USER        # 查看排队/运行状态
 scancel &lt;作业号&gt;       # 取消
-sacct -j &lt;作业号&gt;      # 查看资源使用</code></pre></div>
+sacct -j &lt;作业号&gt;      # 查看资源使用</code></pre></div><!-- example-reading --><p>sbatch 提交 job.sh，并返回作业号；squeue 按当前用户查看排队和运行状态。需要取消时，把占位符替换为实际作业号再使用 scancel；sacct 用于查询该作业的资源和结束状态。</p><!-- /example-reading -->
 <p>PBS / Torque</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/bash</span>
 <span class="hljs-comment">#PBS -N of_case</span>
@@ -358,6 +358,7 @@ decomposePar -force &gt; log.decomposePar 2&gt;&amp;1
 mpirun -np 64 simpleFoam -parallel &gt; log.simpleFoam 2&gt;&amp;1
 qsub job.sh      $ qstat -u <span class="hljs-variable">$USER</span>      $ qdel &lt;作业号&gt;</code></pre></div>
 <p>集群运行中常见的两类环境问题：① 计算节点没 <code>source</code> 环境 —— 脚本里必须显式 <code>source</code> .../etc/bashrc（或用 <code>foamExec</code>）；② 集群的 MPI 与编译 OpenFOAM 时用的 MPI 不是同一个 —— 表现为一跑就 mpirun 报符号错误，解决办法是用集群的 <code>module</code> <code>load</code> 加载与编译时一致的 MPI。</p>
+
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

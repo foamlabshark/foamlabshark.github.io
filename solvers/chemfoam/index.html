@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,137 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-chemfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>chemFoam</h1><div class="prose"><p>在单个计算单元中积分化学反应方程，研究组分和温度随时间的变化。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">chemFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/chemfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/combustion/chemFoam/chemFoam.C">查看 v2512 程序说明</a></p><h2>算例中的计算控制</h2><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-chemfoam"><div class="eyebrow">OpenFOAM v2512</div><h1>chemFoam</h1><div class="prose"><p>在单个计算单元中积分化学反应方程，研究组分和温度随时间的变化。</p><h2 id="brief-introduction">简要介绍</h2><p>选定反应机理后，可先用单单元计算研究温度和组分的时间变化。输入初始温度、压力与组分，再选择化学积分方法，便于检查反应机理和点火延迟。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">chemFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>chemFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/chemfoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/combustion/chemFoam/chemFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与算例场景</h2><p>先确定组分名称、反应机理和热化学数据，再设置入口质量分数、温度与压力。组分质量分数应非负且总和为 1。随后分别选择化学积分方法、燃烧闭合和湍流模型；预混火焰模型与逐组分有限速率化学使用不同的输运变量。</p><p>本页采用官方算例 <code>combustion/chemFoam/h2</code>。这是均匀化学反应器的时间积分算例。重点配置初始温度、压力、组分比例及反应机理；计算目的为点火和化学动力学演化，不需要套用入口—出口流动边界。</p><ol><li>复制完整算例，按 <code>Allrun</code> 准备网格与区域。</li><li>修改物性、模型和初始场，使它们对应同一物理工况。</li><li>分别检查入口、出口、壁面及区域接口的边界条件。</li><li>核对离散格式、线性求解设置、耦合循环及写出间隔，再启动计算。</li></ol><h2>物性与模型配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/chemistryProperties</code></td><td>化学反应积分开关、积分方法与误差控制；与反应机理文件配套。</td></tr><tr><td><code>constant/initialConditions</code></td><td>配套模型数据或初始化设置；它由主字典引用或由 <code>Allrun</code> 中的预处理程序读取。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr></tbody></table></div><details><summary><code>constant/chemistryProperties</code>：化学积分与误差控制。</summary><h3><code>constant/chemistryProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      chemistryProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+chemistryType
+{
+    <span class="hljs-keyword">solver</span>            ode;
+}
+
+chemistry       <span class="hljs-literal">on</span>;
+
+initialChemicalTimeStep <span class="hljs-number">1e-7</span>;
+
+EulerImplicitCoeffs
+{
+    cTauChem        <span class="hljs-number">1</span>;
+    equilibriumRateLimiter <span class="hljs-literal">off</span>;
+}
+
+odeCoeffs
+{
+    <span class="hljs-keyword">solver</span>          seulex;
+    absTol          <span class="hljs-number">1e-12</span>;
+    relTol          <span class="hljs-number">1e-1</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/chemistryProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>chemistry</code> 设为 <code>on</code>：控制化学反应是否启用。</li><li><code>initialChemicalTimeStep</code> 设为 <code>1e-7</code>：设置化学积分的初始子步，单位 s。</li><li><code>odeCoeffs/relTol</code> 设为 <code>1e-1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/constant/chemistryProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/constant/chemistryProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/initialConditions</code>：本算例的配套配置，字段和参数见文件正文。</summary><h3><code>constant/initialConditions</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      initialConditions;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+constantProperty pressure;
+
+fractionBasis  mole;
+
+fractions
+{
+    H2              <span class="hljs-number">1</span>;
+    N2              <span class="hljs-number">3.76</span>;
+    O2              <span class="hljs-number">1</span>;
+}
+
+p               <span class="hljs-number">202650</span>;
+
+T               <span class="hljs-number">1000</span>;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>constantProperty=<code>pressure</code> 选择反应器维持不变的热力学量。fractionBasis=<code>mole</code> 表示组分按所选摩尔或质量基准输入；本例 <code>H2</code>=<code>1</code>、<code>N2</code>=<code>3.76</code>、<code>O2</code>=<code>1</code> 是待归一化的比例。初始 <code>p</code>=<code>202650</code> Pa，<code>T</code>=<code>1000</code> K，用于建立化学反应的初始状态。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/constant/initialConditions">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/constant/initialConditions.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            hePsiThermo;
+    mixture         reactingMixture;
+    transport       sutherland;
+    thermo          janaf;
+    energy          sensibleEnthalpy;
+    equationOfState perfectGas;
+    specie          specie;
+}
+
+CHEMKINFile         <span class="hljs-string">"&lt;case&gt;/chemkin/chem.inp"</span>;
+CHEMKINThermoFile   <span class="hljs-string">"&lt;case&gt;/chemkin/therm.dat"</span>;
+CHEMKINTransportFile <span class="hljs-string">"&lt;case&gt;/chemkin/transportProperties"</span>;
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>hePsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>reactingMixture</code>：规定纯物质或组分混合方式，同时读取组分和反应机理。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>energy</code> = <code>sensibleEnthalpy</code>：选择能量变量，求解显焓 <code>h</code>。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><h2>离散格式与方程求解</h2><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      fvSchemes;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+ddtSchemes
+{
+    default         <span class="hljs-built_in">Euler</span>;
+}
+
+gradSchemes
+{
+}
+
+divSchemes
+{
+}
+
+laplacianSchemes
+{
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      fvSolution;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+solvers
+{
+    Yi
+    {
+        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner  DILU;
+        tolerance       <span class="hljs-number">1e-12</span>;
+        relTol          <span class="hljs-number">0</span>;
+    }
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>Yi</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-12</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/fvSolution.txt">下载此配置文件</a></p></details><h2>时间、迭代与输出设置</h2><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
     <span class="hljs-keyword">format</span>      ascii;
@@ -317,83 +447,10 @@ DebugSwitches
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/controlDict.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary><code>thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-thermoType
-{
-    <span class="hljs-keyword">type</span>            hePsiThermo;
-    mixture         reactingMixture;
-    transport       sutherland;
-    thermo          janaf;
-    energy          sensibleEnthalpy;
-    equationOfState perfectGas;
-    specie          specie;
-}
-
-CHEMKINFile         <span class="hljs-string">"&lt;case&gt;/chemkin/chem.inp"</span>;
-CHEMKINThermoFile   <span class="hljs-string">"&lt;case&gt;/chemkin/therm.dat"</span>;
-CHEMKINTransportFile <span class="hljs-string">"&lt;case&gt;/chemkin/transportProperties"</span>;
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSchemes;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-ddtSchemes
-{
-    default         <span class="hljs-built_in">Euler</span>;
-}
-
-gradSchemes
-{
-}
-
-divSchemes
-{
-}
-
-laplacianSchemes
-{
-}
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-solvers
-{
-    Yi
-    {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-12</span>;
-        relTol          <span class="hljs-number">0</span>;
-    }
-}
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/fvSolution.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>在已加载 OpenFOAM <code>v2512</code> 环境的终端中执行。目标目录应为新目录；官方脚本包含本算例需要的网格、初始化和求解顺序。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>system/controlDict</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>application</code> 设为 <code>chemFoam</code>：指定由 <code>Allrun</code> 等脚本调用的应用程序。</li><li><code>startFrom</code> 设为 <code>startTime</code>：决定从给定起始时刻还是已有结果继续计算。</li><li><code>startTime</code> 设为 <code>0</code>：给定起始时刻。</li><li><code>endTime</code> 设为 <code>0.001</code>：规定计算结束的时间或稳态迭代终点。</li><li><code>deltaT</code> 设为 <code>1e-05</code>：设置时间步；启用自动调步后它用于起步。</li><li><code>maxDeltaT</code> 设为 <code>1</code>：限定自动时间步的上限。</li><li><code>adjustTimeStep</code> 设为 <code>on</code>：控制是否根据 Courant 数自动调整时间步。</li><li><code>writeControl</code> 设为 <code>adjustable</code>：选择按时间步、模拟时间等事件写出结果。</li><li><code>writeInterval</code> 设为 <code>5e-04</code>：给出与 <code>writeControl</code> 配套的写出间隔。</li><li><code>purgeWrite</code> 设为 <code>0</code>：控制保留多少个结果时间目录；0 表示不自动清除。</li><li><code>runTimeModifiable</code> 设为 <code>yes</code>：决定运行中是否重新读取可修改的字典。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/system/controlDict.txt">下载此配置文件</a></p><p>瞬态计算应同时检查时间步与写出间隔：前者影响时间离散和稳定性，后者只决定保存结果的频率。仅缩小 <code>writeInterval</code> 不会提高计算本身的时间分辨率。</p><h2>复制与运行完整算例</h2><p>在已加载 OpenFOAM <code>v2512</code> 环境的终端中执行。目标目录应为新目录；官方脚本包含本算例需要的网格、初始化和求解顺序。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/combustion/chemFoam/h2"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/h2-reference"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/h2-reference"</span>
-./Allrun</code></pre></div><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
+./Allrun</code></pre></div><p>先创建工作目录，再复制完整教程并进入副本。./Allrun 执行该目录中的运行脚本；原始教程目录中的文件不会被改动。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
 . <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
 <span class="hljs-comment">#------------------------------------------------------------------------------</span>
@@ -405,7 +462,7 @@ runApplication $(getApplication)
     (<span class="hljs-built_in">cd</span> validation &amp;&amp; ./Allrun $*)
 <span class="hljs-keyword">fi</span>
 
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/Allrun.txt">下载此配置文件</a></p></details><h2>运行后查看什么</h2><p>按 <code>controlDict</code> 的写出设置检查时间目录与求解日志。初始场中的 求解字段 是对照结果的起点；部分热力学、通量或辅助场由求解器创建，是否写出取决于各字段设置。</p><p>对瞬态算例，比较不同时刻的物理量；对稳态算例，结合残差、连续性误差和监测量判断收敛。<code>Allrun</code> 中的后处理步骤还可能生成 postProcessing、采样文件或专用统计结果。</p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><code>cd</code> 切换当前工作目录。从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。<code>notTest</code> 检查参数列表是否省略 <code>-test</code>。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/chemFoam/h2/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/chemFoam/h2/Allrun.txt">下载此配置文件</a></p></details><h2>运行后查看什么</h2><p>同时观察温度、主要组分、燃料消耗和热释放。检查组分质量分数范围，并结合质量、元素和能量收支判断反应过程。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

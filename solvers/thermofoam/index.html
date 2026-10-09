@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,80 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-thermofoam"><div class="eyebrow">OpenFOAM v2512</div><h1>thermoFoam</h1><div class="prose"><p>在给定流场上求解能量方程，计算温度变化。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">thermoFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/thermofoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/heatTransfer/thermoFoam/thermoFoam.C">查看 v2512 程序说明</a></p><h2>调用示例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">thermoFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>先准备与此程序匹配的 myCase 目录。当前 <code>v2512</code> 教程中未检索到直接以该程序为 <code>application</code> 的独立算例；本页保留其命令入口，并链接所属物理模块的完整算例供配置对照。</p><p><a href="/solvers/?category=%E4%BC%A0%E7%83%AD%E4%B8%8E%E6%B5%AE%E5%8A%9B">查看传热与浮力的其他算例</a></p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-thermofoam"><div class="eyebrow">OpenFOAM v2512</div><h1>thermoFoam</h1><div class="prose"><p>在给定流场上求解能量方程，计算温度变化。</p><h2 id="brief-introduction">简要介绍</h2><p>流场已经确定、需要进一步计算温度时，可以单独求解能量方程。热物性、初始温度和热边界仍须完整设置，速度场则由已有计算结果提供。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">thermoFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>thermoFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/thermofoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/heatTransfer/thermoFoam/thermoFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与参考算例</h2><p><code>v2512</code> 教程中没有直接以 <code>thermoFoam</code> 为 <code>application</code> 的独立算例。下面以 <code>buoyantSimpleFoam</code> 的同族配置为参考，按本程序实际读取的字段和模型说明搭建方法。</p><p><a href="/solvers/buoyantsimplefoam/">查看 buoyantSimpleFoam 的完整文件与运行流程</a></p><h2>初始场与边界条件</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>配置方法</th></tr></thead><tbody><tr><td><code>U</code></td><td>读取并保持给定速度场，不通过动量方程更新。</td></tr><tr><td><code>p 与 T</code></td><td>热力学模型读取的压力、温度；能量字段由所选 <code>h</code> 或 <code>e</code> 形式建立。</td></tr><tr><td><code>湍流与辐射字段</code></td><td>存在 <code>turbulenceProperties</code> 时创建湍流模型；启用辐射后补齐该辐射模型所需字段。</td></tr></tbody></table></div><h2>物性、模型与数值设置</h2><div class="table-scroll"><table><thead><tr><th>文件或位置</th><th>配置方法</th></tr></thead><tbody><tr><td><code>constant/thermophysicalProperties</code></td><td>选择 rhoThermo 支持的热力学组合，能量可为 <code>sensibleEnthalpy</code> 或 <code>sensibleInternalEnergy</code>。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>需要导热/湍流扩散时保留相应模型配置；本程序在 <code>turbulence</code> 对象存在时才加入 alphaEff 扩散项。</td></tr><tr><td><code>system/fvSchemes 与 fvSolution</code></td><td>配置 <code>div</code>(<code>phi</code>,<code>h</code>) 或 <code>div</code>(<code>phi</code>,<code>e</code>)、能量扩散格式及能量线性求解条目。<code>SIMPLE</code> 子字典存在时走稳态控制分支，否则使用 <code>PIMPLE</code> 控制。</td></tr></tbody></table></div><h2>搭建步骤</h2><ol><li>先用流动求解器取得速度和压力，把选定时刻的 <code>U</code>、<code>p</code> 及所需湍流字段作为热计算初始状态。</li><li>重新设置 <code>T</code> 的入口、加热壁面和绝热边界；修改热物性或辐射配置。若保留 h/e 文件，须保证它与新的温度一致。</li><li>选择稳态或瞬态离散，配置能量求解条目。运行时观察能量方程与温度变化；<code>U</code> 不会随热膨胀或浮力自行改变。</li></ol><h2>配置示例与解读</h2><h3><code>system/fvSolution 中的能量求解条目</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solvers
+{
+    <span class="hljs-string">"(h|e)"</span>
+    {
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-8</span>;
+        relTol <span class="hljs-number">0</span>;
+    }
+}
+<span class="hljs-built_in">SIMPLE</span>
+{
+    nNonOrthogonalCorrectors <span class="hljs-number">1</span>;
+}</code></pre></div><p>正则表达式使同一设置覆盖 <code>h</code> 或 <code>e</code>；实际求解哪一个由 <code>thermophysicalProperties</code> 的 <code>energy</code> 决定。<code>relTol</code>=0 要求满足绝对残差阈值。此例采用 <code>SIMPLE</code>，需与 <code>steadyState</code> 时间格式配套。</p><h3>同族算例的物性配置</h3><p>以下是 <code>buoyantSimpleFoam</code> 的原文件，用于核对文件结构与参数位置。按上面的搭建步骤调整模型组合、材料参数和相名后，再用于 <code>thermoFoam</code>。</p><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            heRhoThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+mixture
+{
+    specie
+    {
+        molWeight       <span class="hljs-number">28.96</span>;
+    }
+    thermodynamics
+    {
+        Cp              <span class="hljs-number">1004.4</span>;
+        Hf              <span class="hljs-number">0</span>;
+    }
+    transport
+    {
+        mu              <span class="hljs-number">1.831e-05</span>;
+        Pr              <span class="hljs-number">0.705</span>;
+    }
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heRhoThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>pureMixture</code>：规定纯物质或组分混合方式，各处使用同一套物性。</li><li><code>transport</code> = <code>const</code>：确定黏度及导热的物性关系，采用常输运系数。</li><li><code>thermo</code> = <code>hConst</code>：确定比热、焓等热力学函数，采用常比热。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>sensibleEnthalpy</code>：选择能量变量，求解显焓 <code>h</code>。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>mixture/specie/molWeight</code> 设为 <code>28.96</code>：摩尔质量，单位 kg/kmol。</li><li><code>mixture/thermodynamics/Cp</code> 设为 <code>1004.4</code>：定压比热，单位 J/(kg·K)。</li><li><code>mixture/transport/mu</code> 设为 <code>1.831e-05</code>：动力黏度，单位 Pa·s。</li><li><code>mixture/transport/Pr</code> 设为 <code>0.705</code>：分子 Prandtl 数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/buoyantCavity/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/buoyantCavity/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      turbulenceProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+simulationType          <span class="hljs-built_in">RAS</span>;
+
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel            kOmegaSST;
+
+    turbulence          <span class="hljs-literal">on</span>;
+
+    printCoeffs         <span class="hljs-literal">on</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kOmegaSST</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/buoyantCavity/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/buoyantCavity/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>运行与结果检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">thermoFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>完成网格、初始场和上述模型配置后，在 myCase 中运行本程序。此命令只启动求解，不会代替生成网格、建立区域或初始化颗粒；这些步骤应在运行前完成。</p><p>比较温度分布、热流和浮力驱动速度。多区域接口两侧应按各自外法向核对热流；瞬态升温还要把域内储能变化计入能量收支。</p><blockquote><p>熊猫说：<code>thermoFoam</code> 的“给定流场”包括速度不再由动量方程更新。温度引起的流动反馈若不可忽略，应采用同时求解流动和能量的求解器。</p></blockquote><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

@@ -18,7 +18,7 @@
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
   
-  <link rel="stylesheet" href="/assets/search-matches.css?v=cdf3e661f833">
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=493b7bc58f64" defer></script>
   <script src="/assets/site.js?v=66430a5698e0" defer></script>
@@ -270,7 +270,67 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-enginefoam"><div class="eyebrow">OpenFOAM v2512</div><h1>engineFoam</h1><div class="prose"><p>模拟内燃机中随活塞运动变化的喷雾与流动。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">engineFoam -<span class="hljs-built_in">help</span></code></pre></div><p><a href="/commands/enginefoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/sprayFoam/engineFoam/engineFoam.C">查看 v2512 程序说明</a></p><h2>调用示例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">engineFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>先准备与此程序匹配的 myCase 目录。当前 <code>v2512</code> 教程中未检索到直接以该程序为 <code>application</code> 的独立算例；本页保留其命令入口，并链接所属物理模块的完整算例供配置对照。</p><p><a href="/solvers/?category=%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E9%A2%97%E7%B2%92">查看拉格朗日颗粒的其他算例</a></p><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/solvers/">← 返回求解器速查</a></div><div class="article-shell"><article class="article" data-cms-slug="ref-solvers-enginefoam"><div class="eyebrow">OpenFOAM v2512</div><h1>engineFoam</h1><div class="prose"><p>模拟内燃机中随活塞运动变化的喷雾与流动。</p><h2 id="brief-introduction">简要介绍</h2><p>内燃机中的喷雾与气缸运动相互关联。配置时除注入、雾化和蒸发模型外，还需给定发动机运动参数，使喷射过程与变化的网格及气体状态对应。</p><h2>程序用途与入口</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">engineFoam -<span class="hljs-built_in">help</span></code></pre></div><p>显示 <code>engineFoam</code> 的命令选项后退出，不读取算例进行求解。可据此确认当前终端调用的程序及可用参数。</p><p><a href="/commands/enginefoam/">查看完整命令选项与运行示例</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/lagrangian/sprayFoam/engineFoam/engineFoam.C">查看 v2512 程序说明</a></p><h2>配置顺序与参考算例</h2><p><code>v2512</code> 教程中没有直接以 <code>engineFoam</code> 为 <code>application</code> 的独立算例。下面以 <code>sprayFoam</code> 的同族配置为参考，按本程序实际读取的字段和模型说明搭建方法。</p><p><a href="/solvers/sprayfoam/">查看 sprayFoam 的完整文件与运行流程</a></p><h2>初始场与边界条件</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>配置方法</th></tr></thead><tbody><tr><td><code>U、p、T 与气相组分</code></td><td>可压缩缸内流场和燃烧状态。</td></tr><tr><td><code>喷雾云</code></td><td>喷油时间、喷射方向、粒径、雾化、破碎与蒸发模型。</td></tr><tr><td><code>发动机运动边界</code></td><td>活塞和阀门 <code>patch</code> 必须与 engineMesh 选型及几何定义匹配。</td></tr></tbody></table></div><h2>物性、模型与数值设置</h2><div class="table-scroll"><table><thead><tr><th>文件或位置</th><th>配置方法</th></tr></thead><tbody><tr><td><code>constant/engineGeometry</code></td><td>转速、几何和发动机网格参数；engineTime 根据转速换算曲轴角与秒。</td></tr><tr><td><code>constant/sprayCloudProperties</code></td><td>液体燃料、喷射规律、雾化和破碎设置；具体云名以创建的云对象为准。</td></tr><tr><td><code>system/controlDict 与 fvSolution</code></td><td>起止角度和步长按 engineTime 约定输入，采用 <code>PIMPLE</code> 耦合。</td></tr></tbody></table></div><h2>搭建步骤</h2><ol><li>喷雾物性和破碎模型可从 <code>sprayFoam</code> 算例对照，缸体网格、活塞 <code>patch</code> 与 engineGeometry 则参考发动机算例单独建立。</li><li>根据选定发动机网格类型设置行程、连杆等运动参数；先检查整个曲轴角区间的网格质量，再加入喷油和反应。</li><li>将喷射开始和持续时间与曲轴角统一换算，设置足够小的角度步长解析喷射、压缩和放热。</li></ol><h2>配置示例与解读</h2><h3><code>曲轴角时间换算</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// n = 1500 rpm</span>
+<span class="hljs-comment">// dt = dTheta/(6*n)</span>
+<span class="hljs-comment">// dTheta = 0.1 degree -&gt; dt = 1.111111e-5 s</span></code></pre></div><p>转速 <code>n</code> 的单位为 r/min，每秒转过 6n 度。1500 r/min 下，0.1° 对应约 11.11 μs。这个换算用于核对控制字典和喷射时刻，并不是可以直接复制到 engineGeometry 中的完整配置。</p><h3>同族算例的物性配置</h3><p>以下是 <code>sprayFoam</code> 的原文件，用于核对文件结构与参数位置。按上面的搭建步骤调整模型组合、材料参数和相名后，再用于 <code>engineFoam</code>。</p><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+thermoType
+{
+    <span class="hljs-keyword">type</span>            hePsiThermo;
+    mixture         reactingMixture;
+    transport       sutherland;
+    thermo          janaf;
+    energy          sensibleEnthalpy;
+    equationOfState perfectGas;
+    specie          specie;
+}
+
+CHEMKINFile         <span class="hljs-string">"&lt;case&gt;/chemkin/chem.inp"</span>;
+CHEMKINThermoFile   <span class="hljs-string">"&lt;case&gt;/chemkin/therm.dat"</span>;
+CHEMKINTransportFile <span class="hljs-string">"&lt;case&gt;/chemkin/transportProperties"</span>;
+
+newFormat       <span class="hljs-literal">yes</span>;
+
+inertSpecie     N2;
+
+liquids
+{
+    C7H16;
+}
+
+solids
+{}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>hePsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>reactingMixture</code>：规定纯物质或组分混合方式，同时读取组分和反应机理。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>energy</code> = <code>sensibleEnthalpy</code>：选择能量变量，求解显焓 <code>h</code>。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/sprayFoam/aachenBomb/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span>      ascii;
+    <span class="hljs-keyword">class</span>       dictionary;
+    <span class="hljs-keyword">object</span>      turbulenceProperties;
+}
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
+
+simulationType  <span class="hljs-built_in">RAS</span>;
+
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel        kEpsilon;
+
+    turbulence      <span class="hljs-literal">on</span>;
+
+    printCoeffs     <span class="hljs-literal">on</span>;
+}
+
+
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>阅读<code>constant/turbulenceProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilon</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/lagrangian/sprayFoam/aachenBomb/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h2>运行与结果检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">engineFoam -<span class="hljs-keyword">case</span> ./myCase</code></pre></div><p>完成网格、初始场和上述模型配置后，在 myCase 中运行本程序。此命令只启动求解，不会代替生成网格、建立区域或初始化颗粒；这些步骤应在运行前完成。</p><p>在 <code>lagrangian</code> 输出中观察颗粒位置、速度和模型写出的粒径、温度等属性。结合注入、逸出、沉积与域内存量核对颗粒质量；有双向耦合时比较连续相变化。</p><blockquote><p>熊猫说：<code>engineFoam</code> 使用 engineMesh 和 engineTime。普通喷雾容器算例的静止网格与秒制时间设置不能直接当作发动机算例运行。</p></blockquote><p><a href="/solvers/">返回求解器速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
