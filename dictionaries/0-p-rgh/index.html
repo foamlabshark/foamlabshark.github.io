@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -210,7 +210,7 @@ atmosphere
 }
 </code></pre></div>
 <p><code>fixedFluxPressure</code> 通过压力梯度与速度边界要求的通量配合，适用于该溃坝案例的无穿透壁面。<code>totalPressure</code> 用于案例中的开口压力处理，<code>p0</code> 为所选压力基准下的总压值。与之配套，开口的 <code>U</code> 使用 <code>pressureInletOutletVelocity</code>，相分数使用允许空气回流的 <code>inletOutlet</code>。</p>
-<p>查看真实压力时，应使用求解器输出的 <code>p</code>，或按相同密度与高度参考重建静压。将 <code>p_rgh</code> 直接当作传感器测得的静压，会遗漏高度项。自建浮力或自由液面出口时，还可以研究 <code>prghPressure</code>、<code>prghTotalPressure</code> 等条件，它们的参数与压力转换需按所选求解器配套。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/sloshingTank3D</summary><p>晃荡水箱求解扣除静水头后的压力 <code>p_rgh</code>，使重力与压力梯度更方便配合。</p>
+<p>查看真实压力时，应使用求解器输出的 <code>p</code>，或按相同密度与高度参考重建静压。将 <code>p_rgh</code> 直接当作传感器测得的静压，会遗漏高度项。自建浮力或自由液面出口时，还可以研究 <code>prghPressure</code>、<code>prghTotalPressure</code> 等条件，它们的参数与压力转换需按所选求解器配套。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/sloshingTank3D</summary><p>晃荡水箱求解扣除静水头后的压力 <code>p_rgh</code>，使重力与压力梯度更方便配合。</p>
 <ul>
 <li>量纲为 Pa，<code>internalField uniform 0</code> 设置初始 <code>p_rgh</code>。</li>
 <li><code>walls/fixedFluxPressure</code> 根据壁面速度通量设置相应压力梯度。</li>
@@ -282,7 +282,7 @@ atmosphere
     }
 }
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/movingInjectorBox</summary><p>movingInjectorBox 为颗粒注入的连续相建立 <code>p_rgh</code> 初值和封闭壁面条件。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/movingInjectorBox</summary><p><code>movingInjectorBox</code> 为颗粒注入的连续相建立 <code>p_rgh</code> 初值和封闭壁面条件。</p>
 <ul>
 <li><code>internalField uniform 100000</code> 给定 100000 Pa 的初始 <code>p_rgh</code>。</li>
 <li>量纲为 Pa，实际物理压力还包含求解器的重力势与密度处理。</li>

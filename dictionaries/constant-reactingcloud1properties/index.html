@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>这个字典组织反应颗粒云的注入、物性、传热和反应等子模型。它把颗粒运动与气相的热质交换连接起来，适合描述颗粒挥发、表面反应或其他所选转化过程。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/reactingCloud1Properties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>solution</code></td><td>颗粒云的求解控制，包含稳态/瞬态、载体耦合、源项与时间积分等。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>constantProperties</code></td><td>单个颗粒或材料的基本属性，例如密度、温度和热容；具体键由云类型决定。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/rivuletPanel</summary><p><code>rivuletPanel</code> 的这个文件把名为 <code>reactingCloud1</code> 的颗粒云关闭。计算重点可放在壁面液膜形成的细流上。</p>
+<p>位置：<code>constant/reactingCloud1Properties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>solution</code></td><td>颗粒云的求解控制，包含稳态/瞬态、载体耦合、源项与时间积分等。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>constantProperties</code></td><td>单个颗粒或材料的基本属性，例如密度、温度和热容；具体键由云类型决定。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/rivuletPanel</summary><p><code>rivuletPanel</code> 的这个文件把名为 <code>reactingCloud1</code> 的颗粒云关闭。计算重点可放在壁面液膜形成的细流上。</p>
 <ul>
 <li><code>solution/active no</code> 是本文件唯一的有效设置，求解过程中不推进该颗粒云。</li>
 <li>算例目录中即使保留注入数据，也要由启用的注入模型读取后才会形成计算粒子。这个云目前没有提供这样的完整模型配置。</li>
@@ -217,7 +217,7 @@ solution
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/compartmentFire</summary><p><code>compartmentFire</code> 研究室内火灾流动。此文件使用 <code>solution/active false</code>，关闭额外的反应颗粒云。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>combustion/fireFoam/LES/compartmentFire</code></summary><p><code>compartmentFire</code> 研究室内火灾流动。此文件使用 <code>solution/active false</code>，关闭额外的反应颗粒云。</p>
 <ul>
 <li><code>active false</code> 表示不推进 <code>reactingCloud1</code> 的位置、温度或质量。</li>
 <li>火灾的气相燃烧、浮力与辐射由各自模型文件承担，因此这里无需列出颗粒的阻力、注入和蒸发参数。</li>
@@ -246,7 +246,7 @@ solution
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/counterFlowFlame2DLTS</summary><p><code>counterFlowFlame2DLTS</code> 当前求解气相对向流火焰，<code>reactingCloud1</code> 被关闭，便于先建立气相火焰基准。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>lagrangian/reactingParcelFoam/counterFlowFlame2DLTS</code></summary><p><code>counterFlowFlame2DLTS</code> 当前求解气相对向流火焰，<code>reactingCloud1</code> 被关闭，便于先建立气相火焰基准。</p>
 <ul>
 <li><code>solution/active no</code> 关闭该颗粒云，当前不发生颗粒注入或跟踪。</li>
 <li><code>constantProperties/volumeUpdateMethod constantRho</code> 保留了启用后采用恒密度方式更新颗粒体积的选择；质量改变时，颗粒体积相应变化。</li>

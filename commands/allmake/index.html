@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p><code>wmake</code> 自身也依赖扫描器和代码生成工具，<code>Allmake</code> 按顺序构建这些辅助程序。它用于准备构建系统的工具链，使后续源码依赖分析和应用编译能够正常执行。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 此处是 wmake/src/Allmake，用于编译 Lemon 和依赖分析器，不是算例运行脚本。先完整复制 wmake/src 为个人 tools-src；设置 WMAKE_BIN 为新的个人输出目录，WM_DIR 仍指向已安装的规则。</p>
+<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 此处是 wmake/src/Allmake，用于编译 Lemon 和依赖分析器，不是算例运行脚本。先完整复制 wmake/src 为个人 tools-src；设置 WMAKE_BIN 为新的个人输出目录，<code>WM_DIR</code> 仍指向已安装的规则。</p>
 <h2>示例 1：构建工具链</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cp</span> -a <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/src"</span> tools-src
 WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/tools-bin"</span> bash tools-src/Allmake
@@ -198,15 +198,15 @@ WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/too
 <h2>示例 2：限定并行任务</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/tools-bin"</span> bash tools-src/Allmake -j 2
 </code></pre></div>
-<p>参数传给底层 make，两项工具可并行编译。</p>
+<p>参数传给底层 <code>make</code>，两项工具可并行编译。</p>
 <h2>示例 3：预览编译动作</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/tools-bin-preview"</span> bash tools-src/Allmake -n
 </code></pre></div>
-<p><code>-n</code> 是 make 的试运行选项，打印命令而不执行编译。</p>
+<p><code>-n</code> 是 <code>make</code> 的试运行选项，打印命令而不执行编译。</p>
 <h2>示例 4：构建旧式 Flex 工具</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/tools-bin"</span> bash tools-src/Allmake old
 </code></pre></div>
-<p>old 目标生成 wmkdep，需要 Flex；默认目标则是 wmkdepend。</p>
+<p><code>old</code> 目标生成 wmkdep，需要 Flex；默认目标则是 wmkdepend。</p>
 <h2>示例 5：构建到另一目录</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">WMAKE_BIN=<span class="hljs-string">"<span class="hljs-variable">$PWD</span>/tools-bin-secondary"</span> bash tools-src/Allmake all
 </code></pre></div>

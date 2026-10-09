@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -194,11 +194,11 @@ reconstructPar                            <span class="hljs-comment"># ③ 合�
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">decomposePar [-force] [-copyZero] [-fields] [-latestTime] [-time &lt;范围&gt;] [-cellDist] [-dry-run]</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>选项</th><th>作用</th></tr>
-<tr><td><code>-force</code></td><td>先删掉已有的 processor* 再分（改了网格重新分时必用）</td></tr>
+<tr><td><code>-force</code></td><td>先删掉已有的 <code>processor</code>* 再分（改了网格重新分时必用）</td></tr>
 <tr><td><code>-fields</code></td><td>只分场，不分网格（网格已分好、只是换了初场时用，快很多）</td></tr>
 <tr><td><code>-copyZero</code></td><td>原样复制 0/ 而不做插值分解</td></tr>
 <tr><td><code>-latestTime</code></td><td>只分解最新时刻（续算时用）</td></tr>
-<tr><td><code>-cellDist</code></td><td>输出 cellDist 场，可在 ParaView 里看分区效果</td></tr>
+<tr><td><code>-cellDist</code></td><td>输出 <code>cellDist</code> 场，可在 ParaView 里看分区效果</td></tr>
 </tbody></table></div>
 <p>示例</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">decomposePar -force
@@ -217,7 +217,7 @@ reconstructPar -latestTime            # 只合并最后一个时刻（最常用�
 reconstructPar -newTimes              # 只合并尚未合并过的时刻
 reconstructPar -fields '(U p)'        # 只合并部分场
 reconstructParMesh -constant          # 合并网格（并行 snappyHexMesh 之后必须做）</code></pre></div>
-<p>什么时候可以不合并：只是想在 ParaView 里看结果的话，直接用 Decomposed Case 模式读 processor*（见 8.5），省下大量时间和磁盘。需要合并的场景：要做 <code>mapFields</code>、要把结果交给别人、要用串行工具处理。</p>
+<p>什么时候可以不合并：只是想在 ParaView 里看结果的话，直接用 Decomposed Case 模式读 <code>processor</code>*（见 8.5），省下大量时间和磁盘。需要合并的场景：要做 <code>mapFields</code>、要把结果交给别人、要用串行工具处理。</p>
 <h2>9.5 redistributePar —— 变更核数而不重新分解</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 16 redistributePar -overwrite -parallel      <span class="hljs-comment"># 8 核结果改到 16 核继续算</span>
 mpirun -np 8  redistributePar -reconstruct -parallel    <span class="hljs-comment"># 相当于并行版 reconstructPar，大算例快得多</span>
@@ -226,7 +226,7 @@ mpirun -np 8  redistributePar -decompose -parallel      <span class="hljs-commen
 <h2>9.6 collated 文件模式（大规模并行必备）</h2>
 <p>默认情况下 1000 核会生成 1000 个目录、每个目录里一堆小文件。文件系统（尤其是集群的并行文件系统）会被这种小文件海拖垮。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 256 simpleFoam -parallel -fileHandler collated</code></pre></div>
-<p>所有进程的数据写进 processors256/ 下的少量合并文件。也可以在 etc/controlDict 或算例 <code>controlDict</code> 的 OptimisationSwitches 里全局设定：</p>
+<p>所有进程的数据写进 processors256/ 下的少量合并文件。也可以在 etc/controlDict 或算例 <code>controlDict</code> 的 <code>OptimisationSwitches</code> 里全局设定：</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">OptimisationSwitches
 {
     fileHandler collated;
@@ -271,7 +271,7 @@ sacct -j &lt;作业号&gt;      # 查看资源使用</code></pre></div>
 decomposePar -force &gt; log.decomposePar 2&gt;&amp;1
 mpirun -np 64 simpleFoam -parallel &gt; log.simpleFoam 2&gt;&amp;1
 qsub job.sh      $ qstat -u <span class="hljs-variable">$USER</span>      $ qdel &lt;作业号&gt;</code></pre></div>
-<p>集群运行中常见的两类环境问题：① 计算节点没 <code>source</code> 环境 —— 脚本里必须显式 <code>source</code> .../etc/bashrc（或用 <code>foamExec</code>）；② 集群的 MPI 与编译 OpenFOAM 时用的 MPI 不是同一个 —— 表现为一跑就 mpirun 报符号错误，解决办法是用集群的 module load 加载与编译时一致的 MPI。</p>
+<p>集群运行中常见的两类环境问题：① 计算节点没 <code>source</code> 环境 —— 脚本里必须显式 <code>source</code> .../etc/bashrc（或用 <code>foamExec</code>）；② 集群的 MPI 与编译 OpenFOAM 时用的 MPI 不是同一个 —— 表现为一跑就 mpirun 报符号错误，解决办法是用集群的 <code>module</code> <code>load</code> 加载与编译时一致的 MPI。</p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

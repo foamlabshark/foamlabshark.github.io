@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p>这个字典把可分块的几何写成顶点、六面体块和边界面的连接关系，再为各方向指定单元数和尺寸渐变。<code>blockMesh</code> 读取它后生成体网格，适合方腔、通道和可用多块拼接描述的形状，也常用于准备 <code>snappyHexMesh</code> 的背景网格。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/blockMeshDict</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-mesh-smooth-transition.png" alt="网格尺寸的突变与平滑过渡" loading="lazy"><figcaption><strong>网格尺寸的突变与平滑过渡</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module3.pdf，p. 19</small></figcaption></figure><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">块、缩放与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>blocks</code></td><td>块列表；每个 <code>hex</code> 后面依次为八个顶点编号、可选 <code>cellZone</code> 名称、三个方向的单元数和 grading。块的局部方向由顶点顺序决定。</td></tr><tr><td><code>scale / convertToMeters</code></td><td>坐标缩放倍率，使用 <code>scale</code>；旧配置中的 <code>convertToMeters</code> 也受支持。</td></tr><tr><td><code>boundary.&lt;名称&gt;.faces</code></td><td>该 <code>patch</code> 的四边形面顶点编号列表。一个面只属于一个外部边界，顶点顺序应符合块外法向。<code>upperWall</code>、<code>lowerWall</code> 等名称由用户定义。</td></tr><tr><td><code>defaultPatch</code></td><td>未显式列出的外部面所用的默认 <code>patch</code>，包含 <code>name</code> 与 <code>type</code>；二维前后面常设为 <code>empty</code>，但必须满足一层单元条件。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/mesh/blockMesh/blockMesh/blockMesh.C">v2512 参数读取实现</a></p>
+<h2 id="nested-configuration">块、缩放与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>blocks</code></td><td>块列表；每个 <code>hex</code> 后面依次为八个顶点编号、可选 <code>cellZone</code> 名称、三个方向的单元数和 <code>grading</code>。块的局部方向由顶点顺序决定。</td></tr><tr><td><code>scale / convertToMeters</code></td><td>坐标缩放倍率，使用 <code>scale</code>；旧配置中的 <code>convertToMeters</code> 也受支持。</td></tr><tr><td><code>boundary.&lt;名称&gt;.faces</code></td><td>该 <code>patch</code> 的四边形面顶点编号列表。一个面只属于一个外部边界，顶点顺序应符合块外法向。<code>upperWall</code>、<code>lowerWall</code> 等名称由用户定义。</td></tr><tr><td><code>defaultPatch</code></td><td>未显式列出的外部面所用的默认 <code>patch</code>，包含 <code>name</code> 与 <code>type</code>；二维前后面常设为 <code>empty</code>，但必须满足一层单元条件。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/mesh/blockMesh/blockMesh/blockMesh.C">v2512 参数读取实现</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>blockMeshDict</code> 通过 <code>vertices</code> 定义顶点，以 <code>hex</code> 后的 8 个顶点编号确定块的局部方向和体积符号。(Nx Ny Nz) 指定三个方向的单元数，<code>scale</code> 指定坐标缩放系数，<code>simpleGrading</code> 指定各方向末端与起始单元的尺寸比。</p>
 <p>下例建立长 1 m、宽 0.1 m、厚 0.01 m 的二维通道。厚度方向设置一层单元，两侧边界设为 <code>empty</code>。</p>
@@ -241,11 +241,11 @@ mergePatchPairs ();</code></pre></div>
 <tr><td><code>simpleGrading</code></td><td>例如 (1 10 1)</td><td>沿块的局部方向设置；反向时取对应倒数</td></tr>
 <tr><td>多段 <code>grading</code></td><td>某方向可写 ((0.2 0.3 4) (0.6 0.4 1) (0.2 0.3 0.25))</td><td>每段分别为长度比例、单元比例、扩张比</td></tr>
 <tr><td><code>edgeGrading</code></td><td>对 12 条局部边分别指定扩张比</td><td>按块的局部边编号依次赋值</td></tr>
-<tr><td><code>edges</code></td><td>arc 0 1 (中间点)，或 spline、<code>polyLine</code></td><td>弧线端点与控制点应满足非退化条件</td></tr>
-<tr><td><code>boundary/type</code></td><td><code>patch</code>、<code>wall</code>、<code>empty</code>、symmetryPlane、wedge、cyclic 等</td><td>定义网格边界类型；场边界另行配置</td></tr>
+<tr><td><code>edges</code></td><td><code>arc</code> 0 1 (中间点)，或 <code>spline</code>、<code>polyLine</code></td><td>弧线端点与控制点应满足非退化条件</td></tr>
+<tr><td><code>boundary/type</code></td><td><code>patch</code>、<code>wall</code>、<code>empty</code>、<code>symmetryPlane</code>、<code>wedge</code>、<code>cyclic</code> 等</td><td>定义网格边界类型；场边界另行配置</td></tr>
 <tr><td><code>defaultPatch</code></td><td>为未显式列出的面指定名称和类型</td><td>显式边界之外的面归入该边界</td></tr>
 <tr><td><code>mergePatchPairs</code></td><td>((patchA patchB))</td><td>合并指定的块接口</td></tr>
-</tbody></table></div><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>方腔由一个六面体块生成，配合二维 <code>empty</code> 边界使用。</p>
+</tbody></table></div><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>方腔由一个六面体块生成，配合二维 <code>empty</code> 边界使用。</p>
 <ul>
 <li><code>scale 0.1</code> 把顶点坐标乘以 0.1，得到长高各 0.1 m、厚 0.01 m 的腔体。</li>
 <li><code>hex ... (20 20 1)</code> 在三个方向分成 20、20、1 个单元，共 400 个单元。</li>
@@ -324,11 +324,11 @@ boundary
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><p>pitzDaily 的后台阶及下游通道由五个六面体块拼接，以便在台阶、剪切层和壁面附近分配不同分辨率。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><p><code>pitzDaily</code> 的后台阶及下游通道由五个六面体块拼接，以便在台阶、剪切层和壁面附近分配不同分辨率。</p>
 <ul>
 <li><code>scale 0.001</code> 将毫米量级坐标换算为米。</li>
 <li>入口块 <code>(18 30 1)</code>、下游块 <code>(180 27 1)</code> 与 <code>(180 30 1)</code> 等分别控制不同分区的单元数。</li>
-<li><code>negY</code>、<code>posY</code>、<code>posYR</code> 被 grading 条目引用，使单元向需要分辨的区域渐变。</li>
+<li><code>negY</code>、<code>posY</code>、<code>posYR</code> 被 <code>grading</code> 条目引用，使单元向需要分辨的区域渐变。</li>
 <li><code>inlet</code>、<code>outlet</code>、上下壁面与 <code>frontAndBack empty</code> 分开命名，随后由场文件设置物理边界。</li>
 </ul>
 <p>移动台阶或改变高度时保持相邻块共享面的单元数相容；比较回流长度时优先加密台阶后的剪切层。</p>
@@ -484,7 +484,7 @@ boundary
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/acousticFoam/obliqueAirJet/main</summary><p>倾斜射流声学算例的 main 区先建立规则背景网格，后续数据与边界处理需结合配套流程。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/acousticFoam/obliqueAirJet/main</code></summary><p>倾斜射流声学算例的 main 区先建立规则背景网格，后续数据与边界处理需结合配套流程。</p>
 <ul>
 <li><code>scale 1</code> 表示坐标直接按米使用，包围范围是 <code>x</code>: −0.2～2.2、<code>y</code>: −0.3～1.3、<code>z</code>: −0.2～2.2。</li>
 <li>单块 <code>(15 10 15)</code> 对应 2250 个单元，各方向间距均约 0.16 m。</li>

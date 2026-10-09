@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <p><code>source</code> etc/bashrc 之后，你的终端里会多出上百个变量。它们分两类：</p>
 <p>WM_ 开头（WM = <code>wmake</code>）：编译期用的。决定用哪个编译器、什么精度、装在哪儿。改了它们要重新编译才生效。</p>
 <p>FOAM_ 开头：使用期用的。基本都是路径，让你不用记一长串目录就能跳过去。</p>
-<p>环境变量提供稳定的安装、教程和用户工作目录入口。使用 FOAM_TUTORIALS、FOAM_RUN、<code>FOAM_USER_LIBBIN</code> 等变量，可以减少脚本对个人绝对路径的依赖；首次使用仍需确认变量已定义且指向预期版本。</p>
+<p>环境变量提供稳定的安装、教程和用户工作目录入口。使用 <code>FOAM_TUTORIALS</code>、<code>FOAM_RUN</code>、<code>FOAM_USER_LIBBIN</code> 等变量，可以减少脚本对个人绝对路径的依赖；首次使用仍需确认变量已定义且指向预期版本。</p>
 <p>查看方法：</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>              <span class="hljs-comment"># 看单个变量</span>
 <span class="hljs-built_in">env</span> | grep FOAM_ | <span class="hljs-built_in">sort</span>           <span class="hljs-comment"># 看所有 FOAM_ 变量</span>
@@ -218,10 +218,10 @@
 <tbody><tr><th>变量</th><th>作用</th><th>怎么用</th></tr>
 <tr><td><code>FOAM_SIGFPE</code></td><td>捕获浮点异常（除零、NaN）并立即中止 + 打印调用栈</td><td><code>export FOAM_SIGFPE=true</code></td></tr>
 <tr><td><code>FOAM_SETNAN</code></td><td>把新分配的内存初始化成 NaN，让”用了未初始化变量”立刻暴露</td><td><code>export FOAM_SETNAN=true</code></td></tr>
-<tr><td><code>FOAM_ABORT</code></td><td>让 FatalError 触发 <code>abort</code> 并生成 core dump，方便 gdb 调试</td><td><code>export FOAM_ABORT=true</code></td></tr>
-<tr><td><code>FOAM_CODE_TEMPLATES</code></td><td>codedFixedValue 等动态编译功能的模板目录</td><td>自定义模板时改</td></tr>
+<tr><td><code>FOAM_ABORT</code></td><td>让 FatalError 触发 <code>abort</code> 并生成 <code>core</code> <code>dump</code>，方便 gdb 调试</td><td><code>export FOAM_ABORT=true</code></td></tr>
+<tr><td><code>FOAM_CODE_TEMPLATES</code></td><td><code>codedFixedValue</code> 等动态编译功能的模板目录</td><td>自定义模板时改</td></tr>
 </tbody></table></div>
-<p>FOAM_SIGFPE 用于启用浮点异常捕获。在运行环境支持的情况下，它可帮助定位除零、无效浮点运算等异常。异常位置仍需结合调用栈、初始场、边界条件及离散设置分析。</p>
+<p><code>FOAM_SIGFPE</code> 用于启用浮点异常捕获。在运行环境支持的情况下，它可帮助定位除零、无效浮点运算等异常。异常位置仍需结合调用栈、初始场、边界条件及离散设置分析。</p>
 <h2>4.3 WM_*：编译类</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>变量</th><th>典型值</th><th>含义</th></tr>
@@ -231,9 +231,9 @@
 <tr><td><code>$WM_OPTIONS</code></td><td>linux64GccDPInt32Opt</td><td>平台串，platforms/ 下的子目录名</td></tr>
 <tr><td><code>$WM_ARCH</code></td><td>linux64</td><td>系统架构</td></tr>
 <tr><td><code>$WM_COMPILER</code></td><td>Gcc / Clang</td><td>编译器</td></tr>
-<tr><td><code>$WM_COMPILER_TYPE</code></td><td>system / ThirdParty</td><td>用系统编译器还是自带的</td></tr>
-<tr><td><code>$WM_COMPILE_OPTION</code></td><td>Opt / Debug / Prof</td><td>优化 / 调试 / 性能剖析</td></tr>
-<tr><td><code>$WM_PRECISION_OPTION</code></td><td>DP / SP / SPDP</td><td>双精度 / 单精度 / 混合</td></tr>
+<tr><td><code>$WM_COMPILER_TYPE</code></td><td><code>system</code> / ThirdParty</td><td>用系统编译器还是自带的</td></tr>
+<tr><td><code>$WM_COMPILE_OPTION</code></td><td>Opt / <code>Debug</code> / Prof</td><td>优化 / 调试 / 性能剖析</td></tr>
+<tr><td><code>$WM_PRECISION_OPTION</code></td><td>DP / SP / <code>SPDP</code></td><td>双精度 / 单精度 / 混合</td></tr>
 <tr><td><code>$WM_LABEL_SIZE</code></td><td>32 / 64</td><td>网格标签整型位宽。超过 20 亿网格才需要 64</td></tr>
 <tr><td><code>$WM_MPLIB</code></td><td>SYSTEMOPENMPI</td><td>用哪个 MPI</td></tr>
 <tr><td><code>$WM_NCOMPPROCS</code></td><td>8</td><td>编译时并行核数</td></tr>

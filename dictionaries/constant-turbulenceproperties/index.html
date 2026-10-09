@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -214,13 +214,13 @@ k=\frac32(UI)^2,\qquad
 <div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">simulationType <span class="hljs-built_in">laminar</span>;
 </code></pre></div>
 <p>分子黏性仍由物性文件提供。<code>LES</code> 则使用 <code>simulationType LES</code> 和相应 <code>LES</code> 子字典，指定亚格子模型与滤波尺度模型。<code>LES</code> 还需要三维非定常网格、足够的时间分辨率和统计采样时长，计算目标通常是瞬态结构及其统计量。</p>
-<p>参数调整可从默认系数开始。有物理或文献依据时再覆盖具体模型的系数，并将变化对应到压降、分离位置或壁面量，避免只根据残差曲线挑选模型。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/pitzDaily</summary><p>pitzDaily 的后台阶剪切层按 RANS 平均流动建模。</p>
+<p>参数调整可从默认系数开始。有物理或文献依据时再覆盖具体模型的系数，并将变化对应到压降、分离位置或壁面量，避免只根据残差曲线挑选模型。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/pitzDaily</summary><p><code>pitzDaily</code> 的后台阶剪切层按 RANS 平均流动建模。</p>
 <ul>
 <li><code>simulationType RAS</code> 选择雷诺平均湍流模型。</li>
 <li><code>RASModel kEpsilon</code> 求解湍动能 <code>k</code> 和耗散率 <code>epsilon</code>，两者需要配套初值与边界条件。</li>
 <li><code>turbulence on</code> 启用湍流贡献，<code>printCoeffs on</code> 在日志中打印模型系数。</li>
 </ul>
-<p>改成 kOmegaSST 等模型时同步准备对应字段、壁面条件和网格，而不只是替换模型名称。</p>
+<p>改成 <code>kOmegaSST</code> 等模型时同步准备对应字段、壁面条件和网格，而不只是替换模型名称。</p>
 <p><a href="/assets/examples/v2512/turbulenceproperties/1-turbulenceProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/constant/turbulenceProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
@@ -286,7 +286,7 @@ simulationType      <span class="hljs-built_in">RAS</span>;
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · basic/simpleFoam/implicitAMI</summary><p>implicitAMI 示例在此选择层流模式，主要配置重点在网格接口而非湍流闭合。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>basic/simpleFoam/implicitAMI</code></summary><p>implicitAMI 示例在此选择层流模式，主要配置重点在网格接口而非湍流闭合。</p>
 <ul>
 <li><code>simulationType laminar</code> 让求解器按层流输运处理。</li>
 <li>文件没有启用 <code>RAS</code> 或 <code>LES</code> 子模型，因此没有由本设置引入的湍流输运方程。</li>

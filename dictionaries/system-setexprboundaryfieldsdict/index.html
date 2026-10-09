@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,13 +189,13 @@
 <p>这个字典把边界字段的赋值写成表达式，并指定操作的场与 <code>patch</code>。它适合准备随位置变化的入口或热边界，由 <code>setExprBoundaryFields</code> 将数学表达式落实为边界数据。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/setExprBoundaryFieldsDict</code></p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">边界表达式与目标字段</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>expressions</code></td><td>表达式操作列表；每项在自己的子字典中指定目标字段和 <code>expression</code>。</td></tr><tr><td><code>field / expression</code></td><td>目标字段名称与表达式文本。表达式结果类型、尺寸及目标量纲必须匹配。</td></tr><tr><td><code>variables</code></td><td>表达式中的局部变量定义，例如 ("a=2;")；每个表达式使用各自的作用域。</td></tr><tr><td><code>readFields</code></td><td>预读已有场，使表达式可以访问它们。</td></tr><tr><td><code>constants</code></td><td>表达式可引用的常量或条目，按字典路径引用。</td></tr><tr><td><code>pattern / target</code></td><td><code>pattern</code> 选择边界，<code>target</code> 选择写入的目标，例如 <code>value</code>；应与边界类型允许的条目一致。</td></tr><tr><td><code>_value1</code></td><td>操作名称，可自定。</td></tr></tbody></table></div>
+<h2 id="nested-configuration">边界表达式与目标字段</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>expressions</code></td><td>表达式操作列表；每项在自己的子字典中指定目标字段和 <code>expression</code>。</td></tr><tr><td><code>field / expression</code></td><td>目标字段名称与表达式文本。表达式结果类型、尺寸及目标量纲必须匹配。</td></tr><tr><td><code>variables</code></td><td>表达式中的局部变量定义，例如 ("<code>a</code>=2;")；每个表达式使用各自的作用域。</td></tr><tr><td><code>readFields</code></td><td>预读已有场，使表达式可以访问它们。</td></tr><tr><td><code>constants</code></td><td>表达式可引用的常量或条目，按字典路径引用。</td></tr><tr><td><code>pattern / target</code></td><td><code>pattern</code> 选择边界，<code>target</code> 选择写入的目标，例如 <code>value</code>；应与边界类型允许的条目一致。</td></tr><tr><td><code>_value1</code></td><td>操作名称，可自定。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · compressible/rhoPimpleFoam/RAS/TJunctionAverage</summary><p>TJunctionAverage 用表达式向温度字段的指定边界条目写入空间分段数值，演示 <code>setExprBoundaryFields</code> 的字典操作。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · compressible/rhoPimpleFoam/RAS/TJunctionAverage</summary><p>TJunctionAverage 用表达式向温度字段的指定边界条目写入空间分段数值，演示 <code>setExprBoundaryFields</code> 的字典操作。</p>
 <ul>
 <li><code>field T</code> 选择温度场，<code>patch outlet2</code> 指定要处理的边界。</li>
 <li>表达式 <code>pos().x() &lt; 1e-4 ? 60 : 120</code> 按面中心 <code>x</code> 坐标分成两区，分别生成 60 和 120。</li>
-<li><code>target something</code> 会将结果写入该边界下名为 something 的条目。若目的是设置边界的实际 <code>value</code>，应改成 <code>target value</code>，并选用使用 <code>value</code> 的边界条件。</li>
+<li><code>target something</code> 会将结果写入该边界下名为 <code>something</code> 的条目。若目的是设置边界的实际 <code>value</code>，应改成 <code>target value</code>，并选用使用 <code>value</code> 的边界条件。</li>
 </ul>
 <p>移植为实际温度设置时，数值使用 K，阈值使用网格坐标的长度单位；先检查分区位置，再执行写入。</p>
 <p><a href="/assets/examples/v2512/setexprboundaryfieldsdict/1-setExprBoundaryFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunctionAverage/system/setExprBoundaryFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunctionAverage">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
@@ -278,7 +278,7 @@ updateBCs
 
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · etc/caseDicts/annotated</summary><p>这个注释模板展示如何通过边界表达式写入自定义条目，适合学习字段、边界和目标条目的对应关系。</p>
 <ul>
-<li><code>field T</code> 和 <code>patch outlet2</code> 定位到 <code>T</code> 的 outlet2 边界；<code>readFields (U)</code> 可供表达式引用已有速度数据。</li>
+<li><code>field T</code> 和 <code>patch outlet2</code> 定位到 <code>T</code> 的 <code>outlet2</code> 边界；<code>readFields (U)</code> 可供表达式引用已有速度数据。</li>
 <li>条件表达式按 <code>x</code>=0.0001 m 将结果分为 60、120 两个值。</li>
 <li><code>target something</code> 是演示用的条目名；要更新 <code>T</code> 的 <code>value</code>，将它改为 <code>target value</code>，并按实际温度设置数值。</li>
 </ul>

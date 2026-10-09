@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -184,9 +184,9 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-srfproperties"><div class="eyebrow">OpenFOAM v2512</div><h1>SRFProperties</h1><div class="prose"><p>为单旋转参考系模型设置旋转中心、轴向和转速。SRF 求解器通常求解相对速度 Urel。</p><!-- reference-introduction -->
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-srfproperties"><div class="eyebrow">OpenFOAM v2512</div><h1>SRFProperties</h1><div class="prose"><p>为单旋转参考系模型设置旋转中心、轴向和转速。SRF 求解器通常求解相对速度 <code>Urel</code>。</p><!-- reference-introduction -->
 <h2 id="brief-introduction">简要介绍</h2>
-<p><code>SRFProperties</code> 描述整个计算域采用的单一旋转参考系，常与 SRF 求解器的相对速度 Urel 配合。通过设置转轴、中心和转速，可以在统一转动坐标系中计算对应流动。</p>
+<p><code>SRFProperties</code> 描述整个计算域采用的单一旋转参考系，常与 SRF 求解器的相对速度 <code>Urel</code> 配合。通过设置转轴、中心和转速，可以在统一转动坐标系中计算对应流动。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>constant/SRFProperties</code></p><h2>配置方法</h2><h3>与 MRF 的配置差别</h3><p>SRF 使用全域单一参考系，文件中直接给出 <code>SRFModel</code>、转轴和 <code>rpmCoeffs</code>。<code>MRF</code> 将参考系作用于指定 <code>cellZone</code>，可在一个域内定义多个旋转区域，因此其配置采用 <code>MRF1 { cellZone ...; omega ...; }</code> 的结构。</p>
 <p>选择 SRF 后，还需要使用支持 <code>Urel</code> 的求解器及完整场文件。后处理时区分相对速度与绝对速度，叶轮附近流线、入口速度和外壁运动应在同一坐标系下解释。</p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p>SRF（Single Rotating Frame）在整个计算域使用同一个旋转参考系。<code>SRFSimpleFoam</code> 以相对速度 <code>Urel</code> 求解流动，适合可以在统一旋转坐标系中描述的稳态问题。</p>
@@ -217,7 +217,7 @@ rpmCoeffs
     <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p><code>relative no</code> 表示 <code>inletValue</code> 用绝对坐标系解释，边界条件负责转换为相对速度。最后的 <code>value</code> 提供初始化值，随后由边界条件更新。与转子一起旋转的壁面，则可在相对速度场中采用 <code>noSlip</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/SRFSimpleFoam/mixer</summary><p><code>SRFSimpleFoam</code> 的 mixer 算例在单一旋转参考系中求稳态流动。</p>
+<p><code>relative no</code> 表示 <code>inletValue</code> 用绝对坐标系解释，边界条件负责转换为相对速度。最后的 <code>value</code> 提供初始化值，随后由边界条件更新。与转子一起旋转的壁面，则可在相对速度场中采用 <code>noSlip</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>incompressible/SRFSimpleFoam/mixer</code></summary><p><code>SRFSimpleFoam</code> 的 mixer 算例在单一旋转参考系中求稳态流动。</p>
 <ul>
 <li><code>SRFModel rpm</code> 选择用转每分钟输入转速的模型。</li>
 <li><code>origin (0 0 0)</code>、<code>axis (0 0 1)</code> 定义转轴。</li>
@@ -251,7 +251,7 @@ rpmCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/SRFPimpleFoam/rotor2D</summary><p><code>SRFPimpleFoam</code> 的 rotor2D 用单一旋转参考系计算非定常流动。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/SRFPimpleFoam/rotor2D</code></summary><p><code>SRFPimpleFoam</code> 的 rotor2D 用单一旋转参考系计算非定常流动。</p>
 <ul>
 <li>模型为 <code>rpm</code>，转轴通过原点并沿 <code>z</code>。</li>
 <li><code>rpm 60</code> 表示每分钟 60 转，即每秒一转。</li>

@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -186,7 +186,8 @@
 
   <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/reference/">← 返回参考手册</a></div><div class="article-shell"><article class="article" data-cms-slug="reference-manual-09"><div class="eyebrow">OpenFOAM v2512</div><h1>09 场文件与物理模型配置</h1><div class="prose"><h2>9.1 速度场与压力场</h2>
 <p>下例给出与第 7 章二维通道网格对应的速度和压力场。内部初始速度等于入口速度，壁面采用无滑移条件，出口速度采用零梯度条件。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<h3>速度场 <code>0/U</code></h3>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
     <span class="hljs-keyword">class</span> volVectorField; <span class="hljs-keyword">object</span> U;
@@ -199,8 +200,9 @@
     outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
     walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }
     frontAndBack { <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>; }
-}
-<span class="hljs-keyword">FoamFile</span>
+}</code></pre></div>
+<h3>压力场 <code>0/p</code></h3>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
     <span class="hljs-keyword">class</span> volScalarField; <span class="hljs-keyword">object</span> p;
@@ -220,32 +222,32 @@
 <tbody><tr><th>类型</th><th>含义</th><th>配置要点</th></tr>
 <tr><td><code>fixedValue</code></td><td>固定值</td><td><code>value</code> <code>uniform</code> 300; 或向量值</td></tr>
 <tr><td><code>zeroGradient</code></td><td>法向梯度为零</td><td>无需 <code>value</code>；按出口物理条件选用</td></tr>
-<tr><td>fixedGradient</td><td>固定法向梯度</td><td>gradient <code>uniform</code> 0;</td></tr>
+<tr><td><code>fixedGradient</code></td><td>固定法向梯度</td><td><code>gradient</code> <code>uniform</code> 0;</td></tr>
 <tr><td><code>noSlip</code></td><td>速度为零的壁面</td><td>用于 <code>U</code>，网格对应 <code>wall</code></td></tr>
-<tr><td>slip</td><td>无穿透、切向滑移</td><td>适用于相应速度边界</td></tr>
+<tr><td><code>slip</code></td><td>无穿透、切向滑移</td><td>适用于相应速度边界</td></tr>
 <tr><td><code>movingWallVelocity</code></td><td>随移动壁面的速度</td><td>通常通过 <code>value</code> <code>uniform</code> (0 0 0) 初始化</td></tr>
 <tr><td><code>inletOutlet</code></td><td>流出零梯度，回流指定值</td><td><code>inletValue</code> <code>uniform</code> 0; <code>value</code> <code>uniform</code> 0;</td></tr>
-<tr><td>outletInlet</td><td>与 <code>inletOutlet</code> 的切换方向相反</td><td>出口指定值按该类型的字段要求设置</td></tr>
+<tr><td><code>outletInlet</code></td><td>与 <code>inletOutlet</code> 的切换方向相反</td><td>出口指定值按该类型的字段要求设置</td></tr>
 <tr><td><code>pressureInletOutletVelocity</code></td><td>根据压力入口出口条件确定速度</td><td>配套压力边界，<code>value</code> 为初始值</td></tr>
-<tr><td><code>flowRateInletVelocity</code></td><td>以体积或质量流量规定入口速度</td><td>volumetricFlowRate <code>constant</code> 0.01; 或 massFlowRate 并提供密度信息</td></tr>
+<tr><td><code>flowRateInletVelocity</code></td><td>以体积或质量流量规定入口速度</td><td><code>volumetricFlowRate</code> <code>constant</code> 0.01; 或 <code>massFlowRate</code> 并提供密度信息</td></tr>
 <tr><td><code>totalPressure</code></td><td>总压条件</td><td><code>p0</code> <code>uniform</code> 101325;，<code>U</code>、<code>phi</code>、<code>rho</code>、<code>psi</code> 和 <code>gamma</code> 按流动类型设置</td></tr>
-<tr><td>totalTemperature</td><td>总温条件</td><td><code>T0</code>、<code>gamma</code>、<code>U</code>、<code>phi</code>、<code>psi</code> 等按模型配置</td></tr>
+<tr><td><code>totalTemperature</code></td><td>总温条件</td><td><code>T0</code>、<code>gamma</code>、<code>U</code>、<code>phi</code>、<code>psi</code> 等按模型配置</td></tr>
 <tr><td><code>fixedFluxPressure</code></td><td>按通量约束调节压力梯度</td><td>常用于带重力或特定速度条件的压力场</td></tr>
-<tr><td>waveTransmissive</td><td>波传出型边界</td><td>配置声速、<code>psi</code> 和 <code>gamma</code> 等参数，反射特性受波入射条件影响</td></tr>
-<tr><td>advective</td><td>对流传出型边界</td><td>速度、参考值和远场长度参数依类型要求</td></tr>
+<tr><td><code>waveTransmissive</code></td><td>波传出型边界</td><td>配置声速、<code>psi</code> 和 <code>gamma</code> 等参数，反射特性受波入射条件影响</td></tr>
+<tr><td><code>advective</code></td><td>对流传出型边界</td><td>速度、参考值和远场长度参数依类型要求</td></tr>
 <tr><td><code>empty</code></td><td>二维模型未求解方向</td><td>体网格仅一个单元层，场和网格均须 <code>empty</code></td></tr>
-<tr><td>symmetryPlane</td><td>平面对称</td><td>几何 <code>patch</code> 必须平面且网格类型匹配</td></tr>
-<tr><td>symmetry</td><td>一般对称约束</td><td>按相应几何使用</td></tr>
-<tr><td>wedge</td><td>小角度轴对称扇形</td><td>两个楔面须符合轴对称几何约束</td></tr>
-<tr><td>cyclic</td><td>周期耦合</td><td>网格定义 <code>neighbourPatch</code>、变换等；场写 cyclic</td></tr>
-<tr><td>cyclicAMI</td><td>非匹配网格周期或滑动接口</td><td>接口需具备几何重叠，计算后检查通量误差</td></tr>
-<tr><td>overset</td><td>重叠网格插值边界</td><td>还需要 zoneID、孔切割与重叠插值配置</td></tr>
+<tr><td><code>symmetryPlane</code></td><td>平面对称</td><td>几何 <code>patch</code> 必须平面且网格类型匹配</td></tr>
+<tr><td><code>symmetry</code></td><td>一般对称约束</td><td>按相应几何使用</td></tr>
+<tr><td><code>wedge</code></td><td>小角度轴对称扇形</td><td>两个楔面须符合轴对称几何约束</td></tr>
+<tr><td><code>cyclic</code></td><td>周期耦合</td><td>网格定义 <code>neighbourPatch</code>、变换等；场写 <code>cyclic</code></td></tr>
+<tr><td><code>cyclicAMI</code></td><td>非匹配网格周期或滑动接口</td><td>接口需具备几何重叠，计算后检查通量误差</td></tr>
+<tr><td><code>overset</code></td><td>重叠网格插值边界</td><td>还需要 <code>zoneID</code>、孔切割与重叠插值配置</td></tr>
 <tr><td><code>calculated</code></td><td>值由其他模型计算</td><td><code>value</code> 用于初始化，边界值由关联模型更新</td></tr>
-<tr><td>codedFixedValue</td><td>运行时编译的固定值边界</td><td>见 9.13</td></tr>
-<tr><td>compressible::turbulentTemperatureCoupledBaffleMixed</td><td>多区域共轭传热温度耦合</td><td>配套 mappedWall、相邻区域、导热率获取方式</td></tr>
+<tr><td><code>codedFixedValue</code></td><td>运行时编译的固定值边界</td><td>见 9.13</td></tr>
+<tr><td><code>compressible::turbulentTemperatureCoupledBaffleMixed</code></td><td>多区域共轭传热温度耦合</td><td>配套 mappedWall、相邻区域、导热率获取方式</td></tr>
 </tbody></table></div>
 <h2>9.3 温度场与多相流场</h2>
-<p>温度场 <code>T</code> 采用温度量纲，初值示例为 <code>internalField</code> <code>uniform</code> 300;。等温壁面使用 <code>fixedValue</code>，绝热壁面通常使用 <code>zeroGradient</code>。<code>externalWallHeatFluxTemperature</code> 可指定热通量或功率，并通过 <code>mode</code>、kappaMethod 等参数定义施加方式和导热率来源。</p>
+<p>温度场 <code>T</code> 采用温度量纲，初值示例为 <code>internalField</code> <code>uniform</code> 300;。等温壁面使用 <code>fixedValue</code>，绝热壁面通常使用 <code>zeroGradient</code>。<code>externalWallHeatFluxTemperature</code> 可指定热通量或功率，并通过 <code>mode</code>、<code>kappaMethod</code> 等参数定义施加方式和导热率来源。</p>
 <p><code>p_rgh</code> 表示扣除静水压项后的压力，常见定义为 <span class="math-formula" data-tex="p_{\mathrm{rgh}}=p-\rho gh"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">g</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>=</mo><mi>p</mi><mo>−</mo><mi>ρ</mi><mi>g</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">p_{\mathrm{rgh}}=p-\rho gh</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rgh</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">h</span></span></span></span></span>。参考高度和量纲由求解器确定，不可压缩 Boussinesq 模型可采用归一化形式。恢复实际压力时，应按该求解器的定义还原静水压项。</p>
 <p><code>alpha.water</code> 表示水相体积分数，为无量纲量，取值范围为 [0,1]；多相体系中各相体积分数之和为 1。入口可指定相分数，开放边界可采用 <code>inletOutlet</code>，壁面可采用 <code>zeroGradient</code> 或接触角条件。字段后缀 <code>water</code> 与 <code>phases</code> 中的相名对应。</p>
 <h2>9.4 湍流场与热扩散场</h2>
@@ -300,7 +302,7 @@ simulationType <span class="hljs-built_in">RAS</span>;
     turbulence <span class="hljs-literal">on</span>;
     printCoeffs <span class="hljs-literal">on</span>;
 }</code></pre></div>
-<p>层流采用 <code>simulationType</code> <code>laminar</code>;。<code>LES</code> 可采用 <code>simulationType</code> <code>LES</code>; <code>LES</code> { LESModel WALE; <code>turbulence</code> <code>on</code>; <code>printCoeffs</code> <code>on</code>; <code>delta</code> cubeRootVol; }。</p>
+<p>层流采用 <code>simulationType</code> <code>laminar</code>;。<code>LES</code> 可采用 <code>simulationType</code> <code>LES</code>; <code>LES</code> { LESModel <code>WALE</code>; <code>turbulence</code> <code>on</code>; <code>printCoeffs</code> <code>on</code>; <code>delta</code> <code>cubeRootVol</code>; }。</p>
 <p><code>LES</code> 配置还需确定滤波宽度、近壁处理、入口脉动和时间分辨率，并与网格及边界条件配合。</p>
 <h2>9.7 constant/thermophysicalProperties</h2>
 <p>下例采用单相理想气体、常热容和常输运系数，能量变量为显焓。热物性类型和能量形式应与求解器接口对应。</p>
@@ -327,16 +329,16 @@ mixture
 }</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>作用</th><th>设置方法</th></tr>
-<tr><td><code>type</code></td><td>热物性基类</td><td>hePsiThermo、heRhoThermo 等；须与求解器匹配</td></tr>
-<tr><td><code>mixture</code></td><td>混合物模型</td><td>pureMixture 单组分；反应流使用相应多组分模型</td></tr>
-<tr><td><code>transport</code></td><td>输运模型</td><td>const、sutherland 等</td></tr>
-<tr><td><code>thermo</code></td><td>热容模型</td><td><code>hConst</code> 常热容；janaf 温度相关多项式</td></tr>
-<tr><td><code>equationOfState</code></td><td>状态方程</td><td>perfectGas、rhoConst 等，按介质状态关系选择</td></tr>
+<tr><td><code>type</code></td><td>热物性基类</td><td><code>hePsiThermo</code>、<code>heRhoThermo</code> 等；须与求解器匹配</td></tr>
+<tr><td><code>mixture</code></td><td>混合物模型</td><td><code>pureMixture</code> 单组分；反应流使用相应多组分模型</td></tr>
+<tr><td><code>transport</code></td><td>输运模型</td><td><code>const</code>、<code>sutherland</code> 等</td></tr>
+<tr><td><code>thermo</code></td><td>热容模型</td><td><code>hConst</code> 常热容；<code>janaf</code> 温度相关多项式</td></tr>
+<tr><td><code>equationOfState</code></td><td>状态方程</td><td><code>perfectGas</code>、<code>rhoConst</code> 等，按介质状态关系选择</td></tr>
 <tr><td><code>energy</code></td><td>能量变量</td><td><code>sensibleEnthalpy</code> 或 <code>sensibleInternalEnergy</code> 等</td></tr>
 <tr><td><code>molWeight</code></td><td>摩尔质量</td><td>单位为 kg/kmol，空气示例为 28.96</td></tr>
 <tr><td><code>Cp</code>、<code>Hf</code></td><td>定压比热、生成焓</td><td>按模型定义及参考态赋值</td></tr>
 <tr><td><code>mu</code>、<code>Pr</code></td><td>动力黏度和 Prandtl 数</td><td>采用一致的单位与适用温度范围</td></tr>
-<tr><td><code>As</code>、<code>Ts</code></td><td>Sutherland 输运系数</td><td>选择 sutherland 后按该模型填写</td></tr>
+<tr><td><code>As</code>、<code>Ts</code></td><td>Sutherland 输运系数</td><td>选择 <code>sutherland</code> 后按该模型填写</td></tr>
 <tr><td><code>Tlow</code>、<code>Thigh</code>、<code>Tcommon</code>、<code>lowCpCoeffs</code>、<code>highCpCoeffs</code></td><td>JANAF 温度区间及系数</td><td>从可靠物性数据或机理文件提取</td></tr>
 </tbody></table></div>
 <p><code>rhoCentralFoam</code> 等采用相应的热物性基类和能量变量。使用显内能的求解器应配置 <code>sensibleInternalEnergy</code>，并保留配套教程中的热物性组合。</p>
@@ -349,9 +351,9 @@ mixture
 }
 <span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
 <span class="hljs-keyword">value</span> (<span class="hljs-number">0</span> <span class="hljs-number">-9.81</span> <span class="hljs-number">0</span>);</code></pre></div>
-<p>g 定义重力矢量，其方向与几何坐标系对应。<code>hRef</code> 定义静水压参考高度，通常采用 uniformDimensionedScalarField 和长度量纲；<code>pRef</code> 按求解器接口设置。<code>fvSolution</code> 中的 pRefCell/pRefValue 用于压力方程参考值，作用不同。</p>
+<p>g 定义重力矢量，其方向与几何坐标系对应。<code>hRef</code> 定义静水压参考高度，通常采用 uniformDimensionedScalarField 和长度量纲；<code>pRef</code> 按求解器接口设置。<code>fvSolution</code> 中的 <code>pRefCell/pRefValue</code> 用于压力方程参考值，作用不同。</p>
 <h2>9.9 constant/fvOptions</h2>
-<p><code>fvOptions</code> 用于配置源项和约束，文件位置由求解器的读取路径确定，常见于 <code>constant</code> 或 system。下例在指定 <code>cellZone</code> 内施加速度方程源项，采用 sources 条目。</p>
+<p><code>fvOptions</code> 用于配置源项和约束，文件位置由求解器的读取路径确定，常见于 <code>constant</code> 或 <code>system</code>。下例在指定 <code>cellZone</code> 内施加速度方程源项，采用 sources 条目。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
@@ -369,8 +371,8 @@ drive
         U ((<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) <span class="hljs-number">0</span>);
     }
 }</code></pre></div>
-<p>半隐式源项写为 Su + Sp*字段，括号内依次给出显式项和隐式系数。specific 按单位体积定义，absolute 按所选体积的总量定义。源项量纲取决于控制方程；速度、动量以及以 <code>h</code>、<code>e</code> 或 <code>T</code> 为变量的能量方程应分别确定量纲和密度因子。</p>
-<p><code>selectionMode</code> 指定作用范围，可选 <code>all</code>、<code>cellZone</code>、<code>cellSet</code> 等；<code>timeStart</code> 和 <code>duration</code> 指定作用时间。常用类型包括 <code>scalarSemiImplicitSource</code>、<code>vectorSemiImplicitSource</code>、meanVelocityForce、explicitPorositySource、scalarFixedValueConstraint、limitTemperature 和 codedSource，其参数按对应模型设置。</p>
+<p>半隐式源项写为 Su + Sp*字段，括号内依次给出显式项和隐式系数。<code>specific</code> 按单位体积定义，<code>absolute</code> 按所选体积的总量定义。源项量纲取决于控制方程；速度、动量以及以 <code>h</code>、<code>e</code> 或 <code>T</code> 为变量的能量方程应分别确定量纲和密度因子。</p>
+<p><code>selectionMode</code> 指定作用范围，可选 <code>all</code>、<code>cellZone</code>、<code>cellSet</code> 等；<code>timeStart</code> 和 <code>duration</code> 指定作用时间。常用类型包括 <code>scalarSemiImplicitSource</code>、<code>vectorSemiImplicitSource</code>、<code>meanVelocityForce</code>、<code>explicitPorositySource</code>、scalarFixedValueConstraint、limitTemperature 和 codedSource，其参数按对应模型设置。</p>
 <h2>9.10 constant/MRFProperties 与 SRFProperties</h2>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
@@ -386,8 +388,8 @@ rotorZone
     axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
     omega constant <span class="hljs-number">100</span>;
 }</code></pre></div>
-<p>rotor 为预先建立的 <code>cellZone</code>，<code>omega</code> 的单位为 rad/s。<code>nonRotatingPatches</code> 指定区域内保持静止的边界。<code>MRF</code> 在固定网格上采用旋转参考系近似处理。</p>
-<p><code>SRFProperties</code> 配置单参考系模型，常用 <code>SRFModel</code> rpm 和 rpmCoeffs/rpm，以 rpm 表示转速。使用两种模型时应分别采用对应的角速度单位。</p>
+<p><code>rotor</code> 为预先建立的 <code>cellZone</code>，<code>omega</code> 的单位为 rad/s。<code>nonRotatingPatches</code> 指定区域内保持静止的边界。<code>MRF</code> 在固定网格上采用旋转参考系近似处理。</p>
+<p><code>SRFProperties</code> 配置单参考系模型，常用 <code>SRFModel</code> rpm 和 <code>rpmCoeffs/rpm</code>，以 rpm 表示转速。使用两种模型时应分别采用对应的角速度单位。</p>
 <h2>9.11 constant/dynamicMeshDict</h2>
 <p>下例采用位移拉普拉斯方法平滑网格运动，并通过 0/pointDisplacement 指定位移。求解器需支持该运动模型。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
@@ -397,15 +399,15 @@ displacementLaplacianCoeffs
 {
     diffusivity <span class="hljs-keyword">uniform</span>;
 }</code></pre></div>
-<p>pointDisplacement 为 pointVectorField，采用长度量纲。运动壁面指定相应位移，固定壁面指定零位移。<code>motionSolver</code> 或兼容键 <code>solver</code> 按 <code>v2512</code> 对应模型的接口设置。</p>
+<p><code>pointDisplacement</code> 为 <code>pointVectorField</code>，采用长度量纲。运动壁面指定相应位移，固定壁面指定零位移。<code>motionSolver</code> 或兼容键 <code>solver</code> 按 <code>v2512</code> 对应模型的接口设置。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>模型或功能</th><th>配置项</th><th>相关参数</th></tr>
 <tr><td>规定刚体运动</td><td>solidBodyMotionFvMesh、<code>solidBodyMotionFunction</code> 及相应系数</td><td>旋转中心、轴、速度或时间函数</td></tr>
-<tr><td>六自由度</td><td>sixDoFRigidBodyMotion 运动求解器</td><td><code>mass</code>、momentOfInertia、centreOfMass、力矩参考与约束</td></tr>
+<tr><td>六自由度</td><td><code>sixDoFRigidBodyMotion</code> 运动求解器</td><td><code>mass</code>、momentOfInertia、centreOfMass、力矩参考与约束</td></tr>
 <tr><td>自适应细化</td><td><code>dynamicRefineFvMesh</code></td><td><code>field</code>、<code>refineInterval</code>、<code>lowerRefineLevel</code>、<code>upperRefineLevel</code>、<code>unrefineLevel</code></td></tr>
 <tr><td>细化限制</td><td><code>maxRefinement</code>、<code>maxCells</code>、<code>nBufferLayers</code></td><td>内存估计和细化一致性</td></tr>
 <tr><td>拓扑改变通量修正</td><td><code>correctFluxes</code></td><td>通量和关联速度字段的配对，依求解器设置</td></tr>
-<tr><td>重叠网格</td><td>dynamicOversetFvMesh 等、oversetInterpolation</td><td>zoneID、overset <code>patch</code>、孔切割和插值层</td></tr>
+<tr><td>重叠网格</td><td><code>dynamicOversetFvMesh</code> 等、oversetInterpolation</td><td><code>zoneID</code>、<code>overset</code> <code>patch</code>、孔切割和插值层</td></tr>
 </tbody></table></div>
 <p>先运行 <code>moveDynamicMesh</code> 检查网格运动，重点检查运动过程中质量最差的时刻，再进行流场求解。运动和拓扑变化类型应处于求解器的支持范围内。</p>
 <h2>9.12 多区域传热及专用模型配置</h2>
@@ -415,27 +417,27 @@ regions
     fluid (air)
     solid (solidBlock)
 );</code></pre></div>
-<p><code>air</code> 和 solidBlock 分别配置 constant/区域名/polyMesh、热物性文件以及 system/区域名 下的 <code>fvSchemes</code> 和 <code>fvSolution</code>。初始场位于 0/区域名/。流固界面通常采用 mappedWall 网格边界，并设置相邻区域映射和温度耦合条件。</p>
+<p><code>air</code> 和 <code>solidBlock</code> 分别配置 constant/区域名/polyMesh、热物性文件以及 system/区域名 下的 <code>fvSchemes</code> 和 <code>fvSolution</code>。初始场位于 0/区域名/。流固界面通常采用 mappedWall 网格边界，并设置相邻区域映射和温度耦合条件。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>文件</th><th>用途</th><th>主要参数</th></tr>
-<tr><td><code>constant/radiationProperties</code></td><td>辐射模型</td><td><code>radiation</code> on/off、<code>radiationModel</code>（P1、fvDOM、viewFactor 等）、<code>solverFreq</code> 及模型专用系数</td></tr>
+<tr><td><code>constant/radiationProperties</code></td><td>辐射模型</td><td><code>radiation</code> <code>on/off</code>、<code>radiationModel</code>（<code>P1</code>、fvDOM、<code>viewFactor</code> 等）、<code>solverFreq</code> 及模型专用系数</td></tr>
 <tr><td><code>constant/viewFactorsDict</code></td><td>视角因子设置</td><td>指定参与边界，按生成工具配置积分或射线参数</td></tr>
 <tr><td><code>constant/chemistryProperties</code></td><td>化学积分</td><td><code>chemistry</code>、<code>chemistryType</code> 中的 solver/method、<code>initialChemicalTimeStep</code>、ODE 系数</td></tr>
 <tr><td><code>constant/combustionProperties</code></td><td>燃烧闭合模型</td><td><code>combustionModel</code> 及 PaSR、EDC、<code>laminar</code> 等模型的专用系数</td></tr>
 <tr><td><code>constant/reactions</code></td><td>反应机理</td><td>物种名称、反应式、速率系数；可由 <code>chemkinToFoam</code> 转换</td></tr>
 <tr><td>constant/thermophysicalProperties.相名</td><td>多相分相热物性</td><td>各相 <code>thermoType</code>、状态方程、热容与输运</td></tr>
-<tr><td><code>constant/phaseProperties</code></td><td>Euler 多相体系或特定多相模型</td><td><code>phases</code>、直径模型、阻力、升力、传热等分相和相间模型</td></tr>
+<tr><td><code>constant/phaseProperties</code></td><td><code>Euler</code> 多相体系或特定多相模型</td><td><code>phases</code>、直径模型、阻力、升力、传热等分相和相间模型</td></tr>
 <tr><td><code>constant/kinematicCloudProperties</code> 等</td><td>拉格朗日粒子云</td><td><code>solution</code>、<code>constantProperties</code>、<code>subModels</code>、<code>injectionModels</code>、<code>forces</code>、<code>patchInteractionModel</code></td></tr>
 <tr><td><code>constant/sprayCloudProperties</code></td><td>喷雾云</td><td>在粒子设置基础上加入 atomization、breakup、phaseChange 等模型</td></tr>
 <tr><td><code>constant/porosityProperties</code></td><td>部分求解器的多孔阻力入口</td><td><code>zone</code>、Darcy–Forchheimer 系数及局部坐标；也可通过 <code>fvOptions</code> 配置</td></tr>
 <tr><td><code>constant/solidProperties</code> 或 <code>mechanicalProperties</code></td><td>固体材料</td><td>按固体求解器设置 <code>rho</code>、<code>E</code>、<code>nu</code> 和 <code>planeStress</code>；此处 <code>nu</code> 表示泊松比</td></tr>
-<tr><td><code>system/faSchemes</code>、<code>faSolution</code> 的有限面积位置</td><td>面上离散与求解</td><td><code>v2512</code> 常位于 system/finite-area/；使用 faMesh 对应的字段和算子</td></tr>
+<tr><td><code>system/faSchemes</code>、faSolution 的有限面积位置</td><td>面上离散与求解</td><td><code>v2512</code> 常位于 system/finite-area/；使用 faMesh 对应的字段和算子</td></tr>
 <tr><td>system/finite-area/faMeshDefinition</td><td>有限面积网格生成</td><td>polyMeshPatches、<code>boundary</code>、面选取和边界命名</td></tr>
 <tr><td><code>system/optimisationDict</code></td><td>伴随优化</td><td>优化类型、设计变量、目标函数、约束和更新算法</td></tr>
 </tbody></table></div>
 <p>专用模型的配置项随物种机理、粒子模型、燃烧模型和优化算法变化。可通过 <code>find</code> "<code>$FOAM_TUTORIALS</code>" <code>-name</code> 文件名 查找对应求解器算例，并据模型源码确定条目层级及参数。</p>
 <h2>9.13 运行时编译与字典扩展</h2>
-<p>下例在温度场 <code>T</code> 的 <code>inlet</code> 边界中定义随时间变化的温度。codedFixedValue 在运行时编译代码，需配置编译器和动态库搜索路径。</p>
+<p>下例在温度场 <code>T</code> 的 <code>inlet</code> 边界中定义随时间变化的温度。<code>codedFixedValue</code> 在运行时编译代码，需配置编译器和动态库搜索路径。</p>
 <div class="code-panel" data-language="cpp"><div class="code-toolbar"><span class="code-language">C++</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="C++代码"><code class="hljs language-cpp">inlet
 {
     type codedFixedValue;
@@ -447,7 +449,7 @@ regions
         <span class="hljs-keyword">operator</span>==(<span class="hljs-number">300.0</span> + <span class="hljs-number">10.0</span>*t);
     #};
 }</code></pre></div>
-<p><code>name</code> 指定生成的类型名称，code 定义边界值计算过程；<code>codeInclude</code>、<code>codeOptions</code>、<code>codeLibs</code> 和 <code>localCode</code> 分别补充头文件、编译选项、链接库和局部代码。#codeStream 属于字典函数，通过 <code>C</code>++ 输出流生成字典内容。</p>
+<p><code>name</code> 指定生成的类型名称，<code>code</code> 定义边界值计算过程；<code>codeInclude</code>、<code>codeOptions</code>、<code>codeLibs</code> 和 <code>localCode</code> 分别补充头文件、编译选项、链接库和局部代码。#<code>codeStream</code> 属于字典函数，通过 <code>C</code>++ 输出流生成字典内容。</p>
 <h2>9.14 Make/files 与 Make/options</h2>
 <div class="code-panel" data-language="makefile"><div class="code-toolbar"><span class="code-language">Makefile</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Makefile代码"><code class="hljs language-makefile"><span class="hljs-comment"># Make/files</span>
 myScalarFoam.C
@@ -460,7 +462,7 @@ EXE_INC = \
 EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools</code></pre></div>
-<p>在源码目录运行 <code>wmake</code> 编译应用。编译共享库时，在 Make/files 中设置 <code>LIB = $(FOAM_USER_LIBBIN)/libMyModel</code>，在 Make/options 中设置 <code>LIB_LIBS</code>，并运行 <code>wmake</code> libso。Make 变量采用 $(<code>FOAM_USER_APPBIN</code>) 形式，Bash 变量采用 ${<code>FOAM_USER_APPBIN</code>} 形式。</p>
+<p>在源码目录运行 <code>wmake</code> 编译应用。编译共享库时，在 <code>Make/files</code> 中设置 <code>LIB = $(FOAM_USER_LIBBIN)/libMyModel</code>，在 <code>Make/options</code> 中设置 <code>LIB_LIBS</code>，并运行 <code>wmake</code> <code>libso</code>。<code>Make</code> 变量采用 $(<code>FOAM_USER_APPBIN</code>) 形式，Bash 变量采用 ${<code>FOAM_USER_APPBIN</code>} 形式。</p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

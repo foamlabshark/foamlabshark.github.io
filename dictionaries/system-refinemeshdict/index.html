@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p><code>refineMeshDict</code> 描述细化的单元集合、参考方向和需要加密的方向。它用于在已有网格上增加局部分辨率，例如只加密流动平面内的单元，再由 <code>refineMesh</code> 执行实际拓扑细分。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/refineMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>origin</code></td><td>局部坐标系、旋转或几何操作的参考原点。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">细化方向与坐标系</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>globalCoeffs.tan1 / tan2</code></td><td>global 坐标体系中两根独立切向方向，第三方向由它们构造；<code>directions</code> 用对应方向名选择细化方向。</td></tr><tr><td><code>patchLocalCoeffs.patch</code></td><td><code>patchLocal</code> 坐标系参考的边界名称，需存在于当前网格。</td></tr><tr><td><code>userCoeffs</code></td><td>自定义坐标系，填写 <code>type</code>、<code>origin</code> 及两根独立的局部轴，例如 <code>e1</code>、<code>e3</code>。</td></tr><tr><td><code>useHexTopology / geometricCut</code></td><td>分别控制利用六面体拓扑和几何切割的细化路径；根据原网格类型和细化效果选择。</td></tr><tr><td><code>writeMesh</code></td><td>控制细化过程中的网格写出；不替代命令行对写入时间或覆盖原网格的选择。</td></tr></tbody></table></div>
+<h2 id="nested-configuration">细化方向与坐标系</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>globalCoeffs.tan1 / tan2</code></td><td><code>global</code> 坐标体系中两根独立切向方向，第三方向由它们构造；<code>directions</code> 用对应方向名选择细化方向。</td></tr><tr><td><code>patchLocalCoeffs.patch</code></td><td><code>patchLocal</code> 坐标系参考的边界名称，需存在于当前网格。</td></tr><tr><td><code>userCoeffs</code></td><td>自定义坐标系，填写 <code>type</code>、<code>origin</code> 及两根独立的局部轴，例如 <code>e1</code>、<code>e3</code>。</td></tr><tr><td><code>useHexTopology / geometricCut</code></td><td>分别控制利用六面体拓扑和几何切割的细化路径；根据原网格类型和细化效果选择。</td></tr><tr><td><code>writeMesh</code></td><td>控制细化过程中的网格写出；不替代命令行对写入时间或覆盖原网格的选择。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
@@ -214,7 +214,7 @@ directions      ( tan1 tan2 );      <span class="hljs-comment">// 只在这两�
 useHexTopology  <span class="hljs-literal">yes</span>;
 geometricCut    <span class="hljs-literal">no</span>;
 writeMesh       <span class="hljs-literal">no</span>;
-$ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></pre></div><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/cavitatingFoam/LES/throttle</summary><p>节流空化算例对名为 <code>c0</code> 的单元集合做平面内细化。</p>
+$ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></pre></div><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>multiphase/cavitatingFoam/LES/throttle</code></summary><p>节流空化算例对名为 <code>c0</code> 的单元集合做平面内细化。</p>
 <ul>
 <li><code>set c0</code> 限定需要细化的单元。</li>
 <li><code>coordinateSystem global</code> 采用全局坐标，<code>tan1 (1 0 0)</code>、<code>tan2 (0 1 0)</code> 对应 <code>x</code>、<code>y</code>。</li>
@@ -305,12 +305,12 @@ geometricCut    <span class="hljs-literal">false</span>;
 
 writeMesh       <span class="hljs-literal">false</span>;
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/LES/nozzleFlow2D</summary><p>二维喷嘴流动只在一个全局方向细化 <code>c0</code> 区域，适合控制局部单元形状。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/interFoam/LES/nozzleFlow2D</code></summary><p>二维喷嘴流动只在一个全局方向细化 <code>c0</code> 区域，适合控制局部单元形状。</p>
 <ul>
 <li><code>coordinateSystem global</code> 和 <code>tan1 (1 0 0)</code> 确定 <code>x</code> 向细化。</li>
 <li><code>directions (tan1)</code> 不选择 <code>tan2</code>，改变的方向比较明确。</li>
 <li><code>useHexTopology no</code>、<code>geometricCut yes</code> 选择几何切分方式。</li>
-<li>文件还保留 <code>patchLocalCoeffs</code>，但当前 <code>coordinateSystem</code> 为 global，解释实际设置时以选中的坐标系为准。</li>
+<li>文件还保留 <code>patchLocalCoeffs</code>，但当前 <code>coordinateSystem</code> 为 <code>global</code>，解释实际设置时以选中的坐标系为准。</li>
 </ul>
 <p>沿壁面局部方向细化时，选用局部坐标系并设置对应系数。</p>
 <p><a href="/assets/examples/v2512/refinemeshdict/3-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

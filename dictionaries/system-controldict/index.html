@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -184,13 +184,13 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-controldict"><div class="eyebrow">OpenFOAM v2512</div><h1>controlDict</h1><div class="prose"><p>控制计算起止时间、时间步、结果写出和函数对象。文件位于 system 目录。</p><!-- reference-introduction -->
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-controldict"><div class="eyebrow">OpenFOAM v2512</div><h1>controlDict</h1><div class="prose"><p>控制计算起止时间、时间步、结果写出和函数对象。文件位于 <code>system</code> 目录。</p><!-- reference-introduction -->
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>controlDict</code> 安排一次计算从哪里开始、推进到何时、采用多大的时间步，以及何时保存结果。它还可以组织运行中的监测和后处理对象，因此在网格与物理模型准备后，通常用它确定整个计算的时间和输出计划。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/controlDict</code></p><h2>配置方法</h2><h3>续算与安全停止</h3><p>保留已有时间目录，将 <code>startFrom</code> 改为 <code>latestTime</code>，再设置更大的 <code>endTime</code>，即可从最新结果继续。若希望从头重算，使用独立算例副本并设回 <code>startTime</code>。</p>
 <p><code>runTimeModifiable true</code> 允许运行期间重读支持动态修改的配置。把 <code>stopAt</code> 改为 <code>writeNow</code>，可请求程序在写出当前状态后结束；改为 <code>nextWrite</code> 则在下一次计划写出后结束。最终以日志中的结束和写出记录为准。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">时间、输出与运行控制</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>timeFormat / timePrecision</code></td><td>时间目录名的格式（general、<code>fixed</code>、<code>scientific</code>）与精度；与字段数值的 <code>writeFormat</code>、<code>writePrecision</code> 分开设置。</td></tr><tr><td><code>libs</code></td><td>额外动态库列表。顶层 <code>libs</code> 对整个算例加载库，<code>functions</code> 内每个对象的 <code>libs</code> 为该对象加载实现库。</td></tr><tr><td><code>functions</code></td><td>后处理与运行时控制对象的集合。在每个对象内分别填写 <code>type</code>、<code>libs</code>、<code>executeControl</code> 和 <code>writeControl</code>。</td></tr><tr><td><code>adjustTimeStep / maxCo / maxAlphaCo / maxDeltaT</code></td><td>启用时间步调整，并设置普通 Courant 数、相分数 Courant 数及时间步长上限。按求解器的时间步控制方式选用。</td></tr></tbody></table></div><p><a href="/function-objects/usage/">functionObject 的配置位置</a></p><p><a href="/function-objects/surfaces/">采样面与 cuttingPlane 配置</a></p>
+<h2 id="nested-configuration">时间、输出与运行控制</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>timeFormat / timePrecision</code></td><td>时间目录名的格式（<code>general</code>、<code>fixed</code>、<code>scientific</code>）与精度；与字段数值的 <code>writeFormat</code>、<code>writePrecision</code> 分开设置。</td></tr><tr><td><code>libs</code></td><td>额外动态库列表。顶层 <code>libs</code> 对整个算例加载库，<code>functions</code> 内每个对象的 <code>libs</code> 为该对象加载实现库。</td></tr><tr><td><code>functions</code></td><td>后处理与运行时控制对象的集合。在每个对象内分别填写 <code>type</code>、<code>libs</code>、<code>executeControl</code> 和 <code>writeControl</code>。</td></tr><tr><td><code>adjustTimeStep / maxCo / maxAlphaCo / maxDeltaT</code></td><td>启用时间步调整，并设置普通 Courant 数、相分数 Courant 数及时间步长上限。按求解器的时间步控制方式选用。</td></tr></tbody></table></div><p><a href="/function-objects/usage/">functionObject 的配置位置</a></p><p><a href="/function-objects/surfaces/">采样面与 cuttingPlane 配置</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>system/controlDict</code> 指定从哪个时刻开始、何时结束、每步推进多久，以及多长时间保存一次结果。网格和物理模型确定后，通常先调整这个文件。</p>
 <p>以下内容放在标准 <code>FoamFile</code> 文件头之后，适用于方腔 <code>icoFoam</code> 的固定时间步计算：</p>
@@ -276,7 +276,7 @@ writeInterval  <span class="hljs-number">0.02</span>;
     }
 }
 </code></pre></div>
-<p>这个对象每步记录压力和速度的求解信息，结果位于 <code>postProcessing/solverHistory</code>。完整场可以低频输出，探针和残差则高频记录，兼顾分析需要与磁盘占用。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>这个方腔算例使用 <code>icoFoam</code> 求解不可压缩、层流、非定常流动：顶盖运动带动腔内流体，初始速度为零。这里控制计算持续多久、每步多长，以及何时保存结果。</p>
+<p>这个对象每步记录压力和速度的求解信息，结果位于 <code>postProcessing/solverHistory</code>。完整场可以低频输出，探针和残差则高频记录，兼顾分析需要与磁盘占用。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>这个方腔算例使用 <code>icoFoam</code> 求解不可压缩、层流、非定常流动：顶盖运动带动腔内流体，初始速度为零。这里控制计算持续多久、每步多长，以及何时保存结果。</p>
 <ul>
 <li><code>application icoFoam</code> 指明配套应用；在终端运行 <code>icoFoam</code> 启动求解。<code>startFrom startTime</code> 配合 <code>startTime 0</code>，从目录 <code>0</code> 读取初始场。</li>
 <li><code>endTime 0.5</code> 表示算到物理时间 0.5 s，<code>deltaT 0.005</code> 表示每步推进 0.005 s；从零开始共 100 个时间步。</li>

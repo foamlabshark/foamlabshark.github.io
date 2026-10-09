@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p><code>wcleanObjects</code> 按所选平台配置清理 <code>build</code> 目录中的编译中间产物。它适合在切换构建设置或需要重新编译时使用，让下一次构建重新生成该配置的对象文件。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 此工具要求当前目录等于 WM_PROJECT_DIR 或 WM_THIRD_PARTY_DIR，并删除 <code>build</code> 下匹配的目录。下面使用新建的演示项目并仅在子 shell 中覆盖 WM_PROJECT_DIR，完全隔离正式安装。</p>
+<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 此工具要求当前目录等于 <code>WM_PROJECT_DIR</code> 或 <code>WM_THIRD_PARTY_DIR</code>，并删除 <code>build</code> 下匹配的目录。下面使用新建的演示项目并仅在子 shell 中覆盖 <code>WM_PROJECT_DIR</code>，完全隔离正式安装。</p>
 <h2>示例 1：清理当前配置</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">tool=<span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/scripts/wcleanObjects"</span>
 demoProject=$(<span class="hljs-built_in">mktemp</span> -d <span class="hljs-string">"<span class="hljs-variable">$HOME</span>/foam-clean-build.XXXXXX"</span>)
@@ -210,7 +210,7 @@ demoProject=$(<span class="hljs-built_in">mktemp</span> -d <span class="hljs-str
 <span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$demoProject</span>/build/<span class="hljs-variable">${WM_ARCH}</span>GccDPInt32Opt"</span>
 (<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$demoProject</span>"</span> &amp;&amp; WM_PROJECT_DIR=<span class="hljs-string">"<span class="hljs-variable">$demoProject</span>"</span> <span class="hljs-string">"<span class="hljs-variable">$tool</span>"</span> -compiler=Gcc)
 </code></pre></div>
-<p><code>-compiler</code>=Gcc 选择当前 WM_ARCH 加 Gcc 前缀的构建目录。</p>
+<p><code>-compiler</code>=Gcc 选择当前 <code>WM_ARCH</code> 加 Gcc 前缀的构建目录。</p>
 <h2>示例 4：同时清理两个配置</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">tool=<span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/scripts/wcleanObjects"</span>
 demoProject=$(<span class="hljs-built_in">mktemp</span> -d <span class="hljs-string">"<span class="hljs-variable">$HOME</span>/foam-clean-build.XXXXXX"</span>)
@@ -225,7 +225,7 @@ demoProject=$(<span class="hljs-built_in">mktemp</span> -d <span class="hljs-str
 (<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$demoProject</span>"</span> &amp;&amp; WM_PROJECT_DIR=<span class="hljs-string">"<span class="hljs-variable">$demoProject</span>"</span> <span class="hljs-string">"<span class="hljs-variable">$tool</span>"</span> all)
 </code></pre></div>
 <p>直接调用 <code>wcleanObjects</code> 默认目标是 <code>build</code>；<code>all</code> 移除整个演示 <code>build</code>。</p>
-<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-a | -all</code></td><td>等同于 <code>all</code>，处理全部目标。</td></tr><tr><td><code>-curr | -current</code></td><td>使用当前 WM_OPTIONS 对应的构建配置。</td></tr><tr><td><code>-comp | -compiler</code></td><td>匹配 <code>$WM_ARCH</code>$WM_COMPILER* 对应的构建配置。</td></tr><tr><td><code>-compiler=NAME</code></td><td>匹配 <code>$WM_ARCH</code> 后接指定编译器名称的构建配置。</td></tr><tr><td><code>-help</code></td><td>显示用法。</td></tr></tbody></table></div><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/wmake/scripts/wcleanObjects">源码与说明</a> · <a href="/assets/command-help/wcleanobjects.txt">帮助文本</a></p>
+<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-a | -all</code></td><td>等同于 <code>all</code>，处理全部目标。</td></tr><tr><td><code>-curr | -current</code></td><td>使用当前 <code>WM_OPTIONS</code> 对应的构建配置。</td></tr><tr><td><code>-comp | -compiler</code></td><td>匹配 <code>$WM_ARCH</code>$WM_COMPILER* 对应的构建配置。</td></tr><tr><td><code>-compiler=NAME</code></td><td>匹配 <code>$WM_ARCH</code> 后接指定编译器名称的构建配置。</td></tr><tr><td><code>-help</code></td><td>显示用法。</td></tr></tbody></table></div><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/wmake/scripts/wcleanObjects">源码与说明</a> · <a href="/assets/command-help/wcleanobjects.txt">帮助文本</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

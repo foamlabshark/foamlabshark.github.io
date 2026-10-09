@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,7 +191,7 @@
 <p>位置：<code>system/extrudeMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>constructFrom</code></td><td>指定挤出源来自已有网格、表面或其他受支持的输入。</td></tr><tr><td><code>sourceCase</code></td><td>提供源网格或场的算例位置。相对路径以执行时工作目录为准。</td></tr><tr><td><code>sourcePatches</code></td><td>作为挤出源的边界名称列表。</td></tr><tr><td><code>extrudeModel</code></td><td>挤出几何模型，例如平移、旋转或法向挤出；各模型需要不同系数。</td></tr><tr><td><code>nLayers</code></td><td>挤出或边界层生成的层数；同时检查层厚与总厚度。</td></tr><tr><td><code>expansionRatio</code></td><td>相邻挤出层的厚度增长比例。</td></tr><tr><td><code>axis</code></td><td>旋转轴或方向向量；需明确是否要求单位向量。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="nested-configuration">挤出来源与几何模型</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>sourceFaceZones</code></td><td><code>constructFrom</code> 使用网格时，填写来源 <code>faceZone</code> 列表；按边界挤出时使用 <code>sourcePatches</code>。</td></tr><tr><td><code>flipNormals</code></td><td>反转来源面的挤出法向。</td></tr><tr><td><code>linearDirectionCoeffs.direction / thickness</code></td><td>固定方向挤出模型的方向与总厚度。</td></tr><tr><td><code>linearNormalCoeffs.thickness</code></td><td>沿表面法向挤出的总厚度。</td></tr><tr><td><code>sectorCoeffs.point / axis / angle</code></td><td>扇形挤出的轴上一点、轴方向与总转角，<code>angle</code> 单位为度。模型系数字典与 <code>extrudeModel</code> 同级。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>constructFrom</code> 指定挤出来源，<code>sourceCase</code> 和 <code>sourcePatches</code> 指定源算例及边界，<code>exposedPatchName</code> 定义新暴露边界。<code>extrudeModel</code> 选择挤出模型，<code>nLayers</code> 和 <code>expansionRatio</code> 控制层数及层厚比，<code>mergeFaces</code> 和 <code>mergeTol</code> 控制合并。linearNormal 通过 linearNormalCoeffs/thickness 设置总厚度；其他模型采用各自的系数字典。</p>
+<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>constructFrom</code> 指定挤出来源，<code>sourceCase</code> 和 <code>sourcePatches</code> 指定源算例及边界，<code>exposedPatchName</code> 定义新暴露边界。<code>extrudeModel</code> 选择挤出模型，<code>nLayers</code> 和 <code>expansionRatio</code> 控制层数及层厚比，<code>mergeFaces</code> 和 <code>mergeTol</code> 控制合并。<code>linearNormal</code> 通过 linearNormalCoeffs/thickness 设置总厚度；其他模型采用各自的系数字典。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 片段：沿已有 patch 外法向挤出</span>
 constructFrom patch;
 sourceCase <span class="hljs-string">"."</span>;
@@ -214,7 +214,7 @@ sectorCoeffs   { axisPt (<span class="hljs-number">0</span> <span class="hljs-nu
 nLayers         <span class="hljs-number">1</span>;
 expansionRatio  <span class="hljs-number">1.0</span>;
 mergeFaces      <span class="hljs-literal">false</span>;</code></pre></div>
-<p>典型用途：把一个二维面拉伸成一层网格做二维算例；用 sector 模型做轴对称（wedge）算例。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · mesh/extrudeMesh/faceZoneExtrusion</summary><p>faceZoneExtrusion 从已有面区挤出体网格，可用于由界面生成薄层区域。</p>
+<p>典型用途：把一个二维面拉伸成一层网格做二维算例；用 sector 模型做轴对称（<code>wedge</code>）算例。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · mesh/extrudeMesh/faceZoneExtrusion</summary><p>faceZoneExtrusion 从已有面区挤出体网格，可用于由界面生成薄层区域。</p>
 <ul>
 <li><code>constructFrom mesh</code>、<code>sourceCase "&lt;case&gt;"</code> 指向源网格；<code>sourceFaceZones (f0Zone)</code> 选择挤出面区。</li>
 <li><code>extrudeModel linearNormal</code> 沿局部法向挤出，<code>thickness 0.05</code> 给出 0.05 m 厚度。</li>
@@ -289,7 +289,7 @@ flipNormals <span class="hljs-literal">false</span>;
 mergeFaces <span class="hljs-literal">false</span>;
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/compressibleInterFoam/laminar/climbingRod</summary><p>爬杆流动采用窄楔形挤出，把二维截面变为轴对称近似网格。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/compressibleInterFoam/laminar/climbingRod</code></summary><p>爬杆流动采用窄楔形挤出，把二维截面变为轴对称近似网格。</p>
 <ul>
 <li><code>sourcePatches (front)</code> 是源面，<code>exposedPatchName back</code> 命名另一侧。</li>
 <li><code>extrudeModel wedge</code> 选择楔形模型，<code>point (0 0 0)</code>、<code>axis (0 -1 0)</code> 定义转轴。</li>

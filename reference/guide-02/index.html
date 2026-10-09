@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -202,7 +202,7 @@ curl -s https://dl.openfoam.com/add-debian-repo.sh | <span class="hljs-built_in"
 <span class="hljs-comment"># ③ 激活环境</span>
 <span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
 <span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span></code></pre></div>
-<p>激活 etc/bashrc 会设置可执行程序、共享库和教程等路径。环境未激活时，终端可能找不到 <code>blockMesh</code>，或者错误调用其他版本的程序。激活后应同时检查 WM_PROJECT_VERSION、WM_PROJECT_DIR 和 <code>command</code> <code>-v</code> <code>blockMesh</code>。</p>
+<p>激活 etc/bashrc 会设置可执行程序、共享库和教程等路径。环境未激活时，终端可能找不到 <code>blockMesh</code>，或者错误调用其他版本的程序。激活后应同时检查 <code>WM_PROJECT_VERSION</code>、<code>WM_PROJECT_DIR</code> 和 <code>command</code> <code>-v</code> <code>blockMesh</code>。</p>
 <h2>2.3 路线二：源码编译（Ubuntu 26.04，装到家目录）</h2>
 <p>安装在 ~/OpenFOAM 后，可以在个人目录中修改源码、编译求解器，并分别管理多个版本。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 装编译依赖</span>
@@ -249,9 +249,9 @@ wsl --install -d Ubuntu
 docker run -it --rm -v $HOME/OpenFOAM:/data opencfd/openfoam-default:2512</code></pre></div>
 <p>WSL2 里跑 ParaView 有两种方式：装 Windows 版 ParaView，然后在 Windows 里打开 WSL 路径（\\wsl$\Ubuntu\home\你的用户名\...）；或在 WSL 里装 Linux 版 ParaView（Windows 11 的 WSLg 已内置图形支持）。推荐前者，更流畅。</p>
 <h2>2.6 ParaView 怎么装</h2>
-<p>deb 包 openfoam2512-default 会带一个 ParaView。如果想用新版（例如 6.x），去 paraview.org 下官方二进制包解压到家目录，然后把它的 bin 加进 PATH：</p>
+<p>deb 包 openfoam2512-default 会带一个 ParaView。如果想用新版（例如 6.x），去 paraview.org 下官方二进制包解压到家目录，然后把它的 <code>bin</code> 加进 <code>PATH</code>：</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'export PATH=$HOME/ParaView-6.1.1/bin:$PATH'</span> &gt;&gt; ~/.bashrc</code></pre></div>
-<p><code>v2512</code> 的 <code>paraFoam</code> 调用 PATH 中的 paraview。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> paraview 查看程序位置，再选择所需读取器。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
+<p><code>v2512</code> 的 <code>paraFoam</code> 调用 <code>PATH</code> 中的 <code>paraview</code>。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> <code>paraview</code> 查看程序位置，再选择所需读取器。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

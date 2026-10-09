@@ -21,7 +21,8 @@
   if(offset<text.length)result.push({text:text.slice(offset),code:false});
   return result;
  }
- function parameterCell(cell){return !!cell&&cell.cellIndex===0&&/参数|选项|命令|字段|条目|变量|属性|关键字/.test(cell.closest('table')?.querySelector('tr')?.textContent||'');}
+ function isParameterHeader(header){return /^(?:参数(?:或结构)?|选项|命令(?:或函数)?|字段|条目|变量|属性|关键字|键|值|取值|类型|边界条件(?:类型)?|边界类型|场|字典|求解器|壁面函数|插值格式|预处理\/光顺器|模型(?:或功能)?|class|type|method)$/.test(String(header||'').trim());}
+ function parameterCell(cell){return !!cell&&cell.cellIndex===0&&isParameterHeader(cell.closest('table')?.querySelector('tr')?.cells[0]?.textContent);}
  function decorate(holder){
   const nodes=[],walker=document.createTreeWalker(holder,NodeFilter.SHOW_TEXT);
   while(walker.nextNode())nodes.push(walker.currentNode);
@@ -30,6 +31,6 @@
    const fragment=document.createDocumentFragment();for(const part of split){const el=part.code?document.createElement('code'):document.createTextNode(part.text);if(part.code)el.textContent=part.text;fragment.append(el);}node.replaceWith(fragment);
   }
  }
- const api={parts,decorate,skip,prose};
+ const api={parts,decorate,isParameterHeader,skip,prose};
  if(typeof module==='object'&&module.exports)module.exports=api;else root.FoamInlineCode=api;
 })(typeof window==='object'?window:globalThis);

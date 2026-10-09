@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -235,8 +235,8 @@ mergePatchPairs ();</code></pre></div>
 <tr><td><code>simpleGrading</code></td><td>例如 (1 10 1)</td><td>沿块的局部方向设置；反向时取对应倒数</td></tr>
 <tr><td>多段 <code>grading</code></td><td>某方向可写 ((0.2 0.3 4) (0.6 0.4 1) (0.2 0.3 0.25))</td><td>每段分别为长度比例、单元比例、扩张比</td></tr>
 <tr><td><code>edgeGrading</code></td><td>对 12 条局部边分别指定扩张比</td><td>按块的局部边编号依次赋值</td></tr>
-<tr><td><code>edges</code></td><td>arc 0 1 (中间点)，或 spline、<code>polyLine</code></td><td>弧线端点与控制点应满足非退化条件</td></tr>
-<tr><td><code>boundary/type</code></td><td><code>patch</code>、<code>wall</code>、<code>empty</code>、symmetryPlane、wedge、cyclic 等</td><td>定义网格边界类型；场边界另行配置</td></tr>
+<tr><td><code>edges</code></td><td><code>arc</code> 0 1 (中间点)，或 <code>spline</code>、<code>polyLine</code></td><td>弧线端点与控制点应满足非退化条件</td></tr>
+<tr><td><code>boundary/type</code></td><td><code>patch</code>、<code>wall</code>、<code>empty</code>、<code>symmetryPlane</code>、<code>wedge</code>、<code>cyclic</code> 等</td><td>定义网格边界类型；场边界另行配置</td></tr>
 <tr><td><code>defaultPatch</code></td><td>为未显式列出的面指定名称和类型</td><td>显式边界之外的面归入该边界</td></tr>
 <tr><td><code>mergePatchPairs</code></td><td>((patchA patchB))</td><td>合并指定的块接口</td></tr>
 </tbody></table></div>
@@ -245,14 +245,14 @@ mergePatchPairs ();</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>含义</th><th>设置方法</th></tr>
 <tr><td><code>castellatedMesh</code>、<code>snap</code>、<code>addLayers</code></td><td>分别控制切割细化、贴体和边界层生成</td><td>先检查切割细化和贴体，再配置边界层</td></tr>
-<tr><td><code>geometry</code></td><td>表面及可搜索几何体</td><td>body.stl { <code>type</code> <code>triSurfaceMesh</code>; <code>name</code> body; }</td></tr>
+<tr><td><code>geometry</code></td><td>表面及可搜索几何体</td><td>body.stl { <code>type</code> <code>triSurfaceMesh</code>; <code>name</code> <code>body</code>; }</td></tr>
 <tr><td><code>maxLocalCells</code>、<code>maxGlobalCells</code></td><td>局部及全局细化控制限额</td><td>根据可用内存设置单元数量上限</td></tr>
 <tr><td><code>minRefinementCells</code></td><td>停止继续细化的候选单元阈值</td><td>设为 0 时继续处理剩余细化单元，计算量相应增加</td></tr>
 <tr><td><code>nCellsBetweenLevels</code></td><td>相邻细化级别间的过渡层数</td><td>例如 3</td></tr>
 <tr><td><code>features</code></td><td>显式特征文件和细化等级</td><td>({ <code>file</code> "body.eMesh"; <code>level</code> 2; })</td></tr>
-<tr><td><code>refinementSurfaces</code></td><td>表面的最小最大细化等级</td><td>body { <code>level</code> (2 3); <code>patchInfo</code> { <code>type</code> <code>wall</code>; } }</td></tr>
+<tr><td><code>refinementSurfaces</code></td><td>表面的最小最大细化等级</td><td><code>body</code> { <code>level</code> (2 3); <code>patchInfo</code> { <code>type</code> <code>wall</code>; } }</td></tr>
 <tr><td><code>resolveFeatureAngle</code></td><td>区分尖锐表面特征的角度</td><td>示例为 30，按表面几何特征确定</td></tr>
-<tr><td><code>refinementRegions</code></td><td>体积或距离带细化</td><td><code>mode</code> inside、outside 或 <code>distance</code>；<code>levels</code> 定义等级</td></tr>
+<tr><td><code>refinementRegions</code></td><td>体积或距离带细化</td><td><code>mode</code> <code>inside</code>、<code>outside</code> 或 <code>distance</code>；<code>levels</code> 定义等级</td></tr>
 <tr><td><code>locationInMesh</code></td><td>标记需要保留的连通流体区域</td><td>取目标流体区域内部点，避开边界面</td></tr>
 <tr><td><code>allowFreeStandingZoneFaces</code></td><td>是否允许独立区域面</td><td>与 <code>zone</code> 生成方式匹配</td></tr>
 <tr><td><code>snapControls</code></td><td>贴体松弛和迭代</td><td><code>nSmoothPatch</code>、<code>tolerance</code>、<code>nSolveIter</code>、<code>nRelaxIter</code></td></tr>
@@ -350,7 +350,7 @@ body.stl
 }</code></pre></div>
 <p>输入表面 body.stl 存放于 <code>constant/triSurface</code>。<code>includedAngle</code> 按特征提取器的包含角定义取值，其定义与 <code>resolveFeatureAngle</code> 不同。<code>writeObj</code> 控制可视化文件输出。运行 <code>surfaceFeatureExtract</code> 后，将生成的 <code>eMesh</code> 文件名用于后续特征线配置。</p>
 <h2>7.4 system/meshQualityDict</h2>
-<p>运行 <code>foamGetDict</code> <code>meshQualityDict</code> 获取模板，或通过 #includeEtc "caseDicts/meshQualityDict" 引入。下表列出常用质量指标及示例阈值，阈值应结合网格尺度和求解要求确定。</p>
+<p>运行 <code>foamGetDict</code> <code>meshQualityDict</code> 获取模板，或通过 #<code>includeEtc</code> "<code>caseDicts/meshQualityDict</code>" 引入。下表列出常用质量指标及示例阈值，阈值应结合网格尺度和求解要求确定。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>含义</th><th>示例值</th></tr>
 <tr><td><code>maxNonOrtho</code></td><td>最大非正交角</td><td>65</td></tr>
@@ -367,7 +367,7 @@ body.stl
 <tr><td><code>nSmoothScale</code>、<code>errorReduction</code></td><td>质量失败时缩放处理参数</td><td>4、0.75</td></tr>
 </tbody></table></div>
 <h2>7.5 system/setFieldsDict</h2>
-<p><code>setFields</code> 首先按 <code>defaultFieldValues</code> 设置全域初值，再依次执行 <code>regions</code> 中的区域赋值。区域重叠时，后续赋值覆盖先前结果。目标场文件须预先建立，并设置相应的 class 和 <code>dimensions</code>。</p>
+<p><code>setFields</code> 首先按 <code>defaultFieldValues</code> 设置全域初值，再依次执行 <code>regions</code> 中的区域赋值。区域重叠时，后续赋值覆盖先前结果。目标场文件须预先建立，并设置相应的 <code>class</code> 和 <code>dimensions</code>。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
@@ -429,8 +429,8 @@ actions
 <div class="table-scroll"><table>
 <tbody><tr><th>条目</th><th>含义</th><th>设置方法与取值</th></tr>
 <tr><td><code>name</code></td><td>输出集合或区域名称</td><td>与源项中的 <code>cellZone</code> 匹配</td></tr>
-<tr><td><code>type</code></td><td>对象类别</td><td><code>cellSet</code>、<code>faceSet</code>、pointSet、<code>cellZoneSet</code>、faceZoneSet</td></tr>
-<tr><td><code>action</code></td><td>集合操作</td><td>new、<code>add</code>、<code>subtract</code>、<code>subset</code>、invert、clear、remove</td></tr>
+<tr><td><code>type</code></td><td>对象类别</td><td><code>cellSet</code>、<code>faceSet</code>、<code>pointSet</code>、<code>cellZoneSet</code>、faceZoneSet</td></tr>
+<tr><td><code>action</code></td><td>集合操作</td><td><code>new</code>、<code>add</code>、<code>subtract</code>、<code>subset</code>、invert、<code>clear</code>、<code>remove</code></td></tr>
 <tr><td><code>source</code></td><td>选择算法</td><td><code>boxToCell</code>、<code>sphereToCell</code>、<code>cylinderToCell</code>、patchToFace、fieldToCell 等</td></tr>
 <tr><td><code>sourceInfo</code></td><td>选择源参数子字典</td><td>多数选择源可将参数直接写入动作字典；名称冲突时采用 <code>sourceInfo</code></td></tr>
 </tbody></table></div>
@@ -452,7 +452,7 @@ patches
 );</code></pre></div>
 <p><code>constructFrom</code> <code>patches</code> 从已有边界选面；<code>constructFrom</code> <code>set</code> 从指定 <code>faceSet</code> 选面。<code>pointSync</code> 控制耦合点同步。执行 <code>createPatch</code> <code>-overwrite</code> 后，将 0/U、0/p 等场文件中的边界条目与新建 <code>walls</code> 对应。</p>
 <h2>7.9 system/createBafflesDict</h2>
-<p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 interfaceZone 面区域。</p>
+<p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 <code>interfaceZone</code> 面区域。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">internalFacesOnly <span class="hljs-literal">true</span>;
 baffles
 {
@@ -487,7 +487,7 @@ geometricCut <span class="hljs-literal">false</span>;
 writeMesh <span class="hljs-literal">false</span>;</code></pre></div>
 <p><code>set</code> 指定待细化的单元集合，<code>directions</code> 指定细化方向。二维网格仅沿面内方向细化，厚度方向保持 <code>empty</code> 边界要求的单层结构。运行 <code>refineMesh</code> <code>-overwrite</code> 后，检查场、区域和边界与新网格的对应关系。</p>
 <h2>7.11 system/extrudeMeshDict</h2>
-<p><code>constructFrom</code> 指定挤出来源，<code>sourceCase</code> 和 <code>sourcePatches</code> 指定源算例及边界，<code>exposedPatchName</code> 定义新暴露边界。<code>extrudeModel</code> 选择挤出模型，<code>nLayers</code> 和 <code>expansionRatio</code> 控制层数及层厚比，<code>mergeFaces</code> 和 <code>mergeTol</code> 控制合并。linearNormal 通过 linearNormalCoeffs/thickness 设置总厚度；其他模型采用各自的系数字典。</p>
+<p><code>constructFrom</code> 指定挤出来源，<code>sourceCase</code> 和 <code>sourcePatches</code> 指定源算例及边界，<code>exposedPatchName</code> 定义新暴露边界。<code>extrudeModel</code> 选择挤出模型，<code>nLayers</code> 和 <code>expansionRatio</code> 控制层数及层厚比，<code>mergeFaces</code> 和 <code>mergeTol</code> 控制合并。<code>linearNormal</code> 通过 linearNormalCoeffs/thickness 设置总厚度；其他模型采用各自的系数字典。</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// 片段：沿已有 patch 外法向挤出
 constructFrom patch;
 sourceCase ".";
@@ -512,7 +512,7 @@ patchMap
     outlet sourceOutlet
 );
 cuttingPatches (newCutBoundary);</code></pre></div>
-<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> latestTime。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p>
+<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> <code>latestTime</code>。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p>
 <h2>7.13 system/changeDictionaryDict</h2>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {

@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -214,7 +214,7 @@ system/topAir/fvSolution
 <p><code>regionProperties</code> 负责登记区域，网格由前处理步骤建立。例如已经划分好 <code>cellZone</code> 时，可在对应完整流程中使用 <code>splitMeshRegions</code> 将各区拆分为独立区域网格。命令参数和初场映射应与原始区域划分方式配合。</p><h3 id="example-3">示例 3 · 检查某个区域</h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh -region topAir
 foamDictionary constant/topAir/thermophysicalProperties -entry thermoType
 </code></pre></div>
-<p>第一条检查指定区域网格，第二条查看该区域采用的物性组合。逐区检查能区分全局配置错误和局部材料或边界问题。后处理可选择各区域分别查看温度，也可同时显示界面两侧，比较热流和温度连续性。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · heatTransfer/chtMultiRegionSimpleFoam/jouleHeatingSolid</summary><p>jouleHeatingSolid 虽使用多区域框架，这份区域清单只包含一个固体区。</p>
+<p>第一条检查指定区域网格，第二条查看该区域采用的物性组合。逐区检查能区分全局配置错误和局部材料或边界问题。后处理可选择各区域分别查看温度，也可同时显示界面两侧，比较热流和温度连续性。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · heatTransfer/chtMultiRegionSimpleFoam/jouleHeatingSolid</summary><p>jouleHeatingSolid 虽使用多区域框架，这份区域清单只包含一个固体区。</p>
 <ul>
 <li><code>fluid ()</code> 表示没有列出的流体区域。</li>
 <li><code>solid (solid)</code> 指定名为 <code>solid</code> 的固体区域，网格、场和物性目录需使用同名。</li>
@@ -244,10 +244,10 @@ regions
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionSimpleFoam/heatExchanger</summary><p>heatExchanger 在此把 <code>air</code> 和 porous 两个区域都列为流体处理。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionSimpleFoam/heatExchanger</summary><p>heatExchanger 在此把 <code>air</code> 和 <code>porous</code> 两个区域都列为流体处理。</p>
 <ul>
 <li><code>fluid (air porous)</code> 决定要创建和求解的流体区。</li>
-<li><code>solid ()</code> 没有列出独立固体区域；名称 porous 本身不会把区域变成固体导热模型。</li>
+<li><code>solid ()</code> 没有列出独立固体区域；名称 <code>porous</code> 本身不会把区域变成固体导热模型。</li>
 <li>各区还需要分别给出物性、阻力或其他模型设置。</li>
 </ul>
 <p>增加实际金属固体时建立对应网格和温度耦合，再把区域列到 <code>solid</code> 列表。</p>
@@ -278,7 +278,7 @@ regions
 <ul>
 <li><code>fluid (gas)</code> 指定气体流动区。</li>
 <li><code>solid (solid)</code> 指定固体导热区。</li>
-<li>两类区域名决定 <code>constant</code>、system 和时间目录中相关子目录的对应关系。</li>
+<li>两类区域名决定 <code>constant</code>、<code>system</code> 和时间目录中相关子目录的对应关系。</li>
 </ul>
 <p>新增区域时同时补齐区域清单、网格、各场边界与热物性，尤其要核对界面双方名称。</p>
 <p><a href="/assets/examples/v2512/regionproperties/3-regionProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/reverseBurner/constant/regionProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/reverseBurner">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

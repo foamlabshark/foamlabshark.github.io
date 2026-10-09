@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -185,7 +185,7 @@
 </section>
 
   <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/reference/">← 返回参考手册</a></div><div class="article-shell"><article class="article" data-cms-slug="reference-manual-11"><div class="eyebrow">OpenFOAM v2512</div><h1>11 环境变量与编译工具</h1><div class="prose"><h2>11.1 环境加载与检查</h2>
-<p>以下命令在 Linux 或 WSL 的 Bash 环境中执行。加载路径按实际安装位置设置，环境配置见 etc/bashrc、etc/config.sh/settings 和 aliases，编译配置见 <code>wmake</code>。</p>
+<p>以下命令在 Linux 或 WSL 的 Bash 环境中执行。加载路径按实际安装位置设置，环境配置见 etc/bashrc、etc/config.sh/settings 和 <code>aliases</code>，编译配置见 <code>wmake</code>。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /实际安装路径/OpenFOAM-v2512/etc/bashrc
 <span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span>
 <span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
@@ -195,7 +195,7 @@
 blockMesh -<span class="hljs-built_in">help</span></code></pre></div>
 <p><code>source</code> 在当前 shell 中加载环境；通过 bash 启动的脚本仅设置子进程环境。将正确的 <code>source</code> 命令写入 ~/.bashrc，可在新终端中自动加载。非交互脚本通常采用 <code>cd</code> "<code>$FOAM_TUTORIALS</code>" 等路径命令，避免依赖未展开的别名。</p>
 <h2>11.2 FOAM 系列变量</h2>
-<p>使用 printf '%s\<code>n</code>' "$变量名" 查询变量值。下表按默认源码安装环境说明路径关系，软件包安装的目录前缀以实际环境为准。</p>
+<p>使用 <code>printf</code> '%s\<code>n</code>' "$变量名" 查询变量值。下表按默认源码安装环境说明路径关系，软件包安装的目录前缀以实际环境为准。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>变量</th><th>含义</th><th>用法示例</th></tr>
 <tr><td><code>FOAM_API</code></td><td>数值 API 版本，本手册为 2512</td><td><code>echo</code> "<code>$FOAM_API</code>"</td></tr>
@@ -219,15 +219,15 @@ blockMesh -<span class="hljs-built_in">help</span></code></pre></div>
 <tr><td><code>FOAM_SETNAN</code></td><td>将部分新分配内存初始化为 NaN，辅助排错</td><td><code>export FOAM_SETNAN=true</code></td></tr>
 <tr><td><code>FOAM_ABORT</code></td><td>发生错误时调用 <code>abort</code></td><td><code>export FOAM_ABORT=1</code>，用于调试</td></tr>
 <tr><td><code>FOAM_JOB_DIR</code></td><td>启用作业记录时的目录</td><td><code>echo</code> "<code>$FOAM_JOB_DIR</code>"；未配置时可能为空</td></tr>
-<tr><td><code>FOAM_CASE</code></td><td>当前应用运行中的算例绝对路径</td><td>字典中 #include "${FOAM_CASE}/system/common"</td></tr>
+<tr><td><code>FOAM_CASE</code></td><td>当前应用运行中的算例绝对路径</td><td>字典中 #<code>include</code> "${<code>FOAM_CASE</code>}/system/common"</td></tr>
 <tr><td><code>FOAM_CASENAME</code></td><td>当前应用运行中的算例名称</td><td>用于该进程的环境或字典展开</td></tr>
 </tbody></table></div>
-<p>FOAM_CASE 和 FOAM_CASENAME 由 OpenFOAM 应用在运行进程中设置，可供该进程内的字典展开使用。教程目录变量为 FOAM_TUTORIALS。</p>
+<p><code>FOAM_CASE</code> 和 <code>FOAM_CASENAME</code> 由 OpenFOAM 应用在运行进程中设置，可供该进程内的字典展开使用。教程目录变量为 <code>FOAM_TUTORIALS</code>。</p>
 <h2>11.3 WM 系列变量与编译配置</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>变量</th><th>含义</th><th>示例与说明</th></tr>
 <tr><td><code>WM_PROJECT</code></td><td>项目名</td><td>通常 OpenFOAM</td></tr>
-<tr><td><code>WM_PROJECT_VERSION</code></td><td>带 v 的版本字符串</td><td><code>v2512</code></td></tr>
+<tr><td><code>WM_PROJECT_VERSION</code></td><td>带 <code>v</code> 的版本字符串</td><td><code>v2512</code></td></tr>
 <tr><td><code>WM_PROJECT_DIR</code></td><td>安装或源码根目录</td><td><code>cd</code> "<code>$WM_PROJECT_DIR</code>"</td></tr>
 <tr><td><code>WM_PROJECT_USER_DIR</code></td><td>用户开发根目录</td><td><code>mkdir</code> <code>-p</code> "<code>$WM_PROJECT_USER_DIR/applications</code>"</td></tr>
 <tr><td><code>WM_PROJECT_SITE</code></td><td>站点配置和扩展目录</td><td>未配置站点时可为空</td></tr>
@@ -235,12 +235,12 @@ blockMesh -<span class="hljs-built_in">help</span></code></pre></div>
 <tr><td><code>WM_DIR</code></td><td><code>wmake</code> 所在目录</td><td><code>ls</code> "<code>$WM_DIR</code>"</td></tr>
 <tr><td><code>WM_ARCH</code></td><td>平台架构标识</td><td>例如 linux64，由环境检测</td></tr>
 <tr><td><code>WM_ARCH_OPTION</code></td><td>32 或 64 位平台配置</td><td>与硬件和构建一致</td></tr>
-<tr><td><code>WM_COMPILER_TYPE</code></td><td>编译器来源</td><td>如 system</td></tr>
+<tr><td><code>WM_COMPILER_TYPE</code></td><td>编译器来源</td><td>如 <code>system</code></td></tr>
 <tr><td><code>WM_COMPILER</code></td><td>编译器工具链</td><td>如 Gcc 或 Clang</td></tr>
-<tr><td><code>WM_PRECISION_OPTION</code></td><td>标量精度</td><td>DP、SP、SPDP，须有匹配的已编译库</td></tr>
+<tr><td><code>WM_PRECISION_OPTION</code></td><td>标量精度</td><td>DP、SP、<code>SPDP</code>，须有匹配的已编译库</td></tr>
 <tr><td><code>WM_LABEL_SIZE</code></td><td><code>label</code> 整数位宽</td><td>32 或 64</td></tr>
 <tr><td><code>WM_LABEL_OPTION</code></td><td>派生 <code>label</code> 标识</td><td>如 Int32</td></tr>
-<tr><td><code>WM_COMPILE_OPTION</code></td><td>构建模式</td><td>Opt、Debug、Prof 等可用模式</td></tr>
+<tr><td><code>WM_COMPILE_OPTION</code></td><td>构建模式</td><td>Opt、<code>Debug</code>、Prof 等可用模式</td></tr>
 <tr><td><code>WM_OPTIONS</code></td><td>由平台编译配置组合的目录标识</td><td>例如 linux64GccDPInt32Opt</td></tr>
 <tr><td><code>WM_MPLIB</code></td><td>MPI 选择</td><td>如 SYSTEMOPENMPI</td></tr>
 <tr><td><code>WM_NCOMPPROCS</code></td><td>编译并发数</td><td><code>export WM_NCOMPPROCS=4</code>，设置编译并发数</td></tr>
@@ -253,14 +253,14 @@ blockMesh -<span class="hljs-built_in">help</span></code></pre></div>
 <p>目录别名定义于 etc/config.sh/aliases，直接输入名称即可切换目录。进入下级目录时另用 <code>cd</code>，例如执行 <code>sol</code> 后再执行 <code>cd</code> incompressible/icoFoam。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>命令</th><th>含义</th><th>操作示例</th></tr>
-<tr><td><code>foam</code></td><td>进入 WM_PROJECT_DIR</td><td><code>foam</code>；<code>pwd</code></td></tr>
+<tr><td><code>foam</code></td><td>进入 <code>WM_PROJECT_DIR</code></td><td><code>foam</code>；<code>pwd</code></td></tr>
 <tr><td><code>src</code></td><td>进入核心库源码目录</td><td><code>src</code>；<code>ls</code></td></tr>
-<tr><td><code>lib</code></td><td>进入 FOAM_LIBBIN</td><td><code>lib</code>；<code>ls</code> libfiniteVolume*</td></tr>
+<tr><td><code>lib</code></td><td>进入 <code>FOAM_LIBBIN</code></td><td><code>lib</code>；<code>ls</code> libfiniteVolume*</td></tr>
 <tr><td><code>app</code></td><td>进入 applications</td><td><code>app</code>；<code>ls</code></td></tr>
 <tr><td><code>sol</code></td><td>进入 applications/solvers</td><td><code>sol</code>；<code>cd</code> incompressible/icoFoam</td></tr>
 <tr><td><code>util</code></td><td>进入 applications/utilities</td><td><code>util</code>；<code>cd</code> mesh/generation/blockMesh</td></tr>
-<tr><td><code>tut</code></td><td>进入 FOAM_TUTORIALS</td><td><code>tut</code>；<code>cd</code> incompressible/icoFoam/cavity/cavity</td></tr>
-<tr><td><code>run</code></td><td>进入 FOAM_RUN</td><td><code>mkdir</code> <code>-p</code> "<code>$FOAM_RUN</code>"；<code>run</code></td></tr>
+<tr><td><code>tut</code></td><td>进入 <code>FOAM_TUTORIALS</code></td><td><code>tut</code>；<code>cd</code> incompressible/icoFoam/cavity/cavity</td></tr>
+<tr><td><code>run</code></td><td>进入 <code>FOAM_RUN</code></td><td><code>mkdir</code> <code>-p</code> "<code>$FOAM_RUN</code>"；<code>run</code></td></tr>
 <tr><td><code>ufoam</code></td><td>进入用户开发根目录</td><td><code>ufoam</code>；<code>pwd</code></td></tr>
 <tr><td><code>uapp</code></td><td>进入用户 applications 目录</td><td>建立用户 applications 目录后执行 <code>uapp</code></td></tr>
 <tr><td><code>usol</code></td><td>进入用户 applications/solvers</td><td>建立用户 applications/solvers 目录后执行 <code>usol</code></td></tr>
@@ -285,9 +285,9 @@ blockMesh -<span class="hljs-built_in">help</span></code></pre></div>
 <h2>11.6 编译工具与运行函数</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>命令或函数</th><th>含义</th><th>具体用法与示例</th></tr>
-<tr><td><code>wmake</code></td><td>按 Make 配置构建应用或库</td><td><code>wmake</code>；<code>wmake</code> <code>-j</code> 4；<code>wmake</code> libso</td></tr>
-<tr><td><code>wclean</code></td><td>清理当前应用或库构建产物</td><td><code>wclean</code>；<code>wclean</code> libso</td></tr>
-<tr><td><code>wmakeLnInclude</code></td><td>创建头文件 lnInclude 链接目录</td><td>在库源码目录执行 <code>wmakeLnInclude</code> .</td></tr>
+<tr><td><code>wmake</code></td><td>按 <code>Make</code> 配置构建应用或库</td><td><code>wmake</code>；<code>wmake</code> <code>-j</code> 4；<code>wmake</code> <code>libso</code></td></tr>
+<tr><td><code>wclean</code></td><td>清理当前应用或库构建产物</td><td><code>wclean</code>；<code>wclean</code> <code>libso</code></td></tr>
+<tr><td><code>wmakeLnInclude</code></td><td>创建头文件 <code>lnInclude</code> 链接目录</td><td>在库源码目录执行 <code>wmakeLnInclude</code> .</td></tr>
 <tr><td><code>Allwmake</code></td><td>工程提供的批量构建脚本</td><td>./Allwmake <code>-j</code> 4；参数以该脚本为准</td></tr>
 <tr><td><code>getApplication</code></td><td>读取 <code>controlDict</code> 中的 <code>application</code></td><td>加载 RunFunctions 后执行 <code>getApplication</code></td></tr>
 <tr><td><code>getNumberOfProcessors</code></td><td>读取分区数量</td><td>加载 RunFunctions 后执行 <code>getNumberOfProcessors</code></td></tr>

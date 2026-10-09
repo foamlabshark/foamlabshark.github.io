@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p>需要随坐标或已有场变化的初态时，这个字典用数学表达式描述赋值规律，并选择目标字段和作用区域。它适合生成温度梯度、速度剖面等连续分布，由 <code>setExprFields</code> 计算后保存为场数据。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/setExprFieldsDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>dimensions</code></td><td>七个指数依次表示质量、长度、时间、温度、物质量、电流、发光强度。量纲错误常在矩阵组装或赋值时暴露。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">表达式与目标字段</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>expressions</code></td><td>表达式操作列表；每项在自己的子字典中指定目标字段和 <code>expression</code>。</td></tr><tr><td><code>field / expression</code></td><td>目标字段名称与表达式文本。表达式结果类型、尺寸及目标量纲必须匹配。</td></tr><tr><td><code>variables</code></td><td>表达式中的局部变量定义，例如 ("a=2;")；每个表达式使用各自的作用域。</td></tr><tr><td><code>readFields</code></td><td>预读已有场，使表达式可以访问它们。</td></tr><tr><td><code>constants</code></td><td>表达式可引用的常量或条目，按字典路径引用。</td></tr></tbody></table></div>
+<h2 id="nested-configuration">表达式与目标字段</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>expressions</code></td><td>表达式操作列表；每项在自己的子字典中指定目标字段和 <code>expression</code>。</td></tr><tr><td><code>field / expression</code></td><td>目标字段名称与表达式文本。表达式结果类型、尺寸及目标量纲必须匹配。</td></tr><tr><td><code>variables</code></td><td>表达式中的局部变量定义，例如 ("<code>a</code>=2;")；每个表达式使用各自的作用域。</td></tr><tr><td><code>readFields</code></td><td>预读已有场，使表达式可以访问它们。</td></tr><tr><td><code>constants</code></td><td>表达式可引用的常量或条目，按字典路径引用。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
@@ -204,7 +204,7 @@ expressions
         expression <span class="hljs-string">"300 + 10*pos().x()"</span>;
     }
 );</code></pre></div>
-<p>下例在已有温度场 <code>T</code> 上设置随坐标变化的温度，运行 <code>setExprFields</code> 后生效。<code>fieldMask</code> 限定赋值区域，<code>create</code> 和 <code>dimensions</code> 用于新建场。表达式语法可通过 <code>foamExprParserInfo</code> 查询。边界表达式使用 <code>setExprBoundaryFieldsDict</code>，其结构按边界场接口配置。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/turbineSiting</summary><p>turbineSiting 根据已有风速场计算风功率密度，结果供风机选址比较。</p>
+<p>下例在已有温度场 <code>T</code> 上设置随坐标变化的温度，运行 <code>setExprFields</code> 后生效。<code>fieldMask</code> 限定赋值区域，<code>create</code> 和 <code>dimensions</code> 用于新建场。表达式语法可通过 <code>foamExprParserInfo</code> 查询。边界表达式使用 <code>setExprBoundaryFieldsDict</code>，其结构按边界场接口配置。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/turbineSiting</summary><p>turbineSiting 根据已有风速场计算风功率密度，结果供风机选址比较。</p>
 <ul>
 <li><code>readFields (U)</code> 先读取速度。</li>
 <li>变量 <code>rho=1.2</code> 指定空气密度，表达式 <code>0.5*rho*pow(mag(U),3)</code> 计算与风速三次方成正比的通量密度。</li>

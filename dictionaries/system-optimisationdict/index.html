@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,7 +191,7 @@
 <p>位置：<code>system/optimisationDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr><tr><td><code>method</code></td><td>所采用的分区、插值或模型方法；含义由该字典的读取程序决定。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>optimisationManager</code></td><td>顶层优化管理流程的类型。</td></tr><tr><td><code>primalSolvers.&lt;名称&gt;.solver / solutionControls</code></td><td>每个正问题求解器及其 <code>nIters</code>、<code>residualControl</code> 等迭代控制。</td></tr><tr><td><code>adjointManagers.&lt;名称&gt;.primalSolver</code></td><td>伴随管理器引用的正问题实例名；<code>op1</code>、<code>adjManager1</code> 等均可自定。</td></tr><tr><td><code>adjointSolvers.&lt;名称&gt;.computeSensitivities</code></td><td>是否计算设计敏感度；需与选定伴随模型和设计变量配套。</td></tr><tr><td><code>objectives.objectiveNames.&lt;名称&gt;.type / weight / normalise</code></td><td>目标函数类型、权重与归一化设置；目标之间的量纲和尺度需一致处理。</td></tr><tr><td><code>ATCModel</code></td><td>伴随湍流相关的对流项处理模型，属于相应伴随求解器的配置。</td></tr><tr><td><code>optimisation.designVariables</code></td><td>设计变量类型、<code>sensitivityType</code>、<code>shapeType</code> 等几何与敏感度表示。</td></tr><tr><td><code>optimisation.updateMethod.method / maxInitChange</code></td><td>更新算法和初始变化限制；参数是否生效取决于所选优化方法。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval</summary><p>topology/reEval 用已有设计重新计算原始流场，重点是评估该几何下的总压损失。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval</summary><p>topology/reEval 用已有设计重新计算原始流场，重点是评估该几何下的总压损失。</p>
 <ul>
 <li><code>optimisationManager singleRun</code> 执行一次计算流程，原始求解器 <code>op1</code> 使用不可压缩 <code>SIMPLE</code>。</li>
 <li><code>nIters 3000</code> 限定最大原始迭代次数，<code>p</code>、<code>U</code> 的 <code>residualControl</code> 均为 <code>5e-7</code>。</li>
@@ -291,8 +291,8 @@ adjointManagers
 
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/adjointOptimisationFoam/sensitivityMaps/sbend/laminar</summary><p>S 形弯管的 sensitivityMaps 算例求解原始流场和伴随场，并在上下壁面输出总压损失的形状敏感度。</p>
 <ul>
-<li><code>singleRun</code> 执行一次原始—伴随流程；原始 simple 与伴随 adjointSimple 都允许最多 3000 次迭代。</li>
-<li>两组 <code>residualControl</code> 均设为 <code>1e-7</code>，分别控制 <code>p</code>、<code>U</code> 和 pa、Ua 的停止要求。</li>
+<li><code>singleRun</code> 执行一次原始—伴随流程；原始 <code>simple</code> 与伴随 <code>adjointSimple</code> 都允许最多 3000 次迭代。</li>
+<li>两组 <code>residualControl</code> 均设为 <code>1e-7</code>，分别控制 <code>p</code>、<code>U</code> 和 pa、<code>Ua</code> 的停止要求。</li>
 <li><code>PtLosses</code> 的 <code>patches (Inlet Outlet)</code> 指定测量总压损失的边界，名称大小写需与网格一致。</li>
 <li><code>sensitivityType surfacePoints</code>、<code>patches (lower upper)</code> 把设计敏感度输出到上下壁面点。</li>
 </ul>
@@ -397,11 +397,11 @@ optimisation
     }
 }
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/adjointOptimisationFoam/shapeOptimisation/sbend/laminar/opt/unconstrained/losses/SD</summary><p>losses_sD 将 S 形弯管的总压损失作为优化目标，通过 B 样条参数控制上下壁面的形状。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/adjointOptimisationFoam/shapeOptimisation/sbend/laminar/opt/unconstrained/losses/SD</summary><p>losses_sD 将 S 形弯管的总压损失作为优化目标，通过 <code>B</code> 样条参数控制上下壁面的形状。</p>
 <ul>
 <li><code>optimisationManager steadyOptimisation</code> 开启多轮稳态优化，每轮需要原始与伴随流场。</li>
-<li>simple 和 adjointSimple 的 <code>nIters 3000</code>、残差阈值 <code>1e-7</code> 控制每轮方程求解。</li>
-<li><code>type shape</code>、<code>shapeType volumetricBSplines</code> 以体积 B 样条控制点描述网格变形，<code>patches (lower upper)</code> 指定可调整壁面。</li>
+<li><code>simple</code> 和 <code>adjointSimple</code> 的 <code>nIters 3000</code>、残差阈值 <code>1e-7</code> 控制每轮方程求解。</li>
+<li><code>type shape</code>、<code>shapeType volumetricBSplines</code> 以体积 <code>B</code> 样条控制点描述网格变形，<code>patches (lower upper)</code> 指定可调整壁面。</li>
 <li><code>sensitivityType shapeFI</code> 选择形状敏感度计算方法，<code>maxInitChange 2e-3</code> 限制初始设计改变量尺度。</li>
 <li><code>method steepestDescent</code> 沿目标梯度的下降方向更新设计。</li>
 </ul>

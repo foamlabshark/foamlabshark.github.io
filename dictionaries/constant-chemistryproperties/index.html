@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>chemistryProperties</code> 决定是否求解化学反应，以及采用哪种化学积分方法和时间控制。它与反应机理、热物性和燃烧模型配合，控制局部组分及反应能量随时间如何更新。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/chemistryProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>chemistryType</code></td><td>化学求解器、方法或化学热物性组合选择，决定后续化学系数的读取方式。</td></tr><tr><td><code>chemistry</code></td><td>化学反应积分开关；组分输运方程按求解器设置运行。</td></tr><tr><td><code>initialChemicalTimeStep</code></td><td>首次化学积分采用的时间步估计；后续步长由所选化学积分器调整。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/rectangularChannel</summary><p><code>rectangularChannel</code> 用带颗粒的流动算例演示颗粒与连续相的耦合。这里把气相化学反应积分关闭，便于单独观察输运和颗粒过程。</p>
+<p>位置：<code>constant/chemistryProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>chemistryType</code></td><td>化学求解器、方法或化学热物性组合选择，决定后续化学系数的读取方式。</td></tr><tr><td><code>chemistry</code></td><td>化学反应积分开关；组分输运方程按求解器设置运行。</td></tr><tr><td><code>initialChemicalTimeStep</code></td><td>首次化学积分采用的时间步估计；后续步长由所选化学积分器调整。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/rectangularChannel</summary><p><code>rectangularChannel</code> 用带颗粒的流动算例演示颗粒与连续相的耦合。这里把气相化学反应积分关闭，便于单独观察输运和颗粒过程。</p>
 <ul>
 <li><code>chemistryType/solver noChemistrySolver</code> 选择不推进化学反应方程的求解对象。</li>
 <li><code>chemistry off</code> 关闭化学计算。颗粒受力、换热和相变分别由云文件中的模型控制，阅读本文件时可同时打开该算例的云属性文件。</li>
@@ -222,7 +222,7 @@ chemistry       <span class="hljs-literal">off</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/smallPoolFire3D</summary><p><code>smallPoolFire3D</code> 计算小型池火。此处关闭的是详细化学方程积分；配套 <code>combustionProperties</code> 实际选择 <code>EDM</code>，由混合控制的燃烧模型提供反应源项。</p>
 <ul>
 <li><code>noChemistrySolver</code> 与 <code>chemistry off</code> 使本文件不承担化学动力学积分工作。</li>
-<li><code>initialChemicalTimeStep 1e-07</code> 是保留的化学初始子步长条目。在当前关闭状态下，改变它不会改变 EDM 的混合时间尺度。</li>
+<li><code>initialChemicalTimeStep 1e-07</code> 是保留的化学初始子步长条目。在当前关闭状态下，改变它不会改变 <code>EDM</code> 的混合时间尺度。</li>
 <li>火焰反应强弱应结合 <code>combustionProperties/EDMCoeffs</code> 中实际的 <code>Cd 1</code>、<code>CEDC 1</code> 以及流动和湍流设置理解。</li>
 </ul>
 <p>研究化学动力学对点火或熄火的影响时，需要更换配套燃烧/化学模型并准备反应机理。保持入口供燃料方式一致，比较热释放率和温度，才能看清模型变化带来的影响。</p>

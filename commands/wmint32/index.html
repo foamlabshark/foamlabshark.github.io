@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,12 +189,12 @@
 <p><code>wmInt32</code> 重新加载 OpenFOAM 环境，并选择32 位整数网格编号。它用于切换后续编译与运行所用的平台配置，程序和自定义库应采用一致的精度及整数位宽，所需二进制产物也需对应这一配置。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>先加载 <code>v2512</code> 环境，在交互式 Bash 中逐行执行。此 alias 重新加载环境并选择 WM_LABEL_SIZE=32；对应编译配置的程序和库需已安装，或在可写源码树中自行构建。</p>
+<p>先加载 <code>v2512</code> 环境，在交互式 Bash 中逐行执行。此 alias 重新加载环境并选择 <code>WM_LABEL_SIZE</code>=32；对应编译配置的程序和库需已安装，或在可写源码树中自行构建。</p>
 <h2>示例 1：选择编译配置</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">wmInt32
 <span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_LABEL_SIZE</span>"</span>
 </code></pre></div>
-<p>输出 32。DP 为双精度，SP 为单精度，SPDP 使用单精度存储并扩展求解精度；<code>label</code> size 控制整数索引位宽。</p>
+<p>输出 32。DP 为双精度，SP 为单精度，<code>SPDP</code> 使用单精度存储并扩展求解精度；<code>label</code> size 控制整数索引位宽。</p>
 <h2>示例 2：定位对应程序与库</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">wmInt32
 <span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_OPTIONS</span>"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_APPBIN</span>"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_LIBBIN</span>"</span>
@@ -204,13 +204,13 @@
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">wmInt32
 wmake -show-cxxflags
 </code></pre></div>
-<p>输出该配置采用的 <code>C</code>++ 编译选项，可看到精度和 WM_LABEL_SIZE 宏。</p>
+<p>输出该配置采用的 <code>C</code>++ 编译选项，可看到精度和 <code>WM_LABEL_SIZE</code> 宏。</p>
 <h2>示例 4：为个人程序使用该配置</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">wmInt32
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_USER_DIR</span>/applications/utilities/fieldStats"</span>
 wmake
 </code></pre></div>
-<p>先准备有 Make/files 和 Make/options 的 fieldStats。重新编译得到与当前配置匹配的用户程序；相应 OpenFOAM 库须存在。</p>
+<p>先准备有 <code>Make/files</code> 和 <code>Make/options</code> 的 <code>fieldStats</code>。重新编译得到与当前配置匹配的用户程序；相应 OpenFOAM 库须存在。</p>
 <h2>示例 5：检查同一网格</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">wmInt32
 checkMesh -<span class="hljs-keyword">case</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/caseA"</span> &gt; <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/caseA/log.checkMesh.32"</span> 2&gt;&amp;1

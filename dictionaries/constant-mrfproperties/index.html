@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -206,7 +206,7 @@
 <p>转速与角速度满足 <span class="math-formula" data-tex="\omega=2\pi n/60"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>n</mi><mi mathvariant="normal">/</mi><mn>60</mn></mrow><annotation encoding="application/x-tex">\omega=2\pi n/60</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal">n</span><span class="mord">/60</span></span></span></span></span>。1000 r/min 对应约 104.72 rad/s。将转速数值 1000 直接填进 <code>omega</code> 会改变实际转速。</p><h3 id="example-2">示例 2 · nonRotatingPatches 怎么填</h3><p><code>MRF</code> 区域中的边界通常按区域旋转处理。若固定外壁也落在旋转单元区域的边界上，需要把对应 <code>patch</code> 名加入 <code>nonRotatingPatches</code>，例如：</p>
 <div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">nonRotatingPatches (stationaryWall);
 </code></pre></div>
-<p>名称与网格 <code>boundary</code> 文件一致。叶轮壁面随参考系旋转，固定机壳保持绝对静止；这一区分决定壁面速度与流体相对运动。若固定壁面在旋转区之外，则由其所在区域的普通边界设置处理。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/rotatingCylinders</summary><p>rotatingCylinders 采用 <code>MRF</code> 旋转参考系处理转动区域，网格点保持原位。</p>
+<p>名称与网格 <code>boundary</code> 文件一致。叶轮壁面随参考系旋转，固定机壳保持绝对静止；这一区分决定壁面速度与流体相对运动。若固定壁面在旋转区之外，则由其所在区域的普通边界设置处理。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/rotatingCylinders</summary><p>rotatingCylinders 采用 <code>MRF</code> 旋转参考系处理转动区域，网格点保持原位。</p>
 <ul>
 <li><code>cellZone all</code> 选定作用区域，<code>active yes</code> 启用它。</li>
 <li><code>origin (0 0 0)</code>、<code>axis (0 0 1)</code> 给出 <code>z</code> 轴转动中心。</li>
@@ -243,7 +243,7 @@ MRF1
     omega     <span class="hljs-number">100</span>;
 }
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</summary><p>cpuCabinet 在 domain0 流体区内用 <code>MRF</code> 近似风扇区域的转动。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><p>cpuCabinet 在 <code>domain0</code> 流体区内用 <code>MRF</code> 近似风扇区域的转动。</p>
 <ul>
 <li><code>cellZone v_MRF</code> 指定局部旋转区，<code>active true</code> 启用。</li>
 <li>转轴通过 (−0.01,0.04,−0.06)，<code>axis (1 0 0)</code> 沿 <code>x</code>。</li>
@@ -279,7 +279,7 @@ VC_1
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/simpleFoam/mixerVessel2D</summary><p>mixerVessel2D 使用 <code>MRF</code> 近似搅拌转子对流体的作用。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/simpleFoam/mixerVessel2D</summary><p><code>mixerVessel2D</code> 使用 <code>MRF</code> 近似搅拌转子对流体的作用。</p>
 <ul>
 <li><code>cellZone rotor</code> 选择旋转单元区。</li>
 <li>转轴经过原点，方向为 <code>(0 0 1)</code>。</li>

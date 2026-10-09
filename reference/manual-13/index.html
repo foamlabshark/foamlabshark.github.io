@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -207,7 +207,7 @@ foamToVTK -latestTime -fields <span class="hljs-string">'(U p)'</span></code></p
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -entry startFrom -<span class="hljs-built_in">set</span> latestTime
 foamDictionary system/controlDict -entry endTime -<span class="hljs-built_in">set</span> 2
 pimpleFoam &gt; log.restart 2&gt;&amp;1</code></pre></div>
-<p>并行续算采用 <code>-parallel</code>，各 processor 目录应具有一致的时刻和网格数据。运行中将 <code>stopAt</code> 设为 <code>writeNow</code> 或 <code>nextWrite</code>，可在写出结果后停止；该操作要求 <code>runTimeModifiable</code> 为 <code>true</code>，且求解器在运行中读取控制字典。</p>
+<p>并行续算采用 <code>-parallel</code>，各 <code>processor</code> 目录应具有一致的时刻和网格数据。运行中将 <code>stopAt</code> 设为 <code>writeNow</code> 或 <code>nextWrite</code>，可在写出结果后停止；该操作要求 <code>runTimeModifiable</code> 为 <code>true</code>，且求解器在运行中读取控制字典。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -entry stopAt -<span class="hljs-built_in">set</span> writeNow</code></pre></div>
 <p>再次启动前将 <code>stopAt</code> 恢复为 <code>endTime</code>；保留 <code>writeNow</code> 会使程序在启动后即停止。</p>
 <h2>13.4 Allrun 模板</h2>
@@ -227,7 +227,7 @@ runParallel <span class="hljs-string">"<span class="hljs-subst">$(getApplication
 runApplication reconstructPar -latestTime</code></pre></div>
 <p><code>runApplication</code> 和 <code>runParallel</code> 自动记录日志，并按已有日志决定是否跳过执行。重新运行前应处理对应日志。<code>Allclean</code> 的清理范围应限定于本算例可重新生成的文件。</p>
 <h2>13.5 一维激波管计算</h2>
-<p><code>v2512</code> 的一维激波管教程位于 tutorials/compressible/rhoCentralFoam/shockTube。其 <code>fvSchemes</code> 采用 fluxScheme Kurganov，并分别设置 reconstruct(<code>rho</code>) vanLeer、reconstruct(<code>U</code>) vanLeerV 和 reconstruct(<code>T</code>) vanLeer，以完成可压缩流变量重构。</p>
+<p><code>v2512</code> 的一维激波管教程位于 tutorials/compressible/rhoCentralFoam/shockTube。其 <code>fvSchemes</code> 采用 fluxScheme Kurganov，并分别设置 <code>reconstruct</code>(<code>rho</code>) <code>vanLeer</code>、<code>reconstruct</code>(<code>U</code>) vanLeerV 和 <code>reconstruct</code>(<code>T</code>) <code>vanLeer</code>，以完成可压缩流变量重构。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cp</span> -a <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/compressible/rhoCentralFoam/shockTube"</span> \
       <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/shockTube2512"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/shockTube2512"</span>

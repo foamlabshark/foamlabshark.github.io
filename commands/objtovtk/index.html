@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p>OBJ 文件中的折线可表示轨迹、特征线或辅助几何。<code>objToVTK</code> 把这些线数据转换成 <code>legacy</code> VTK，便于在 ParaView 中与网格和场结果叠加查看。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>OBJ 包含 v 顶点和 <code>l</code> 折线记录；两个位置参数依次是输入OBJ与输出VTK。</p>
+<p>OBJ 包含 <code>v</code> 顶点和 <code>l</code> 折线记录；两个位置参数依次是输入OBJ与输出VTK。</p>
 <h2>示例 1：转换一条已有折线</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">objToVTK centreline.obj centreline.vtk
 </code></pre></div>
@@ -198,7 +198,7 @@
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">printf</span> <span class="hljs-string">'v 0 0 0\nv 1 0 0\nv 1 1 0\nl 1 2 3\n'</span> &gt; elbow-line.obj
 objToVTK elbow-line.obj elbow-line.vtk
 </code></pre></div>
-<p>v 定义3个点，<code>l</code> 按1开始的编号连接折线；输出显示一个直角转弯，便于理解格式。</p>
+<p><code>v</code> 定义3个点，<code>l</code> 按1开始的编号连接折线；输出显示一个直角转弯，便于理解格式。</p>
 <h2>示例 3：转换两条独立线段</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">printf</span> <span class="hljs-string">'v 0 0 0\nv 1 0 0\nv 0 1 0\nv 1 1 0\nl 1 2\nl 3 4\n'</span> &gt; two-lines.obj
 objToVTK two-lines.obj two-lines.vtk
@@ -210,15 +210,15 @@ objToVTK two-lines.obj two-lines.vtk
     objToVTK <span class="hljs-string">"<span class="hljs-variable">$f</span>"</span> <span class="hljs-string">"vtk-lines/<span class="hljs-subst">$(basename <span class="hljs-string">"<span class="hljs-variable">${f%.obj}</span>"</span>)</span>.vtk"</span>
 <span class="hljs-keyword">done</span>
 </code></pre></div>
-<p>lines 目录中已有若干OBJ折线；逐个转换并保留基本文件名，输出集中到 vtk-lines。</p>
+<p><code>lines</code> 目录中已有若干OBJ折线；逐个转换并保留基本文件名，输出集中到 vtk-lines。</p>
 <h2>示例 5：查看周期匹配辅助线</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">createPatch -writeObj
 <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> final_*_match.obj; <span class="hljs-keyword">do</span>
     objToVTK <span class="hljs-string">"<span class="hljs-variable">$f</span>"</span> <span class="hljs-string">"<span class="hljs-variable">${f%.obj}</span>.vtk"</span>
 <span class="hljs-keyword">done</span>
 </code></pre></div>
-<p><code>createPatchDict</code> 已配置 cyclic 配对，<code>-writeObj</code> 会生成 final_&lt;两侧<code>patch</code>名&gt;_match.obj。这些折线连接配对面中心；转换成 VTK 后可检查配对方向与距离。</p>
-<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-case &lt;dir&gt;</code></td><td>指定算例目录；省略时使用当前目录。</td></tr><tr><td><code>-noFunctionObjects</code></td><td>跳过函数对象的执行。</td></tr><tr><td><code>-help</code></td><td>显示简要帮助并退出。</td></tr><tr><td><code>-help-full</code></td><td>显示完整帮助并退出。</td></tr></tbody></table></div><details class="command-more-options"><summary>更多参数（10 项）</summary><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-debug-switch &lt;name=val&gt;</code></td><td>设置指定的 DebugSwitch 调试开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-fileHandler &lt;handler&gt;</code></td><td>指定文件读写处理器类型。</td></tr><tr><td><code>-info-switch &lt;name=val&gt;</code></td><td>设置指定的 InfoSwitch 信息输出开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-lib &lt;name&gt;</code></td><td>额外加载一个或一组共享库；可重复使用。</td></tr><tr><td><code>-no-libs</code></td><td>跳过 <code>controlDict</code> 中 <code>libs</code> 条目指定的库。</td></tr><tr><td><code>-opt-switch &lt;name=val&gt;</code></td><td>设置指定的 OptimisationSwitch 优化开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-doc</code></td><td>在浏览器中打开文档。</td></tr><tr><td><code>-doc-source</code></td><td>在浏览器中打开源码。</td></tr><tr><td><code>-help-man</code></td><td>显示完整帮助，以 man 手册格式输出，然后退出。</td></tr><tr><td><code>-help-notes</code></td><td>显示程序功能说明并退出。</td></tr></tbody></table></div></details><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/utilities/mesh/manipulation/objToVTK/objToVTK.C">源码与说明</a> · <a href="/assets/command-help/objtovtk.txt">帮助文本</a></p>
+<p><code>createPatchDict</code> 已配置 <code>cyclic</code> 配对，<code>-writeObj</code> 会生成 <code>final_</code>&lt;两侧<code>patch</code>名&gt;<code>_match.obj</code>。这些折线连接配对面中心；转换成 VTK 后可检查配对方向与距离。</p>
+<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-case &lt;dir&gt;</code></td><td>指定算例目录；省略时使用当前目录。</td></tr><tr><td><code>-noFunctionObjects</code></td><td>跳过函数对象的执行。</td></tr><tr><td><code>-help</code></td><td>显示简要帮助并退出。</td></tr><tr><td><code>-help-full</code></td><td>显示完整帮助并退出。</td></tr></tbody></table></div><details class="command-more-options"><summary>更多参数（10 项）</summary><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-debug-switch &lt;name=val&gt;</code></td><td>设置指定的 DebugSwitch 调试开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-fileHandler &lt;handler&gt;</code></td><td>指定文件读写处理器类型。</td></tr><tr><td><code>-info-switch &lt;name=val&gt;</code></td><td>设置指定的 InfoSwitch 信息输出开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-lib &lt;name&gt;</code></td><td>额外加载一个或一组共享库；可重复使用。</td></tr><tr><td><code>-no-libs</code></td><td>跳过 <code>controlDict</code> 中 <code>libs</code> 条目指定的库。</td></tr><tr><td><code>-opt-switch &lt;name=val&gt;</code></td><td>设置指定的 OptimisationSwitch 优化开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-doc</code></td><td>在浏览器中打开文档。</td></tr><tr><td><code>-doc-source</code></td><td>在浏览器中打开源码。</td></tr><tr><td><code>-help-man</code></td><td>显示完整帮助，以 <code>man</code> 手册格式输出，然后退出。</td></tr><tr><td><code>-help-notes</code></td><td>显示程序功能说明并退出。</td></tr></tbody></table></div></details><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/utilities/mesh/manipulation/objToVTK/objToVTK.C">源码与说明</a> · <a href="/assets/command-help/objtovtk.txt">帮助文本</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

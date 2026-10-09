@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p>长时间计算需要在合适的写出点结束时，<code>foamEndJob</code> 通过修改运行中的控制设置请求求解器停止。它适合保留当前计算结果后有序结束任务，停止时机由选择的写出与退出方式决定。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>加载 <code>v2512</code> 环境，使用个人算例副本 caseA。并行示例先配置 <code>decomposeParDict</code> 并完成 <code>decomposePar</code>，程序和字典须匹配。 只对自己的正在运行的进程使用。solverPid 为求解器 PID；<code>controlDict</code> 须有 <code>runTimeModifiable</code> <code>true</code>，以及 startTime/stopAt/writeControl/writeInterval/endTime 的普通条目。</p>
+<p>加载 <code>v2512</code> 环境，使用个人算例副本 <code>caseA</code>。并行示例先配置 <code>decomposeParDict</code> 并完成 <code>decomposePar</code>，程序和字典须匹配。 只对自己的正在运行的进程使用。solverPid 为求解器 <code>PID</code>；<code>controlDict</code> 须有 <code>runTimeModifiable</code> <code>true</code>，以及 startTime/stopAt/writeControl/writeInterval/endTime 的普通条目。</p>
 <h2>示例 1：在下一次正常写出后结束</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamEndJob -<span class="hljs-keyword">case</span> caseA <span class="hljs-string">"<span class="hljs-variable">$solverPid</span>"</span>
 </code></pre></div>
@@ -202,13 +202,13 @@
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cd</span> caseA
 foamEndJob <span class="hljs-string">"<span class="hljs-variable">$solverPid</span>"</span>
 </code></pre></div>
-<p>省略 <code>-case</code> 使用当前目录；PID 必须属于此算例。</p>
+<p>省略 <code>-case</code> 使用当前目录；<code>PID</code> 必须属于此算例。</p>
 <h2>示例 4：读取自己保存的 PID</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">solverPid=$(<span class="hljs-built_in">cat</span> caseA/solver.pid)
 ps -p <span class="hljs-string">"<span class="hljs-variable">$solverPid</span>"</span> -o pid,args
 foamEndJob -<span class="hljs-keyword">case</span> caseA <span class="hljs-string">"<span class="hljs-variable">$solverPid</span>"</span>
 </code></pre></div>
-<p>先显示 PID 对应命令确认算例，再请求写出后结束。</p>
+<p>先显示 <code>PID</code> 对应命令确认算例，再请求写出后结束。</p>
 <h2>示例 5：撤销等待结束请求</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamEndJob -clear -<span class="hljs-keyword">case</span> caseA
 </code></pre></div>

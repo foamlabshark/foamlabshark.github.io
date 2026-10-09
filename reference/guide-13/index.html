@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -196,21 +196,21 @@ wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍
 <h2>13.2 ddtSchemes</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>写法</th><th>精度/性质</th><th>何时用</th></tr>
-<tr><td>steadyState</td><td>去掉时间项</td><td>稳态求解器必须用这个</td></tr>
-<tr><td>Euler</td><td>一阶隐式，无条件稳定，有数值耗散</td><td>瞬态起步、鲁棒优先</td></tr>
+<tr><td><code>steadyState</code></td><td>去掉时间项</td><td>稳态求解器必须用这个</td></tr>
+<tr><td><code>Euler</code></td><td>一阶隐式，无条件稳定，有数值耗散</td><td>瞬态起步、鲁棒优先</td></tr>
 <tr><td><code>backward</code></td><td>二阶隐式</td><td>LES/DNS 的主力</td></tr>
-<tr><td>CrankNicolson 0.9</td><td>二阶，系数 0~1（0=Euler，1=纯 CN）</td><td>精度要求高时，一般取 0.9 保稳</td></tr>
-<tr><td>localEuler</td><td>伪时间步（局部时间步长加速收敛）</td><td>稳态加速</td></tr>
+<tr><td><code>CrankNicolson</code> 0.9</td><td>二阶，系数 0~1（0=<code>Euler</code>，1=纯 CN）</td><td>精度要求高时，一般取 0.9 保稳</td></tr>
+<tr><td><code>localEuler</code></td><td>伪时间步（局部时间步长加速收敛）</td><td>稳态加速</td></tr>
 </tbody></table></div>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes { default <span class="hljs-built_in">backward</span>; }</code></pre></div>
-<p><code>LES</code> 需要控制时空离散的数值耗散。可选择 <code>backward</code> 或适当的 CrankNicolson 配置，并检查稳定性、网格分辨率与统计量；使用一阶 Euler 时，重点检查时间步对结果的影响。</p>
+<p><code>LES</code> 需要控制时空离散的数值耗散。可选择 <code>backward</code> 或适当的 <code>CrankNicolson</code> 配置，并检查稳定性、网格分辨率与统计量；使用一阶 <code>Euler</code> 时，重点检查时间步对结果的影响。</p>
 <h2>13.3 gradSchemes</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>写法</th><th>说明</th></tr>
-<tr><td>Gauss linear</td><td>标准二阶，最常用</td></tr>
+<tr><td><code>Gauss</code> <code>linear</code></td><td>标准二阶，最常用</td></tr>
 <tr><td>leastSquares</td><td>最小二乘，网格差时更准</td></tr>
-<tr><td>cellLimited Gauss linear 1</td><td>限制梯度不产生新极值，1 = 完全限制</td></tr>
-<tr><td>cellLimited&lt;cubic&gt; 1.5 Gauss linear 1</td><td>更平滑的限制器</td></tr>
+<tr><td>cellLimited <code>Gauss</code> <code>linear</code> 1</td><td>限制梯度不产生新极值，1 = 完全限制</td></tr>
+<tr><td>cellLimited&lt;cubic&gt; 1.5 <code>Gauss</code> <code>linear</code> 1</td><td>更平滑的限制器</td></tr>
 </tbody></table></div>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">gradSchemes
 {
@@ -218,17 +218,17 @@ wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍
     grad(U)         cellLimited Gauss linear 1;    // 网格差或有激波时加限制
 }</code></pre></div>
 <h2>13.4 divSchemes（对流项，最关键）</h2>
-<p>写法是 Gauss &lt;插值格式&gt;，Gauss 表示用高斯定理做体积分→面积分。真正起作用的是后面的插值格式：</p>
+<p>写法是 <code>Gauss</code> &lt;插值格式&gt;，<code>Gauss</code> 表示用高斯定理做体积分→面积分。真正起作用的是后面的插值格式：</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>插值格式</th><th>阶数</th><th>有界性</th><th>评价</th></tr>
-<tr><td>upwind</td><td>一阶</td><td>绝对有界</td><td>最稳但最耗散，只用来救急或做初场</td></tr>
-<tr><td>linear</td><td>二阶中心</td><td>无界</td><td>精度最好，<code>LES</code> 用；RANS 上容易振荡</td></tr>
-<tr><td>linearUpwind <code>grad</code>(<code>U</code>)</td><td>二阶迎风</td><td>基本有界</td><td>稳态 RANS 的常用选择</td></tr>
-<tr><td>limitedLinear 1</td><td>二阶 + 限制器</td><td>有界</td><td>通用、稳健，1 最严格</td></tr>
-<tr><td>vanLeer</td><td>TVD</td><td>有界</td><td>相分数 <code>alpha</code> 常用</td></tr>
-<tr><td>interfaceCompression vanLeer 1</td><td>VOF 界面压缩</td><td></td><td><code>interFoam</code> 的 <code>alpha</code> 方程</td></tr>
-<tr><td>LUST <code>grad</code>(<code>U</code>)</td><td>75% 线性 + 25% 迎风</td><td></td><td><code>LES</code> 折中方案</td></tr>
-<tr><td>limitedLinear01 1</td><td>限制在 [0,1]</td><td></td><td><code>alpha</code>、组分等有物理上下界的量</td></tr>
+<tr><td><code>upwind</code></td><td>一阶</td><td>绝对有界</td><td>最稳但最耗散，只用来救急或做初场</td></tr>
+<tr><td><code>linear</code></td><td>二阶中心</td><td>无界</td><td>精度最好，<code>LES</code> 用；RANS 上容易振荡</td></tr>
+<tr><td><code>linearUpwind</code> <code>grad</code>(<code>U</code>)</td><td>二阶迎风</td><td>基本有界</td><td>稳态 RANS 的常用选择</td></tr>
+<tr><td><code>limitedLinear</code> 1</td><td>二阶 + 限制器</td><td>有界</td><td>通用、稳健，1 最严格</td></tr>
+<tr><td><code>vanLeer</code></td><td>TVD</td><td>有界</td><td>相分数 <code>alpha</code> 常用</td></tr>
+<tr><td><code>interfaceCompression</code> <code>vanLeer</code> 1</td><td>VOF 界面压缩</td><td></td><td><code>interFoam</code> 的 <code>alpha</code> 方程</td></tr>
+<tr><td><code>LUST</code> <code>grad</code>(<code>U</code>)</td><td>75% 线性 + 25% 迎风</td><td></td><td><code>LES</code> 折中方案</td></tr>
+<tr><td><code>limitedLinear01</code> 1</td><td>限制在 [0,1]</td><td></td><td><code>alpha</code>、组分等有物理上下界的量</td></tr>
 </tbody></table></div>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// 稳态 RANS 的典型配置
 divSchemes
@@ -257,16 +257,16 @@ divSchemes
     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
 }</code></pre></div>
 <p>在相应格式字典中使用 <code>default</code> <code>none</code>，可要求相关项显式指定离散格式。缺失项会在运行时报告。应先确认方程项、变量及适用格式，再补充配置，避免仅根据名称机械复制。</p>
-<p>bounded 用于稳态输运方程，通过减去 <span class="math-formula" data-tex="(\nabla \cdot \varphi )U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi>φ</mi><mo stretchy="false">)</mo><mi>U</mi></mrow><annotation encoding="application/x-tex">(\nabla \cdot \varphi )U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span></span> 修正迭代过程中质量不守恒造成的源项。</p>
+<p><code>bounded</code> 用于稳态输运方程，通过减去 <span class="math-formula" data-tex="(\nabla \cdot \varphi )U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi>φ</mi><mo stretchy="false">)</mo><mi>U</mi></mrow><annotation encoding="application/x-tex">(\nabla \cdot \varphi )U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span></span> 修正迭代过程中质量不守恒造成的源项。</p>
 <h2>13.5 laplacianSchemes 与 snGradSchemes</h2>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">laplacianSchemes { default Gauss linear corrected; }
 snGradSchemes    { default corrected; }</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>修正方式</th><th>适用非正交角</th></tr>
-<tr><td>orthogonal</td><td>完全正交网格（如标准 <code>blockMesh</code> 方腔）</td></tr>
-<tr><td>corrected</td><td>&lt; 70°，标准选择</td></tr>
-<tr><td>limited corrected 0.5</td><td>70°–80°，0.5 表示限制到一半</td></tr>
-<tr><td>limited corrected 0.33</td><td>&gt; 80°，更保守</td></tr>
+<tr><td><code>orthogonal</code></td><td>完全正交网格（如标准 <code>blockMesh</code> 方腔）</td></tr>
+<tr><td><code>corrected</code></td><td>&lt; 70°，标准选择</td></tr>
+<tr><td>limited <code>corrected</code> 0.5</td><td>70°–80°，0.5 表示限制到一半</td></tr>
+<tr><td>limited <code>corrected</code> 0.33</td><td>&gt; 80°，更保守</td></tr>
 <tr><td>uncorrected</td><td>不修正，最稳但有误差</td></tr>
 </tbody></table></div>
 <p>怎么选：跑一次 <code>checkMesh</code> 看最大非正交角，按上表挑。这就是 6.5 节强调 <code>checkMesh</code> 的原因之一——它的输出直接决定这里怎么填。</p>

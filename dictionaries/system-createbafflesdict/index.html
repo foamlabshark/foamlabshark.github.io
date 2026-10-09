@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,9 +189,9 @@
 <p>这个字典指定哪些内部面要成为挡板，以及挡板两侧分别采用什么名称和网格类型。<code>createBaffles</code> 读取后生成两侧独立边界，便于为薄壁、隔板或耦合接口设置不同的场条件。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/createBafflesDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">挡板两侧的边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.name</code></td><td>新边界的名称；<code>master</code>、<code>slave</code> 表示两侧，名称可自定。</td></tr><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.type</code></td><td>新边界类型，例如 <code>wall</code>、<code>patch</code> 或 cyclic。选择 cyclic 时还需匹配 <code>neighbourPatch</code>、<code>transform</code>、<code>matchTolerance</code> 等耦合设置。</td></tr><tr><td><code>baffleFaces</code></td><td>所选 <code>faceZone</code> 的名称。</td></tr></tbody></table></div><p><a href="/dictionaries/system-createpatchdict/">新建与修改 patch 的参数</a></p>
+<h2 id="nested-configuration">挡板两侧的边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.name</code></td><td>新边界的名称；<code>master</code>、<code>slave</code> 表示两侧，名称可自定。</td></tr><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.type</code></td><td>新边界类型，例如 <code>wall</code>、<code>patch</code> 或 <code>cyclic</code>。选择 <code>cyclic</code> 时还需匹配 <code>neighbourPatch</code>、<code>transform</code>、<code>matchTolerance</code> 等耦合设置。</td></tr><tr><td><code>baffleFaces</code></td><td>所选 <code>faceZone</code> 的名称。</td></tr></tbody></table></div><p><a href="/dictionaries/system-createpatchdict/">新建与修改 patch 的参数</a></p>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 interfaceZone 面区域。</p>
+<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 <code>interfaceZone</code> 面区域。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">internalFacesOnly <span class="hljs-literal">true</span>;
 baffles
 {
@@ -206,7 +206,7 @@ baffles
         }
     }
 }</code></pre></div>
-<p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</summary><p>cpuCabinet 的这份文件保留了创建薄挡板的配置入口，但没有定义实际挡板。</p>
+<p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><p>cpuCabinet 的这份文件保留了创建薄挡板的配置入口，但没有定义实际挡板。</p>
 <ul>
 <li><code>internalFacesOnly true</code> 限定操作对象为内部面。</li>
 <li><code>baffles {}</code> 为空，因此这里没有要分离的面区、主面或从面。</li>
@@ -240,7 +240,7 @@ baffles
 <ul>
 <li><code>internalFacesOnly true</code> 只处理内部面。</li>
 <li><code>type faceZone</code>、<code>zoneName membrane</code> 选择已有膜面区。</li>
-<li><code>master</code> 命名为 membranePipe，<code>slave</code> 命名为 membraneSleeve，两侧都设为 <code>wall</code>。</li>
+<li><code>master</code> 命名为 <code>membranePipe</code>，<code>slave</code> 命名为 <code>membraneSleeve</code>，两侧都设为 <code>wall</code>。</li>
 <li>生成后两侧空间位置重合，但各自有边界面与场条件。</li>
 </ul>
 <p>更换膜模型时在两侧场边界中设置相应耦合或传输规律；网格分面本身只建立边界。</p>
@@ -286,11 +286,11 @@ baffles
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleFoam/RAS/annularThermalMixer</summary><p>环形热混合器将 <code>rotatingZone</code> 面区分为 AMI1、AMI2，构造不共形网格的配对接口。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleFoam/RAS/annularThermalMixer</summary><p>环形热混合器将 <code>rotatingZone</code> 面区分为 <code>AMI1</code>、<code>AMI2</code>，构造不共形网格的配对接口。</p>
 <ul>
 <li><code>zoneName rotatingZone</code> 给出被拆分的面区。</li>
 <li>主面为 <code>cyclicAMI</code>，<code>neighbourPatch AMI2</code> 指向对面，<code>matchTolerance 0.0001</code> 指定匹配容差。</li>
-<li>从面通过 <code>$master</code> 继承设置，再改名 AMI2、把邻面改为 AMI1。</li>
+<li>从面通过 <code>$master</code> 继承设置，再改名 <code>AMI2</code>、把邻面改为 <code>AMI1</code>。</li>
 <li><code>internalFacesOnly true</code> 将分面限制在内部面，<code>transform noOrdering</code> 保留此接口的变换设置。</li>
 </ul>
 <p>改动区域名称时成对更新 <code>neighbourPatch</code>，并检查两侧覆盖和插值权重。</p>

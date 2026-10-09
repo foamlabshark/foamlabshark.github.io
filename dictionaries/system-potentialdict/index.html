@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,11 +191,11 @@
 <p>位置：<code>system/potentialDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>sigma</code></td><td>常见为表面张力系数，但在电磁模型中可表示电导率；以模型与量纲为准。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>pair.&lt;组分对&gt;.pairPotential</code></td><td>两体势类型；O-O、Ar-Ar 是当前分子类型间的配对名称。</td></tr><tr><td><code>rMin / rCut / dr</code></td><td>两体势表的最小距离、截断距离和采样步长。</td></tr><tr><td><code>lennardJonesCoeffs.sigma / epsilon</code></td><td>Lennard–Jones 的长度与能量尺度。</td></tr><tr><td><code>maitlandSmithCoeffs.m / gamma / rm</code></td><td>Maitland–Smith 势函数的指数参数与参考距离。</td></tr><tr><td><code>energyScalingFunction</code></td><td>势能的截断/缩放函数，选择后读取其对应 <code>Coeffs</code>，例如 <code>doubleSigmoidCoeffs</code>。</td></tr><tr><td><code>doubleSigmoidCoeffs.shift1 / scale1 / shift2 / scale2</code></td><td>两段 sigmoid 的平移与尺度参数，用于调整势能切换。</td></tr><tr><td><code>electrostatic / dampedCoulombCoeffs.alpha</code></td><td>静电项及阻尼 Coulomb 模型的阻尼参数。</td></tr><tr><td><code>tether.&lt;位置类型&gt;.tetherPotential</code></td><td>系留势类型；<code>restrainedHarmonicSpringCoeffs</code> 的 <code>springConstant</code> 和 <code>rR</code> 控制弹簧与约束长度尺度。</td></tr><tr><td><code>external.gravity</code></td><td>外部重力项，作用于分子质量；与两体势分开组织。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater</summary><p>周期水分子体系使用分子间势计算相互作用，<code>potentialDict</code> 把短程作用与静电作用分别配置。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater</summary><p>周期水分子体系使用分子间势计算相互作用，<code>potentialDict</code> 把短程作用与静电作用分别配置。</p>
 <ul>
 <li>氧位点之间采用 Lennard–Jones 势，<code>sigma 3.154e-10</code> m 给出长度尺度，<code>epsilon 1.07690722e-21</code> J 给出能量尺度。</li>
 <li><code>rCut 1e-9</code> 将这组作用截断在 1 nm，<code>rMin</code>、<code>dr</code> 控制查表区间和分辨率，<code>writeTables yes</code> 输出势能表。</li>
-<li>静电部分使用 dampedCoulomb，<code>alpha 2e9</code> 控制阻尼，<code>shiftedForce</code> 处理截断处的力连续性。</li>
+<li>静电部分使用 <code>dampedCoulomb</code>，<code>alpha 2e9</code> 控制阻尼，<code>shiftedForce</code> 处理截断处的力连续性。</li>
 <li><code>potentialEnergyLimit 1e-18</code> 配合 <code>removalOrder</code> 处理初始化时能量过高的分子重叠。</li>
 <li><code>tether</code> 中为 <code>O</code> 定义弹簧参数，只有被标记为系留位点的分子才使用该约束；外加重力为零。</li>
 </ul>
@@ -317,11 +317,11 @@ external
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon</summary><p>氩原子算例以 <code>Ar</code>–<code>Ar</code> 对势描述分子间作用，并输出查表结果供检查。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon</code></summary><p>氩原子算例以 <code>Ar</code>–<code>Ar</code> 对势描述分子间作用，并输出查表结果供检查。</p>
 <ul>
 <li><code>pairPotential maitlandSmith</code> 选择 Maitland–Smith 势，<code>m 13</code>、<code>gamma 7.5</code> 控制势形状。</li>
 <li><code>rm 0.3756e-9</code> m 和 <code>epsilon 1.990108438e-21</code> J 设置长度与能量尺度。</li>
-<li><code>rCut 1e-9</code>、<code>rMin 0.15e-9</code>、<code>dr 5e-14</code> 给出势表范围与步长；doubleSigmoid 用 0.9 nm、0.97 nm 附近的过渡平滑处理截断。</li>
+<li><code>rCut 1e-9</code>、<code>rMin 0.15e-9</code>、<code>dr 5e-14</code> 给出势表范围与步长；<code>doubleSigmoid</code> 用 0.9 nm、0.97 nm 附近的过渡平滑处理截断。</li>
 <li>本算例 <code>Ar</code> 电荷为零，文件中保留的静电配置对这些中性粒子的库仑作用为零；tether/O 也只有对应的系留位点才使用。</li>
 </ul>
 <p><code>gravity (0 0 0)</code> 关闭外重力。改变势参数前后可比较势阱位置、势阱深度和体系平衡状态。</p>

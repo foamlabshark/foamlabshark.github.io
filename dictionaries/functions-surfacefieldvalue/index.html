@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -208,7 +208,7 @@
 </code></pre></div>
 <p><code>name</code> 是实际出口 <code>patch</code>。<code>phi</code> 已包含每个网格面的面积贡献，<code>sum</code> 将其相加得到总流量。<code>writeArea</code> 同时记录所选面积，有助于检查边界选择是否正确。正值通常表示流出域外，负值表示流入。</p>
 <p>不可压缩场的 <code>phi</code> 常以 m³/s 表示，可压缩场则常以 kg/s 表示，读取字段量纲确认。对壁面热流密度 W/m²，需要 <code>areaIntegrate</code> 才得到 W；对温度场使用 <code>areaAverage</code> 得到面积平均温度。</p>
-<p>截面平均温度若用于流体携热量，通常应按质量通量加权。此时可研究 <code>weightedAverage</code> 或相应加权面积操作，并明确权重场是否已经包含面积。发生回流时，正负通量会抵消，可以按需要分别统计流入与流出部分。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/simpleReactingParcelFoam/verticalChannel</summary><p>稳态垂直通道用出口通量加权平均，获得更适合表示流出流体状态的温度和水蒸气含量。</p>
+<p>截面平均温度若用于流体携热量，通常应按质量通量加权。此时可研究 <code>weightedAverage</code> 或相应加权面积操作，并明确权重场是否已经包含面积。发生回流时，正负通量会抵消，可以按需要分别统计流入与流出部分。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></summary><p>稳态垂直通道用出口通量加权平均，获得更适合表示流出流体状态的温度和水蒸气含量。</p>
 <ul>
 <li><code>regionType patch</code>、<code>name outlet</code> 选择出口。</li>
 <li><code>operation weightedAverage</code> 配合 <code>weightField phi</code> 按面通量加权。</li>
@@ -367,7 +367,7 @@ profiling
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</summary><p>挡风玻璃除霜的多区域计算每步监测 cabin 流体区入口通量。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</summary><p>挡风玻璃除霜的多区域计算每步监测 <code>cabin</code> 流体区入口通量。</p>
 <ul>
 <li><code>region cabin</code> 将函数对象绑定到客舱网格。</li>
 <li><code>regionType patch</code>、<code>name inlet</code> 选择入口。</li>

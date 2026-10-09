@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,7 +189,7 @@
 <p>并行求解前，这个字典规定把完整网格分成多少份、采用什么分区方法，以及哪些连接需要保留在一起。<code>decomposePar</code> 按此生成处理器子域，分区数随后应与并行启动的进程数对应。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/decomposeParDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>numberOfSubdomains</code></td><td>并行分区数，通常须与 MPI 进程数一致。</td></tr><tr><td><code>method</code></td><td>所采用的分区、插值或模型方法；含义由该字典的读取程序决定。</td></tr><tr><td><code>regions</code></td><td>几何选择区域或多区域列表，按所在字典的格式填写。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">分区方法与约束</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>simpleCoeffs.n / delta</code></td><td>simple 分解的三个方向分区数和轻微几何扰动系数；<code>n</code> 的乘积应等于 <code>numberOfSubdomains</code>。</td></tr><tr><td><code>hierarchicalCoeffs.n / delta / order</code></td><td>逐方向分解；<code>order</code>（例如 xyz）决定顺序，其余含义与几何分解匹配。</td></tr><tr><td><code>coeffs</code></td><td>部分分解模型支持通用系数字典；使用模型专名系数字典时先确认当前模型读取路径。</td></tr><tr><td><code>regions.&lt;区域&gt;.numberOfSubdomains / method</code></td><td>按区域指定分解方法和进程数，区域进程数取全局可用进程数以内的整数。</td></tr><tr><td><code>constraints.&lt;名称&gt;.type</code></td><td>例如 <code>preserveBaffles</code>、<code>preserveFaceZones</code>、<code>preservePatches</code>；保护指定连接关系。约束可能影响负载均衡。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/parallel/decompose/decompositionMethods/decompositionMethod/decompositionMethod.H">v2512 参数读取实现</a></p>
+<h2 id="nested-configuration">分区方法与约束</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>simpleCoeffs.n / delta</code></td><td><code>simple</code> 分解的三个方向分区数和轻微几何扰动系数；<code>n</code> 的乘积应等于 <code>numberOfSubdomains</code>。</td></tr><tr><td><code>hierarchicalCoeffs.n / delta / order</code></td><td>逐方向分解；<code>order</code>（例如 <code>xyz</code>）决定顺序，其余含义与几何分解匹配。</td></tr><tr><td><code>coeffs</code></td><td>部分分解模型支持通用系数字典；使用模型专名系数字典时先确认当前模型读取路径。</td></tr><tr><td><code>regions.&lt;区域&gt;.numberOfSubdomains / method</code></td><td>按区域指定分解方法和进程数，区域进程数取全局可用进程数以内的整数。</td></tr><tr><td><code>constraints.&lt;名称&gt;.type</code></td><td>例如 <code>preserveBaffles</code>、<code>preserveFaceZones</code>、<code>preservePatches</code>；保护指定连接关系。约束可能影响负载均衡。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/parallel/decompose/decompositionMethods/decompositionMethod/decompositionMethod.H">v2512 参数读取实现</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
@@ -198,7 +198,7 @@
 }
 numberOfSubdomains <span class="hljs-number">4</span>;
 method scotch;</code></pre></div>
-<p><code>numberOfSubdomains</code> 指定分区数，与求解阶段 mpirun <code>-np</code> 的进程数一致。<code>scotch</code> 采用图分割，simple 按坐标规则划分，hierarchical 按指定方向依次划分，manual 使用给定的处理器映射，multiLevel 组合多级分解方法。</p>
+<p><code>numberOfSubdomains</code> 指定分区数，与求解阶段 mpirun <code>-np</code> 的进程数一致。<code>scotch</code> 采用图分割，<code>simple</code> 按坐标规则划分，<code>hierarchical</code> 按指定方向依次划分，<code>manual</code> 使用给定的处理器映射，<code>multiLevel</code> 组合多级分解方法。</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 用 simple 替换上面的 method 时，加入以下系数</span>
 method simple;
 simpleCoeffs
@@ -206,7 +206,7 @@ simpleCoeffs
     n (<span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>);
     delta <span class="hljs-number">0.001</span>;
 }</code></pre></div>
-<p>示例中 <code>n</code> 的三个分量乘积为 4。<code>hierarchicalCoeffs</code> 还通过 <code>order</code> 指定划分顺序，如 xyz。多区域算例可在 <code>regions</code> 子字典中分别设置方法和子域数。<code>constraints</code> 用于保持挡板、面区域及指定连接关系，约束范围同时影响负载均衡。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">numberOfSubdomains  <span class="hljs-number">8</span>;          <span class="hljs-comment">// 必须等于 mpirun -np 的数字</span>
+<p>示例中 <code>n</code> 的三个分量乘积为 4。<code>hierarchicalCoeffs</code> 还通过 <code>order</code> 指定划分顺序，如 <code>xyz</code>。多区域算例可在 <code>regions</code> 子字典中分别设置方法和子域数。<code>constraints</code> 用于保持挡板、面区域及指定连接关系，约束范围同时影响负载均衡。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">numberOfSubdomains  <span class="hljs-number">8</span>;          <span class="hljs-comment">// 必须等于 mpirun -np 的数字</span>
 
 method              scotch;     <span class="hljs-comment">// 分区算法</span>
 
@@ -217,12 +217,12 @@ manualCoeffs    { dataFile <span class="hljs-string">"decompositionData"</span>;
 <div class="table-scroll"><table>
 <tbody><tr><th><code>method</code></th><th>说明</th><th>何时用</th></tr>
 <tr><td><code>scotch</code></td><td>自动最小化交界面，默认首选</td><td>绝大多数情况</td></tr>
-<tr><td>hierarchical</td><td>按指定顺序在 x/y/z 上依次均分</td><td>规则区域、想控制分区形状</td></tr>
-<tr><td>simple</td><td>直接三向均分</td><td>简单几何</td></tr>
-<tr><td>kahip / metis</td><td>其他图分区库</td><td>有装才有</td></tr>
-<tr><td>multiLevel</td><td>多级分区（跨节点/节点内分别优化）</td><td>大规模集群</td></tr>
-<tr><td>structured</td><td>沿某方向不切（保持结构）</td><td>边界层方向不切分</td></tr>
-<tr><td>manual</td><td>读文件指定每个单元归谁</td><td>特殊需求</td></tr>
+<tr><td><code>hierarchical</code></td><td>按指定顺序在 x/y/z 上依次均分</td><td>规则区域、想控制分区形状</td></tr>
+<tr><td><code>simple</code></td><td>直接三向均分</td><td>简单几何</td></tr>
+<tr><td><code>kahip</code> / <code>metis</code></td><td>其他图分区库</td><td>有装才有</td></tr>
+<tr><td><code>multiLevel</code></td><td>多级分区（跨节点/节点内分别优化）</td><td>大规模集群</td></tr>
+<tr><td><code>structured</code></td><td>沿某方向不切（保持结构）</td><td>边界层方向不切分</td></tr>
+<tr><td><code>manual</code></td><td>读文件指定每个单元归谁</td><td>特殊需求</td></tr>
 </tbody></table></div>
 <p>约束条件（保证某些面不被切开）：</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">constraints
@@ -231,7 +231,7 @@ manualCoeffs    { dataFile <span class="hljs-string">"decompositionData"</span>;
     cyclics       { <span class="hljs-keyword">type</span> preservePatches; patches (cyc1 cyc2); }
     faces         { <span class="hljs-keyword">type</span> singleProcessorFaceSets; sets ((f0 <span class="hljs-number">-1</span>)); }
 }</code></pre></div>
-<p><code>n</code> (2 2 2) 的乘积必须等于 <code>numberOfSubdomains</code>，写不一致会直接报错。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/filmPanel0</summary><p>filmPanel0 的并行计算把网格分给 12 个进程。</p>
+<p><code>n</code> (2 2 2) 的乘积必须等于 <code>numberOfSubdomains</code>，写不一致会直接报错。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/filmPanel0</summary><p>filmPanel0 的并行计算把网格分给 12 个进程。</p>
 <ul>
 <li><code>numberOfSubdomains 12</code> 指定子域数，运行 MPI 时的进程数需与之匹配。</li>
 <li><code>method scotch</code> 根据网格连接自动分区，目标是平衡工作量并控制子域接口。</li>
@@ -258,7 +258,7 @@ numberOfSubdomains <span class="hljs-number">12</span>;
 
 method  scotch;
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/compartmentFire</summary><p>compartmentFire 使用 8 个并行子域计算燃烧室流动。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>combustion/fireFoam/LES/compartmentFire</code></summary><p><code>compartmentFire</code> 使用 8 个并行子域计算燃烧室流动。</p>
 <ul>
 <li><code>numberOfSubdomains 8</code> 对应八个计算分区。</li>
 <li><code>method scotch</code> 根据拓扑自动划分，不需要在本字典手工指定各坐标方向份数。</li>
@@ -290,7 +290,7 @@ method      scotch;
 <ul>
 <li><code>numberOfSubdomains 4</code> 决定分区数量。</li>
 <li><code>method scotch</code> 自动划分网格连接，适用于当前三维区域。</li>
-<li>为复算目录中的网格和字段重新生成 processor 分区。</li>
+<li>为复算目录中的网格和字段重新生成 <code>processor</code> 分区。</li>
 </ul>
 <p>改变网格或并行规模后重新分解，再比较同一设计的目标函数和流动结果。</p>
 <p><a href="/assets/examples/v2512/decomposepardict/3-decomposeParDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval/system/decomposeParDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -205,7 +205,7 @@
 <p><code>fields</code> 选择要跟踪的方程；VOF 算例可将 <code>p</code> 换为 <code>p_rgh</code>，湍流计算可增加 <code>k</code>、<code>epsilon</code> 或 <code>omega</code>。<code>writeInterval 1</code> 每步写出，文本保存在 <code>postProcessing/linearSolvers/</code>。先查看文件头，区分初始残差、最终残差和迭代次数。</p>
 <p><code>writeResidualFields</code> 开启后可写初始残差场，适合定位空间上的残差分布，同时会增加输出量。某时间步没有求解某个场时，该场可能没有新的线性求解记录。</p>
 <p>一个 <code>PIMPLE</code> 时间步可能多次求解压力和速度，需要结合日志中的外校正与内校正次数解释记录。<code>solverInfo</code> 提供线性求解信息，稳态计算还可以同时记录流量、压降或阻力，观察这些目标量是否稳定。</p>
-<p>该对象主要在求解时使用。已经结束且只保存场文件的计算，可以从保留的求解日志提取残差；这些历史迭代数据无法由某一个最终场重新构造。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><p>平面 Poiseuille 算例专门记录压力线性求解信息。</p>
+<p>该对象主要在求解时使用。已经结束且只保存场文件的计算，可以从保留的求解日志提取残差；这些历史迭代数据无法由某一个最终场重新构造。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><p>平面 Poiseuille 算例专门记录压力线性求解信息。</p>
 <ul>
 <li><code>#includeEtc .../solverInfo.cfg</code> 引入公共 <code>solverInfo</code> 设置。</li>
 <li><code>fields (p)</code> 只筛选压力方程，便于逐步查看残差和迭代情况。</li>
@@ -219,9 +219,9 @@
 fields      ( p );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · compressible/rhoSimpleFoam/aerofoilNACA0012</summary><p>可压缩 NACA0012 算例监测压力、速度、能量和湍流方程的求解表现。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>compressible/rhoSimpleFoam/aerofoilNACA0012</code></summary><p>可压缩 NACA0012 算例监测压力、速度、能量和湍流方程的求解表现。</p>
 <ul>
-<li>公共 solverInfo.cfg 提供函数对象类型与输出设置。</li>
+<li>公共 <code>solverInfo.cfg</code> 提供函数对象类型与输出设置。</li>
 <li><code>fields (p U e k omega)</code> 选择五类字段，<code>e</code> 是此算例使用的能量变量。</li>
 <li>输出可用于发现某个方程残差持续偏高或线性迭代成本增加。</li>
 </ul>
@@ -233,11 +233,11 @@ fields      ( p );
 fields      ( p U e k omega );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantBoussinesqPimpleFoam/BenardCells</summary><p>Bénard 对流算例记录 <code>p_rgh</code> 的求解信息，便于观察浮力流动中的压力校正。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>heatTransfer/buoyantBoussinesqPimpleFoam/BenardCells</code></summary><p><code>B</code>énard 对流算例记录 <code>p_rgh</code> 的求解信息，便于观察浮力流动中的压力校正。</p>
 <ul>
 <li><code>fields (p_rgh)</code> 只监测扣除重力势后的压力变量。</li>
 <li><code>writeControl writeTime</code> 跟随主结果写出。</li>
-<li><code>writeFields yes</code> 同时启用相应诊断场输出，公共 solverInfo.cfg 提供其他基础设置。</li>
+<li><code>writeFields yes</code> 同时启用相应诊断场输出，公共 <code>solverInfo.cfg</code> 提供其他基础设置。</li>
 </ul>
 <p>出现对流结构变化时把压力求解信息与温度、速度变化放在同一时间范围比较。</p>
 <p><a href="/assets/examples/v2512/solverinfo/3-solverInfo.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/BenardCells/system/solverInfo">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/BenardCells">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>

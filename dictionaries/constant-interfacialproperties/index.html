@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -184,14 +184,14 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-interfacialproperties"><div class="eyebrow">OpenFOAM v2512</div><h1>interfacialProperties</h1><div class="prose"><p>multiphaseEulerFoam/mixerVessel2D 教程保留的相间阻力与换热配置，示例包含 SchillerNaumann、RanzMarshall、相间混合选择与小相分数控制。</p><!-- reference-introduction -->
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-interfacialproperties"><div class="eyebrow">OpenFOAM v2512</div><h1>interfacialProperties</h1><div class="prose"><p>multiphaseEulerFoam/mixerVessel2D 教程保留的相间阻力与换热配置，示例包含 <code>SchillerNaumann</code>、<code>RanzMarshall</code>、相间混合选择与小相分数控制。</p><!-- reference-introduction -->
 <h2 id="brief-introduction">简要介绍</h2>
 <p>这个字典示例来自对应多相搅拌教程，组织相间阻力、换热和混合选择。它用于说明各相怎样交换动量与热量，具体文件结构应与同一教程的相系统和求解器一起使用。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>constant/interfacialProperties</code></p><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dragModel1 / dragModel2</code></td><td>两种相角色对应的阻力关联式；须与 <code>dragPhase</code> 和 <code>dispersedPhase</code> 的连续相、分散相定义一致。</td></tr><tr><td><code>heatTransferModel1 / heatTransferModel2</code></td><td>相角色对应的传热模型；模型系数字典随所选模型变化。</td></tr><tr><td><code>minInterfaceAlpha / residualSlip</code></td><td>用于小相分数或小滑移量附近数值处理的阈值；不替代相分数边界和初值。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/multiphaseEulerFoam/mixerVessel2D</summary><p><code>mixerVessel2D</code> 的此文件保留了旧式两相接口写法。<code>v2512</code> 的配套 <code>multiphaseEulerFoam</code> 通过 <code>multiphaseSystem</code> 读取 <code>constant/transportProperties</code>；实际相间模型应在那个文件中的相对表里调整。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/multiphaseEulerFoam/mixerVessel2D</summary><p><code>mixerVessel2D</code> 的此文件保留了旧式两相接口写法。<code>v2512</code> 的配套 <code>multiphaseEulerFoam</code> 通过 <code>multiphaseSystem</code> 读取 <code>constant/transportProperties</code>；实际相间模型应在那个文件中的相对表里调整。</p>
 <ul>
 <li>这里的 <code>dragModel1/2 SchillerNaumann</code> 表达两侧分散相均采用球形分散物阻力关联式的意图；<code>dragPhase blended</code> 表达两种分散状态的混合处理。</li>
 <li><code>heatTransferModel1/2 RanzMarshall</code> 是分散颗粒换热关联式的名称。当前求解流程应以实际读取的模型字典为准，原文件适合用于理解旧式参数组织。</li>

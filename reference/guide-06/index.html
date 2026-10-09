@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -220,7 +220,7 @@ boundary  faces  neighbour  owner  points</code></pre></div>
 <tr><td><code>surfaceTransformPoints</code></td><td>缩放/平移/旋转几何</td><td><code>surfaceTransformPoints</code> <code>-scale</code> '(0.001 0.001 0.001)' in.stl out.stl</td></tr>
 <tr><td><code>surfaceConvert</code></td><td>格式转换（stl/obj/vtk/nas…）</td><td><code>surfaceConvert</code> in.obj out.stl</td></tr>
 <tr><td><code>surfaceOrient</code></td><td>统一法向朝向</td><td><code>surfaceOrient</code> in.stl '(0 0 0)' out.stl</td></tr>
-<tr><td><code>surfaceMeshTriangulate</code></td><td>把 OpenFOAM 边界导出为 STL</td><td>surfaceMeshTriangulate walls.stl <code>-patches</code> '(wall.*)'</td></tr>
+<tr><td><code>surfaceMeshTriangulate</code></td><td>把 OpenFOAM 边界导出为 STL</td><td><code>surfaceMeshTriangulate</code> walls.stl <code>-patches</code> '(wall.*)'</td></tr>
 <tr><td><code>surfaceBooleanFeatures</code></td><td>两个曲面的交线</td><td>复杂几何拼接时用</td></tr>
 <tr><td><code>surfaceSplitByPatch</code></td><td>按 <code>solid</code> 名拆分 STL</td><td>一个 STL 里含多个部件时</td></tr>
 </tbody></table></div>
@@ -258,7 +258,7 @@ reconstructParMesh -constant</code></pre></div>
 <p>字典写法见第 16 章。</p>
 <h2>6.4 extrudeMesh 与 extrudeToRegionMesh</h2>
 <p>是什么：把一个面（或一个已有的 <code>patch</code>）沿法向/轴向拉伸成三维网格。</p>
-<p>挤出工具可以构造薄层、轴对称 wedge 或独立的薄壁区域。挤出方向、层数和前后边界类型必须与目标模型的二维或轴对称假设一致。</p>
+<p>挤出工具可以构造薄层、轴对称 <code>wedge</code> 或独立的薄壁区域。挤出方向、层数和前后边界类型必须与目标模型的二维或轴对称假设一致。</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">extrudeMesh                       # 读 system/extrudeMeshDict
 extrudeToRegionMesh -overwrite    # 从 faceZone 生成新 region（共轭传热常用）</code></pre></div>
 <h2>6.5 checkMesh —— 网格体检（每次建完网格必跑）</h2>
@@ -283,12 +283,12 @@ Checking geometry...
 Mesh OK.</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>指标</th><th>安全范围</th><th>超标了怎么办</th></tr>
-<tr><td>non-orthogonality（非正交角）</td><td>&lt; 70 好；70–80 需处理；&gt; 80 危险</td><td>在 <code>fvSolution</code> 里加 <code>nNonOrthogonalCorrectors</code> 1~2，<code>fvSchemes</code> 的 <code>laplacianSchemes</code> 用 limited corrected 0.33</td></tr>
+<tr><td>non-orthogonality（非正交角）</td><td>&lt; 70 好；70–80 需处理；&gt; 80 危险</td><td>在 <code>fvSolution</code> 里加 <code>nNonOrthogonalCorrectors</code> 1~2，<code>fvSchemes</code> 的 <code>laplacianSchemes</code> 用 limited <code>corrected</code> 0.33</td></tr>
 <tr><td><code>skewness</code>（歪斜度）</td><td>&lt; 4</td><td>改网格，数值上没有好办法救</td></tr>
 <tr><td>aspect ratio（纵横比）</td><td>&lt; 100（边界层区域可放宽）</td><td>检查边界层加密是否过分</td></tr>
-<tr><td>negative volume（负体积）</td><td>必须为 0</td><td>网格是坏的，必须重建</td></tr>
+<tr><td><code>negative</code> <code>volume</code>（负体积）</td><td>必须为 0</td><td>网格是坏的，必须重建</td></tr>
 </tbody></table></div>
-<p>看到 ***Number of severely non-orthogonal <code>faces</code>: N 这种带 *** 的行，一定要处理，它是错误不是提示。</p>
+<p>看到 ***Number <code>of</code> severely non-orthogonal <code>faces</code>: N 这种带 *** 的行，一定要处理，它是错误不是提示。</p>
 <h2>6.6 renumberMesh —— 重排单元编号提速</h2>
 <p>是什么：用 Cuthill-McKee 等算法重新编号单元，让相邻单元的编号也相邻。</p>
 <p>重编号可改善矩阵带宽和访问局部性。用相同算例比较重编号前后的运行时间与收敛情况，评估效果。</p>
@@ -334,15 +334,15 @@ interFoam</code></pre></div>
 <p>兄弟命令</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>命令</th><th>作用</th><th>示例</th></tr>
-<tr><td><code>setExprFields</code></td><td>用表达式给场赋值，比 <code>setFields</code> 灵活得多</td><td><code>setExprFields</code> <code>-field</code> <code>U</code> <code>-expression</code> "<code>vector</code>(4*pos().y()*(1-pos().y()),0,0)"（抛物线入口）</td></tr>
+<tr><td><code>setExprFields</code></td><td>用表达式给场赋值，比 <code>setFields</code> 灵活得多</td><td><code>setExprFields</code> <code>-field</code> <code>U</code> <code>-expression</code> "<code>vector</code>(4*<code>pos</code>().y()*(1-pos().y()),0,0)"（抛物线入口）</td></tr>
 <tr><td><code>setExprBoundaryFields</code></td><td>同上，但作用在边界上</td><td>给非均匀边界条件用</td></tr>
 <tr><td><code>setAlphaField</code></td><td>按解析形状（球、平面）精确初始化相分数，界面处给出部分填充的体积分数</td><td>配合 <code>interIsoFoam</code> 做界面收敛性研究</td></tr>
 </tbody></table></div>
-<p><code>setExprFields</code> 值得单独说一句：它让你不写代码就能给出解析初场（剪切层、涡、扰动），做验证算例时极其省事。表达式里可用 pos()（单元中心坐标）、vol()、<code>time</code>()、rand() 等。</p>
+<p><code>setExprFields</code> 值得单独说一句：它让你不写代码就能给出解析初场（剪切层、涡、扰动），做验证算例时极其省事。表达式里可用 <code>pos</code>()（单元中心坐标）、vol()、<code>time</code>()、rand() 等。</p>
 <h2>6.10 网格操作类命令一览</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>命令</th><th>作用</th><th>典型用法</th></tr>
-<tr><td><code>createPatch</code></td><td>合并/拆分/新建边界 <code>patch</code>，把 cyclic 配对起来</td><td><code>createPatch</code> <code>-overwrite</code>（读 <code>system/createPatchDict</code>）</td></tr>
+<tr><td><code>createPatch</code></td><td>合并/拆分/新建边界 <code>patch</code>，把 <code>cyclic</code> 配对起来</td><td><code>createPatch</code> <code>-overwrite</code>（读 <code>system/createPatchDict</code>）</td></tr>
 <tr><td><code>mergeMeshes</code></td><td>把两套网格合成一套</td><td><code>mergeMeshes</code> . ../otherCase <code>-overwrite</code></td></tr>
 <tr><td><code>stitchMesh</code></td><td>把两个 <code>patch</code> 缝合成内部面</td><td><code>stitchMesh</code> <code>-perfect</code> patchA patchB <code>-overwrite</code></td></tr>
 <tr><td><code>mirrorMesh</code></td><td>按平面镜像网格</td><td><code>mirrorMesh</code> <code>-overwrite</code>（读 <code>mirrorMeshDict</code>）</td></tr>
@@ -354,7 +354,7 @@ interFoam</code></pre></div>
 <tr><td><code>polyDualMesh</code></td><td>生成对偶多面体网格</td><td><code>polyDualMesh</code> 60 <code>-overwrite</code></td></tr>
 <tr><td><code>collapseEdges</code></td><td>折叠过短的边，修补差网格</td><td><code>collapseEdges</code> <code>-overwrite</code></td></tr>
 <tr><td><code>moveDynamicMesh</code></td><td>只跑动网格运动，不解流场（检查运动设置）</td><td><code>moveDynamicMesh</code> <code>-checkAMI</code></td></tr>
-<tr><td><code>zeroDimensionalMesh</code></td><td>生成单单元网格（做化学反应零维验证）</td><td>zeroDimensionalMesh</td></tr>
+<tr><td><code>zeroDimensionalMesh</code></td><td>生成单单元网格（做化学反应零维验证）</td><td><code>zeroDimensionalMesh</code></td></tr>
 </tbody></table></div>
 <h2>6.11 mapFields / mapFieldsPar —— 把结果映射到另一套网格</h2>
 <p>是什么：把一个算例的场插值到另一个（网格不同的）算例上。</p>
@@ -375,7 +375,7 @@ mpirun -np 8 mapFieldsPar ../coarseCase -consistent -sourceTime latestTime -para
 <tr><td><code>gmshToFoam</code></td><td>Gmsh .msh</td><td><code>gmshToFoam</code> model.msh</td></tr>
 <tr><td><code>ideasUnvToFoam</code></td><td>I-DEAS / Salome .unv</td><td><code>ideasUnvToFoam</code> mesh.unv</td></tr>
 <tr><td><code>cfx4ToFoam</code></td><td>CFX .geo</td><td><code>cfx4ToFoam</code> mesh.geo</td></tr>
-<tr><td><code>starToFoam</code> / <code>ccm26ToFoam</code></td><td>STAR-CD / STAR-CCM+</td><td>ccm26ToFoam mesh.ccm</td></tr>
+<tr><td><code>starToFoam</code> / <code>ccm26ToFoam</code></td><td>STAR-CD / STAR-CCM+</td><td><code>ccm26ToFoam</code> mesh.ccm</td></tr>
 <tr><td><code>ansysToFoam</code></td><td>ANSYS .ans</td><td><code>ansysToFoam</code> mesh.ans <code>-scale</code> 0.001</td></tr>
 <tr><td><code>plot3dToFoam</code></td><td>Plot3D</td><td><code>plot3dToFoam</code> mesh.xyz</td></tr>
 <tr><td><code>netgenNeutralToFoam</code></td><td>Netgen</td><td><code>netgenNeutralToFoam</code> mesh.vol</td></tr>

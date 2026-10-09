@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>本条来自风挡颗粒与液膜教程，描述有限面积区域中的运动表面相关设置。它用于协调体网格、表面区域和对应模型，应结合该教程的区域建立及耦合流程阅读。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/regionFaIBMProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>surface</code></td><td>运动表面的几何路径，&lt;<code>constant</code>&gt; 在 OpenFOAM 文件查找机制中展开。</td></tr><tr><td><code>solidBodyMotionFunction</code></td><td>刚体运动函数，这些示例使用 rotatingMotion。</td></tr><tr><td><code>origin</code></td><td>局部坐标系、旋转或几何操作的参考原点。</td></tr><tr><td><code>axis</code></td><td>旋转轴或方向向量；需明确是否要求单位向量。</td></tr><tr><td><code>omega</code></td><td>角速度参数或湍流比耗散率场名，二者物理意义与量纲不同。</td></tr><tr><td><code>frequency</code></td><td>sine 函数的频率参数；与所定义函数的时间变量配合。</td></tr><tr><td><code>amplitude</code></td><td>sine 函数的振幅。</td></tr><tr><td><code>t0</code></td><td>时间函数参考起点，改变相位。</td></tr><tr><td><code>scale</code></td><td>此处属于对应区域对象的标量 Function1 设置，应按所用区域模型解释。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/kinematicParcelFoam/windshield</summary><p>windshield 用两个浸入边界表面表示摆动部件，<code>regionFaIBMProperties</code> 给它们指定几何和随时间变化的旋转运动。</p>
+<p>位置：<code>constant/regionFaIBMProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>surface</code></td><td>运动表面的几何路径，&lt;<code>constant</code>&gt; 在 OpenFOAM 文件查找机制中展开。</td></tr><tr><td><code>solidBodyMotionFunction</code></td><td>刚体运动函数，这些示例使用 <code>rotatingMotion</code>。</td></tr><tr><td><code>origin</code></td><td>局部坐标系、旋转或几何操作的参考原点。</td></tr><tr><td><code>axis</code></td><td>旋转轴或方向向量；需明确是否要求单位向量。</td></tr><tr><td><code>omega</code></td><td>角速度参数或湍流比耗散率场名，二者物理意义与量纲不同。</td></tr><tr><td><code>frequency</code></td><td><code>sine</code> 函数的频率参数；与所定义函数的时间变量配合。</td></tr><tr><td><code>amplitude</code></td><td><code>sine</code> 函数的振幅。</td></tr><tr><td><code>t0</code></td><td>时间函数参考起点，改变相位。</td></tr><tr><td><code>scale</code></td><td>此处属于对应区域对象的标量 Function1 设置，应按所用区域模型解释。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/kinematicParcelFoam/windshield</summary><p><code>windshield</code> 用两个浸入边界表面表示摆动部件，<code>regionFaIBMProperties</code> 给它们指定几何和随时间变化的旋转运动。</p>
 <ul>
 <li><code>IBM1</code> 与 <code>IBM2</code> 分别读取 surface.obj 和 surface_offset.obj，路径中的 <code>&lt;constant&gt;</code> 指向当前算例的 <code>constant</code> 目录。</li>
 <li>两者均为 <code>rotatingMotion</code>，旋转轴为 <code>(0 0 1)</code>；旋转中心分别是 <code>(0.5 0 0)</code> 与 <code>(0.65 0 0)</code>。</li>

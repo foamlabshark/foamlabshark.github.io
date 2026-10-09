@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -225,10 +225,10 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
     <span class="hljs-meta">#includeFunc  flowRatePatch(name=outlet)</span>
     <span class="hljs-meta">#includeFunc  singleGraph</span>
 }</code></pre></div>
-<p>预配置函数位于 etc/caseDicts/postProcessing。用 <code>postProcess</code> <code>-list</code> 查看预配置入口，<code>foamGetDict</code> 复制模板，再设置场名、边界名称及执行、输出频率。#includeFunc 可载入模板或本地配置。</p>
+<p>预配置函数位于 etc/caseDicts/postProcessing。用 <code>postProcess</code> <code>-list</code> 查看预配置入口，<code>foamGetDict</code> 复制模板，再设置场名、边界名称及执行、输出频率。#<code>includeFunc</code> 可载入模板或本地配置。</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">ls $FOAM_ETC/caseDicts/postProcessing/*        # 看看有哪些现成模板</code></pre></div>
 <h2>8.3 常用 functionObject 的写法</h2>
-<p>写在 <code>system/controlDict</code> 的 <code>functions</code> {} 里（也可以单独放文件再 #include）。所有 <code>functionObject</code> 都有这几个公共关键字：</p>
+<p>写在 <code>system/controlDict</code> 的 <code>functions</code> {} 里（也可以单独放文件再 #<code>include</code>）。所有 <code>functionObject</code> 都有这几个公共关键字：</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>关键字</th><th>含义</th></tr>
 <tr><td><code>type</code></td><td>功能类型</td></tr>
@@ -236,7 +236,7 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 <tr><td><code>writeControl</code></td><td><code>timeStep</code> / <code>runTime</code> / <code>writeTime</code> / <code>onEnd</code></td></tr>
 <tr><td><code>writeInterval</code></td><td>间隔</td></tr>
 <tr><td><code>executeControl</code> / <code>executeInterval</code></td><td>计算频率（可以算得勤、写得少）</td></tr>
-<tr><td><code>enabled</code></td><td>true/false，临时关掉某个功能</td></tr>
+<tr><td><code>enabled</code></td><td><code>true/false</code>，临时关掉某个功能</td></tr>
 <tr><td><code>timeStart</code> / <code>timeEnd</code></td><td>只在某段时间内工作（如统计平均只从流动充分发展后开始）</td></tr>
 </tbody></table></div>
 <p>① 探针：监测某几个点的时间序列</p>
@@ -380,17 +380,17 @@ paraFoam -vtk -<span class="hljs-built_in">touch</span>              <span class
 paraFoam -block              <span class="hljs-comment"># 打开 blockMeshDict 定义的块结构（调试 blockMesh 用）</span>
 paraFoam -region solid       <span class="hljs-comment"># 打开指定区域</span>
 paraFoam -<span class="hljs-keyword">case</span> ../run1</code></pre></div>
-<p><code>v2512</code> 的 <code>paraFoam</code> 调用 PATH 中的 paraview。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> paraview 查看程序位置，再选择所需读取器。</p>
-<p>并行结果怎么看：不需要先 <code>reconstructPar</code>。在 ParaView 里打开 .foam 后，属性面板里把 Case Type 从 Reconstructed Case 改成 Decomposed Case 即可直接读 processor* 目录。省时间也省硬盘。</p>
+<p><code>v2512</code> 的 <code>paraFoam</code> 调用 <code>PATH</code> 中的 <code>paraview</code>。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> <code>paraview</code> 查看程序位置，再选择所需读取器。</p>
+<p>并行结果怎么看：不需要先 <code>reconstructPar</code>。在 ParaView 里打开 .foam 后，属性面板里把 Case Type 从 Reconstructed Case 改成 Decomposed Case 即可直接读 <code>processor</code>* 目录。省时间也省硬盘。</p>
 <p>六个必会操作</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>目的</th><th>操作</th></tr>
-<tr><td>看内部流场</td><td>Filters → Slice（切面），法向选 <code>z</code></td></tr>
+<tr><td>看内部流场</td><td><code>Filters</code> → Slice（切面），法向选 <code>z</code></td></tr>
 <tr><td>看等值面</td><td>等值面：<code>Filters → Contour</code>（先用“单元数据转点数据”过滤器）</td></tr>
-<tr><td>看涡结构</td><td>先 <code>postProcess</code> <code>-func</code> <code>Q</code>，再 Contour 取 <code>Q</code> 的正值</td></tr>
-<tr><td>看矢量</td><td>Filters → Glyph，Scale Array 选 <code>U</code>，Scale Factor 调到合适</td></tr>
-<tr><td>取一条线的数据</td><td>Filters → Plot Over Line，右侧直接出曲线，可 Save Data 成 <code>csv</code></td></tr>
-<tr><td>看流线</td><td>Filters → Stream Tracer</td></tr>
+<tr><td>看涡结构</td><td>先 <code>postProcess</code> <code>-func</code> <code>Q</code>，再 <code>Contour</code> 取 <code>Q</code> 的正值</td></tr>
+<tr><td>看矢量</td><td><code>Filters</code> → Glyph，Scale Array 选 <code>U</code>，Scale Factor 调到合适</td></tr>
+<tr><td>取一条线的数据</td><td><code>Filters</code> → Plot Over Line，右侧直接出曲线，可 Save <code>Data</code> 成 <code>csv</code></td></tr>
+<tr><td>看流线</td><td><code>Filters</code> → Stream Tracer</td></tr>
 </tbody></table></div>
 <p>使用 ParaView 过滤器前，应检查输入数组是单元数据还是点数据。对需要点数据的操作，可根据过滤器要求使用“单元数据转点数据”（<code>Cell Data to Point Data</code>），或检查 OpenFOAM 读取器的转换选项。转换会引入插值，分析结果时应明确其数据位置。</p>
 <p>导出动画：View → Animation，或者 File → Save Animation 存成 png 序列，再用</p>
@@ -407,7 +407,7 @@ ffmpeg -r 25 -i images/seq.%04d.png -pix_fmt yuv420p movie.mp4</code></pre></div
 <tr><td><code>postProcess</code> <code>-func</code> <code>writeCellCentres</code></td><td>输出单元中心坐标场，做自定义分析时常用</td></tr>
 <tr><td><code>particleTracks</code></td><td>拉格朗日颗粒轨迹重建</td></tr>
 <tr><td><code>noise</code></td><td>声压级/频谱分析（气动噪声）</td></tr>
-</tbody></table></div><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#includeFunc <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
+</tbody></table></div><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

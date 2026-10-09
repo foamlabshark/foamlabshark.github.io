@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -209,7 +209,7 @@
 </code></pre></div>
 <p><code>probeLocations</code> 以米给出探针坐标，两个位置位于基础方腔内部。<code>cell</code> 读取探针所在单元的值；需要插值到点时，可以研究 <code>cellPoint</code>。<code>writeInterval 1</code> 表示每步记录，独立于全场写出间隔。</p>
 <p>数据位于 <code>postProcessing/cavityProbes/&lt;起始时间&gt;/p</code> 和 <code>U</code>。文件头记录探针编号，数据第一列为时间，之后按探针顺序排列；速度每个点有三个分量。变时间步计算的时间列一般不等间隔，做频谱前需要采用适合非均匀采样的方法，或先重采样。</p>
-<p>探针落在域外时，日志会提示定位失败。几何缩放后更新坐标，移动网格中还需确认固定探针在整个采样阶段都位于目标流体区域。增加温度采样只需把 <code>fields</code> 改为 <code>(p U T)</code>，前提是案例中存在温度场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><p>平面 Poiseuille 算例在一个固定位置监测速度随时间的变化。</p>
+<p>探针落在域外时，日志会提示定位失败。几何缩放后更新坐标，移动网格中还需确认固定探针在整个采样阶段都位于目标流体区域。增加温度采样只需把 <code>fields</code> 改为 <code>(p U T)</code>，前提是案例中存在温度场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><p>平面 Poiseuille 算例在一个固定位置监测速度随时间的变化。</p>
 <ul>
 <li><code>#includeEtc .../probes.cfg</code> 引入 <code>probes</code> 函数对象的公共设置。</li>
 <li><code>fields (U)</code> 只采样速度向量。</li>
@@ -227,7 +227,7 @@ probeLocations
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</summary><p>cpuCabinet 同时监测部件平均温度和局部探针，用于区分整体温升与局部热点。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><p>cpuCabinet 同时监测部件平均温度和局部探针，用于区分整体温升与局部热点。</p>
 <ul>
 <li><code>Volume1_v_CPU</code>、<code>Volume3_v_fins</code> 采用 <code>volAverage</code> 对各自区域的 <code>T</code> 做体积加权平均。</li>
 <li><code>probesFins/region v_fins</code> 在两个给定位置采样固体温度。</li>
@@ -310,7 +310,7 @@ probesFluid
 }
 <span class="hljs-meta">#remove (_volFieldValue _surfaceFieldValue)</span>
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</summary><p>Rutland 涡算例在两个对称位置记录压力，以观察可压缩涡运动的时间变化。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></summary><p>Rutland 涡算例在两个对称位置记录压力，以观察可压缩涡运动的时间变化。</p>
 <ul>
 <li><code>functions/probes</code> 的 <code>type probes</code> 与 <code>libs (sampling)</code> 启用点采样。</li>
 <li>位置为 <code>(3 2 0)</code> 和 <code>(3 -2 0)</code>，<code>fields (p)</code> 保存压力。</li>

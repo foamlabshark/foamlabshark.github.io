@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>meshQualityDict</code> 将允许的网格非正交性、偏斜和体积等指标集中设置。它可供网格生成过程判断局部操作是否可接受，也可用于后续质量检查，让生成与检查采用一致的阈值。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>system/meshQualityDict</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-mesh-nonorthogonality.png" alt="非正交角的几何定义" loading="lazy"><figcaption><strong>非正交角的几何定义</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module3.pdf，p. 16</small></figcaption></figure><h2>配置方法</h2><p>运行 <code>foamGetDict</code> <code>meshQualityDict</code> 获取模板，或通过 #includeEtc "caseDicts/meshQualityDict" 引入。下表列出常用质量指标及示例阈值，阈值应结合网格尺度和求解要求确定。</p>
+<p>位置：<code>system/meshQualityDict</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-mesh-nonorthogonality.png" alt="非正交角的几何定义" loading="lazy"><figcaption><strong>非正交角的几何定义</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module3.pdf，p. 16</small></figcaption></figure><h2>配置方法</h2><p>运行 <code>foamGetDict</code> <code>meshQualityDict</code> 获取模板，或通过 #<code>includeEtc</code> "<code>caseDicts/meshQualityDict</code>" 引入。下表列出常用质量指标及示例阈值，阈值应结合网格尺度和求解要求确定。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>含义</th><th>示例值</th></tr>
 <tr><td><code>maxNonOrtho</code></td><td>最大非正交角</td><td>65</td></tr>
@@ -205,11 +205,11 @@
 <tr><td><code>nSmoothScale</code>、<code>errorReduction</code></td><td>质量失败时缩放处理参数</td><td>4、0.75</td></tr>
 </tbody></table></div><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#includeEtc "caseDicts/meshQualityDict"     // 直接用官方默认阈值</span>
 maxNonOrtho <span class="hljs-number">65</span>;                             <span class="hljs-comment">// 再局部覆盖</span></code></pre></div>
-<p>供 <code>checkMesh</code> <code>-meshQuality</code> 与 <code>snappyHexMesh</code> 共用。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/reactingFoam/RAS/membrane</summary><p>膜分离反应流算例把网格质量阈值集中放在公共配置中。</p>
+<p>供 <code>checkMesh</code> <code>-meshQuality</code> 与 <code>snappyHexMesh</code> 共用。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/reactingFoam/RAS/membrane</summary><p>膜分离反应流算例把网格质量阈值集中放在公共配置中。</p>
 <ul>
 <li>这里唯一的有效条目是 <code>#includeEtc "caseDicts/meshQualityDict"</code>，它从当前 OpenFOAM 安装展开质量约束。</li>
 <li>实际阈值取决于被包含文件；阅读本例时应连同该文件查看非正交、倾斜与体积等要求。</li>
-<li>本文件没有局部覆盖值，调整某项可在 include 后显式添加同名条目。</li>
+<li>本文件没有局部覆盖值，调整某项可在 <code>include</code> 后显式添加同名条目。</li>
 </ul>
 <p>网格被拒绝时先定位具体质量项和坏单元位置，再判断是改善几何、网格参数，还是调整适当阈值。</p>
 <p><a href="/assets/examples/v2512/meshqualitydict/1-meshQualityDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/meshQualityDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
@@ -234,7 +234,7 @@ maxNonOrtho <span class="hljs-number">65</span>;                             <sp
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/rotorDisk</summary><p>rotorDisk 的网格质量设置引用生成器用的公共阈值，供网格生成与质量判断使用。</p>
 <ul>
 <li><code>#includeEtc "caseDicts/mesh/generation/meshQualityDict.cfg"</code> 指向安装内的生成配置。</li>
-<li>本地文件没有再定义数值，因此完整配置由 include 展开取得。</li>
+<li>本地文件没有再定义数值，因此完整配置由 <code>include</code> 展开取得。</li>
 <li>需要定制时可在文件后部增加明确的质量阈值，并保留与求解离散格式的对应。</li>
 </ul>
 <p>旋转盘附近的高纵横比或局部细化需要查看坏单元分布；单独放宽阈值不会改变网格本身。</p>
@@ -257,7 +257,7 @@ maxNonOrtho <span class="hljs-number">65</span>;                             <sp
 <span class="hljs-meta">#includeEtc "caseDicts/mesh/generation/meshQualityDict.cfg"</span>
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · combustion/XiDyMFoam/annularCombustorTurbine</summary><p>环形燃烧器网格沿用公共质量标准，并对非正交角作了更明确的限制。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>combustion/XiDyMFoam/annularCombustorTurbine</code></summary><p>环形燃烧器网格沿用公共质量标准，并对非正交角作了更明确的限制。</p>
 <ul>
 <li><code>#includeEtc "caseDicts/meshQualityDict"</code> 提供基础质量约束。</li>
 <li><code>maxNonOrtho 55</code> 将允许的最大非正交角设为 55°，本地值覆盖包含文件中的同名项。</li>

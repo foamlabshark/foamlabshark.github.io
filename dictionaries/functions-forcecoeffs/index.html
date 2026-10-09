@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -217,7 +217,7 @@ C_D=\frac{F_D}{\tfrac12\rho U_\infty^2 A_{ref}}.
 </code></pre></div>
 <p><code>e1</code> 为阻力方向，<code>e3</code> 为升力方向，两者正交；这里阻力沿 <code>x</code>、升力沿 <code>y</code>。<code>origin</code> 是力矩参考点，<code>magUInf</code> 是参考速度，<code>lRef</code> 是力矩归一化所用长度，<code>Aref</code> 是参考面积。</p>
 <p><code>v2512</code> 的不可压缩系数计算中，密度在力与动压归一化中抵消；源码按单位密度处理这一情形。若要得到有量纲力并正确应用实际密度，同时使用 <code>forces</code>。可压缩系数计算则需要与参考动压一致的参考密度。</p>
-<p>结果位于 <code>postProcessing/bodyCoefficients/</code>。二维案例的 <code>Aref</code> 应包含实际网格厚度，或在一致的单位展长定义下处理。改变来流方向时同步更新坐标方向与参考速度，以免把升力投影到了错误轴上。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/LES/motorBike/motorBike</summary><p><code>motorBike</code> 的 <code>forceCoeffs</code> 将总载荷换算为无量纲升阻力系数。</p>
+<p>结果位于 <code>postProcessing/bodyCoefficients/</code>。二维案例的 <code>Aref</code> 应包含实际网格厚度，或在一致的单位展长定义下处理。改变来流方向时同步更新坐标方向与参考速度，以免把升力投影到了错误轴上。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/LES/motorBike/motorBike</summary><p><code>motorBike</code> 的 <code>forceCoeffs</code> 将总载荷换算为无量纲升阻力系数。</p>
 <ul>
 <li><code>patches ("motorBike.*")</code> 收集摩托车相关表面，<code>rho rhoInf</code>、<code>rhoInf 1</code> 给参考密度。</li>
 <li><code>magUInf 20</code>、<code>Aref 0.75</code> 分别给 20 m/s 来流和 0.75 m² 参考面积，力系数按动压乘面积归一化。</li>
@@ -254,7 +254,7 @@ forces
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/pimpleFoam/LES/NACA4412</summary><p>NACA4412 的升阻力方向根据攻角表达式计算，避免手工填写不一致的方向向量。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/pimpleFoam/LES/NACA4412</code></summary><p>NACA4412 的升阻力方向根据攻角表达式计算，避免手工填写不一致的方向向量。</p>
 <ul>
 <li><code>AoA 13.87</code> 以角度输入，<code>degToRad</code> 转为三角函数使用的弧度。</li>
 <li><code>liftDir</code>、<code>dragDir</code> 分别由正弦和余弦构造，与来流方向对应。</li>
@@ -296,7 +296,7 @@ forceCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/sonicFoam/RAS/nacaAirfoil</summary><p>高速翼型算例把指定壁面的载荷按自由来流尺度归一化。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/sonicFoam/RAS/nacaAirfoil</code></summary><p>高速翼型算例把指定壁面的载荷按自由来流尺度归一化。</p>
 <ul>
 <li><code>patches (wall_4)</code> 选择翼型表面。</li>
 <li><code>magUInf 618.022</code>、<code>lRef 1</code>、<code>Aref 1</code> 给速度、长度与面积参考。</li>

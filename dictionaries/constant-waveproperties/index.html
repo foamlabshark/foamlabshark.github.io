@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>waveProperties</code> 定义造波或吸波模型，把波高、周期、水深和传播方向转换为相应边界行为。它适合数值波浪水槽，需要让波浪参数与重力方向、初始水位及入口出口位置一致。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/waveProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>waveModel</code></td><td>采用的波浪理论或造波模型，决定色散关系和所需波参数。</td></tr><tr><td><code>waveHeight</code></td><td>波峰到波谷的高度，一般为振幅的两倍。</td></tr><tr><td><code>waveAngle</code></td><td>波浪传播方向角，其单位与参考方向由模型定义。</td></tr><tr><td><code>rampTime</code></td><td>造波信号逐渐增长到目标幅值的时间，用于减小启动瞬态。</td></tr><tr><td><code>wavePeriod</code></td><td>波浪周期。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/waves/waveMakerSolitary</summary><p>waveMakerSolitary 的 <code>waveProperties</code> 配置出口消波，使传播到出口的长波尽量平顺地离开计算域。</p>
+<p>位置：<code>constant/waveProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>waveModel</code></td><td>采用的波浪理论或造波模型，决定色散关系和所需波参数。</td></tr><tr><td><code>waveHeight</code></td><td>波峰到波谷的高度，一般为振幅的两倍。</td></tr><tr><td><code>waveAngle</code></td><td>波浪传播方向角，其单位与参考方向由模型定义。</td></tr><tr><td><code>rampTime</code></td><td>造波信号逐渐增长到目标幅值的时间，用于减小启动瞬态。</td></tr><tr><td><code>wavePeriod</code></td><td>波浪周期。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/waves/waveMakerSolitary</summary><p>waveMakerSolitary 的 <code>waveProperties</code> 配置出口消波，使传播到出口的长波尽量平顺地离开计算域。</p>
 <ul>
 <li><code>outlet</code> 是实际出口边界名称，<code>alpha alpha.water</code> 指定用于识别水面的体积分数字段。</li>
 <li><code>waveModel shallowWaterAbsorption</code> 根据浅水波关系构造吸收处理。</li>
@@ -227,7 +227,7 @@ outlet
 <li><code>waveAngle 0</code> 设置传播方向，<code>uMean 2.0825</code> 提供流函数波解中的平均速度参数，应与所用理论解配套。</li>
 <li><code>Bjs</code>、<code>Ejs</code> 是该波解的级数系数，改变波高、水深或周期时应重新求解这些系数。</li>
 <li><code>rampTime 3.017</code> 使造波在一个周期内逐步建立，<code>activeAbsorption yes</code> 启用入口的主动吸收处理。</li>
-<li>出口使用 shallowWaterAbsorption，<code>nPaddle 1</code> 对整个边界采用单个控制分段。</li>
+<li>出口使用 <code>shallowWaterAbsorption</code>，<code>nPaddle 1</code> 对整个边界采用单个控制分段。</li>
 </ul>
 <p>通过入口下游的水位探针检查实际周期和波高，再逐步分析反射与耗散。</p>
 <p><a href="/assets/examples/v2512/waveproperties/2-waveProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction/constant/waveProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">78 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

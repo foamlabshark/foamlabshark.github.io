@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -186,16 +186,16 @@
 
   <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/commands/">← 返回命令速查</a></div><div class="article-shell"><article class="article" data-cms-slug="command-makedepend"><div class="eyebrow">OpenFOAM v2512</div><h1>makeDepend</h1><div class="prose"><p>封装预处理器的依赖生成命令，供构建规则使用。</p><!-- reference-introduction -->
 <h2 id="brief-introduction">简要介绍</h2>
-<p><code>makeDepend</code> 封装预处理器的依赖生成功能，分析源文件引用了哪些头文件。输出的 Make 依赖关系用于判断哪些输入变化后需要重新编译，避免每次都重建整个项目。</p>
+<p><code>makeDepend</code> 封装预处理器的依赖生成功能，分析源文件引用了哪些头文件。输出的 <code>Make</code> 依赖关系用于判断哪些输入变化后需要重新编译，避免每次都重建整个项目。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 这是用 cpp <code>-M</code> 生成 <code>C</code>++ 依赖的测试包装器。先准备 main.C；WM_PRECISION_OPTION 和 WM_LABEL_SIZE 来自已加载环境。以下通过重定向保存依赖。</p>
+<p>先加载 <code>v2512</code> 环境。内部工具使用完整路径；所有输出放在个人可写目录。 这是用 cpp <code>-M</code> 生成 <code>C</code>++ 依赖的测试包装器。先准备 <code>main.C</code>；<code>WM_PRECISION_OPTION</code> 和 <code>WM_LABEL_SIZE</code> 来自已加载环境。以下通过重定向保存依赖。</p>
 <h2>示例 1：生成简单依赖</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">printf</span> <span class="hljs-string">'#include "model.H"\nint main() { return 0; }\n'</span> &gt; main.C
 <span class="hljs-built_in">touch</span> model.H
 <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/scripts/makeDepend"</span> main.C &gt; main.dep
 </code></pre></div>
-<p>cpp 读取 main.C 的头文件引用，输出 make 依赖规则。</p>
+<p>cpp 读取 <code>main.C</code> 的头文件引用，输出 <code>make</code> 依赖规则。</p>
 <h2>示例 2：增加头文件搜索目录</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p include
 <span class="hljs-built_in">cp</span> model.H include/model.H
@@ -209,11 +209,11 @@
 <h2>示例 4：生成 OpenFOAM 源码依赖</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/scripts/makeDepend"</span> -I<span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/src/OpenFOAM/lnInclude"</span> -I<span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/src/OSspecific/POSIX/lnInclude"</span> basicFoamTool.C &gt; basicFoamTool.dep
 </code></pre></div>
-<p>basicFoamTool.C 是只使用相应基础头文件的自编源码；所用库越多，需要追加相应 include 路径。</p>
+<p>basicFoamTool.C 是只使用相应基础头文件的自编源码；所用库越多，需要追加相应 <code>include</code> 路径。</p>
 <h2>示例 5：给两个源文件分别生成依赖</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-keyword">for</span> src <span class="hljs-keyword">in</span> main.C model.C; <span class="hljs-keyword">do</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/wmake/scripts/makeDepend"</span> -Iinclude <span class="hljs-string">"<span class="hljs-variable">$src</span>"</span> &gt; <span class="hljs-string">"<span class="hljs-variable">${src%.C}</span>.dep"</span> || <span class="hljs-built_in">break</span>; <span class="hljs-keyword">done</span>
 </code></pre></div>
-<p>先准备 model.C；每个源文件得到独立依赖文件，失败时结束循环。</p>
+<p>先准备 <code>model.C</code>；每个源文件得到独立依赖文件，失败时结束循环。</p>
 <h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/wmake/scripts/makeDepend">源码与说明</a> · <a href="/assets/command-help/makedepend.txt">帮助文本</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>

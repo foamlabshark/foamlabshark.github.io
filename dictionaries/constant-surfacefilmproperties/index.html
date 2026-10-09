@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,10 +188,10 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>surfaceFilmProperties</code> 描述壁面液膜的材料和模型，并安排相变、颗粒或壁面相互作用。它用于表面液膜区域与主体流动之间的耦合，膜厚、温度和交换过程由配套字段及模型共同确定。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/surfaceFilmProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>surfaceFilmModel</code></td><td>表面液膜模型选择，需与液膜区域和主流体耦合条件配套。</td></tr><tr><td><code>region</code></td><td>目标网格区域名称；多区域场与网格路径中应保持一致。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>injectionModels</code></td><td>注入时间、位置、流量与粒径分布等设置；需要同时满足总注入质量与统计分辨率要求。</td></tr><tr><td><code>radiationModel</code></td><td>辐射传输模型名称，例如 P1、fvDOM 或 viewFactor；不同模型需要不同附加文件。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
+<p>位置：<code>constant/surfaceFilmProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>surfaceFilmModel</code></td><td>表面液膜模型选择，需与液膜区域和主流体耦合条件配套。</td></tr><tr><td><code>region</code></td><td>目标网格区域名称；多区域场与网格路径中应保持一致。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>injectionModels</code></td><td>注入时间、位置、流量与粒径分布等设置；需要同时满足总注入质量与统计分辨率要求。</td></tr><tr><td><code>radiationModel</code></td><td>辐射传输模型名称，例如 <code>P1</code>、fvDOM 或 <code>viewFactor</code>；不同模型需要不同附加文件。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>surfaceFilmModel / thermoSingleLayerCoeffs</code></td><td>液膜模型与其系数字典；下面的子模型属于该系数字典。</td></tr><tr><td><code>filmThermoModel / liquidCoeffs</code></td><td>液膜热物性模型；<code>liquid</code> 指定液体，<code>useReferenceValues</code> 决定是否按参考状态取值。</td></tr><tr><td><code>filmViscosityModel / turbulence / laminarCoeffs.Cf</code></td><td>液膜黏度、湍流模型与层流闭合系数。</td></tr><tr><td><code>deltaWet / hydrophilic</code></td><td>判断湿润区域的液膜厚度阈值与亲液处理开关。</td></tr><tr><td><code>upperSurfaceModels.heatTransferModel / lowerSurfaceModels.heatTransferModel</code></td><td>分别定义液膜上表面与下表面的换热关联，常量模型在 <code>constantCoeffs</code> 中填 <code>c0</code>。</td></tr><tr><td><code>phaseChangeModel / injectionModels / forces</code></td><td>液膜相变、液滴注入以及 <code>thermocapillary</code> 等力模型；只有被选中的过程才读取相应系数字典。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/smallPoolFire3D</summary><p><code>smallPoolFire3D</code> 的当前配置关闭表面液膜区域，池火计算由气相及配套边界模型组织。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/smallPoolFire3D</summary><p><code>smallPoolFire3D</code> 的当前配置关闭表面液膜区域，池火计算由气相及配套边界模型组织。</p>
 <ul>
 <li><code>surfaceFilmModel none</code> 选择空液膜模型；<code>active false</code> 关闭液膜演化。</li>
 <li><code>region none</code> 与这个关闭状态一致，当前无需读取名为液膜区域的网格与场。</li>

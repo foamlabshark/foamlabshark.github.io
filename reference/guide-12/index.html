@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,9 +189,9 @@
 <div class="table-scroll"><table>
 <tbody><tr><th>关键字</th><th>可选值</th><th>含义</th><th>备注</th></tr>
 <tr><td><code>application</code></td><td>求解器名</td><td>记录用哪个求解器</td><td>只是记录；<code>Allrun</code> 里 <code>getApplication</code> 读它</td></tr>
-<tr><td><code>startFrom</code></td><td>firstTime / <code>startTime</code> / latestTime</td><td>从哪开始</td><td>续算用 latestTime</td></tr>
+<tr><td><code>startFrom</code></td><td>firstTime / <code>startTime</code> / <code>latestTime</code></td><td>从哪开始</td><td>续算用 <code>latestTime</code></td></tr>
 <tr><td><code>startTime</code></td><td>数值</td><td><code>startFrom</code> <code>startTime</code> 时的起始时刻</td><td></td></tr>
-<tr><td><code>stopAt</code></td><td><code>endTime</code> / <code>writeNow</code> / noWriteNow / <code>nextWrite</code></td><td>何时停</td><td>见 7.5</td></tr>
+<tr><td><code>stopAt</code></td><td><code>endTime</code> / <code>writeNow</code> / <code>noWriteNow</code> / <code>nextWrite</code></td><td>何时停</td><td>见 7.5</td></tr>
 <tr><td><code>endTime</code></td><td>数值</td><td>结束时刻</td><td>稳态求解器里是”最大迭代步数”</td></tr>
 <tr><td><code>deltaT</code></td><td>数值</td><td>时间步长</td><td>稳态时通常写 1</td></tr>
 <tr><td><code>writeControl</code></td><td><code>timeStep</code> / <code>runTime</code> / <code>adjustableRunTime</code> / <code>cpuTime</code> / <code>clockTime</code></td><td>按什么控制输出</td><td>变步长时用 <code>adjustableRunTime</code></td></tr>
@@ -199,8 +199,8 @@
 <tr><td><code>purgeWrite</code></td><td>整数</td><td>只保留最近 N 个时间目录，0 = 全保留</td><td>长算例防止撑爆硬盘</td></tr>
 <tr><td><code>writeFormat</code></td><td><code>ascii</code> / <code>binary</code></td><td>结果文件格式</td><td>大算例用 <code>binary</code>，省一半空间且快</td></tr>
 <tr><td><code>writePrecision</code></td><td>整数（默认 6）</td><td>输出有效数字</td><td></td></tr>
-<tr><td><code>writeCompression</code></td><td><code>on</code> / <code>off</code></td><td>是否 gzip 压缩</td><td>硬盘紧张时开</td></tr>
-<tr><td><code>timeFormat</code></td><td>general / <code>fixed</code> / <code>scientific</code></td><td>时间目录名格式</td><td></td></tr>
+<tr><td><code>writeCompression</code></td><td><code>on</code> / <code>off</code></td><td>是否 <code>gzip</code> 压缩</td><td>硬盘紧张时开</td></tr>
+<tr><td><code>timeFormat</code></td><td><code>general</code> / <code>fixed</code> / <code>scientific</code></td><td>时间目录名格式</td><td></td></tr>
 <tr><td><code>timePrecision</code></td><td>整数（默认 6）</td><td>时间目录名的有效数字</td><td>步长很小时要调大，否则目录重名</td></tr>
 <tr><td><code>runTimeModifiable</code></td><td><code>true</code> / <code>false</code></td><td>允许运行中改字典</td><td>建议一直开着</td></tr>
 <tr><td><code>adjustTimeStep</code></td><td><code>yes</code> / <code>no</code></td><td>自适应时间步</td><td>瞬态常用</td></tr>
@@ -211,7 +211,7 @@
 <tr><td><code>libs</code></td><td>库名列表</td><td>运行时加载额外库</td><td>用自定义边界条件时</td></tr>
 <tr><td><code>functions</code></td><td>子字典</td><td><code>functionObject</code> 列表</td><td>见第 8 章</td></tr>
 <tr><td><code>DebugSwitches</code></td><td>子字典</td><td>打开某个类的调试输出</td><td>排查疑难问题时</td></tr>
-<tr><td><code>OptimisationSwitches</code></td><td>子字典</td><td>fileHandler、I/O 缓冲等</td><td>大规模并行时</td></tr>
+<tr><td><code>OptimisationSwitches</code></td><td>子字典</td><td><code>fileHandler</code>、I/O 缓冲等</td><td>大规模并行时</td></tr>
 </tbody></table></div>
 <h2>12.2 两个典型例子</h2>
 <p>瞬态（<code>interFoam</code> 溃坝）</p>
@@ -249,7 +249,7 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
     <span class="hljs-meta">#includeFunc solverInfo</span>
     <span class="hljs-meta">#includeFunc yPlus</span>
 }</code></pre></div>
-<p><code>writeControl</code> 到底选哪个：变步长（<code>adjustTimeStep</code> <code>yes</code>）时选 <code>runTime</code> 会导致输出时刻对不齐（步长恰好跨过输出时刻就跳过了）；<code>adjustableRunTime</code> 会微调步长让它正好落在输出时刻上，这才是变步长算例的正确选择。做动画时尤其重要——帧间隔必须均匀。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#includeFunc <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
+<p><code>writeControl</code> 到底选哪个：变步长（<code>adjustTimeStep</code> <code>yes</code>）时选 <code>runTime</code> 会导致输出时刻对不齐（步长恰好跨过输出时刻就跳过了）；<code>adjustableRunTime</code> 会微调步长让它正好落在输出时刻上，这才是变步长算例的正确选择。做动画时尤其重要——帧间隔必须均匀。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

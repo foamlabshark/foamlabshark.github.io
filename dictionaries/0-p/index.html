@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -204,7 +204,7 @@
 </code></pre></div>
 <p><code>[0 2 -2 0 0 0 0]</code> 对应 m²/s²，即物理压力除以恒定密度。出口固定为零，建立压力参考；入口与静止壁面使用此通道案例中的零梯度设置。与给定入口速度配合后，压力分布由动量与连续性求出。</p>
 <p>两点压差换算为 Pa 时，使用 <span class="math-formula" data-tex="\Delta p_{\mathrm{Pa}}=\rho\Delta p"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">a</mi></mrow></msub><mo>=</mo><mi>ρ</mi><mi mathvariant="normal">Δ</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">\Delta p_{\mathrm{Pa}}=\rho\Delta p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">Δ</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">Pa</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mord">Δ</span><span class="mord mathnormal">p</span></span></span></span></span>。例如密度为 1000 kg/m³，字段压差 0.2 m²/s² 对应 200 Pa。</p>
-<p>可压缩案例的量纲为 <code>[1 -1 -2 0 0 0 0]</code>，理想气体状态方程需要绝对压力，例如 <code>internalField uniform 100000</code>。封闭的不可压缩域如果压力边界全部为梯度型，还需要在相应的 <code>PISO</code>、<code>SIMPLE</code> 或 <code>PIMPLE</code> 设置中指定压力参考。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>不可压缩方腔的 <code>p</code> 是运动学压力，配合速度边界求解压力校正。</p>
+<p>可压缩案例的量纲为 <code>[1 -1 -2 0 0 0 0]</code>，理想气体状态方程需要绝对压力，例如 <code>internalField uniform 100000</code>。封闭的不可压缩域如果压力边界全部为梯度型，还需要在相应的 <code>PISO</code>、<code>SIMPLE</code> 或 <code>PIMPLE</code> 设置中指定压力参考。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>不可压缩方腔的 <code>p</code> 是运动学压力，配合速度边界求解压力校正。</p>
 <ul>
 <li><code>dimensions [0 2 -2 0 0 0 0]</code> 表示 m²/s²，即物理压力除以恒定密度。</li>
 <li><code>internalField uniform 0</code> 给出统一初值。</li>
@@ -251,7 +251,7 @@
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><p>pitzDaily 在出口给定运动学压力参考，让入口速度决定通过流量。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><p><code>pitzDaily</code> 在出口给定运动学压力参考，让入口速度决定通过流量。</p>
 <ul>
 <li>压力量纲 <code>[0 2 -2 0 0 0 0]</code>，初值为零。</li>
 <li><code>outlet/fixedValue 0</code> 固定出口参考压力。</li>
@@ -314,7 +314,7 @@
 <li>量纲 <code>[1 -1 -2 0 0 0 0]</code> 对应 Pa。</li>
 <li><code>internalField uniform 1e5</code> 给出 100000 Pa 初始压力。</li>
 <li>出口 <code>fixedValue</code> 通过 <code>$internalField</code> 复用同一个数值，形成给定背压。</li>
-<li><code>".*"/zeroGradient</code> 给其他一般边界默认梯度条件，公共 include 处理几何约束类型。</li>
+<li><code>".*"/zeroGradient</code> 给其他一般边界默认梯度条件，公共 <code>include</code> 处理几何约束类型。</li>
 </ul>
 <p>改变背压时结合入口总压、温度和气体状态方程检查流动，尤其关注是否发生阻塞或激波。</p>
 <p><a href="/assets/examples/v2512/p/3-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

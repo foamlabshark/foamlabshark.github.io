@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,12 +189,12 @@
 <p>网格的单元编号影响矩阵排列，但不直接改变几何形状。<code>renumberMeshDict</code> 选择重新编号的方法和控制参数，供 <code>renumberMesh</code> 调整编号顺序，常用于网格准备结束后的计算效率整理。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/renumberMeshDict</code></p><h2>配置方法</h2><p><code>renumberMethod</code> 指定网格编号算法，如 <code>CuthillMcKee</code>；算法参数置于对应系数字典。运行 <code>renumberMesh</code> <code>-list-renumber</code> 可查询可用方法。重新编号用于调整稀疏矩阵带宽，网格几何分辨率保持不变。</p>
-<p>FOAM_FILEHANDLER 设置默认文件处理器，常用值为 uncollated 和 collated；命令行 <code>-fileHandler</code> 可覆盖该设置。collated 通过合并并行 I/O 减少文件数量，其性能取决于文件系统、MPI 和缓冲策略。结果读取及重分配应使用支持该格式的工具。</p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>method</code></td><td>所采用的分区、插值或模型方法；含义由该字典的读取程序决定。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">重排模型与系数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>manualCoeffs.dataFile</code></td><td>manual 方法读入的单元重排列表文件。</td></tr><tr><td><code>structuredCoeffs.patches / depthFirst / reverse</code></td><td>structured 方法的起始边界与遍历、反向选项，放在该模型系数字典中。</td></tr><tr><td><code>springCoeffs.maxCo / freezeFraction / maxIter</code></td><td>spring 方法内部优化的步长限制、冻结比例与迭代上限；这里的 <code>maxCo</code> 不控制流动求解。</td></tr><tr><td><code>zoltanCoeffs.ORDER_METHOD</code></td><td>Zoltan 库使用的排序方法名；大小写要与库接口一致，且运行环境需要编译相应支持。</td></tr><tr><td><code>writeMaps / sortCoupledFaceCells</code></td><td>是否写出重排映射，以及是否优先排列耦合边界附近的单元。</td></tr><tr><td><code>note / verbose</code></td><td><code>note</code> 保存说明文字；<code>verbose</code> 控制模型的详细输出。</td></tr></tbody></table></div><h2 id="additional-configuration">模型参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>blockCoeffs</code></td><td>block 重排模型的系数字典。</td></tr></tbody></table></div>
+<p><code>FOAM_FILEHANDLER</code> 设置默认文件处理器，常用值为 uncollated 和 <code>collated</code>；命令行 <code>-fileHandler</code> 可覆盖该设置。<code>collated</code> 通过合并并行 I/O 减少文件数量，其性能取决于文件系统、MPI 和缓冲策略。结果读取及重分配应使用支持该格式的工具。</p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>method</code></td><td>所采用的分区、插值或模型方法；含义由该字典的读取程序决定。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
+<h2 id="nested-configuration">重排模型与系数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>manualCoeffs.dataFile</code></td><td><code>manual</code> 方法读入的单元重排列表文件。</td></tr><tr><td><code>structuredCoeffs.patches / depthFirst / reverse</code></td><td><code>structured</code> 方法的起始边界与遍历、反向选项，放在该模型系数字典中。</td></tr><tr><td><code>springCoeffs.maxCo / freezeFraction / maxIter</code></td><td>spring 方法内部优化的步长限制、冻结比例与迭代上限；这里的 <code>maxCo</code> 不控制流动求解。</td></tr><tr><td><code>zoltanCoeffs.ORDER_METHOD</code></td><td>Zoltan 库使用的排序方法名；大小写要与库接口一致，且运行环境需要编译相应支持。</td></tr><tr><td><code>writeMaps / sortCoupledFaceCells</code></td><td>是否写出重排映射，以及是否优先排列耦合边界附近的单元。</td></tr><tr><td><code>note / verbose</code></td><td><code>note</code> 保存说明文字；<code>verbose</code> 控制模型的详细输出。</td></tr></tbody></table></div><h2 id="additional-configuration">模型参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>blockCoeffs</code></td><td><code>block</code> 重排模型的系数字典。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · etc/caseDicts/annotated</summary><p>这是 <code>renumberMesh</code> 的附注模板，当前实际选中 Cuthill–McKee 重编号，以改善矩阵寻址布局。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · etc/caseDicts/annotated</summary><p>这是 <code>renumberMesh</code> 的附注模板，当前实际选中 Cuthill–McKee 重编号，以改善矩阵寻址布局。</p>
 <ul>
-<li><code>method CuthillMcKee</code> 选择重排算法；下面 manual、structured、spring 等子字典展示其他算法的参数入口。</li>
+<li><code>method CuthillMcKee</code> 选择重排算法；下面 <code>manual</code>、<code>structured</code>、spring 等子字典展示其他算法的参数入口。</li>
 <li><code>writeMaps false</code> 不额外写出新旧编号映射，<code>sortCoupledFaceCells false</code> 不将耦合边界单元专门排到末尾。</li>
 <li><code>springCoeffs/maxCo 0.01</code> 只在 spring 方法下控制编号跳动尺度，含义与流动 Courant 数不同。</li>
 </ul>

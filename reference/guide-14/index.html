@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -214,20 +214,20 @@
 <p>线性求解器怎么选</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>求解器</th><th>适用矩阵</th><th>场景</th></tr>
-<tr><td>GAMG</td><td>对称</td><td>压力方程首选，大网格上比 PCG 快数倍</td></tr>
-<tr><td>PCG</td><td>对称</td><td>压力，配 <code>preconditioner</code> DIC</td></tr>
-<tr><td>PBiCGStab</td><td>非对称</td><td><code>U</code>、<code>k</code>、<code>epsilon</code> 等</td></tr>
-<tr><td>smoothSolver</td><td>通用</td><td><code>U</code> 与湍流量，简单快速</td></tr>
-<tr><td>diagonal</td><td>对角阵</td><td>显式方程（如 <code>rhoCentralFoam</code> 里的密度）</td></tr>
+<tr><td><code>GAMG</code></td><td>对称</td><td>压力方程首选，大网格上比 <code>PCG</code> 快数倍</td></tr>
+<tr><td><code>PCG</code></td><td>对称</td><td>压力，配 <code>preconditioner</code> <code>DIC</code></td></tr>
+<tr><td><code>PBiCGStab</code></td><td>非对称</td><td><code>U</code>、<code>k</code>、<code>epsilon</code> 等</td></tr>
+<tr><td><code>smoothSolver</code></td><td>通用</td><td><code>U</code> 与湍流量，简单快速</td></tr>
+<tr><td><code>diagonal</code></td><td>对角阵</td><td>显式方程（如 <code>rhoCentralFoam</code> 里的密度）</td></tr>
 </tbody></table></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>预处理/光顺器</th><th>用于</th></tr>
-<tr><td>DIC</td><td>对称矩阵（配 PCG）</td></tr>
-<tr><td>DILU</td><td>非对称矩阵（配 PBiCGStab）</td></tr>
-<tr><td>GaussSeidel / symGaussSeidel</td><td>GAMG、smoothSolver 的光顺器</td></tr>
-<tr><td>DICGaussSeidel</td><td>GAMG 用，收敛更快但每步更贵</td></tr>
+<tr><td><code>DIC</code></td><td>对称矩阵（配 <code>PCG</code>）</td></tr>
+<tr><td><code>DILU</code></td><td>非对称矩阵（配 <code>PBiCGStab</code>）</td></tr>
+<tr><td><code>GaussSeidel</code> / <code>symGaussSeidel</code></td><td><code>GAMG</code>、<code>smoothSolver</code> 的光顺器</td></tr>
+<tr><td><code>DICGaussSeidel</code></td><td><code>GAMG</code> 用，收敛更快但每步更贵</td></tr>
 </tbody></table></div>
-<p>压力方程的长波误差可能使迭代收敛较慢。GAMG 通过网格聚合与多层修正加速误差消除，但性能依赖矩阵、聚合参数、平滑器和并行划分。应比较实际迭代次数与求解耗时，不采用固定的耗时比例判断。</p>
+<p>压力方程的长波误差可能使迭代收敛较慢。<code>GAMG</code> 通过网格聚合与多层修正加速误差消除，但性能依赖矩阵、聚合参数、平滑器和并行划分。应比较实际迭代次数与求解耗时，不采用固定的耗时比例判断。</p>
 <p><code>tolerance</code> 是绝对残差阈值，<code>relTol</code> 是相对初始残差的下降阈值。中间修正与最终修正可采用不同精度；求解器选择 <code>pFinal</code> 等配置时使用对应设置。<code>relTol</code> 0 使求解过程按绝对阈值或迭代上限停止。</p>
 <h2>14.2 SIMPLE / PISO / PIMPLE 控制</h2>
 <p>稳态 <code>SIMPLE</code></p>

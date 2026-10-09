@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -188,7 +188,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>fvSolution</code> 控制离散方程怎样求解：各字段选用什么线性算法、迭代到什么容差，以及压力和速度如何校正。它还可设置欠松弛，适合在方程和离散格式已经确定后组织迭代收敛过程。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>system/fvSolution</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-pimple-pressure-coupling.png" alt="PIMPLE 外校正与 PISO 内校正" loading="lazy"><figcaption><strong><code>PIMPLE</code> 外校正与 <code>PISO</code> 内校正</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module6.pdf，p. 96</small></figcaption></figure><h2>配置方法</h2><h3>每次线性求解何时结束</h3><p><code>solver</code> 选择算法，<code>preconditioner</code> 选择预条件器，<code>smoother</code> 选择平滑方法。PCG 适用于相应的对称正定系统；有对流项的非对称系统可使用 <code>PBiCGStab</code> 等算法。</p>
+<p>位置：<code>system/fvSolution</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-pimple-pressure-coupling.png" alt="PIMPLE 外校正与 PISO 内校正" loading="lazy"><figcaption><strong><code>PIMPLE</code> 外校正与 <code>PISO</code> 内校正</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module6.pdf，p. 96</small></figcaption></figure><h2>配置方法</h2><h3>每次线性求解何时结束</h3><p><code>solver</code> 选择算法，<code>preconditioner</code> 选择预条件器，<code>smoother</code> 选择平滑方法。<code>PCG</code> 适用于相应的对称正定系统；有对流项的非对称系统可使用 <code>PBiCGStab</code> 等算法。</p>
 <p><code>tolerance</code> 是归一化残差的绝对阈值，<code>relTol</code> 是相对本次初始残差的比例。初始残差为 0.01 时，<code>relTol 0.05</code> 对应 0.0005。满足相应停止条件后，本次线性求解结束；还可用 <code>maxIter</code> 限制最大迭代次数。</p>
 <p><code>pFinal</code> 先通过 <code>$p;</code> 继承压力配置，再关闭相对提前停止条件。最终校正采用更严格的压力求解，前面的校正可以较快完成。它使用同一个压力场。</p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>system/fvSolution</code> 主要包含三类内容：各场的线性求解器、压力—速度耦合算法，以及需要时使用的松弛因子。下面是一份适用于 <code>icoFoam</code> 方腔的主体配置，放在 <code>FoamFile</code> 文件头之后：</p>
 <div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solvers
@@ -245,7 +245,7 @@
 }
 </code></pre></div>
 <p><code>fields</code> 控制求解后场值的更新，<code>equations</code> 控制求解前矩阵的松弛。较小因子一般使更新更平缓，也可能增加迭代次数。正则键应匹配实际模型的场名。比较松弛因子时，观察达到相同目标量精度所需的耗时。</p>
-<p><code>residualControl</code> 用于 <code>SIMPLE</code> 或 <code>PIMPLE</code> 的外层收敛判断，<code>solvers</code> 的容差用于内层线性求解。二者放在不同层次，分别影响耦合迭代与每次矩阵求解。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p><code>icoFoam</code> 在每个时间步使用 <code>PISO</code> 修正压力和速度。这里同时规定线性方程的求解方式和一次时间步内的校正次数。</p>
+<p><code>residualControl</code> 用于 <code>SIMPLE</code> 或 <code>PIMPLE</code> 的外层收敛判断，<code>solvers</code> 的容差用于内层线性求解。二者放在不同层次，分别影响耦合迭代与每次矩阵求解。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p><code>icoFoam</code> 在每个时间步使用 <code>PISO</code> 修正压力和速度。这里同时规定线性方程的求解方式和一次时间步内的校正次数。</p>
 <ul>
 <li>压力 <code>p</code> 使用 <code>PCG</code>、<code>DIC</code>，绝对容差 <code>1e-6</code>，相对容差 <code>0.05</code>。普通压力求解可以在残差降到初始值的 5% 时结束，也可以因达到绝对容差而结束。</li>
 <li><code>pFinal</code> 通过 <code>$p</code> 继承压力设置，再令 <code>relTol 0</code>，使最后一次压力求解以绝对容差作为停止要求。</li>

@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -185,7 +185,7 @@
 </section>
 
   <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/reference/">← 返回参考手册</a></div><div class="article-shell"><article class="article" data-cms-slug="reference-guide-10"><div class="eyebrow">OpenFOAM v2512</div><h1>第 10 章　编译与二次开发命令</h1><div class="prose"><h2>10.1 wmake 系列</h2>
-<p><code>wmake</code> 是 OpenFOAM 自己的编译系统（对 make 的封装），你自己写的求解器、边界条件、<code>functionObject</code> 都用它编译。</p>
+<p><code>wmake</code> 是 OpenFOAM 自己的编译系统（对 <code>make</code> 的封装），你自己写的求解器、边界条件、<code>functionObject</code> 都用它编译。</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>命令</th><th>作用</th></tr>
 <tr><td><code>wmake</code></td><td>编译当前目录的程序或库</td></tr>
@@ -194,8 +194,8 @@
 <tr><td><code>wmake</code> <code>all</code></td><td>递归编译子目录</td></tr>
 <tr><td><code>wclean</code></td><td>清理当前目录的编译产物</td></tr>
 <tr><td><code>wclean</code> <code>all</code></td><td>递归清理</td></tr>
-<tr><td><code>wmakeLnInclude</code> &lt;目录&gt;</td><td>生成 lnInclude 符号链接目录（头文件索引）</td></tr>
-<tr><td><code>wmakeFilesAndOptions</code></td><td>生成 Make/files 与 Make/options 模板</td></tr>
+<tr><td><code>wmakeLnInclude</code> &lt;目录&gt;</td><td>生成 <code>lnInclude</code> 符号链接目录（头文件索引）</td></tr>
+<tr><td><code>wmakeFilesAndOptions</code></td><td>生成 <code>Make/files</code> 与 <code>Make/options</code> 模板</td></tr>
 <tr><td><code>wmakeCollect</code></td><td>批量编译加速（编译整个 OpenFOAM 时用）</td></tr>
 </tbody></table></div>
 <h2>10.2 一个自定义求解器的最小流程</h2>
@@ -219,7 +219,7 @@ wmake
 <span class="hljs-built_in">which</span> myIcoFoam
 /home/chen/OpenFOAM/chen-v2512/platforms/linux64GccDPInt32Opt/bin/myIcoFoam</code></pre></div>
 <p>建议将自定义源码放在独立的用户工作目录，并通过版本控制管理。代码不必限定在一个固定目录，但编译输出与运行时库路径应按 <code>FOAM_USER_APPBIN</code>、<code>FOAM_USER_LIBBIN</code> 等配置，避免把个人修改混入安装源码。</p>
-<p>Make/files 与 Make/options 是什么</p>
+<p><code>Make/files</code> 与 <code>Make/options</code> 是什么</p>
 <div class="code-panel" data-language="makefile"><div class="code-toolbar"><span class="code-language">Makefile</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Makefile代码"><code class="hljs language-makefile"><span class="hljs-comment"># Make/files —— 编译哪些源文件、产物叫什么、放哪</span>
 myIcoFoam.C
 EXE = <span class="hljs-variable">$(FOAM_USER_APPBIN)</span>/myIcoFoam
@@ -231,10 +231,10 @@ EXE_INC = \
 EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools</code></pre></div>
-<p>找不到头文件可能来自包含路径、文件名大小写、缺失依赖或尚未生成的 lnInclude。undefined <code>reference</code> 还可能来自源文件未参与编译、库依赖、链接顺序或 ABI 不匹配，应结合完整编译/链接命令定位。</p>
+<p>找不到头文件可能来自包含路径、文件名大小写、缺失依赖或尚未生成的 <code>lnInclude</code>。<code>undefined</code> <code>reference</code> 还可能来自源文件未参与编译、库依赖、链接顺序或 ABI 不匹配，应结合完整编译/链接命令定位。</p>
 <h2>10.3 codeStream 与 codedFixedValue：在字典中编写并运行 C++</h2>
 <p>是什么：直接在字典里嵌 <code>C</code>++ 代码，OpenFOAM 运行时自动编译成库并加载。</p>
-<p>codedFixedValue 可以在字典中嵌入 <code>C</code>++ 实现定制边界，并在运行时编译相关代码。使用时仍需正确设置 <code>name</code>、code、包含项和库依赖，并确认代码在当前 <code>v2512</code> API 下能够编译。</p>
+<p><code>codedFixedValue</code> 可以在字典中嵌入 <code>C</code>++ 实现定制边界，并在运行时编译相关代码。使用时仍需正确设置 <code>name</code>、<code>code</code>、包含项和库依赖，并确认代码在当前 <code>v2512</code> API 下能够编译。</p>
 <div class="code-panel" data-language="cpp"><div class="code-toolbar"><span class="code-language">C++</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="C++代码"><code class="hljs language-cpp"><span class="hljs-comment">// 0/U 里给一个抛物线入口</span>
 inlet
 {
@@ -254,7 +254,7 @@ endTime  #codeStream
 {
     code #{ os &lt;&lt; <span class="hljs-number">10.0</span>*<span class="hljs-number">2</span>; #};
 };</code></pre></div>
-<p>改了代码不生效？ 动态编译的产物缓存在算例的 dynamicCode/ 目录里。改完 code 块必须清缓存：</p>
+<p>改了代码不生效？ 动态编译的产物缓存在算例的 dynamicCode/ 目录里。改完 <code>code</code> 块必须清缓存：</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">rm</span> -rf dynamicCode
 <span class="hljs-comment"># 或</span>
 . <span class="hljs-variable">$WM_PROJECT_DIR</span>/bin/tools/CleanFunctions &amp;&amp; cleanDynamicCode</code></pre></div>

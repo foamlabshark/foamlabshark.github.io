@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -189,12 +189,12 @@
 <p>此求解器将多个相分别作为连续介质，耦合流动、传热和反应。它适合相间动量、热量和质量交换同时存在的体系，每一类交换通过配套模型连接相应方程。</p>
 <!-- /reference-introduction -->
 <h2>开始前</h2>
-<p><code>reactingMultiphaseEulerFoam</code> 用于可反应的多流体 Euler–Euler 模型。以下操作使用已完成网格与初始化的串行算例 <code>baseCase</code>；将它换成自己的目录名。各例中的新目录用于保留不同设置，运行前使用尚未存在的目录名。 配套输入可从<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/reactingMultiphaseEulerFoam/RAS/wallBoiling1D_2phase">官方 <code>multiphase/reactingMultiphaseEulerFoam/RAS/wallBoiling1D_2phase</code> 算例</a>取得；先按该算例的 <code>Allrun</code> 完成网格和初始场准备。 <code>foamCloneCase</code> 将最早时刻的场和 <code>constant</code>、<code>system</code> 复制到实验目录，各组对照从同一初态开始。</p>
+<p><code>reactingMultiphaseEulerFoam</code> 用于可反应的多流体 <code>Euler</code>–<code>Euler</code> 模型。以下操作使用已完成网格与初始化的串行算例 <code>baseCase</code>；将它换成自己的目录名。各例中的新目录用于保留不同设置，运行前使用尚未存在的目录名。 配套输入可从<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/reactingMultiphaseEulerFoam/RAS/wallBoiling1D_2phase">官方 <code>multiphase/reactingMultiphaseEulerFoam/RAS/wallBoiling1D_2phase</code> 算例</a>取得；先按该算例的 <code>Allrun</code> 完成网格和初始场准备。 <code>foamCloneCase</code> 将最早时刻的场和 <code>constant</code>、<code>system</code> 复制到实验目录，各组对照从同一初态开始。</p>
 <h2>示例 1：运行准备好的算例</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">reactingMultiphaseEulerFoam -<span class="hljs-keyword">case</span> baseCase &gt; baseCase/log.reactingMultiphaseEulerFoam 2&gt;&amp;1
 <span class="hljs-built_in">tail</span> -n 20 baseCase/log.reactingMultiphaseEulerFoam
 </code></pre></div>
-<p><code>-case baseCase</code> 指定算例；<code>&gt; ... 2&gt;&amp;1</code> 将正常输出和报错都保存到日志。程序按 <code>controlDict</code> 的起止设置求解可反应的多流体 Euler–Euler 模型，结果场，例如 <code>p_rgh</code>写入相应时间目录。日志末尾可查看计算进度和执行时间。</p>
+<p><code>-case baseCase</code> 指定算例；<code>&gt; ... 2&gt;&amp;1</code> 将正常输出和报错都保存到日志。程序按 <code>controlDict</code> 的起止设置求解可反应的多流体 <code>Euler</code>–<code>Euler</code> 模型，结果场，例如 <code>p_rgh</code>写入相应时间目录。日志末尾可查看计算进度和执行时间。</p>
 <h2>示例 2：先做一段短程计算</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamCloneCase baseCase short-study
 foamDictionary short-study/system/controlDict -entry startFrom -<span class="hljs-built_in">set</span> startTime
@@ -205,7 +205,7 @@ end=$(awk -v t=<span class="hljs-string">"<span class="hljs-variable">$t0</span>
 foamDictionary short-study/system/controlDict -entry endTime -<span class="hljs-built_in">set</span> <span class="hljs-string">"<span class="hljs-variable">$end</span>"</span>
 reactingMultiphaseEulerFoam -<span class="hljs-keyword">case</span> short-study &gt; short-study/log.reactingMultiphaseEulerFoam 2&gt;&amp;1
 </code></pre></div>
-<p>先复制输入，再把结束值设为起始值加 <code>5 × deltaT</code>。这样可用一段较短的计算检查可反应的多流体 Euler–Euler 模型的初始化和求解过程；原算例设置保留在 <code>baseCase</code>。若算例启用了自适应时间步，实际步数随步长调整而变化；这里控制的是结束时刻。</p>
+<p>先复制输入，再把结束值设为起始值加 <code>5 × deltaT</code>。这样可用一段较短的计算检查可反应的多流体 <code>Euler</code>–<code>Euler</code> 模型的初始化和求解过程；原算例设置保留在 <code>baseCase</code>。若算例启用了自适应时间步，实际步数随步长调整而变化；这里控制的是结束时刻。</p>
 <h2>示例 3：每十步保存一次结果</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamCloneCase baseCase output-study
 foamDictionary output-study/system/controlDict -entry startFrom -<span class="hljs-built_in">set</span> startTime
@@ -241,7 +241,7 @@ reconstructPar -<span class="hljs-keyword">case</span> parallel-study -latestTim
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/multiphase/reactingMultiphaseEulerFoam/laminar/bubbleColumn"</span> reactingMultiphaseEulerFoam-study
 <span class="hljs-built_in">cd</span> reactingMultiphaseEulerFoam-study
-<span class="hljs-built_in">ls</span></code></pre></div><p>使用一个新的目录名。算例中的 <code>Allrun</code> 列出网格、初始化和求解顺序；含多级网格或跨目录数据的教程，需要同时保留相邻文件。</p><details class="command-more-options"><summary>更多参数（16 项）</summary><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-debug-switch &lt;name=val&gt;</code></td><td>设置指定的 DebugSwitch 调试开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-fileHandler &lt;handler&gt;</code></td><td>指定文件读写处理器类型。</td></tr><tr><td><code>-hostRoots &lt;((host1 dir1) .. (hostN dirN))&gt;</code></td><td>为分布式运行的各子进程指定主机与根目录；主机名支持正则表达式。</td></tr><tr><td><code>-info-switch &lt;name=val&gt;</code></td><td>设置指定的 InfoSwitch 信息输出开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-lib &lt;name&gt;</code></td><td>额外加载一个或一组共享库；可重复使用。</td></tr><tr><td><code>-mpi-no-comm-dup</code></td><td>跳过初始化时的 MPI_Comm_dup() 调用。</td></tr><tr><td><code>-mpi-split-by-appnum</code></td><td>按 APPNUM 对全局通信器进行分组。</td></tr><tr><td><code>-mpi-threads</code></td><td>请求启用 MPI 线程支持。</td></tr><tr><td><code>-no-libs</code></td><td>跳过 <code>controlDict</code> 中 <code>libs</code> 条目指定的库。</td></tr><tr><td><code>-opt-switch &lt;name=val&gt;</code></td><td>设置指定的 OptimisationSwitch 优化开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-roots &lt;(dir1 .. dirN)&gt;</code></td><td>为分布式运行的各子进程指定根目录。</td></tr><tr><td><code>-world &lt;name&gt;</code></td><td>指定并行通信使用的局部通信域名称。</td></tr><tr><td><code>-doc</code></td><td>在浏览器中打开文档。</td></tr><tr><td><code>-doc-source</code></td><td>在浏览器中打开源码。</td></tr><tr><td><code>-help-man</code></td><td>显示完整帮助，以 man 手册格式输出，然后退出。</td></tr><tr><td><code>-help-notes</code></td><td>显示程序功能说明并退出。</td></tr></tbody></table></div></details><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/multiphase/reactingMultiphaseEulerFoam/reactingMultiphaseEulerFoam.C">源码与说明</a> · <a href="/assets/command-help/reactingmultiphaseeulerfoam.txt">帮助文本</a></p>
+<span class="hljs-built_in">ls</span></code></pre></div><p>使用一个新的目录名。算例中的 <code>Allrun</code> 列出网格、初始化和求解顺序；含多级网格或跨目录数据的教程，需要同时保留相邻文件。</p><details class="command-more-options"><summary>更多参数（16 项）</summary><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-debug-switch &lt;name=val&gt;</code></td><td>设置指定的 DebugSwitch 调试开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-fileHandler &lt;handler&gt;</code></td><td>指定文件读写处理器类型。</td></tr><tr><td><code>-hostRoots &lt;((host1 dir1) .. (hostN dirN))&gt;</code></td><td>为分布式运行的各子进程指定主机与根目录；主机名支持正则表达式。</td></tr><tr><td><code>-info-switch &lt;name=val&gt;</code></td><td>设置指定的 InfoSwitch 信息输出开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-lib &lt;name&gt;</code></td><td>额外加载一个或一组共享库；可重复使用。</td></tr><tr><td><code>-mpi-no-comm-dup</code></td><td>跳过初始化时的 MPI_Comm_dup() 调用。</td></tr><tr><td><code>-mpi-split-by-appnum</code></td><td>按 APPNUM 对全局通信器进行分组。</td></tr><tr><td><code>-mpi-threads</code></td><td>请求启用 MPI 线程支持。</td></tr><tr><td><code>-no-libs</code></td><td>跳过 <code>controlDict</code> 中 <code>libs</code> 条目指定的库。</td></tr><tr><td><code>-opt-switch &lt;name=val&gt;</code></td><td>设置指定的 OptimisationSwitch 优化开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-roots &lt;(dir1 .. dirN)&gt;</code></td><td>为分布式运行的各子进程指定根目录。</td></tr><tr><td><code>-world &lt;name&gt;</code></td><td>指定并行通信使用的局部通信域名称。</td></tr><tr><td><code>-doc</code></td><td>在浏览器中打开文档。</td></tr><tr><td><code>-doc-source</code></td><td>在浏览器中打开源码。</td></tr><tr><td><code>-help-man</code></td><td>显示完整帮助，以 <code>man</code> 手册格式输出，然后退出。</td></tr><tr><td><code>-help-notes</code></td><td>显示程序功能说明并退出。</td></tr></tbody></table></div></details><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/solvers/multiphase/reactingMultiphaseEulerFoam/reactingMultiphaseEulerFoam.C">源码与说明</a> · <a href="/assets/command-help/reactingmultiphaseeulerfoam.txt">帮助文本</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

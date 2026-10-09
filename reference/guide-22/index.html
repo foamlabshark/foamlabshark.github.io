@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -228,7 +228,7 @@ diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑�
 <tr><td><code>system/controlDict</code></td><td><code>application</code>、<code>startFrom</code>、<code>startTime</code>、<code>stopAt</code>、<code>endTime</code>、<code>deltaT</code>、<code>writeControl</code>、<code>writeInterval</code></td></tr>
 <tr><td><code>system/fvSchemes</code></td><td><code>ddtSchemes</code>、<code>gradSchemes</code>、<code>divSchemes</code>、<code>laplacianSchemes</code>、<code>interpolationSchemes</code>、<code>snGradSchemes</code></td></tr>
 <tr><td><code>system/fvSolution</code></td><td><code>solvers</code>；瞬态还要 PISO/PIMPLE，稳态还要 <code>SIMPLE</code> + <code>relaxationFactors</code></td></tr>
-<tr><td><code>system/blockMeshDict</code></td><td><code>scale</code>、<code>vertices</code>、<code>blocks</code>、<code>edges</code>、<code>boundary</code>、mergePatchPairs</td></tr>
+<tr><td><code>system/blockMeshDict</code></td><td><code>scale</code>、<code>vertices</code>、<code>blocks</code>、<code>edges</code>、<code>boundary</code>、<code>mergePatchPairs</code></td></tr>
 <tr><td><code>system/decomposeParDict</code></td><td><code>numberOfSubdomains</code>、<code>method</code></td></tr>
 <tr><td><code>constant/transportProperties</code></td><td><code>transportModel</code>、<code>nu</code>（多相时按相分组 + <code>sigma</code>）</td></tr>
 <tr><td><code>constant/turbulenceProperties</code></td><td><code>simulationType</code>（RAS/LES 时还要对应子字典）</td></tr>
@@ -246,10 +246,10 @@ diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑�
 </tbody></table></div>
 <p>迁移算例时，先确认教程的 OpenFOAM 分支和版本，再逐项调整求解器、物性、湍流、源项和边界类型。foamRun、momentumTransport 等名称有助于识别分支。</p>
 <h2>附录 D　学习路径建议</h2>
-<p>第一阶段（能跑）：cavity（<code>icoFoam</code>）→ pitzDaily（<code>simpleFoam</code>）→ damBreak（<code>interFoam</code>）。目标是把”复制算例 → 建网格 → 检查 → 求解 → 可视化 → 清理”这条链路走顺，能看懂日志。</p>
+<p>第一阶段（能跑）：cavity（<code>icoFoam</code>）→ <code>pitzDaily</code>（<code>simpleFoam</code>）→ damBreak（<code>interFoam</code>）。目标是把”复制算例 → 建网格 → 检查 → 求解 → 可视化 → 清理”这条链路走顺，能看懂日志。</p>
 <p>第二阶段（能改）：改网格密度看结果变化；改边界条件；改湍流模型；改离散格式。目标是理解每个字典的每一项改了会发生什么——这一步必须自己动手试，看书没用。</p>
 <p>第三阶段（能验证）：做一个有解析解或有实验数据的算例（Poiseuille 流、<span class="math-formula" data-tex="\mathrm{Re}=100"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">\mathrm{Re}=100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">Re</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></span> 圆柱绕流的 St 数、后台阶再附着长度），把误差算出来。目标是建立”我的结果可信吗”的判断力。</p>
-<p>第四阶段（能开发）：从 <code>icoFoam</code> 出发加一个标量输运方程；写一个 codedFixedValue 边界条件；写一个自己的 <code>functionObject</code>。目标是能读懂 <code>$FOAM_SOLVERS</code> 里的代码。</p>
+<p>第四阶段（能开发）：从 <code>icoFoam</code> 出发加一个标量输运方程；写一个 <code>codedFixedValue</code> 边界条件；写一个自己的 <code>functionObject</code>。目标是能读懂 <code>$FOAM_SOLVERS</code> 里的代码。</p>
 <h2>附录 E　资源</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>资源</th><th>地址 / 位置</th></tr>

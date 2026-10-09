@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -200,9 +200,9 @@ patchMap
     outlet sourceOutlet
 );
 cuttingPatches (newCutBoundary);</code></pre></div>
-<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> latestTime。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">patchMap        ( inlet1 inlet );   <span class="hljs-comment">// 源算例 patch → 目标算例 patch</span>
+<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> <code>latestTime</code>。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">patchMap        ( inlet1 inlet );   <span class="hljs-comment">// 源算例 patch → 目标算例 patch</span>
 cuttingPatches  ( outlet );         <span class="hljs-comment">// 被切开的 patch（源网格不覆盖的部分）</span></code></pre></div>
-<p>网格边界一致时可以完全不用这个文件，直接 <code>mapFields</code> ../src <code>-consistent</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavityGrade</summary><p>cavityGrade 用较粗或不同分布的方腔结果初始化新网格。</p>
+<p>网格边界一致时可以完全不用这个文件，直接 <code>mapFields</code> ../src <code>-consistent</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavityGrade</summary><p>cavityGrade 用较粗或不同分布的方腔结果初始化新网格。</p>
 <ul>
 <li><code>patchMap ()</code> 没有额外列出需要配对的边界名称。</li>
 <li><code>cuttingPatches ()</code> 表示没有指定穿过源域内部的新切割边界。</li>
@@ -263,7 +263,7 @@ cuttingPatches
 
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/icoFoam/cavity/cavityClipped</summary><p>cavityClipped 的目标边界名与源方腔不同，因此需要一项名称对应。</p>
 <ul>
-<li><code>patchMap (lid movingWall)</code> 将目标 lid 与源 <code>movingWall</code> 配对。</li>
+<li><code>patchMap (lid movingWall)</code> 将目标 <code>lid</code> 与源 <code>movingWall</code> 配对。</li>
 <li><code>cuttingPatches ()</code> 没有另外列出切割边界。</li>
 <li>映射时还需提供源算例和相应结果时刻，字典不会自动选择数据来源。</li>
 </ul>

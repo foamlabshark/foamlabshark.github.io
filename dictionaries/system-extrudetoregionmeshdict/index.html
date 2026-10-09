@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,7 +191,7 @@
 <p>位置：<code>system/extrudeToRegionMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>region</code></td><td>目标网格区域名称；多区域场与网格路径中应保持一致。</td></tr><tr><td><code>extrudeModel</code></td><td>挤出几何模型，例如平移、旋转或法向挤出；各模型需要不同系数。</td></tr><tr><td><code>nLayers</code></td><td>挤出或边界层生成的层数；同时检查层厚与总厚度。</td></tr><tr><td><code>expansionRatio</code></td><td>相邻挤出层的厚度增长比例。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>linearNormalCoeffs.thickness</code></td><td>沿来源面法向挤出的总厚度，与 <code>nLayers</code>、<code>expansionRatio</code> 配合。</td></tr><tr><td><code>faceZones / patches</code></td><td>选择来源面区或边界；名称应在原始网格中存在。</td></tr><tr><td><code>oneD / oneDPolyPatchType</code></td><td>一维挤出区域及其特殊边界类型的设置，需要与后续区域求解方式相容。</td></tr><tr><td><code>adaptMesh / sampleMode</code></td><td>是否同步修改原网格，以及区域间映射采用的采样方式。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/simplePMMApanel</summary><p>PMMA 板燃烧算例从已有 panel 面区向厚度方向拉伸，建立固体板区域 panelRegion。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/simplePMMApanel</summary><p>PMMA 板燃烧算例从已有 <code>panel</code> 面区向厚度方向拉伸，建立固体板区域 <code>panelRegion</code>。</p>
 <ul>
 <li><code>faceZones (panel)</code> 选定起始面区，<code>region panelRegion</code> 给新网格命名。</li>
 <li><code>extrudeModel linearNormal</code> 沿局部法向拉伸，<code>thickness 0.0234</code> 给出板厚 23.4 mm。</li>
@@ -240,7 +240,7 @@ linearNormalCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/cylinder</summary><p><code>cylinder</code> 算例从 wallFilmFaces 面区生成 <code>wallFilmRegion</code>，为壁面液膜计算提供附着区域。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/cylinder</summary><p><code>cylinder</code> 算例从 <code>wallFilmFaces</code> 面区生成 <code>wallFilmRegion</code>，为壁面液膜计算提供附着区域。</p>
 <ul>
 <li><code>faceZones (wallFilmFaces)</code> 选定壁面集合，<code>region wallFilmRegion</code> 是后续液膜模型查找的区域名称。</li>
 <li><code>linearNormal</code> 沿壁面法向拉伸，<code>thickness 0.01</code>、<code>nLayers 1</code> 生成 0.01 m 的单层区域。</li>
@@ -286,7 +286,7 @@ linearNormalCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/rivuletPanel</summary><p>rivuletPanel 从板面创建壁膜区域，随后在其上计算液膜沿板面的运动。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/rivuletPanel</summary><p><code>rivuletPanel</code> 从板面创建壁膜区域，随后在其上计算液膜沿板面的运动。</p>
 <ul>
 <li><code>wallFilmFaces</code> 指定要拉伸的面区，输出区域名称为 <code>wallFilmRegion</code>。</li>
 <li><code>linearNormal</code>、<code>thickness 0.01</code> 沿板法向生成厚 0.01 m 的网格区域，<code>nLayers 1</code> 只保留一层。</li>

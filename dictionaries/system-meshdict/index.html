@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,12 +191,12 @@
 <p>位置：<code>system/meshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>maxCellSize</code></td><td>cfMesh 的基准或最大单元尺寸，长度单位随几何坐标单位确定。</td></tr><tr><td><code>surfaceFile</code></td><td>网格生成使用的表面几何文件路径；单位与表面闭合性需在前处理中检查。</td></tr><tr><td><code>boundaryCellSize</code></td><td>cfMesh 边界附近的尺寸控制，与局部细化及边界层设置共同作用。</td></tr><tr><td><code>boundaryLayers</code></td><td>cfMesh 边界层生成控制，与 <code>snappyHexMesh</code> 的 <code>addLayersControls</code> 结构不同。</td></tr><tr><td><code>nLayers</code></td><td>挤出或边界层生成的层数；同时检查层厚与总厚度。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>boundaryLayers.patchBoundaryLayers.&lt;patch&gt;</code></td><td>按边界分别覆盖 <code>nLayers</code>、<code>thicknessRatio</code> 等层网格设置。</td></tr><tr><td><code>boundaryCellSizeRefinementThickness</code></td><td>边界加密向体网格内部延伸的厚度。</td></tr><tr><td><code>thicknessRatio</code></td><td>相邻两层的厚度比。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval</summary><p>拓扑优化的 reEval 阶段利用表面几何重新生成网格，<code>meshDict</code> 控制整体尺度及壁面层。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval</summary><p>拓扑优化的 reEval 阶段利用表面几何重新生成网格，<code>meshDict</code> 控制整体尺度及壁面层。</p>
 <ul>
 <li><code>maxCellSize 0.006</code> 将主体网格尺度设为 6 mm，<code>boundaryCellSize 0.004</code> 将边界附近细化到 4 mm。</li>
 <li><code>boundaryCellSizeRefinementThickness 0.015</code> 给出距边界约 15 mm 的细化影响范围。</li>
 <li><code>surfaceFile fileName</code> 是等待工作流替换的几何文件名占位符；单独使用时填入实际表面文件路径。</li>
-<li>正则表达式选择 lower、upper、left、right、topOPatch 等边界，<code>nLayers 5</code>、<code>thicknessRatio 1.8</code> 在这些壁面生成 5 层逐步增长的边界层单元。</li>
+<li>正则表达式选择 <code>lower</code>、<code>upper</code>、<code>left</code>、<code>right</code>、topOPatch 等边界，<code>nLayers 5</code>、<code>thicknessRatio 1.8</code> 在这些壁面生成 5 层逐步增长的边界层单元。</li>
 </ul>
 <p>几何更新后重点查看狭窄通道是否有足够单元，以及边界层是否因局部间隙而被截断。</p>
 <p><a href="/assets/examples/v2512/meshdict/1-meshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval/system/meshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/1_Inlet_2_Outlet/levelSet/R_05x_NB_01x/reEval">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

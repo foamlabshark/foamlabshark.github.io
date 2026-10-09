@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -184,9 +184,9 @@
  <p id="account-panel-message" role="status" hidden></p>
 </section>
 
-  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-options"><div class="eyebrow">OpenFOAM v2512</div><h1>options</h1><div class="prose"><p>Make/options 设置头文件搜索路径和链接库，供 <code>wmake</code> 编译应用程序或共享库。</p><!-- reference-introduction -->
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/dictionaries/">← 返回配置与字典速查</a></div><div class="article-shell"><article class="article" data-cms-slug="dictionary-options"><div class="eyebrow">OpenFOAM v2512</div><h1>options</h1><div class="prose"><p><code>Make/options</code> 设置头文件搜索路径和链接库，供 <code>wmake</code> 编译应用程序或共享库。</p><!-- reference-introduction -->
 <h2 id="brief-introduction">简要介绍</h2>
-<p>Make/options 告诉编译器到哪里找头文件，以及最终链接哪些库。开发程序使用 finiteVolume 等模块时，需要在这里补充相应包含路径和链接项，使源码中的接口能对应到实际库实现。</p>
+<p><code>Make/options</code> 告诉编译器到哪里找头文件，以及最终链接哪些库。开发程序使用 finiteVolume 等模块时，需要在这里补充相应包含路径和链接项，使源码中的接口能对应到实际库实现。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>Make/options</code></p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># Make/files</span>
 myScalarFoam.C
@@ -199,28 +199,28 @@ EXE_INC = \
 EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools</code></pre></div>
-<p>在源码目录运行 <code>wmake</code> 编译应用。编译共享库时，在 Make/files 中设置 <code>LIB = $(FOAM_USER_LIBBIN)/libMyModel</code>，在 Make/options 中设置 <code>LIB_LIBS</code>，并运行 <code>wmake</code> libso。Make 变量采用 $(<code>FOAM_USER_APPBIN</code>) 形式，Bash 变量采用 ${<code>FOAM_USER_APPBIN</code>} 形式。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · applications/test/predicates/Make</summary><p>predicates 测试的 Make/options 为空，表示这里没有额外声明本地头文件路径或链接选项。</p>
+<p>在源码目录运行 <code>wmake</code> 编译应用。编译共享库时，在 <code>Make/files</code> 中设置 <code>LIB = $(FOAM_USER_LIBBIN)/libMyModel</code>，在 <code>Make/options</code> 中设置 <code>LIB_LIBS</code>，并运行 <code>wmake</code> <code>libso</code>。<code>Make</code> 变量采用 $(<code>FOAM_USER_APPBIN</code>) 形式，Bash 变量采用 ${<code>FOAM_USER_APPBIN</code>} 形式。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · applications/test/predicates/Make</summary><p>predicates 测试的 <code>Make/options</code> 为空，表示这里没有额外声明本地头文件路径或链接选项。</p>
 <ul>
 <li>编译仍使用 <code>wmake</code> 的通用规则与环境配置。</li>
-<li>源文件和目标名在相邻 Make/files 中声明。</li>
+<li>源文件和目标名在相邻 <code>Make/files</code> 中声明。</li>
 <li>新增外部头文件或库时再添加相应 <code>EXE_INC</code>、<code>EXE_LIBS</code>。</li>
 </ul>
 <p>出现头文件或链接错误时，分别检查搜索路径和链接依赖。</p>
-<p><a href="/assets/examples/v2512/options/1-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/predicates/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/predicates/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/**/</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · applications/test/codeStream/Make</summary><p>codeStream 测试显式保留了一个空的 <code>EXE_INC</code> 入口。</p>
+<p><a href="/assets/examples/v2512/options/1-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/predicates/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/predicates/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/**/</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · applications/test/codeStream/Make</summary><p><code>codeStream</code> 测试显式保留了一个空的 <code>EXE_INC</code> 入口。</p>
 <ul>
-<li><code>EXE_INC =</code> 没有附加自定义 include 目录。</li>
+<li><code>EXE_INC =</code> 没有附加自定义 <code>include</code> 目录。</li>
 <li>源代码可继续使用构建环境已经提供的头文件搜索路径。</li>
 <li>新增本地头文件目录时使用 <code>-I路径</code> 写在这个变量中。</li>
 </ul>
 <p>涉及新库时还需配置链接项，头文件可见与符号可链接是构建的两个步骤。</p>
-<p><a href="/assets/examples/v2512/options/2-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/codeStream/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/codeStream/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">EXE_INC =</code></pre></div></details><details class="reference-example"><summary>案例文件 3 · applications/test/MathFunctions/Make</summary><p>MathFunctions 测试复用相邻 TestTools 目录中的测试辅助头文件。</p>
+<p><a href="/assets/examples/v2512/options/2-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/codeStream/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/codeStream/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">EXE_INC =</code></pre></div></details><details class="reference-example"><summary>案例文件 3 · applications/test/MathFunctions/Make</summary><p>MathFunctions 测试复用相邻 <code>TestTools</code> 目录中的测试辅助头文件。</p>
 <ul>
 <li><code>EXE_INC = -I../TestTools</code> 将相对目录加入头文件搜索。</li>
 <li><code>..</code> 相对于当前应用构建目录解释，因此目录层级影响能否找到文件。</li>
 <li>当前文件没有额外列出 <code>EXE_LIBS</code>。</li>
 </ul>
-<p>移动测试代码时同步更新 include 路径，并根据新增调用检查链接依赖。</p>
-<p><a href="/assets/examples/v2512/options/3-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/MathFunctions/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/MathFunctions/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">EXE_INC = -I../TestTools</code></pre></div></details><h2>相关命令</h2><p><a href="/commands/wmake/">wmake</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>找不到头文件</td><td>核对 <code>EXE_INC</code>、库 lnInclude 是否生成以及当前 WM_PROJECT_DIR。</td></tr><tr><td>链接时 undefined <code>reference</code></td><td>核对 <code>EXE_LIBS</code> / <code>LIB_LIBS</code>、库名与链接顺序，并确认实现文件参与编译。</td></tr><tr><td>加载共享库失败</td><td>检查编译使用的 <code>v2512</code> 环境与运行时 ABI、库搜索路径和 <code>controlDict</code> 的 <code>libs</code>。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
+<p>移动测试代码时同步更新 <code>include</code> 路径，并根据新增调用检查链接依赖。</p>
+<p><a href="/assets/examples/v2512/options/3-options.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/test/MathFunctions/Make/options">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/test/MathFunctions/Make">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">EXE_INC = -I../TestTools</code></pre></div></details><h2>相关命令</h2><p><a href="/commands/wmake/">wmake</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>找不到头文件</td><td>核对 <code>EXE_INC</code>、库 <code>lnInclude</code> 是否生成以及当前 <code>WM_PROJECT_DIR</code>。</td></tr><tr><td>链接时 <code>undefined</code> <code>reference</code></td><td>核对 <code>EXE_LIBS</code> / <code>LIB_LIBS</code>、库名与链接顺序，并确认实现文件参与编译。</td></tr><tr><td>加载共享库失败</td><td>检查编译使用的 <code>v2512</code> 环境与运行时 ABI、库搜索路径和 <code>controlDict</code> 的 <code>libs</code>。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

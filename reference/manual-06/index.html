@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -196,7 +196,7 @@
 <tr><td>system/</td><td><code>controlDict</code>、<code>fvSchemes</code>、<code>fvSolution</code>、网格工具字典</td><td>时间、离散、求解和工具控制</td></tr>
 <tr><td>constant/区域名 和 system/区域名</td><td>分别保存各区域的网格、物性和数值配置</td><td>共轭传热等</td></tr>
 <tr><td>system/finite-area/ 和 constant/finite-area/</td><td>有限面积配置与网格；多区域按名称分层</td><td>有限面积模型</td></tr>
-<tr><td>processor0/ 等</td><td>分散式并行网格和场；collated 采用对应目录结构</td><td><code>decomposePar</code> 等生成</td></tr>
+<tr><td>processor0/ 等</td><td>分散式并行网格和场；<code>collated</code> 采用对应目录结构</td><td><code>decomposePar</code> 等生成</td></tr>
 <tr><td>postProcessing/</td><td>函数对象的采样、积分与统计结果</td><td>运行时或事后处理</td></tr>
 <tr><td>时间目录/polyMesh/</td><td>移动网格点坐标及更新后的拓扑</td><td>动网格结果</td></tr>
 <tr><td><code>Allrun</code>、<code>Allclean</code></td><td>约定的算例运行与清理脚本</td><td>算例批处理</td></tr>
@@ -214,9 +214,9 @@
 <tbody><tr><th>条目</th><th>含义</th><th>设置方法</th></tr>
 <tr><td><code>version</code></td><td>OpenFOAM 文件格式版本</td><td>通常设为 2.0</td></tr>
 <tr><td><code>format</code></td><td>存储方式</td><td><code>ascii</code> 可读；<code>binary</code> 更紧凑</td></tr>
-<tr><td><code>class</code></td><td>数据类型</td><td>dictionary、<code>volScalarField</code>、<code>volVectorField</code> 等</td></tr>
+<tr><td><code>class</code></td><td>数据类型</td><td><code>dictionary</code>、<code>volScalarField</code>、<code>volVectorField</code> 等</td></tr>
 <tr><td><code>object</code></td><td>对象名</td><td>通常与文件名一致</td></tr>
-<tr><td><code>location</code></td><td>可选存储位置说明</td><td>如 "0" 或 "system"，用于描述存储位置</td></tr>
+<tr><td><code>location</code></td><td>可选存储位置说明</td><td>如 "0" 或 "<code>system</code>"，用于描述存储位置</td></tr>
 <tr><td><code>dimensions</code></td><td>七个 SI 基本量纲指数</td><td>顺序为质量、长度、时间、温度、物质的量、电流、发光强度</td></tr>
 <tr><td><code>uniform</code> 与 <code>nonuniform</code></td><td>统一赋值或按对象逐项赋值</td><td>非均匀列表数量须与网格对象数量匹配</td></tr>
 <tr><td><code>true/false</code>、<code>on/off</code>、<code>yes/no</code></td><td>常见开关表示</td><td>同一文件采用一致的开关写法</td></tr>
@@ -226,21 +226,21 @@
 <div class="table-scroll"><table>
 <tbody><tr><th>关键字</th><th>作用</th><th>示例</th></tr>
 <tr><td>$名称</td><td>引用当前或可见作用域中的字典条目</td><td><code>pFinal</code> { <code>$p</code>; <code>relTol</code> 0; }</td></tr>
-<tr><td>${名称}</td><td>限定变量名称范围，支持环境变量展开</td><td>#include "${FOAM_CASE}/system/commonSettings"</td></tr>
-<tr><td>$../名称</td><td>访问父字典作用域</td><td>a $../referenceValue;</td></tr>
-<tr><td>$!名称</td><td>从顶层字典查找</td><td>a $!referenceValue;</td></tr>
-<tr><td>#<code>include</code></td><td>读取指定文件</td><td>#include "commonSettings"</td></tr>
-<tr><td>#<code>includeIfPresent</code></td><td>仅在文件存在时包含</td><td>#includeIfPresent "localOverrides"</td></tr>
-<tr><td>#<code>includeEtc</code></td><td>从 OpenFOAM 配置搜索路径引入文件</td><td>#includeEtc "caseDicts/meshQualityDict"</td></tr>
-<tr><td>#<code>includeFunc</code></td><td>加入预配置函数对象</td><td>#includeFunc <code>solverInfo</code></td></tr>
-<tr><td>#<code>inputMode</code></td><td>控制重复键合并方式</td><td>#inputMode merge</td></tr>
-<tr><td>#<code>remove</code></td><td>删除已有条目，支持正则表达式</td><td>#remove "obsolete.*"</td></tr>
-<tr><td>#<code>calc</code></td><td>由动态编译表达式生成值</td><td>length 2; halfLength #calc "<code>$length/2.0</code>";</td></tr>
-<tr><td>#<code>eval</code></td><td>采用表达式求值</td><td>a #eval "sqrt(2.0)";</td></tr>
+<tr><td>${名称}</td><td>限定变量名称范围，支持环境变量展开</td><td>#<code>include</code> "${<code>FOAM_CASE</code>}/system/commonSettings"</td></tr>
+<tr><td>$../名称</td><td>访问父字典作用域</td><td><code>a</code> $../referenceValue;</td></tr>
+<tr><td>$!名称</td><td>从顶层字典查找</td><td><code>a</code> $!referenceValue;</td></tr>
+<tr><td>#<code>include</code></td><td>读取指定文件</td><td>#<code>include</code> "commonSettings"</td></tr>
+<tr><td>#<code>includeIfPresent</code></td><td>仅在文件存在时包含</td><td>#<code>includeIfPresent</code> "localOverrides"</td></tr>
+<tr><td>#<code>includeEtc</code></td><td>从 OpenFOAM 配置搜索路径引入文件</td><td>#<code>includeEtc</code> "<code>caseDicts/meshQualityDict</code>"</td></tr>
+<tr><td>#<code>includeFunc</code></td><td>加入预配置函数对象</td><td>#<code>includeFunc</code> <code>solverInfo</code></td></tr>
+<tr><td>#<code>inputMode</code></td><td>控制重复键合并方式</td><td>#<code>inputMode</code> <code>merge</code></td></tr>
+<tr><td>#<code>remove</code></td><td>删除已有条目，支持正则表达式</td><td>#<code>remove</code> "obsolete.*"</td></tr>
+<tr><td>#<code>calc</code></td><td>由动态编译表达式生成值</td><td><code>length</code> 2; halfLength #<code>calc</code> "<code>$length/2.0</code>";</td></tr>
+<tr><td>#<code>eval</code></td><td>采用表达式求值</td><td><code>a</code> #<code>eval</code> "sqrt(2.0)";</td></tr>
 <tr><td>#<code>codeStream</code></td><td>编译执行 <code>C</code>++ 并写回字典内容</td><td>见第 9.13 节</td></tr>
 </tbody></table></div>
-<p>OpenFOAM 字典引用与 Bash 变量展开分别由各自的解析器处理。使用 shell 生成含 <code>$p</code> 的字典时，采用带引号的 here-document 定界符，如 &lt;&lt;'EOF'，可保留引用原文。</p>
-<p><code>foamDictionary</code> <code>system/fvSolution</code> <code>-expand</code> 可查看展开后的配置。#calc 和 #codeStream 会编译并执行代码，使用时需具备相应编译环境。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#includeFunc <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
+<p>OpenFOAM 字典引用与 Bash 变量展开分别由各自的解析器处理。使用 shell 生成含 <code>$p</code> 的字典时，采用带引号的 here-document 定界符，如 &lt;&lt;'<code>EOF</code>'，可保留引用原文。</p>
+<p><code>foamDictionary</code> <code>system/fvSolution</code> <code>-expand</code> 可查看展开后的配置。#<code>calc</code> 和 #<code>codeStream</code> 会编译并执行代码，使用时需具备相应编译环境。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>

@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -191,10 +191,10 @@
 <p>位置：<code>system/caseProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>initialConditions</code></td><td>生成初始场时使用的变量和值，常写作 <code>p</code> <code>uniform</code> 100000 或 <code>U</code> <code>uniform</code> (0 0 0)。</td></tr><tr><td><code>rho</code></td><td>密度或密度场引用；是否为量纲标量、常量或场名由模型定义。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr><tr><td><code>boundaryConditions</code></td><td>以逻辑边界组组织模板；每组再通过 <code>patches</code> 对应实际网格边界。</td></tr><tr><td><code>category</code></td><td>边界模板类别，例如 <code>wall</code> 或 <code>inlet</code>，影响可选择的模板类型。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr><tr><td><code>options</code></td><td>热传递、流动等边界模板选项；由所用模板库定义。</td></tr><tr><td><code>values</code></td><td>传给模板的字段或数值，示例通过 $/initialConditions 引用根字典中的默认值。</td></tr><tr><td><code>omega</code></td><td>角速度参数或湍流比耗散率场名，二者物理意义与量纲不同。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>flowSpecification</code></td><td>按流动规格组织初始场和边界模板；与所选求解器、不可压缩/可压缩形式一致。</td></tr><tr><td><code>wallFunction</code></td><td>是否按模板采用壁面函数；必须同时检查湍流模型、近壁网格及 <code>y</code>+。</td></tr><tr><td><code>nut / k / epsilon / omega</code></td><td>由模板生成的湍流字段。修改规格后需重新生成相应 0/ 文件，直接改 <code>caseProperties</code> 不会自动改写已有初值。</td></tr><tr><td><code>motorbike 等区域名称</code></td><td>边界或几何分组名，与模板和网格中的名称对应。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 include 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · preProcessing/createZeroDirectory/snappyMultiRegionHeater</summary><p><code>createZeroDirectory</code> 使用 <code>caseProperties</code> 中的物理角色生成初始场。这里配置多区域加热器的 leftSolid 固体区域。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · preProcessing/createZeroDirectory/snappyMultiRegionHeater</summary><p><code>createZeroDirectory</code> 使用 <code>caseProperties</code> 中的物理角色生成初始场。这里配置多区域加热器的 <code>leftSolid</code> 固体区域。</p>
 <ul>
 <li><code>initialConditions</code> 设 <code>p</code>=100000 Pa、<code>rho</code>=8000 kg/m³、<code>T</code>=300 K，供后面的边界模板引用。</li>
-<li><code>thermalWalls</code> 覆盖 minX、minZ、maxZ，<code>heatTransfer adiabatic</code> 指定绝热处理。</li>
+<li><code>thermalWalls</code> 覆盖 <code>minX</code>、<code>minZ</code>、<code>maxZ</code>，<code>heatTransfer adiabatic</code> 指定绝热处理。</li>
 <li><code>thermalCoupledWalls</code> 用 <code>".*_to_.*"</code> 匹配区域间界面，<code>heatTransfer thermalCoupled</code> 生成热耦合设置。</li>
 <li><code>values $/initialConditions</code> 从顶层初始条件引用参数，避免在各边界重复维护数值。</li>
 </ul>
@@ -321,9 +321,9 @@ boundaryConditions
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · preProcessing/createZeroDirectory/motorBike</summary><p><code>motorBike</code> 的 <code>caseProperties</code> 用于创建外流计算的初始场和边界条件。它把车体、地面、入口、出口分别描述为物理边界。</p>
 <ul>
 <li>初始 <code>U (20 0 0)</code> 设来流速度 20 m/s，<code>k 0.24</code>、<code>omega 1.78</code> 给出湍流初值。</li>
-<li><code>motorBikeGroup</code> 采用静止无滑移壁面和 highReynolds 壁面处理；地面 <code>lowerWall</code> 同样为无滑移壁面。</li>
+<li><code>motorBikeGroup</code> 采用静止无滑移壁面和 <code>highReynolds</code> 壁面处理；地面 <code>lowerWall</code> 同样为无滑移壁面。</li>
 <li><code>inlet</code> 的 <code>subSonic</code>、<code>fixedVelocity</code> 使用给定入口速度，<code>outlet</code> 的 <code>returnFlow default</code> 为可能的回流提供模板处理。</li>
-<li><code>upperWall</code> 和 <code>frontAndBack</code> 使用 slip，减少外围边界对切向速度的约束。</li>
+<li><code>upperWall</code> 和 <code>frontAndBack</code> 使用 <code>slip</code>，减少外围边界对切向速度的约束。</li>
 </ul>
 <p>改变来流工况时同时检查湍流入口值和车体首层网格；若模拟移动地面，应更新地面运动选项及速度。</p>
 <p><a href="/assets/examples/v2512/caseproperties/3-caseProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/preProcessing/createZeroDirectory/motorBike/system/caseProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/preProcessing/createZeroDirectory/motorBike">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">114 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\

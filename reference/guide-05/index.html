@@ -23,7 +23,7 @@
   <script src="/assets/site.js?v=51d4ce447c7b" defer></script>
   
   
-  <script src="/assets/runtime-content.js?v=2e016c67989a" defer></script>
+  <script src="/assets/runtime-content.js?v=bbf32d0e8116" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=b7d4607cf389" defer></script>
@@ -31,7 +31,7 @@
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
   <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
-  <link rel="stylesheet" href="/assets/town/town-entry.css?v=08c09f0deae8">
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
   <script src="/assets/runtime-panda-pet.js?v=5d1f6884200c" defer></script>
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
@@ -190,7 +190,7 @@
 <tbody><tr><th>选项</th><th>作用</th><th>为什么需要它</th></tr>
 <tr><td><code>-help</code></td><td>简要帮助</td><td>忘了选项时第一反应</td></tr>
 <tr><td><code>-help-full</code></td><td>完整帮助（含不常用选项）</td><td><code>-help</code> 里没有的高级选项在这</td></tr>
-<tr><td><code>-help-man</code></td><td>man 手册格式</td><td>配合 \| <code>less</code> 慢慢读</td></tr>
+<tr><td><code>-help-man</code></td><td><code>man</code> 手册格式</td><td>配合 \| <code>less</code> 慢慢读</td></tr>
 <tr><td><code>-doc</code></td><td>打开该程序的在线 Doxygen 文档</td><td>想知道背后的方程</td></tr>
 <tr><td><code>-srcDoc</code></td><td>打开源码文档</td><td>读实现细节</td></tr>
 <tr><td><code>-case</code> &lt;<code>dir</code>&gt;</td><td>指定算例目录</td><td>不用先 <code>cd</code> 进去；写脚本时必备</td></tr>
@@ -242,7 +242,7 @@ foamHelp boundary -browse inletOutlet</code></pre></div>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamGetDict -list                 <span class="hljs-comment"># 列出所有可取的模板</span>
 foamGetDict singleGraph           <span class="hljs-comment"># 把沿线取样模板拷进 system/</span>
 foamGetDict -<span class="hljs-keyword">case</span> ../run1 probes  <span class="hljs-comment"># 拷到别的算例目录</span></code></pre></div>
-<p>先用 <code>command</code> <code>-v</code> <code>foamGetDict</code> 检查当前环境。若安装未提供该脚本，可从正确的 etc/caseDicts 子目录复制对应模板；模板仍可能通过 #includeEtc 引用其他文件。</p>
+<p>先用 <code>command</code> <code>-v</code> <code>foamGetDict</code> 检查当前环境。若安装未提供该脚本，可从正确的 etc/caseDicts 子目录复制对应模板；模板仍可能通过 #<code>includeEtc</code> 引用其他文件。</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cp</span> <span class="hljs-variable">$FOAM_ETC</span>/caseDicts/postProcessing/graphs/singleGraph system/
 <span class="hljs-built_in">ls</span> <span class="hljs-variable">$FOAM_ETC</span>/caseDicts/postProcessing/     <span class="hljs-comment"># 先看看有哪些模板</span></code></pre></div>
 <h2>5.5 foamEtcFile —— 定位配置文件</h2>
@@ -290,7 +290,7 @@ foamDictionary system/fvSolution -entry solvers -keywords
 
 <span class="hljs-comment"># ⑦ 展开所有 #include、宏和计算，看"程序最终读到的"是什么</span>
 foamDictionary system/controlDict -<span class="hljs-built_in">expand</span></code></pre></div>
-<p>第 ⑦ 条在排查”我用了 #include 结果不对”时是决定性的：它把所有包含、变量替换、#calc 全部算完再打印，你看到的就是求解器看到的。</p>
+<p>第 ⑦ 条在排查”我用了 #<code>include</code> 结果不对”时是决定性的：它把所有包含、变量替换、#<code>calc</code> 全部算完再打印，你看到的就是求解器看到的。</p>
 <p>批量脚本示例（网格无关性验证）</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">for N in 20 40 80 160; do
     foamCloneCase base mesh_$N
@@ -324,7 +324,7 @@ foamMonitor -l logs/p_0</code></pre></div>
 foamJob -s simpleFoam             <span class="hljs-comment"># 同时输出到屏幕（screen）</span>
 foamJob -p -s interFoam           <span class="hljs-comment"># 并行 + 屏幕输出</span>
 <span class="hljs-string">"/usr/lib/openfoam/openfoam2512/bin/tools/foamExec"</span> simpleFoam -<span class="hljs-built_in">help</span>         <span class="hljs-comment"># 在正确环境下执行（集群脚本里常用）</span></code></pre></div>
-<p><code>foamExec</code> 位于安装目录的 bin/tools，通常不会作为独立命令加入 PATH。它根据自身路径定位安装并激活 etc/bashrc，再执行传入程序；作业脚本通常也可以直接 <code>source</code> 已知安装的 bashrc。</p>
+<p><code>foamExec</code> 位于安装目录的 bin/tools，通常不会作为独立命令加入 <code>PATH</code>。它根据自身路径定位安装并激活 etc/bashrc，再执行传入程序；作业脚本通常也可以直接 <code>source</code> 已知安装的 bashrc。</p>
 <h2>5.13 foamSystemCheck / foamInstallationTest</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSystemCheck        <span class="hljs-comment"># 编译前：检查 gcc/mpi/flex 等基础环境</span>
 foamInstallationTest   <span class="hljs-comment"># 安装后：检查路径、库、命令是否都正常</span></code></pre></div>
@@ -339,7 +339,7 @@ foamListTimes -<span class="hljs-built_in">rm</span>        <span class="hljs-co
 foamNew <span class="hljs-built_in">source</span> H MyClass             <span class="hljs-comment"># 新建源文件模板</span>
 foamNewBC fixedValue vector myBC                   <span class="hljs-comment"># 新建边界条件骨架</span>
 foamNewFunctionObject myFO          <span class="hljs-comment"># 新建 functionObject 骨架</span></code></pre></div>
-<p>代码生成工具可以建立与 OpenFOAM 运行时选择机制相配套的类结构和 Make 配置。生成后仍需实现物理逻辑，检查基类接口、库依赖和边界更新条件，并通过小算例验证。</p>
+<p>代码生成工具可以建立与 OpenFOAM 运行时选择机制相配套的类结构和 <code>Make</code> 配置。生成后仍需实现物理逻辑，检查基类接口、库依赖和边界更新条件，并通过小算例验证。</p>
 <h2>5.16 Allrun / Allclean 与 RunFunctions</h2>
 <p>官方算例里几乎都有 <code>Allrun</code>、<code>Allclean</code>（有的还有 Allmesh、Allpost）。它们是普通 shell 脚本，开头都会 <code>source</code> 两个函数库：</p>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
@@ -371,7 +371,7 @@ restore0Dir
 runApplication blockMesh
 runApplication setFields
 runApplication $(getApplication)</code></pre></div>
-<p>CleanFunctions 提供的函数：<code>cleanCase</code>（删时间目录、日志、processor*）、<code>cleanCase0</code>（再把 0/ 也删掉，配合 0.orig 用）、<code>cleanTimeDirectories</code>、<code>cleanPostProcessing</code>、<code>cleanDynamicCode</code>（清 dynamicCode/，改了 codedFixedValue 却不生效时必须清）。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#includeFunc <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p><h2>未安装的官方目标</h2><p><code>foamCalc</code> 与 <code>foamExprParserInfo</code> 的源码位于 <code>v2512</code> 的 applications/tools。用 <code>command</code> <code>-v</code> 查找程序；需要时先编译安装。</p><p><code>foamHelp boundary -field U</code> 需要能够读取相应网格和字段的算例。源码工具中的浏览器文档功能还依赖可用的文档索引及浏览器设置。</p>
+<p>CleanFunctions 提供的函数：<code>cleanCase</code>（删时间目录、日志、<code>processor</code>*）、<code>cleanCase0</code>（再把 0/ 也删掉，配合 0.orig 用）、<code>cleanTimeDirectories</code>、<code>cleanPostProcessing</code>、<code>cleanDynamicCode</code>（清 dynamicCode/，改了 <code>codedFixedValue</code> 却不生效时必须清）。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p><h2>未安装的官方目标</h2><p><code>foamCalc</code> 与 <code>foamExprParserInfo</code> 的源码位于 <code>v2512</code> 的 applications/tools。用 <code>command</code> <code>-v</code> 查找程序；需要时先编译安装。</p><p><code>foamHelp boundary -field U</code> 需要能够读取相应网格和字段的算例。源码工具中的浏览器文档功能还依赖可用的文档索引及浏览器设置。</p>
 </div></article><aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside></div>
 </main>
   <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
