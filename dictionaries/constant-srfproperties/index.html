@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -308,14 +309,14 @@ rpmCoeffs
     <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p><code>relative no</code> 表示 <code>inletValue</code> 用绝对坐标系解释，边界条件负责转换为相对速度。最后的 <code>value</code> 提供初始化值，随后由边界条件更新。与转子一起旋转的壁面，则可在相对速度场中采用 <code>noSlip</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>incompressible/SRFSimpleFoam/mixer</code></summary><p><code>SRFSimpleFoam</code> 的 mixer 算例在单一旋转参考系中求稳态流动。</p>
+<p><code>relative no</code> 表示 <code>inletValue</code> 用绝对坐标系解释，边界条件负责转换为相对速度。最后的 <code>value</code> 提供初始化值，随后由边界条件更新。与转子一起旋转的壁面，则可在相对速度场中采用 <code>noSlip</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>incompressible/SRFSimpleFoam/mixer</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/SRFSimpleFoam/mixer"><h3>算例问题：mixer</h3><p class="reference-case-problem">叶轮带动容器内流体旋转并形成循环流动。叶轮区与静止容器之间需要正确处理相对运动，具体版本采用旋转参考系、AMI 或动网格；主要观察速度分布、叶轮载荷和混合区。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer"><code>incompressible/SRFSimpleFoam/mixer</code></a>。</p></section><!-- /reference-case-contexts --><p><code>SRFSimpleFoam</code> 的 mixer 算例在单一旋转参考系中求稳态流动。</p>
 <ul>
 <li><code>SRFModel rpm</code> 选择用转每分钟输入转速的模型。</li>
 <li><code>origin (0 0 0)</code>、<code>axis (0 0 1)</code> 定义转轴。</li>
 <li><code>rpmCoeffs/rpm 1000</code> 对应约 104.72 rad/s，单位与 <code>MRF</code> 的 <code>omega</code> 写法不同。</li>
 </ul>
 <p>改变转速时修改 rpm，并结合求解器使用的相对速度和壁面条件解释输出。</p>
-<p><a href="/assets/examples/v2512/srfproperties/1-SRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer/constant/SRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/srfproperties/1-SRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer/constant/SRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFSimpleFoam/mixer/constant/SRFProperties"><code>incompressible/SRFSimpleFoam/mixer/constant/SRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -342,14 +343,14 @@ rpmCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/SRFPimpleFoam/rotor2D</code></summary><p><code>SRFPimpleFoam</code> 的 rotor2D 用单一旋转参考系计算非定常流动。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/SRFPimpleFoam/rotor2D</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/SRFPimpleFoam/rotor2D"><h3>算例问题：rotor2D</h3><p class="reference-case-problem">转子在流体中旋转，转子表面的运动向流体输入动量。动网格、AMI 或重叠网格用于处理转子与背景区域的连接，主要观察叶轮附近速度、压力及运动区域的连续性。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D"><code>incompressible/SRFPimpleFoam/rotor2D</code></a>。</p></section><!-- /reference-case-contexts --><p><code>SRFPimpleFoam</code> 的 rotor2D 用单一旋转参考系计算非定常流动。</p>
 <ul>
 <li>模型为 <code>rpm</code>，转轴通过原点并沿 <code>z</code>。</li>
 <li><code>rpm 60</code> 表示每分钟 60 转，即每秒一转。</li>
 <li>旋转参考系的速度变量需与相对速度边界条件保持一致。</li>
 </ul>
 <p>提高转速时检查时间分辨率，并按实际边界是否随转子运动设置速度条件。</p>
-<p><a href="/assets/examples/v2512/srfproperties/2-SRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/srfproperties/2-SRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -377,6 +378,7 @@ rpmCoeffs
 
 
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/srfsimplefoam/">SRFSimpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
+
 </div>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>

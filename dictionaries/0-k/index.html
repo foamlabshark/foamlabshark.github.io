@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -296,14 +297,14 @@ wall
 </code></pre></div>
 <p>将这两个块放入 <code>boundaryField</code>，并保留其他 <code>patch</code> 的条件。字段量纲为 <code>[0 2 -2 0 0 0 0]</code>。入口值代表进入计算域的湍流水平；该壁面函数用于相应的壁面处理，<code>value</code> 提供初始字段值。具体近壁策略需与 <code>epsilon</code> 或 <code>omega</code>、<code>nut</code> 以及网格层配合。</p>
 <p>保持湍流强度不变而将入口速度减半时，入口 <code>k</code> 变为原来的四分之一。也可以采用 <code>turbulentIntensityKineticEnergyInlet</code>，使入口 <code>k</code> 根据速度和给定强度更新。</p>
-<p>运行中反复出现很小的负值并被限制时，应定位异常区域，查看对流格式、初值、回流边界和网格质量。入口湍流参数以实验数据为优先，经验强度用于缺少数据时的估算与敏感性分析。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/pitzDailyExptInlet</summary><p>pitzDailyExptInlet 用实验型入口数据给定非均匀湍动能廓线。</p>
+<p>运行中反复出现很小的负值并被限制时，应定位异常区域，查看对流格式、初值、回流边界和网格质量。入口湍流参数以实验数据为优先，经验强度用于缺少数据时的估算与敏感性分析。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/pitzDailyExptInlet</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDailyExptInlet"><h3>算例问题：pitzDailyExptInlet</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet"><code>incompressible/simpleFoam/pitzDailyExptInlet</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDailyExptInlet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption>pitzDailyExptInlet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>pitzDailyExptInlet 用实验型入口数据给定非均匀湍动能廓线。</p>
 <ul>
 <li>列表开头 <code>70</code> 表示 70 个采样值，顺序应与入口 boundaryData 的 <code>points</code> 对应。</li>
 <li><code>k</code> 的单位为 m²/s²，表中包含 <code>2.95219</code>、<code>0.0807476</code> 等不同位置的数值。</li>
 <li>这些数据由相应映射入口条件读入，位置和插值方式在配套文件中确定。</li>
 </ul>
 <p>替换实验廓线时同时更新点坐标及 <code>k</code>、<code>epsilon</code> 等数据，保留采样顺序和单位。</p>
-<p><a href="/assets/examples/v2512/k/1-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet/constant/boundaryData/inlet/0/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// Data on points</span>
+<p><a href="/assets/examples/v2512/k/1-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet/constant/boundaryData/inlet/0/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDailyExptInlet/constant/boundaryData/inlet/0/k"><code>incompressible/simpleFoam/pitzDailyExptInlet/constant/boundaryData/inlet/0/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// Data on points</span>
 <span class="hljs-number">70</span>
 (
 
@@ -382,14 +383,14 @@ wall
 <span class="hljs-number">2.20308</span>
 )
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/simplePMMApanel</summary><p>simplePMMApanel 的 <code>LES</code> 火灾算例给湍动能字段一个很小的正初值。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/simplePMMApanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/simplePMMApanel"><h3>算例问题：simplePMMApanel</h3><p class="reference-case-problem">PMMA 固体板受热后热解，释放可燃气体并在气相中燃烧。固体温升、热解质量源、火焰辐射与气相流动相互影响，主要观察热解区、火焰和板面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel"><code>combustion/fireFoam/LES/simplePMMApanel</code></a>。</p></section><!-- /reference-case-contexts --><p>simplePMMApanel 的 <code>LES</code> 火灾算例给湍动能字段一个很小的正初值。</p>
 <ul>
 <li><code>dimensions [0 2 -2 0 0 0 0]</code> 对应 m²/s²。</li>
 <li><code>internalField uniform 1e-5</code> 提供启动值，后续变化由所选模型决定。</li>
 <li><code>".*"/zeroGradient</code> 为匹配的边界使用零法向梯度。</li>
 </ul>
 <p>更换湍流模型时检查它是否求解 <code>k</code>，以及壁面和开口条件是否与新的模型相容。</p>
-<p><a href="/assets/examples/v2512/k/2-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/0.orig/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/k/2-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/0.orig/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/0.orig/k"><code>combustion/fireFoam/LES/simplePMMApanel/0.orig/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -418,14 +419,14 @@ wall
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>lagrangian/sprayFoam/aachenBomb</code></summary><p><code>aachenBomb</code> 的湍流初场用 <code>k</code> 和 <code>epsilon</code> 共同确定初始湍流尺度。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>lagrangian/sprayFoam/aachenBomb</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/sprayFoam/aachenBomb"><h3>算例问题：aachenBomb</h3><p class="reference-case-problem"><code>aachenBomb</code> 研究燃油喷入高温、高压空气后的喷雾与反应过程。计算域为封闭长方体容器，截面为 20 mm × 20 mm，高 100 mm；空气初始静止，温度为 800 K，压力为 5 MPa。喷嘴位于容器顶部附近，沿负 <code>y</code> 方向喷入初温 320 K 的正庚烷，喷射持续 1.25 ms，总质量为 6 mg。液滴以拉格朗日颗粒描述，气相在网格上求解；算例同时设置了液滴阻力、换热、蒸发、破碎及 PaSR 燃烧模型。可观察液滴运动、燃油蒸气分布以及气相温度和组分的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb"><code>lagrangian/sprayFoam/aachenBomb</code></a>。</p><figure class="reference-case-figure"><img alt="aachenBomb 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/spray-bomb.svg" width="720"><figcaption><code>aachenBomb</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>aachenBomb</code> 的湍流初场用 <code>k</code> 和 <code>epsilon</code> 共同确定初始湍流尺度。</p>
 <ul>
 <li><code>internalField uniform 1</code> 给定 <code>k</code>=1 m²/s²。</li>
 <li><code>walls/kqRWallFunction</code> 提供相应的近壁处理。</li>
 <li>边界 <code>value uniform 1</code> 是该条件所需的初始值。</li>
 </ul>
 <p>改变湍流强度时与 <code>epsilon</code> 成组调整，并检查喷雾环境的长度与时间尺度。</p>
-<p><a href="/assets/examples/v2512/k/3-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/0.orig/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/k/3-k.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/0.orig/k">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/0.orig/k"><code>lagrangian/sprayFoam/aachenBomb/0.orig/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

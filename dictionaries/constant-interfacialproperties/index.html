@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -282,7 +283,7 @@
 <p>位置：<code>constant/interfacialProperties</code></p><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dragModel1 / dragModel2</code></td><td>两种相角色对应的阻力关联式；须与 <code>dragPhase</code> 和 <code>dispersedPhase</code> 的连续相、分散相定义一致。</td></tr><tr><td><code>heatTransferModel1 / heatTransferModel2</code></td><td>相角色对应的传热模型；模型系数字典随所选模型变化。</td></tr><tr><td><code>minInterfaceAlpha / residualSlip</code></td><td>用于小相分数或小滑移量附近数值处理的阈值；不替代相分数边界和初值。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/multiphaseEulerFoam/mixerVessel2D</summary><p><code>mixerVessel2D</code> 的此文件保留了旧式两相接口写法。<code>v2512</code> 的配套 <code>multiphaseEulerFoam</code> 通过 <code>multiphaseSystem</code> 读取 <code>constant/transportProperties</code>；实际相间模型应在那个文件中的相对表里调整。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/multiphaseEulerFoam/mixerVessel2D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/multiphaseEulerFoam/mixerVessel2D"><h3>算例问题：mixerVessel2D</h3><p class="reference-case-problem">叶轮带动容器内流体旋转并形成循环流动。叶轮区与静止容器之间需要正确处理相对运动，具体版本采用旋转参考系、AMI 或动网格；主要观察速度分布、叶轮载荷和混合区。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D"><code>multiphase/multiphaseEulerFoam/mixerVessel2D</code></a>。</p></section><!-- /reference-case-contexts --><p><code>mixerVessel2D</code> 的此文件保留了旧式两相接口写法。<code>v2512</code> 的配套 <code>multiphaseEulerFoam</code> 通过 <code>multiphaseSystem</code> 读取 <code>constant/transportProperties</code>；实际相间模型应在那个文件中的相对表里调整。</p>
 <ul>
 <li>这里的 <code>dragModel1/2 SchillerNaumann</code> 表达两侧分散相均采用球形分散物阻力关联式的意图；<code>dragPhase blended</code> 表达两种分散状态的混合处理。</li>
 <li><code>heatTransferModel1/2 RanzMarshall</code> 是分散颗粒换热关联式的名称。当前求解流程应以实际读取的模型字典为准，原文件适合用于理解旧式参数组织。</li>
@@ -290,7 +291,7 @@
 <li>在有效的 <code>drag</code> 子字典中，<code>residualSlip 1e-2</code> 是 0.01 m/s 的滑移速度下限，<code>residualPhaseFraction 1e-2</code> 是相分数正则化参数；原文件的 <code>minInterfaceAlpha</code> 没有对应到当前这条读取路径。</li>
 </ul>
 <p>要比较搅拌中空气与水的滑移，可进入 <code>transportProperties/drag</code> 修改该相对的阻力设置，并检查气泡直径模型。增加一种流体时，还要补齐它与其他相之间需要的模型配置。</p>
-<p><a href="/assets/examples/v2512/interfacialproperties/1-interfacialProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D/constant/interfacialProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/interfacialproperties/1-interfacialProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D/constant/interfacialProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/multiphaseEulerFoam/mixerVessel2D/constant/interfacialProperties"><code>multiphase/multiphaseEulerFoam/mixerVessel2D/constant/interfacialProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

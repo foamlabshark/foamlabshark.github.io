@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,7 +280,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>本条面向相应固体或热弹性求解器，给出热物性及热应力相关开关。它把温度计算与材料响应联系起来，适合在结构问题中组织导热参数和温度引起的附加作用。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/thermalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>C</code></td><td>固体比热容，可通过 uniform/value 方式指定。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>k</code></td><td>固体热导率，此处不是湍动能。</td></tr><tr><td><code>alpha</code></td><td>固体线膨胀系数，此处不是多相流体积分数。</td></tr><tr><td><code>thermalStress</code></td><td>是否启用温度变化引起的热应力。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>stressAnalysis/solidDisplacementFoam/plateHole</code></summary><p>plateHole 的 <code>thermalProperties</code> 提供热传导和热膨胀所需常数，并决定是否把温度变化耦合到应力。</p>
+<p>位置：<code>constant/thermalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>C</code></td><td>固体比热容，可通过 uniform/value 方式指定。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>k</code></td><td>固体热导率，此处不是湍动能。</td></tr><tr><td><code>alpha</code></td><td>固体线膨胀系数，此处不是多相流体积分数。</td></tr><tr><td><code>thermalStress</code></td><td>是否启用温度变化引起的热应力。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>stressAnalysis/solidDisplacementFoam/plateHole</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="stressAnalysis/solidDisplacementFoam/plateHole"><h3>算例问题：plateHole</h3><p class="reference-case-problem">带圆孔的板在外部载荷作用下变形，孔边产生应力集中。算例求解固体位移并计算应变和应力，重点观察孔周应力分布及远场载荷条件。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole"><code>stressAnalysis/solidDisplacementFoam/plateHole</code></a>。</p><figure class="reference-case-figure"><img alt="plateHole 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/plate-hole.svg" width="720"><figcaption>plateHole 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>plateHole 的 <code>thermalProperties</code> 提供热传导和热膨胀所需常数，并决定是否把温度变化耦合到应力。</p>
 <ul>
 <li><code>C/value 434</code> 为比热容，单位 J/(kg·K)。</li>
 <li><code>k/value 60.5</code> 为热导率，单位 W/(m·K)。</li>
@@ -287,7 +288,7 @@
 <li><code>thermalStress no</code> 在当前计算中关闭热应力耦合。</li>
 </ul>
 <p>研究受热板的变形时开启热应力，并同时给出温度初值、热边界条件以及对应参考温度设置。</p>
-<p><a href="/assets/examples/v2512/thermalproperties/1-thermalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole/constant/thermalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermalproperties/1-thermalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole/constant/thermalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/stressAnalysis/solidDisplacementFoam/plateHole/constant/thermalProperties"><code>stressAnalysis/solidDisplacementFoam/plateHole/constant/thermalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

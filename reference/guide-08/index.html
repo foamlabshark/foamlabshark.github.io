@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -282,7 +283,7 @@
 postProcess -funcs <span class="hljs-string">'(func1 func2)'</span>
 postProcess -list                    <span class="hljs-comment"># 列出预配置函数对象入口</span></code></pre></div><!-- example-reading --><p><code>postProcess</code> 在已有结果上执行功能对象。只读取最新结果时刻。<code>postProcess</code> 在已有结果上执行功能对象。</p><!-- /example-reading -->
 <p>示例</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 看有哪些功能可用</span>
+<p class="reference-code-source">示例来源：本站整理，8.1 <code>postProcess</code> —— 通用后处理命令的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 看有哪些功能可用</span>
 postProcess -list
 
 <span class="hljs-comment"># ② 计算速度大小，写成新场 mag(U)</span>
@@ -375,7 +376,7 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 }</code></pre></div>
 <p>得到 <code>UMean</code>、<code>UPrime2Mean</code>（雷诺应力）等。<code>timeStart</code> 不设对，统计里会混入初始瞬态，结果没法用。</p>
 <p>④ 沿线取样（画剖面图）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">singleGraph
+<p class="reference-code-source">示例来源：本站整理，8.3 常用 <code>functionObject</code> 的写法的第 2 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">singleGraph
 {
     <span class="hljs-keyword">type</span>            sets;
     <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libsampling.so"</span>);
@@ -397,7 +398,7 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 }</code></pre></div>
 <p>输出在 postProcessing/singleGraph/&lt;时间&gt;/line1_U_p.xy，可直接用 gnuplot/Python 画。</p>
 <p>⑤ 切面取样（导出面数据给 ParaView 或做面积分）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">surfaces
+<p class="reference-code-source">示例来源：本站整理，8.3 常用 <code>functionObject</code> 的写法的第 3 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">surfaces
 {
     <span class="hljs-keyword">type</span>            surfaces;
     <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libsampling.so"</span>);

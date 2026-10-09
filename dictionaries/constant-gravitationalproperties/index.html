@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,14 +280,14 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>这个文件为对应浅水教程提供重力及旋转相关参数，参与水深平均方程。它用于把波动传播和旋转作用与浅水模型连接起来，应与初始水深、地形和坐标方向一致。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/gravitationalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>g</code></td><td>含显式量纲的重力加速度向量，垂向方向由其符号与坐标共同确定。</td></tr><tr><td><code>rotating</code></td><td>是否在浅水方程中考虑旋转效应。</td></tr><tr><td><code>Omega</code></td><td>旋转角速度向量，量纲为时间的负一次方。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>incompressible/shallowWaterFoam/squareBump</code></summary><p>squareBump 用浅水方程计算自由液面的传播，同时可考虑旋转参考系中的科里奥利效应。</p>
+<p>位置：<code>constant/gravitationalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>g</code></td><td>含显式量纲的重力加速度向量，垂向方向由其符号与坐标共同确定。</td></tr><tr><td><code>rotating</code></td><td>是否在浅水方程中考虑旋转效应。</td></tr><tr><td><code>Omega</code></td><td>旋转角速度向量，量纲为时间的负一次方。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>incompressible/shallowWaterFoam/squareBump</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/shallowWaterFoam/squareBump"><h3>算例问题：squareBump</h3><p class="reference-case-problem">浅水流经过局部隆起，地形改变水深和深度平均速度。算例求解浅水方程，主要观察水面高度、流速及地形附近的波动，而不直接解析完整的竖向速度分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump"><code>incompressible/shallowWaterFoam/squareBump</code></a>。</p></section><!-- /reference-case-contexts --><p>squareBump 用浅水方程计算自由液面的传播，同时可考虑旋转参考系中的科里奥利效应。</p>
 <ul>
 <li><code>g (0 0 -9.81)</code> 指定重力向下，大小为 9.81 m/s²。</li>
 <li><code>rotating true</code> 开启旋转项。</li>
 <li><code>Omega (0 0 7.292e-5)</code> 给出沿 <code>z</code> 轴的角速度，大小接近地球自转角速度，单位为 s⁻¹。</li>
 </ul>
 <p>研究旋转作用时可比较 <code>rotating</code> 为 <code>true</code> 和 <code>false</code> 的两组结果，保持初始水深扰动、网格和时间步一致。</p>
-<p><a href="/assets/examples/v2512/gravitationalproperties/1-gravitationalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump/constant/gravitationalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/gravitationalproperties/1-gravitationalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump/constant/gravitationalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/shallowWaterFoam/squareBump/constant/gravitationalProperties"><code>incompressible/shallowWaterFoam/squareBump/constant/gravitationalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

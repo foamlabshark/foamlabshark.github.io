@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -305,7 +306,7 @@ sectorCoeffs   { axisPt (<span class="hljs-number">0</span> <span class="hljs-nu
 nLayers         <span class="hljs-number">1</span>;
 expansionRatio  <span class="hljs-number">1.0</span>;
 mergeFaces      <span class="hljs-literal">false</span>;</code></pre></div>
-<p>典型用途：把一个二维面拉伸成一层网格做二维算例；用 sector 模型做轴对称（<code>wedge</code>）算例。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · mesh/extrudeMesh/faceZoneExtrusion</summary><p>faceZoneExtrusion 从已有面区挤出体网格，可用于由界面生成薄层区域。</p>
+<p>典型用途：把一个二维面拉伸成一层网格做二维算例；用 sector 模型做轴对称（<code>wedge</code>）算例。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · mesh/extrudeMesh/faceZoneExtrusion</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/extrudeMesh/faceZoneExtrusion"><h3>算例问题：faceZoneExtrusion</h3><p class="reference-case-problem">从已有面区域沿指定方向拉伸生成网格，用于将表面网格转换为具有厚度的体网格。需要对应设置面区域、拉伸方向、层数和层间增长率，并检查生成区域的边界与连接。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion"><code>mesh/extrudeMesh/faceZoneExtrusion</code></a>。</p></section><!-- /reference-case-contexts --><p>faceZoneExtrusion 从已有面区挤出体网格，可用于由界面生成薄层区域。</p>
 <ul>
 <li><code>constructFrom mesh</code>、<code>sourceCase "&lt;case&gt;"</code> 指向源网格；<code>sourceFaceZones (f0Zone)</code> 选择挤出面区。</li>
 <li><code>extrudeModel linearNormal</code> 沿局部法向挤出，<code>thickness 0.05</code> 给出 0.05 m 厚度。</li>
@@ -313,7 +314,7 @@ mergeFaces      <span class="hljs-literal">false</span>;</code></pre></div>
 <li><code>mergeFaces false</code> 保留面分离结构。</li>
 </ul>
 <p>改变厚度前检查法向是否指向目标区域，完成后检查薄层单元质量和新边界名称。</p>
-<p><a href="/assets/examples/v2512/extrudemeshdict/1-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/extrudemeshdict/1-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/extrudeMesh/faceZoneExtrusion/system/extrudeMeshDict"><code>mesh/extrudeMesh/faceZoneExtrusion/system/extrudeMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -342,7 +343,7 @@ thickness     <span class="hljs-number">0.05</span>;
 flipNormals <span class="hljs-literal">false</span>;
 mergeFaces <span class="hljs-literal">false</span>;
 
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · compressible/rhoPimpleFoam/RAS/aerofoilNACA0012</summary><p>NACA0012 网格从 <code>back</code> 边界沿固定方向挤出，形成有限厚度的翼型网格。</p>
+<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · compressible/rhoPimpleFoam/RAS/aerofoilNACA0012</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleFoam/RAS/aerofoilNACA0012"><h3>算例问题：aerofoilNACA0012</h3><p class="reference-case-problem">来流绕过二维翼型，在表面形成边界层并在下游形成尾流。入口来流、攻角和近壁网格共同影响表面压力及升阻力；重叠网格版本将翼型附近网格与背景网格分别建立。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012"><code>compressible/rhoPimpleFoam/RAS/aerofoilNACA0012</code></a>。</p><figure class="reference-case-figure"><img alt="aerofoilNACA0012 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>aerofoilNACA0012 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>NACA0012 网格从 <code>back</code> 边界沿固定方向挤出，形成有限厚度的翼型网格。</p>
 <ul>
 <li><code>constructFrom patch</code>、<code>sourcePatches (back)</code> 选择源边界。</li>
 <li><code>linearDirection</code> 采用统一方向 <code>(0 -1 0)</code>，而非各面法向。</li>
@@ -350,7 +351,7 @@ mergeFaces <span class="hljs-literal">false</span>;
 <li><code>flipNormals false</code> 与 <code>mergeFaces false</code> 保持本例的方向和面结构。</li>
 </ul>
 <p>展向宽度改变时同步调整厚度、网格层数及后处理参考面积。</p>
-<p><a href="/assets/examples/v2512/extrudemeshdict/2-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/extrudemeshdict/2-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/aerofoilNACA0012/system/extrudeMeshDict"><code>compressible/rhoPimpleFoam/RAS/aerofoilNACA0012/system/extrudeMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -380,14 +381,14 @@ flipNormals <span class="hljs-literal">false</span>;
 mergeFaces <span class="hljs-literal">false</span>;
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/compressibleInterFoam/laminar/climbingRod</code></summary><p>爬杆流动采用窄楔形挤出，把二维截面变为轴对称近似网格。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/compressibleInterFoam/laminar/climbingRod</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/compressibleInterFoam/laminar/climbingRod"><h3>算例问题：climbingRod</h3><p class="reference-case-problem">旋转杆带动周围流体运动，自由液面随旋转和流体应力发生变形。算例同时涉及杆面运动、流体本构与气液界面，需结合所选流变模型观察杆附近的液面和速度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod"><code>multiphase/compressibleInterFoam/laminar/climbingRod</code></a>。</p><figure class="reference-case-figure"><img alt="climbingRod 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/rotating-rod.svg" width="720"><figcaption>climbingRod 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>爬杆流动采用窄楔形挤出，把二维截面变为轴对称近似网格。</p>
 <ul>
 <li><code>sourcePatches (front)</code> 是源面，<code>exposedPatchName back</code> 命名另一侧。</li>
 <li><code>extrudeModel wedge</code> 选择楔形模型，<code>point (0 0 0)</code>、<code>axis (0 -1 0)</code> 定义转轴。</li>
 <li><code>angle 1</code> 指定 1° 的扇角，<code>flipNormals false</code> 保持源面方向。</li>
 </ul>
 <p>改变轴线或扇角时检查两个楔面及其场边界类型，确保几何与轴对称假设一致。</p>
-<p><a href="/assets/examples/v2512/extrudemeshdict/3-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/extrudemeshdict/3-extrudeMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod/system/extrudeMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/climbingRod/system/extrudeMeshDict"><code>multiphase/compressibleInterFoam/laminar/climbingRod/system/extrudeMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

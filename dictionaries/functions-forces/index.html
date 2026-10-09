@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -299,7 +300,7 @@
 </code></pre></div>
 <p><code>patches</code> 选择参与积分的表面，可以列出多个壁面。<code>rho rhoInf</code> 表示采用指定常密度，<code>rhoInf 1.2</code> 的单位是 kg/m³，用于把运动学压力等量转换成物理力。<code>CofR</code> 是力矩参考点，改变它会改变力矩，合力保持相同。</p>
 <p>压力积分与黏性积分分别输出，便于判断受力来源。数据保存在 <code>postProcessing/bodyForces/</code>，先读文件头确定列含义。可压缩案例通常读取实际 <code>rho</code> 字段，并采用相应压力单位。</p>
-<p>这个对象需要求解器中的输运或湍流模型来获得应力，适合在求解时执行，或在支持的求解器后处理环境中使用。二维网格积分包含实际厚度，转换为单位展长力时除以该厚度。多个离散物体可分别创建对象，保留各自 <code>patch</code> 与力矩中心。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam</summary><p>二维翼型预计算对 <code>wing</code> 边界积分压力与黏性力。</p>
+<p>这个对象需要求解器中的输运或湍流模型来获得应力，适合在求解时执行，或在支持的求解器后处理环境中使用。二维网格积分包含实际厚度，转换为单位展长力时除以该厚度。多个离散物体可分别创建对象，保留各自 <code>patch</code> 与力矩中心。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam"><h3>算例问题：wingMotion2D_simpleFoam</h3><p class="reference-case-problem">翼型按规定规律运动，周围流场随边界位置与速度变化。该目录中的辅助设置用于准备运动计算或初始流场，阅读时应结合主算例的运动脚本与网格设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam"><code>incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam</code></a>。</p><figure class="reference-case-figure"><img alt="wingMotion2D_simpleFoam 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>wingMotion2D_simpleFoam 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>二维翼型预计算对 <code>wing</code> 边界积分压力与黏性力。</p>
 <ul>
 <li><code>type forces</code>、<code>libs (forces)</code> 启用力统计，<code>patches (wing)</code> 选择受力表面。</li>
 <li><code>rho rhoInf</code>、<code>rhoInf 1</code> 采用参考密度 1，把相关运动学压力转换为力所需形式。</li>
@@ -307,7 +308,7 @@
 <li>每 10 个求解步写出，<code>log false</code> 减少终端打印。</li>
 </ul>
 <p>改变翼型厚度方向范围时按实际三维面积解释总力；力矩比较应使用同一个参考中心。</p>
-<p><a href="/assets/examples/v2512/forces/1-forces.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/1-forces.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces"><code>incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -331,7 +332,7 @@ forces
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/DTCHull</summary><p>DTCHull 在每个求解步统计 <code>hull</code> 表面的载荷，用于观察船体阻力随迭代或时间的发展。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/DTCHull</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/RAS/DTCHull"><h3>算例问题：DTCHull</h3><p class="reference-case-problem">船体固定在水气两相计算域中，给定来流后计算船体附近的压力、黏性流动和自由表面波。由船体表面积分得到阻力，并检查船首、船尾及尾流区的波面形态。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull"><code>multiphase/interFoam/RAS/DTCHull</code></a>。</p><figure class="reference-case-figure"><img alt="DTCHull 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/hull.svg" width="720"><figcaption>DTCHull 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>DTCHull 在每个求解步统计 <code>hull</code> 表面的载荷，用于观察船体阻力随迭代或时间的发展。</p>
 <ul>
 <li><code>patches (hull)</code> 限定船体受力表面。</li>
 <li><code>type forces</code> 和 <code>forces</code> 库计算压力力、黏性力及力矩。</li>
@@ -339,7 +340,7 @@ forces
 <li><code>writeControl timeStep</code>、<code>writeInterval 1</code> 每步记录载荷，<code>log on</code> 同时打印到日志；主场则每 100 步保存。</li>
 </ul>
 <p>更换船体或姿态后检查 <code>patch</code> 和参考中心，并结合求解器当前时间处理解释载荷曲线。</p>
-<p><a href="/assets/examples/v2512/forces/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict"><code>multiphase/interFoam/RAS/DTCHull/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -401,7 +402,7 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset</code></summary><p>重叠网格翼型算例对 <code>wing</code> 表面输出力与力矩，便于与普通网格结果比较。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset"><h3>算例问题：aeroFoil_overset</h3><p class="reference-case-problem">来流绕过二维翼型，在表面形成边界层并在下游形成尾流。入口来流、攻角和近壁网格共同影响表面压力及升阻力；重叠网格版本将翼型附近网格与背景网格分别建立。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset"><code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset</code></a>。</p><figure class="reference-case-figure"><img alt="aeroFoil_overset 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>aeroFoil_overset 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>重叠网格翼型算例对 <code>wing</code> 表面输出力与力矩，便于与普通网格结果比较。</p>
 <ul>
 <li><code>type forces</code>、<code>patches (wing)</code> 选择积分对象。</li>
 <li><code>CofR (0.4974612746 -0.01671895744 0.125)</code> 保持明确的力矩中心。</li>
@@ -409,7 +410,7 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
 <li>主求解采用 <code>overSimpleFoam</code> 与 <code>startFrom latestTime</code>，从已有结果继续稳态迭代。</li>
 </ul>
 <p>比较不同重叠区域或网格分辨率时，保持来流、参考密度与积分表面一致。</p>
-<p><a href="/assets/examples/v2512/forces/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict"><code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -301,14 +302,14 @@ atmosphere
 }
 </code></pre></div>
 <p><code>fixedFluxPressure</code> 通过压力梯度与速度边界要求的通量配合，适用于该溃坝案例的无穿透壁面。<code>totalPressure</code> 用于案例中的开口压力处理，<code>p0</code> 为所选压力基准下的总压值。与之配套，开口的 <code>U</code> 使用 <code>pressureInletOutletVelocity</code>，相分数使用允许空气回流的 <code>inletOutlet</code>。</p>
-<p>查看真实压力时，应使用求解器输出的 <code>p</code>，或按相同密度与高度参考重建静压。将 <code>p_rgh</code> 直接当作传感器测得的静压，会遗漏高度项。自建浮力或自由液面出口时，还可以研究 <code>prghPressure</code>、<code>prghTotalPressure</code> 等条件，它们的参数与压力转换需按所选求解器配套。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/sloshingTank3D</summary><p>晃荡水箱求解扣除静水头后的压力 <code>p_rgh</code>，使重力与压力梯度更方便配合。</p>
+<p>查看真实压力时，应使用求解器输出的 <code>p</code>，或按相同密度与高度参考重建静压。将 <code>p_rgh</code> 直接当作传感器测得的静压，会遗漏高度项。自建浮力或自由液面出口时，还可以研究 <code>prghPressure</code>、<code>prghTotalPressure</code> 等条件，它们的参数与压力转换需按所选求解器配套。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/sloshingTank3D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/sloshingTank3D"><h3>算例问题：sloshingTank3D</h3><p class="reference-case-problem">容器运动或初始扰动使内部液体晃动，水面倾斜并形成随时间变化的压力。算例用于研究自由液面与容器运动的耦合，主要观察液面高度、壁面载荷及动网格质量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D"><code>multiphase/interFoam/laminar/sloshingTank3D</code></a>。</p></section><!-- /reference-case-contexts --><p>晃荡水箱求解扣除静水头后的压力 <code>p_rgh</code>，使重力与压力梯度更方便配合。</p>
 <ul>
 <li>量纲为 Pa，<code>internalField uniform 0</code> 设置初始 <code>p_rgh</code>。</li>
 <li><code>walls/fixedFluxPressure</code> 根据壁面速度通量设置相应压力梯度。</li>
 <li>重构实际压力还需要密度、重力方向与重力势参考，关系由求解器处理。</li>
 </ul>
 <p>改变水深或容器运动时，保持 <code>p_rgh</code>、相分数、重力与壁面速度条件相容。</p>
-<p><a href="/assets/examples/v2512/p-rgh/1-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/1-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh"><code>multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -337,14 +338,14 @@ atmosphere
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interIsoFoam/sphereInReversedVortexFlow</summary><p>反向涡流中的球形界面测试把外边界 <code>p_rgh</code> 设为统一参考值。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interIsoFoam/sphereInReversedVortexFlow</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interIsoFoam/sphereInReversedVortexFlow"><h3>算例问题：sphereInReversedVortexFlow</h3><p class="reference-case-problem">球形相区置于规定的涡旋速度场中，先被拉伸变形，再随反向速度场回到初始状态附近。该算例主要检验界面输运的形状保持与体积守恒，速度场用于驱动界面运动。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow</code></a>。</p></section><!-- /reference-case-contexts --><p>反向涡流中的球形界面测试把外边界 <code>p_rgh</code> 设为统一参考值。</p>
 <ul>
 <li><code>dimensions [1 -1 -2 0 0 0 0]</code> 表示压力单位 Pa。</li>
 <li>内部初值为 0，<code>sides/fixedValue</code> 同样固定为 0。</li>
 <li>这与配套给定速度场、界面输运测试共同组成问题。</li>
 </ul>
 <p>更换为封闭容器时重新选择压力边界和参考设置，而球形相区的几何仍由初始化文件决定。</p>
-<p><a href="/assets/examples/v2512/p-rgh/2-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/2-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -373,14 +374,14 @@ atmosphere
     }
 }
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/movingInjectorBox</summary><p><code>movingInjectorBox</code> 为颗粒注入的连续相建立 <code>p_rgh</code> 初值和封闭壁面条件。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/movingInjectorBox</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/movingInjectorBox"><h3>算例问题：movingInjectorBox</h3><p class="reference-case-problem">喷射位置随时间移动，向箱体中的载气持续注入颗粒或液滴。算例将移动注入器的位置、方向和注入量与颗粒跟踪相联系，主要观察喷射轨迹和粒子空间分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox"><code>lagrangian/reactingParcelFoam/movingInjectorBox</code></a>。</p></section><!-- /reference-case-contexts --><p><code>movingInjectorBox</code> 为颗粒注入的连续相建立 <code>p_rgh</code> 初值和封闭壁面条件。</p>
 <ul>
 <li><code>internalField uniform 100000</code> 给定 100000 Pa 的初始 <code>p_rgh</code>。</li>
 <li>量纲为 Pa，实际物理压力还包含求解器的重力势与密度处理。</li>
 <li><code>walls/fixedFluxPressure</code> 与壁面通量对应，保持压力梯度和速度约束一致。</li>
 </ul>
 <p>改变初始热力状态时同时调整温度与热物性，检查密度是否符合预期。</p>
-<p><a href="/assets/examples/v2512/p-rgh/3-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/3-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh"><code>lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

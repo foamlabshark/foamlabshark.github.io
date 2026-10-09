@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,7 +280,7 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>这个字典为相应湍流盒工具规定初始谱场和模态设置，用于构造具有目标能量分布的速度扰动。它常出现在各向同性湍流教程中，为后续衰减或受迫湍流计算准备初态。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/createBoxTurbDict</code></p><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/decayIsoTurb</summary><p>decayIsoTurb 需要一个具有给定能谱的初始速度场。<code>createBoxTurb</code> 使用实验谱表和随机模态在周期立方体内构造速度。</p>
+<p>位置：<code>constant/createBoxTurbDict</code></p><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/decayIsoTurb</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/decayIsoTurb"><h3>算例问题：decayIsoTurb</h3><p class="reference-case-problem">周期立方体内设置初始湍流速度场，随后在没有持续外部供能的条件下衰减。算例通过动能、耗散和能谱的时间变化检验湍流解析或亚格子模型，网格与初始谱应相互匹配。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb"><code>incompressible/pimpleFoam/LES/decayIsoTurb</code></a>。</p><figure class="reference-case-figure"><img alt="decayIsoTurb 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/periodic-cube.svg" width="720"><figcaption>decayIsoTurb 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>decayIsoTurb 需要一个具有给定能谱的初始速度场。<code>createBoxTurb</code> 使用实验谱表和随机模态在周期立方体内构造速度。</p>
 <ul>
 <li><code>N (64 64 64)</code> 设置三方向各 64 个离散点，<code>L</code> 的三个分量均约 0.56549 m，网格尺度约为 8.84 mm。</li>
 <li><code>nModes 5000</code> 用 5000 个模态近似目标谱；增加模态数会增加生成成本。</li>
@@ -287,7 +288,7 @@
 <li>后续流动计算让初始湍流在黏性作用下衰减，可以比较各时刻能谱与总动能。</li>
 </ul>
 <p>把 N 改成 128³ 时同步检查网格生成设置与输出空间；保持盒子尺寸和初始谱一致，才能比较分辨率的影响。</p>
-<p><a href="/assets/examples/v2512/createboxturbdict/1-createBoxTurbDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb/constant/createBoxTurbDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">53 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createboxturbdict/1-createBoxTurbDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb/constant/createBoxTurbDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb/constant/createBoxTurbDict"><code>incompressible/pimpleFoam/LES/decayIsoTurb/constant/createBoxTurbDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">53 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -346,7 +347,7 @@ Ek          table
 <li><code>Ek table</code> 从波数 15 到 2000 提供采样数据，工具据此构造初始速度的谱分布。</li>
 </ul>
 <p>提高分辨率主要扩展可表达的小尺度范围；提高 <code>nModes</code> 主要改善目标谱的离散近似。两项可分别改变并对照生成后的谱曲线。</p>
-<p><a href="/assets/examples/v2512/createboxturbdict/2-createBoxTurbDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/createBoxTurbDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createboxturbdict/2-createBoxTurbDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/createBoxTurbDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><p class="reference-code-source">示例来源：本站整理，算例问题：decayIsoTurb的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -398,6 +399,7 @@ Ek          table
 
 
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/boxturb/">boxTurb</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>场没有发生预期变化</td><td>核对写入时刻、区域和所选集合；检查工具是否读取了实际传入的字典。</td></tr><tr><td>初始化破坏守恒</td><td>统计积分质量、体积或组分和；局部赋值可能覆盖其他已经设定的区域。</td></tr><tr><td>边界值与内部值冲突</td><td>初始化赋值后，按物理问题设置边界类型；求解过程中边界值按该类型更新。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
+
 </div>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>

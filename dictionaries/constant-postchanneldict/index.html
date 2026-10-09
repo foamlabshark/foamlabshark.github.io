@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,14 +280,14 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p><code>postChannelDict</code> 为通道湍流后处理指定壁面法向分层和平均方式。<code>postChannel</code> 据此把均匀方向上的数据汇总为一维剖面，便于比较平均速度及湍流统计量。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/postChannelDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>patches</code></td><td>开始按网格层聚合数据的种子壁面，例如 <code>bottomWall</code>。</td></tr><tr><td><code>component</code></td><td>层推进的坐标方向，示例为 <code>y</code>。</td></tr><tr><td><code>symmetric</code></td><td>是否按对称通道将两半区域的对称或反对称分量合并。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/periodicPlaneChannel</summary><p>periodicPlaneChannel 对周期通道的统计流场做横向分层平均，得到用于分析近壁湍流的剖面。</p>
+<p>位置：<code>constant/postChannelDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>patches</code></td><td>开始按网格层聚合数据的种子壁面，例如 <code>bottomWall</code>。</td></tr><tr><td><code>component</code></td><td>层推进的坐标方向，示例为 <code>y</code>。</td></tr><tr><td><code>symmetric</code></td><td>是否按对称通道将两半区域的对称或反对称分量合并。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/periodicPlaneChannel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/periodicPlaneChannel"><h3>算例问题：periodicPlaneChannel</h3><p class="reference-case-problem">两平行壁面之间的湍流通道采用周期或指定入口方式维持流动。算例用于研究近壁湍流、平均速度和脉动统计，不同子目录提供入口湍流或模型对照设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel"><code>incompressible/pimpleFoam/LES/periodicPlaneChannel</code></a>。</p><figure class="reference-case-figure"><img alt="periodicPlaneChannel 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/channel.svg" width="720"><figcaption>periodicPlaneChannel 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>periodicPlaneChannel 对周期通道的统计流场做横向分层平均，得到用于分析近壁湍流的剖面。</p>
 <ul>
 <li><code>patches (bottomWall)</code> 指定参考壁面。</li>
 <li><code>component y</code> 以 <code>y</code> 坐标组织通道法向剖面。</li>
 <li><code>symmetric true</code> 利用通道两壁的统计对称性，将对称位置的结果组合。</li>
 </ul>
 <p>当上下壁面粗糙度、温度或运动条件不同，改用不强制对称的统计方式，并分别检查两侧剖面。</p>
-<p><a href="/assets/examples/v2512/postchanneldict/1-postChannelDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel/constant/postChannelDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/postchanneldict/1-postChannelDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel/constant/postChannelDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicPlaneChannel/constant/postChannelDict"><code>incompressible/pimpleFoam/LES/periodicPlaneChannel/constant/postChannelDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

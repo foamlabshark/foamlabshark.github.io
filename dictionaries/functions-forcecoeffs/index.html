@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -308,7 +309,7 @@ C_D=\frac{F_D}{\tfrac12\rho U_\infty^2 A_{ref}}.
 </code></pre></div>
 <p><code>e1</code> 为阻力方向，<code>e3</code> 为升力方向，两者正交；这里阻力沿 <code>x</code>、升力沿 <code>y</code>。<code>origin</code> 是力矩参考点，<code>magUInf</code> 是参考速度，<code>lRef</code> 是力矩归一化所用长度，<code>Aref</code> 是参考面积。</p>
 <p><code>v2512</code> 的不可压缩系数计算中，密度在力与动压归一化中抵消；源码按单位密度处理这一情形。若要得到有量纲力并正确应用实际密度，同时使用 <code>forces</code>。可压缩系数计算则需要与参考动压一致的参考密度。</p>
-<p>结果位于 <code>postProcessing/bodyCoefficients/</code>。二维案例的 <code>Aref</code> 应包含实际网格厚度，或在一致的单位展长定义下处理。改变来流方向时同步更新坐标方向与参考速度，以免把升力投影到了错误轴上。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/LES/motorBike/motorBike</summary><p><code>motorBike</code> 的 <code>forceCoeffs</code> 将总载荷换算为无量纲升阻力系数。</p>
+<p>结果位于 <code>postProcessing/bodyCoefficients/</code>。二维案例的 <code>Aref</code> 应包含实际网格厚度，或在一致的单位展长定义下处理。改变来流方向时同步更新坐标方向与参考速度，以免把升力投影到了错误轴上。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/LES/motorBike/motorBike</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pisoFoam/LES/motorBike/motorBike"><h3>算例问题：motorBike</h3><p class="reference-case-problem">来流绕过摩托车与骑手组合外形，表面附近形成边界层，后方形成分离尾流。主要结果为压力、速度、阻力及尾流结构；包含伴随设置时，还用于评价表面形状对目标函数的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike"><code>incompressible/pisoFoam/LES/motorBike/motorBike</code></a>。</p></section><!-- /reference-case-contexts --><p><code>motorBike</code> 的 <code>forceCoeffs</code> 将总载荷换算为无量纲升阻力系数。</p>
 <ul>
 <li><code>patches ("motorBike.*")</code> 收集摩托车相关表面，<code>rho rhoInf</code>、<code>rhoInf 1</code> 给参考密度。</li>
 <li><code>magUInf 20</code>、<code>Aref 0.75</code> 分别给 20 m/s 来流和 0.75 m² 参考面积，力系数按动压乘面积归一化。</li>
@@ -316,7 +317,7 @@ C_D=\frac{F_D}{\tfrac12\rho U_\infty^2 A_{ref}}.
 <li><code>lRef 1.42</code> 用于力矩系数，<code>CofR (0.72 0 0)</code> 给力矩中心。</li>
 </ul>
 <p>改动车速时同步修改 <code>magUInf</code>；更换参考面积后应明确系数定义，才能和其他结果比较。</p>
-<p><a href="/assets/examples/v2512/forcecoeffs/1-forceCoeffs.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike/system/forceCoeffs">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forcecoeffs/1-forceCoeffs.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike/system/forceCoeffs">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/LES/motorBike/motorBike/system/forceCoeffs"><code>incompressible/pisoFoam/LES/motorBike/motorBike/system/forceCoeffs</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -345,7 +346,7 @@ forces
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/pimpleFoam/LES/NACA4412</code></summary><p>NACA4412 的升阻力方向根据攻角表达式计算，避免手工填写不一致的方向向量。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/pimpleFoam/LES/NACA4412</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/NACA4412"><h3>算例问题：NACA4412</h3><p class="reference-case-problem">来流绕过带弯度的 NACA4412 翼型，在较强逆压梯度下形成分离流动。算例用于观察翼面压力、分离剪切层和尾流，以及它们对升力和阻力的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412"><code>incompressible/pimpleFoam/LES/NACA4412</code></a>。</p><figure class="reference-case-figure"><img alt="NACA4412 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>NACA4412 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>NACA4412 的升阻力方向根据攻角表达式计算，避免手工填写不一致的方向向量。</p>
 <ul>
 <li><code>AoA 13.87</code> 以角度输入，<code>degToRad</code> 转为三角函数使用的弧度。</li>
 <li><code>liftDir</code>、<code>dragDir</code> 分别由正弦和余弦构造，与来流方向对应。</li>
@@ -353,7 +354,7 @@ forces
 <li><code>CofR (0.25 0 0)</code> 是四分之一弦长力矩中心，每步记录系数。</li>
 </ul>
 <p>改变攻角时同时核对实际入口速度方向；改变展向宽度时同步更新 <code>Aref</code>。</p>
-<p><a href="/assets/examples/v2512/forcecoeffs/2-forceCoeffs.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/forceCoeffs">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forcecoeffs/2-forceCoeffs.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/forceCoeffs">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/forceCoeffs"><code>incompressible/pimpleFoam/LES/NACA4412/system/forceCoeffs</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -387,7 +388,7 @@ forceCoeffs
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/sonicFoam/RAS/nacaAirfoil</code></summary><p>高速翼型算例把指定壁面的载荷按自由来流尺度归一化。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/sonicFoam/RAS/nacaAirfoil</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/sonicFoam/RAS/nacaAirfoil"><h3>算例问题：nacaAirfoil</h3><p class="reference-case-problem">超声速来流绕过翼型，形成激波、膨胀区与尾流。压力、密度和温度需要通过可压缩方程耦合计算，主要观察激波位置和翼面压力分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil"><code>compressible/sonicFoam/RAS/nacaAirfoil</code></a>。</p><figure class="reference-case-figure"><img alt="nacaAirfoil 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>nacaAirfoil 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>高速翼型算例把指定壁面的载荷按自由来流尺度归一化。</p>
 <ul>
 <li><code>patches (wall_4)</code> 选择翼型表面。</li>
 <li><code>magUInf 618.022</code>、<code>lRef 1</code>、<code>Aref 1</code> 给速度、长度与面积参考。</li>
@@ -395,7 +396,7 @@ forceCoeffs
 <li><code>CofR (0 0 0)</code>、<code>pitchAxis (0 0 1)</code> 定义力矩中心和轴，<code>writeControl writeTime</code> 跟随主结果写出。</li>
 </ul>
 <p>更换攻角或实际参考面积后更新归一化设置；可压缩压力与密度应按求解器字段单位解释。</p>
-<p><a href="/assets/examples/v2512/forcecoeffs/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">73 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forcecoeffs/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/sonicFoam/RAS/nacaAirfoil/system/controlDict"><code>compressible/sonicFoam/RAS/nacaAirfoil/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">73 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

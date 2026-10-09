@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,14 +280,14 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>这个字典为相应轨迹处理流程选择颗粒及输出控制，把已保存的粒子位置整理为轨迹。它适合减少需要导出的颗粒数量或调整轨迹长度，具体字段按配套工具读取方式使用。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/particleTrackDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>cloud</code></td><td>要导出的轨迹云名称；示例为 <code>reactingCloud1Tracks</code>，应与已有 <code>lagrangian</code> 数据一致。</td></tr><tr><td><code>fields</code></td><td>目标场列表。场名、数据类型和计算时刻必须满足相应函数对象的要求。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/reactingHeterogenousParcelFoam/rectangularDuct</code></summary><p>矩形管道算例保存了颗粒轨迹云 <code>reactingCloud1Tracks</code>，<code>steadyParticleTracks</code> 将它整理为可显示的轨迹及沿轨迹的数据。</p>
+<p>位置：<code>constant/particleTrackDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>cloud</code></td><td>要导出的轨迹云名称；示例为 <code>reactingCloud1Tracks</code>，应与已有 <code>lagrangian</code> 数据一致。</td></tr><tr><td><code>fields</code></td><td>目标场列表。场名、数据类型和计算时刻必须满足相应函数对象的要求。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/reactingHeterogenousParcelFoam/rectangularDuct</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingHeterogenousParcelFoam/rectangularDuct"><h3>算例问题：rectangularDuct</h3><p class="reference-case-problem">反应性颗粒随气流通过矩形管道，颗粒表面与气相组分发生非均相反应，并交换热量和质量。算例关注颗粒温度、质量及气相组分沿管道的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct"><code>lagrangian/reactingHeterogenousParcelFoam/rectangularDuct</code></a>。</p></section><!-- /reference-case-contexts --><p>矩形管道算例保存了颗粒轨迹云 <code>reactingCloud1Tracks</code>，<code>steadyParticleTracks</code> 将它整理为可显示的轨迹及沿轨迹的数据。</p>
 <ul>
 <li><code>cloud reactingCloud1Tracks</code> 指定要读取的轨迹云名称，应与时间目录下 <code>lagrangian</code> 子目录对应。</li>
 <li><code>fields (d U T)</code> 为每条轨迹附带粒径、速度和温度，便于观察颗粒沿管道的受热与运动。</li>
 <li>这些值来自计算时保存的颗粒字段，字段名需要与云目录中的文件一致。</li>
 </ul>
 <p>希望比较组分或反应程度时，先让颗粒模型输出相应字段，再把字段名称加入列表。</p>
-<p><a href="/assets/examples/v2512/particletrackdict/1-particleTrackDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct/constant/particleTrackDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/particletrackdict/1-particleTrackDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct/constant/particleTrackDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingHeterogenousParcelFoam/rectangularDuct/constant/particleTrackDict"><code>lagrangian/reactingHeterogenousParcelFoam/rectangularDuct/constant/particleTrackDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -319,7 +320,7 @@ fields
 <li><code>fields (d U T)</code> 选择粒径、速度和温度，分别用于轨迹大小、速度方向和热状态的分析。</li>
 </ul>
 <p>先确认选定时间中存在该云及字段，再运行轨迹导出；其他云可通过更换 <code>cloud</code> 值处理。</p>
-<p><a href="/assets/examples/v2512/particletrackdict/2-particleTrackDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/particleTrackDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/particletrackdict/2-particleTrackDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/particleTrackDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><p class="reference-code-source">示例来源：本站整理，算例问题：<code>rectangularDuct</code>的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

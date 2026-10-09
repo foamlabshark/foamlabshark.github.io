@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -276,7 +277,7 @@
     <h1>08 时间控制与数值求解设置</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><h2>8.1 system/controlDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<p class="reference-code-source">示例来源：本站整理，8.1 <code>system/controlDict</code>的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
     <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> controlDict;
@@ -355,7 +356,7 @@ wallDist { method meshWave; }</code></pre></div>
 </tbody></table></div>
 <p>湍流方程可采用 <code>div</code>(<code>phi</code>,<code>k</code>) <code>Gauss</code> <code>upwind</code>; 和 <code>div</code>(<code>phi</code>,<code>omega</code>) <code>Gauss</code> <code>upwind</code>;，字段名称随模型确定。VOF 求解器的 <code>div</code>(<code>phi</code>,<code>alpha</code>)、<code>div</code>(<code>phirb</code>,<code>alpha</code>) 等条目采用其配套教程的定义。<code>rhoCentralFoam</code> 还需设置 fluxScheme 及变量重构格式。</p>
 <h2>8.3 system/fvSolution</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<p class="reference-code-source">示例来源：本站整理，8.3 <code>system/fvSolution</code>的第 2 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
     <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
     <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> fvSolution;
@@ -445,6 +446,7 @@ simpleCoeffs
 <h2>8.5 system/renumberMeshDict 与文件处理器</h2>
 <p><code>renumberMethod</code> 指定网格编号算法，如 <code>CuthillMcKee</code>；算法参数置于对应系数字典。运行 <code>renumberMesh</code> <code>-list-renumber</code> 可查询可用方法。重新编号用于调整稀疏矩阵带宽，网格几何分辨率保持不变。</p>
 <p><code>FOAM_FILEHANDLER</code> 设置默认文件处理器，常用值为 uncollated 和 <code>collated</code>；命令行 <code>-fileHandler</code> 可覆盖该设置。<code>collated</code> 通过合并并行 I/O 减少文件数量，其性能取决于文件系统、MPI 和缓冲策略。结果读取及重分配应使用支持该格式的工具。</p>
+
 </div>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>

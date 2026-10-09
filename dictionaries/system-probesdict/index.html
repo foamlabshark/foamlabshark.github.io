@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -282,14 +283,14 @@
 <p>位置：<code>system/probesDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>fields</code></td><td>目标场列表。场名、数据类型和计算时刻必须满足相应函数对象的要求。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="nested-configuration">探针与采样设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>functions / type / libs</code></td><td>按功能对象组织采样配置。通过 #<code>include</code> 将其载入 <code>controlDict</code>，或用命令的 <code>-dict</code> 选项指定该文件。</td></tr><tr><td><code>sets / surfaces / probeLocations</code></td><td>分别设置采样线或点集合、采样面、探针位置；<code>start</code>、<code>end</code>、<code>nPoints</code> 属于相应的内层采样几何。</td></tr><tr><td><code>setFormat / surfaceFormat</code></td><td>分别为点线和表面输出选择格式；应写在对应 <code>sets</code> 或 <code>surfaces</code> 外层对象内。</td></tr><tr><td><code>executeInterval / timeStart / timeEnd</code></td><td>功能对象的执行间隔与启用时间窗口。</td></tr></tbody></table></div><p><a href="/function-objects/sets/">采样线与点集合的全部类型</a></p><p><a href="/function-objects/surfaces/">cuttingPlane 等采样面类型</a></p><p><a href="/function-objects/probes/">探针位置与插值</a></p>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/parcelInBox</summary><p>parcelInBox 在指定位置记录载气的温度、水蒸气、压力及 <code>kT</code> 字段，用于观察颗粒与气相的耦合响应。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/parcelInBox</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/parcelInBox"><h3>算例问题：parcelInBox</h3><p class="reference-case-problem">箱体中设置少量颗粒，用于检查颗粒与周围气体之间的动量、热量和质量交换。简单几何便于单独观察颗粒轨迹、温度及粒径变化，并核对所选子模型。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox"><code>lagrangian/reactingParcelFoam/parcelInBox</code></a>。</p></section><!-- /reference-case-contexts --><p>parcelInBox 在指定位置记录载气的温度、水蒸气、压力及 <code>kT</code> 字段，用于观察颗粒与气相的耦合响应。</p>
 <ul>
 <li><code>fields (T H2O p kT)</code> 选择四个实际场名，其中 <code>H2O</code> 对应求解器中的水蒸气组分场。</li>
 <li><code>probeLocations ((0.005 0 0))</code> 把探针放在 <code>x</code>=5 mm 处，坐标单位与网格一致。</li>
 <li>采样值来自该点所在单元及所用插值设置，输出时间间隔由调用此字典的采样对象控制。</li>
 </ul>
 <p>新增探针时在位置列表中增加三分量坐标，并确认点位于计算域内，再比较靠近颗粒与远离颗粒位置的响应。</p>
-<p><a href="/assets/examples/v2512/probesdict/1-probesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox/system/probesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/probesdict/1-probesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox/system/probesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox/system/probesDict"><code>lagrangian/reactingParcelFoam/parcelInBox/system/probesDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

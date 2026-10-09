@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,14 +280,14 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>本条示例属于 <code>electrostaticFoam</code> 的 chargedWire 教程，提供介电常数及电荷输运相关参数。它为该静电问题连接电荷与电势方程，文件名相同的其他教程仍应按各自求解器解释内容。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>constant/physicalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>epsilon0</code></td><td>真空介电常数，用于 <code>electrostaticFoam</code> 静电 Poisson 方程。</td></tr><tr><td><code>k</code></td><td>此处是电荷输运相关系数，不是湍动能场，也不是热导率；应结合 <code>electrostaticFoam</code> 方程及量纲理解。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>electromagnetics/electrostaticFoam/chargedWire</code></summary><p>chargedWire 求解电势与空间电荷的输运。<code>physicalProperties</code> 给出介电常数和电荷迁移率。</p>
+<p>位置：<code>constant/physicalProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>epsilon0</code></td><td>真空介电常数，用于 <code>electrostaticFoam</code> 静电 Poisson 方程。</td></tr><tr><td><code>k</code></td><td>此处是电荷输运相关系数，不是湍动能场，也不是热导率；应结合 <code>electrostaticFoam</code> 方程及量纲理解。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>electromagnetics/electrostaticFoam/chargedWire</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="electromagnetics/electrostaticFoam/chargedWire"><h3>算例问题：chargedWire</h3><p class="reference-case-problem">带电导线在周围空间产生静电场，电荷分布与电势边界共同决定电势及电场强度。算例求解电场问题，主要检查导线附近的电势梯度和电荷相关设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire"><code>electromagnetics/electrostaticFoam/chargedWire</code></a>。</p></section><!-- /reference-case-contexts --><p>chargedWire 求解电势与空间电荷的输运。<code>physicalProperties</code> 给出介电常数和电荷迁移率。</p>
 <ul>
 <li><code>epsilon0 8.85419e-12</code> 是真空介电常数，单位 F/m；它把电荷密度与电势 Poisson 方程联系起来。</li>
 <li><code>k 0.00016</code> 是迁移率，单位 m²/(<code>V</code>·s)，电场驱动的漂移速度与 <code>k</code> 成正比。</li>
 <li>求解器从电势梯度得到电场，并通过 <code>rhoFlux = -k*magSf*snGrad(phi)</code> 构造输运通量。</li>
 </ul>
 <p>改变迁移率后比较相同边界电压下的电荷分布与迁移时间，电势 <code>phi</code> 的单位为 <code>V</code>。</p>
-<p><a href="/assets/examples/v2512/physicalproperties/1-physicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire/constant/physicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/physicalproperties/1-physicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire/constant/physicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/electromagnetics/electrostaticFoam/chargedWire/constant/physicalProperties"><code>electromagnetics/electrostaticFoam/chargedWire/constant/physicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

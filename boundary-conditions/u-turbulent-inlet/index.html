@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="boundary-conditions" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -275,7 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>U · turbulentInlet</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在参考值上叠加随机波动，生成随时间变化的入口信号。</p><h2 id="brief-introduction">简要介绍</h2><p>入口需要在平均值附近叠加随机扰动时，可设置 referenceField 和 fluctuationScale。它用于构造波动输入；若目标是指定相关长度或湍流统计结构，应选择能够控制这些量的入口模型。</p><h2>文件位置与适用条件</h2><p>填写在 0/U 的 <code>boundaryField</code> 子字典中。示例中的 <code>inlet</code> 必须与网格边界名一致。</p><h2>参数设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>必填与默认值</th><th>含义与单位</th></tr></thead><tbody><tr><td><code>type</code></td><td>必填</td><td>填写 <code>turbulentInlet</code>；大小写必须一致。</td></tr><tr><td><code>referenceField</code></td><td>必填</td><td>平均参考速度向量。</td></tr><tr><td><code>fluctuationScale</code></td><td>必填</td><td>各分量的波动尺度。</td></tr><tr><td><code>alpha</code></td><td>可选</td><td>新随机值与旧值的混合系数。</td></tr><tr><td><code>value</code></td><td>必填</td><td>初始速度。</td></tr></tbody></table></div><h2>配置示例</h2><h3>示例 1：基本配置</h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+    <div class="prose"><p>在参考值上叠加随机波动，生成随时间变化的入口信号。</p><h2 id="brief-introduction">简要介绍</h2><p>入口需要在平均值附近叠加随机扰动时，可设置 referenceField 和 fluctuationScale。它用于构造波动输入；若目标是指定相关长度或湍流统计结构，应选择能够控制这些量的入口模型。</p><!-- reference-concepts --><p>边界在参考值上叠加随时间更新的随机波动，再通过 <code>alpha</code> 与上一时刻边界值混合。fluctuationScale 控制各分量波动幅度，<code>alpha</code> 控制相邻时刻的相关程度。它适合施加简单入口扰动；若目标是具有给定 Reynolds 应力与空间相关尺度的 <code>LES</code> 入口，应查看 DFSEM 或数字滤波入口。</p><!-- /reference-concepts --><h2>文件位置与适用条件</h2><p>填写在 0/U 的 <code>boundaryField</code> 子字典中。示例中的 <code>inlet</code> 必须与网格边界名一致。</p><h2>参数设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>必填与默认值</th><th>含义与单位</th></tr></thead><tbody><tr><td><code>type</code></td><td>必填</td><td>填写 <code>turbulentInlet</code>；大小写必须一致。</td></tr><tr><td><code>referenceField</code></td><td>必填</td><td>平均参考速度向量。</td></tr><tr><td><code>fluctuationScale</code></td><td>必填</td><td>各分量的波动尺度。</td></tr><tr><td><code>alpha</code></td><td>可选</td><td>新随机值与旧值的混合系数。</td></tr><tr><td><code>value</code></td><td>必填</td><td>初始速度。</td></tr></tbody></table></div><h2>配置示例</h2><h3>示例 1：基本配置</h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span> turbulentInlet;
     referenceField <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);

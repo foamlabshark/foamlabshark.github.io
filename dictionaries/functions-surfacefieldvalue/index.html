@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -299,7 +300,7 @@
 </code></pre></div>
 <p><code>name</code> 是实际出口 <code>patch</code>。<code>phi</code> 已包含每个网格面的面积贡献，<code>sum</code> 将其相加得到总流量。<code>writeArea</code> 同时记录所选面积，有助于检查边界选择是否正确。正值通常表示流出域外，负值表示流入。</p>
 <p>不可压缩场的 <code>phi</code> 常以 m³/s 表示，可压缩场则常以 kg/s 表示，读取字段量纲确认。对壁面热流密度 W/m²，需要 <code>areaIntegrate</code> 才得到 W；对温度场使用 <code>areaAverage</code> 得到面积平均温度。</p>
-<p>截面平均温度若用于流体携热量，通常应按质量通量加权。此时可研究 <code>weightedAverage</code> 或相应加权面积操作，并明确权重场是否已经包含面积。发生回流时，正负通量会抵消，可以按需要分别统计流入与流出部分。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></summary><p>稳态垂直通道用出口通量加权平均，获得更适合表示流出流体状态的温度和水蒸气含量。</p>
+<p>截面平均温度若用于流体携热量，通常应按质量通量加权。此时可研究 <code>weightedAverage</code> 或相应加权面积操作，并明确权重场是否已经包含面积。发生回流时，正负通量会抵消，可以按需要分别统计流入与流出部分。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/simpleReactingParcelFoam/verticalChannel"><h3>算例问题：verticalChannel</h3><p class="reference-case-problem">颗粒随气流通过通道，在运动过程中与载气交换动量、热量或质量。通道方向决定重力相对来流的方向，主要观察颗粒速度、温度及质量变化；稳态和 LTS 版本采用不同的时间推进方式。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel"><code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></a>。</p><p class="reference-case-source">同一物理问题的另一配置算例：lagrangian/reactingParcelFoam/verticalChannelLTS。</p></section><!-- /reference-case-contexts --><p>稳态垂直通道用出口通量加权平均，获得更适合表示流出流体状态的温度和水蒸气含量。</p>
 <ul>
 <li><code>regionType patch</code>、<code>name outlet</code> 选择出口。</li>
 <li><code>operation weightedAverage</code> 配合 <code>weightField phi</code> 按面通量加权。</li>
@@ -307,7 +308,7 @@
 <li><code>writeControl writeTime</code> 跟随主结果写出，主场每 20 次迭代保存。</li>
 </ul>
 <p>出口存在回流时检查通量符号及加权结果的含义，必要时分别统计流入与流出部分。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">71 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefieldvalue/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict"><code>lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">71 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -385,7 +386,7 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
 <li><code>writeFields no</code> 保留简洁的统计文件，日志也会显示数值。</li>
 </ul>
 <p>判断稳态收敛时同时看加权出口量和残差；局部时间步的迭代编号应按该求解过程解释。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">74 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefieldvalue/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict"><code>lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">74 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -458,7 +459,7 @@ profiling
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</summary><p>挡风玻璃除霜的多区域计算每步监测 <code>cabin</code> 流体区入口通量。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionFoam/windshieldDefrost"><h3>算例问题：windshieldDefrost</h3><p class="reference-case-problem">暖空气流经挡风玻璃，玻璃通过内部导热和表面对流逐渐升温。算例把空气与玻璃作为相邻区域，主要观察玻璃温度分布及暖风覆盖情况。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost"><code>heatTransfer/chtMultiRegionFoam/windshieldDefrost</code></a>。</p><figure class="reference-case-figure"><img alt="windshieldDefrost 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>windshieldDefrost 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>挡风玻璃除霜的多区域计算每步监测 <code>cabin</code> 流体区入口通量。</p>
 <ul>
 <li><code>region cabin</code> 将函数对象绑定到客舱网格。</li>
 <li><code>regionType patch</code>、<code>name inlet</code> 选择入口。</li>
@@ -466,7 +467,7 @@ profiling
 <li>每步记录并打印，主场则按 1 s 的可调时间间隔保存。</li>
 </ul>
 <p>按该区域 <code>phi</code> 的量纲解释质量或体积流率，再与出口及区域质量变化比较。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">73 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefieldvalue/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict"><code>heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">73 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

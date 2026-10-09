@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -307,14 +308,14 @@ wall
 </code></pre></div>
 <p>场量纲为 <code>[0 0 -1 0 0 0 0]</code>。入口采用给定值，壁面由 <code>omegaWallFunction</code> 根据近壁信息更新。配套检查 <code>0/k</code>、<code>0/nut</code>、模型选择以及 <code>fvSolution</code> 中的 <code>omega</code> 求解器设置。</p>
 <p><code>omegaWallFunction</code> 具有可配置的近壁混合方式，选择时结合 <code>y</code>⁺ 和模型要求。将入口尺度增大，会减小由上式估算的 <code>omega</code>，并影响湍流在入口下游的衰减。</p>
-<p>切换模型后出现 <code>cannot find file omega</code>，说明初始字段尚未补齐；提示找不到 <code>div(phi,omega)</code> 或相应求解器时，继续补充离散和线性求解器配置。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/RAS/cavity</summary><p>湍流方腔使用 <code>omega</code> 描述比耗散率，壁面条件与相应 <code>k</code>–<code>omega</code> 类模型配合。</p>
+<p>切换模型后出现 <code>cannot find file omega</code>，说明初始字段尚未补齐；提示找不到 <code>div(phi,omega)</code> 或相应求解器时，继续补充离散和线性求解器配置。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/RAS/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pisoFoam/RAS/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity"><code>incompressible/pisoFoam/RAS/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>湍流方腔使用 <code>omega</code> 描述比耗散率，壁面条件与相应 <code>k</code>–<code>omega</code> 类模型配合。</p>
 <ul>
 <li><code>dimensions [0 0 -1 0 0 0 0]</code> 表示 s⁻¹。</li>
 <li>内部初值为 <code>22.4</code>，移动与固定壁面共用 <code>omegaWallFunction</code>。</li>
 <li><code>frontAndBack/empty</code> 保持二维计算。</li>
 </ul>
 <p>增大盖板速度或更换湍流初值时，同时检查 <code>k</code>、<code>omega</code>、<code>nut</code> 和近壁网格的对应关系。</p>
-<p><a href="/assets/examples/v2512/omega/1-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/omega/1-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity/0.orig/omega"><code>incompressible/pisoFoam/RAS/cavity/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -349,7 +350,7 @@ wall
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/electrostaticDeposition</summary><p>electrostaticDeposition 给壁面和开放侧边分别设置 <code>omega</code> 条件。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/electrostaticDeposition</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/RAS/electrostaticDeposition"><h3>算例问题：electrostaticDeposition</h3><p class="reference-case-problem">金属板按照给定的平移和转动轨迹运动，周围水气界面随板面运动而改变。算例通过表格指定六自由度运动，板面采用 <code>movingWallVelocity</code>，主要观察板附近液体附着、排液以及自由液面的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition"><code>multiphase/interFoam/RAS/electrostaticDeposition</code></a>。</p></section><!-- /reference-case-contexts --><p>electrostaticDeposition 给壁面和开放侧边分别设置 <code>omega</code> 条件。</p>
 <ul>
 <li>初值 <code>0.22</code> 的单位为 s⁻¹。</li>
 <li><code>metalSheet/omegaWallFunction</code> 对金属板应用近壁处理。</li>
@@ -357,7 +358,7 @@ wall
 <li><code>value $internalField</code> 为边界提供启动值。</li>
 </ul>
 <p>侧边回流明显时，为进入流体设置相应的湍流尺度。</p>
-<p><a href="/assets/examples/v2512/omega/2-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/omega/2-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega"><code>multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -394,14 +395,14 @@ wall
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreakWithObstacle</summary><p>带障碍物溃坝目录中的 <code>omega</code> 文件提供可供相应湍流设置使用的字段模板，实际是否求解它由 <code>turbulenceProperties</code> 决定。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreakWithObstacle</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/damBreakWithObstacle"><h3>算例问题：damBreakWithObstacle</h3><p class="reference-case-problem">局部水柱在重力作用下坍塌并撞击下游障碍物，周围为空气。计算跟踪水气界面、回流与冲击压力，用于检查界面输运、固壁条件和时间步设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle"><code>multiphase/interFoam/laminar/damBreakWithObstacle</code></a>。</p><figure class="reference-case-figure"><img alt="damBreakWithObstacle 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/dam-obstacle.svg" width="720"><figcaption>damBreakWithObstacle 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>带障碍物溃坝目录中的 <code>omega</code> 文件提供可供相应湍流设置使用的字段模板，实际是否求解它由 <code>turbulenceProperties</code> 决定。</p>
 <ul>
 <li>初值 <code>2</code> 的单位为 s⁻¹。</li>
 <li><code>atmosphere/inletOutlet</code> 在回流时使用同一初值，流出时外推。</li>
 <li>障碍物与墙面共用 <code>omegaWallFunction</code>。</li>
 </ul>
 <p>启用 <code>k</code>–<code>omega</code> 类模型时同步准备 <code>k</code> 和 <code>nut</code>，保持所有墙面条件相容。</p>
-<p><a href="/assets/examples/v2512/omega/3-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/omega/3-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega"><code>multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

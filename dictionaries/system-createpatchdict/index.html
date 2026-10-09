@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -305,14 +306,14 @@ patches
         patches         (left);
     }
 );</code></pre></div>
-<p>用途：把网格转换器生成的一堆零散 <code>patch</code> 合并；把两个面配成周期边界；改 <code>patch</code> 类型。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/overInterDyMFoam/rigidBodyHull/background</summary><p>船体背景网格将已有边界重组为 <code>overset</code> 接口，供重叠网格插值使用。</p>
+<p>用途：把网格转换器生成的一堆零散 <code>patch</code> 合并；把两个面配成周期边界；改 <code>patch</code> 类型。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/overInterDyMFoam/rigidBodyHull/background</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/overInterDyMFoam/rigidBodyHull/background"><h3>算例问题：background</h3><p class="reference-case-problem">船体置于水与空气组成的计算域中，流体压力和黏性力驱动允许的刚体运动，运动又改变船体附近的流场和自由液面。船体网格与背景网格通过重叠网格连接，需关注船体姿态、受力、波面和网格插值区域。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background"><code>multiphase/overInterDyMFoam/rigidBodyHull/background</code></a>。</p><figure class="reference-case-figure"><img alt="background 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/hull.svg" width="720"><figcaption>background 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>船体背景网格将已有边界重组为 <code>overset</code> 接口，供重叠网格插值使用。</p>
 <ul>
 <li><code>name oversetPatch</code> 给新边界命名，<code>patchInfo/type overset</code> 设定重叠接口类型。</li>
 <li><code>constructFrom patches</code>、<code>patches (MRF_REGION)</code> 指明从已有 <code>MRF_REGION</code> 边界收集面。</li>
 <li><code>pointSync false</code> 关闭额外的点同步步骤，<code>value uniform 0</code> 是该配置附带的初始化条目。</li>
 </ul>
 <p>表面名称改变时更新来源列表，并在各场文件中同步设置新的 <code>oversetPatch</code> 条件。</p>
-<p><a href="/assets/examples/v2512/createpatchdict/1-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createpatchdict/1-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/background/system/createPatchDict"><code>multiphase/overInterDyMFoam/rigidBodyHull/background/system/createPatchDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -348,14 +349,14 @@ patches
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · mesh/foamyHexMesh/mixerVessel</summary><p>mixerVessel 提供了一份空的 <code>createPatch</code> 配置入口。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · mesh/foamyHexMesh/mixerVessel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/foamyHexMesh/mixerVessel"><h3>算例问题：mixerVessel</h3><p class="reference-case-problem">以给定表面几何为边界，利用 <code>foamyHexMesh</code> 生成以六面体为主的体网格。几何约束、目标尺寸和局部细化决定网格分布；该示例用于网格生成与质量检查，不包含完整流动求解。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel"><code>mesh/foamyHexMesh/mixerVessel</code></a>。</p><figure class="reference-case-figure"><img alt="mixerVessel 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption>mixerVessel 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>mixerVessel 提供了一份空的 <code>createPatch</code> 配置入口。</p>
 <ul>
 <li><code>patches ()</code> 没有列出新边界的构造任务，因此当前文件不会按清单生成额外 <code>patch</code>。</li>
 <li><code>pointSync false</code> 指定不执行额外的耦合点同步。</li>
 <li>真正分组边界时需在 <code>patches</code> 列表中增加名称、类型和来源。</li>
 </ul>
 <p>可先由 <code>topoSet</code> 选出面集合，再用 <code>constructFrom</code> <code>set</code> 引用它，避免依靠模糊的几何猜测分组。</p>
-<p><a href="/assets/examples/v2512/createpatchdict/2-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createpatchdict/2-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/foamyHexMesh/mixerVessel/system/createPatchDict"><code>mesh/foamyHexMesh/mixerVessel/system/createPatchDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -382,14 +383,14 @@ patches
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantSimpleFoam/comfortHotRoom</summary><p>comfortHotRoom 把预先选好的面集合分别变成房间入口和出口。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantSimpleFoam/comfortHotRoom</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/buoyantSimpleFoam/comfortHotRoom"><h3>算例问题：comfortHotRoom</h3><p class="reference-case-problem">房间内温度与气流共同影响热舒适性。算例先计算空气速度和温度，再利用舒适性后处理评估不同位置的环境状态；舒适性指标还需要人体代谢、衣着等参数。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom"><code>heatTransfer/buoyantSimpleFoam/comfortHotRoom</code></a>。</p></section><!-- /reference-case-contexts --><p>comfortHotRoom 把预先选好的面集合分别变成房间入口和出口。</p>
 <ul>
 <li><code>constructFrom set</code> 表示来源是面集合，两项分别引用 <code>set inlet</code> 和 <code>set outlet</code>。</li>
 <li>新边界同名为 <code>inlet</code>、<code>outlet</code>，<code>patchInfo/type patch</code> 定义一般边界类型，具体速度和温度条件在场文件中设置。</li>
 <li><code>pointSync false</code>、<code>writeCyclicMatch false</code> 控制点同步和周期匹配诊断输出。</li>
 </ul>
 <p>改变开口位置时先重新生成面集合，再运行 <code>createPatch</code>，最后检查边界面数与场条目。</p>
-<p><a href="/assets/examples/v2512/createpatchdict/3-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createpatchdict/3-createPatchDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/createPatchDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/createPatchDict"><code>heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/createPatchDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

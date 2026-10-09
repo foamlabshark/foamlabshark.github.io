@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -279,12 +280,12 @@
 <h2 id="brief-introduction">简要介绍</h2>
 <p>求解器建立连续方程后，还需要把时间导数、梯度、对流和扩散写成网格上的离散关系。<code>fvSchemes</code> 为这些运算选择格式，决定场值如何在单元与面之间组合，是调整数值精度和稳定性的主要配置。</p>
 <!-- /reference-introduction -->
-<p>位置：<code>system/fvSchemes</code></p><figure class="wolf-figure"><img src="/assets/wolf/wolf-advection-profile-errors.png" alt="一维输运中的格式误差曲线" loading="lazy"><figcaption><strong>一维输运中的格式误差曲线</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module6.pdf，p. 157</small></figcaption></figure><h2>配置方法</h2><h3>稳态与瞬态</h3><p>稳态求解使用 <code>steadyState</code>；瞬态可选择 <code>Euler</code>、<code>backward</code> 或带偏心参数的 <code>CrankNicolson</code>。对流格式、时间格式和步长分别影响误差。比较时保留其他参数，先看峰值、积分量和剖面，再决定是否需要进一步细化网格或减小时间步。</p><!-- reference-configuration-supplement -->
+<p>位置：<code>system/fvSchemes</code></p><figure class="wolf-figure"><img alt="一维输运中的格式误差曲线" loading="lazy" src="/assets/wolf/wolf-advection-profile-errors.png"><figcaption><strong>一维输运中的格式误差曲线</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module6.pdf，p. 157</small></figcaption></figure><h2>配置方法</h2><h3>稳态与瞬态</h3><p>稳态求解使用 <code>steadyState</code>；瞬态可选择 <code>Euler</code>、<code>backward</code> 或带偏心参数的 <code>CrankNicolson</code>。对流格式、时间格式和步长分别影响误差。比较时保留其他参数，先看峰值、积分量和剖面，再决定是否需要进一步细化网格或减小时间步。</p><!-- reference-configuration-supplement -->
 <h2 id="nested-configuration">通量与辅助离散设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>fluxRequired</code></td><td>哪些字段需要保存相应离散通量的声明；字段名可作开关项，例如 <code>p</code>;。由求解器和离散过程决定是否需要。</td></tr><tr><td><code>wallDist.method</code></td><td>壁面距离计算方法，例如 <code>meshWave</code>；写在 <code>wallDist</code> 子字典中。</td></tr><tr><td><code>divSchemes 中的 turbulence 等分组名</code></td><td>供 <code>$turbulence</code> 引用的格式别名。方程格式按 <code>div</code>(<code>phi</code>,<code>k</code>) 等键设置。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>system/fvSchemes</code> 为时间导数、梯度、对流和扩散分别选择数值格式。求解器负责建立哪些方程，字典负责指定这些算子的离散方法。</p>
 <p>以下是均匀正交方腔可用的一组设置，放在 <code>FoamFile</code> 文件头之后：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">ddtSchemes
+<p class="reference-code-source">示例来源：本站整理，示例 1 · 基本配置的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">ddtSchemes
 {
     default <span class="hljs-built_in">Euler</span>;
 }
@@ -368,7 +369,7 @@ snGradSchemes
     default corrected;
 }
 </code></pre></div>
-<p><code>corrected</code> 通过重建梯度补充中心连线与面法向之间的差别。修正项较大时，可以研究受限修正并改善网格。增加 <code>fvSolution</code> 的非正交校正次数，则让显式修正使用更新后的场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p>方腔使用单一、正交的六面体块网格。<code>fvSchemes</code> 把连续方程中的时间导数、对流项和扩散项分别对应到离散格式。</p>
+<p><code>corrected</code> 通过重建梯度补充中心连线与面法向之间的差别。修正项较大时，可以研究受限修正并改善网格。增加 <code>fvSolution</code> 的非正交校正次数，则让显式修正使用更新后的场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity"><code>incompressible/icoFoam/cavity/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>方腔使用单一、正交的六面体块网格。<code>fvSchemes</code> 把连续方程中的时间导数、对流项和扩散项分别对应到离散格式。</p>
 <ul>
 <li><code>ddtSchemes/default Euler</code> 使用一阶隐式时间离散，配合 <code>controlDict</code> 的 0.005 s 步长推进非定常流动。</li>
 <li><code>div(phi,U) Gauss linear</code> 用高斯积分与线性面插值离散速度对流；本例低 Reynolds 数且网格规整，适合观察中心插值的基本行为。</li>
@@ -377,7 +378,7 @@ snGradSchemes
 <li><code>divSchemes/default none</code> 要求为实际使用的对流项明确给出格式，漏项时会报告缺少配置。</li>
 </ul>
 <p>若将网格改为明显非正交网格，应检查 Laplacian 与法向梯度修正方式。改变时间精度时，同时比较时间步；空间格式、时间格式和步长共同决定离散误差。</p>
-<p><a href="/assets/examples/v2512/fvschemes/1-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">50 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvschemes/1-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSchemes"><code>incompressible/icoFoam/cavity/cavity/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">50 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -426,7 +427,7 @@ snGradSchemes
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><p>后台阶流动包含剪切层与回流区，<code>pitzDaily</code> 为稳态速度和湍流输运选择不同的对流格式。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDaily 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption><code>pitzDaily</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>后台阶流动包含剪切层与回流区，<code>pitzDaily</code> 为稳态速度和湍流输运选择不同的对流格式。</p>
 <ul>
 <li><code>ddtSchemes/default steadyState</code> 取消瞬态导数，配合 <code>simpleFoam</code> 求稳态解。</li>
 <li><code>div(phi,U) bounded Gauss linearUpwind grad(U)</code> 用带梯度重构的迎风格式求速度对流；<code>grad(U)</code> 指定重构所用的梯度条目。</li>
@@ -435,7 +436,7 @@ snGradSchemes
 <li><code>wallDist/method meshWave</code> 指定到壁面距离的计算方法，壁面距离会被有关湍流模型使用。</li>
 </ul>
 <p>加大入口速度或降低黏度后，剪切层会更难解析。可先比较网格细化和对流格式对回流长度的影响，再调整限制强度；求解残差很小仍可能伴随空间离散误差。</p>
-<p><a href="/assets/examples/v2512/fvschemes/2-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvschemes/2-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes"><code>incompressible/simpleFoam/pitzDaily/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -497,7 +498,7 @@ wallDist
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreak/damBreak</summary><p>溃坝的相分数决定水和空气的分布，动量方程还要使用随相分数变化的密度。本文件因此同时配置了动量输运和界面输运。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreak/damBreak</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/damBreak/damBreak"><h3>算例问题：damBreak</h3><p class="reference-case-problem">水与空气最初分居容器中的不同区域，水柱随后在重力作用下坍塌、铺展并撞击侧壁。入口流速不驱动这一过程，关键输入是初始水柱、重力、两相物性和固壁条件；主要结果是水面形状、速度及壁面压力随时间的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak"><code>multiphase/interFoam/laminar/damBreak/damBreak</code></a>。</p><figure class="reference-case-figure"><img alt="damBreak 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/dam-break.svg" width="720"><figcaption>damBreak 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>溃坝的相分数决定水和空气的分布，动量方程还要使用随相分数变化的密度。本文件因此同时配置了动量输运和界面输运。</p>
 <ul>
 <li><code>ddtSchemes/default Euler</code> 采用一阶隐式时间格式，步长由 <code>controlDict</code> 的 Courant 限制调整。</li>
 <li><code>div(rhoPhi,U) Gauss linearUpwind grad(U)</code> 用质量通量 <code>rhoPhi</code> 输运速度，体现两相密度不同。</li>
@@ -506,7 +507,7 @@ wallDist
 <li><code>laplacianSchemes/default Gauss linear corrected</code> 与 <code>snGradSchemes/default corrected</code> 配合处理扩散项的非正交修正。</li>
 </ul>
 <p>界面过于弥散时，同时检查网格、时间步与压缩设置。比较时固定其他条件，并观察水体积和 <code>alpha.water</code> 的范围；只更换一个格式名称不足以判断整个界面算法的表现。</p>
-<p><a href="/assets/examples/v2512/fvschemes/3-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvschemes/3-fvSchemes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSchemes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSchemes"><code>multiphase/interFoam/laminar/damBreak/damBreak/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

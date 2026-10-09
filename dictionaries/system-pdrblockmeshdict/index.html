@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -282,7 +283,7 @@
 <p>位置：<code>system/PDRblockMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>x / y / z 中的 points、nCells、ratios</code></td><td>三个方向各自的分段坐标、分段单元数与尺寸渐变比例；每段长度、单元数和比例需成组对应。</td></tr><tr><td><code>boundary.&lt;名称&gt;.faces</code></td><td>PDR 块域的边界面选择，填写 PDR 块定义中的面编号。</td></tr><tr><td><code>defaultPatch.name / type</code></td><td>未分配外边界的默认名称与类型。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><p><code>PDRblockMesh</code> 可以沿三个坐标方向给出分段坐标和单元数。本例生成顶盖驱动方腔的二维网格。</p>
+<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity"><code>incompressible/icoFoam/cavity/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>PDRblockMesh</code> 可以沿三个坐标方向给出分段坐标和单元数。本例生成顶盖驱动方腔的二维网格。</p>
 <ul>
 <li><code>scale 0.1</code> 将坐标缩放成米：<code>x</code>、<code>y</code> 的 0～1 对应 0.1 m，<code>z</code> 的 0～0.1 对应 0.01 m。</li>
 <li><code>x</code>、<code>y</code> 均分成 20 个单元，<code>z</code> 只有 1 层，总计 20×20×1=400 个六面体。</li>
@@ -290,7 +291,7 @@
 <li>面编号 3 命名为 <code>movingWall</code>，0、1、2 合并为 <code>fixedWalls</code>；4、5 合并为 <code>empty</code> 类型的 <code>frontAndBack</code>，使求解采用二维设置。</li>
 </ul>
 <p>细化时可把 <code>x</code>、<code>y</code> 的单元数同时改成 40，保持 <code>z</code> 一层和前后 <code>empty</code> 边界，便于比较相同几何上的速度分布。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/1-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/pdrblockmeshdict/1-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict"><code>incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -350,7 +351,7 @@ boundary
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/lumpedPointMotion/bridge/steady</summary><p>桥梁算例用分段网格覆盖桥梁附近与较远的外流区域，随后配合桥体几何及运动处理。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/lumpedPointMotion/bridge/steady</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/lumpedPointMotion/bridge/steady"><h3>算例问题：steady</h3><p class="reference-case-problem">桥梁结构的运动以若干集中点及连接关系描述，并与周围流体载荷联系。该子目录用于准备稳态流场，后续结构运动需要结合集中点运动参数和流体力信息。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady"><code>incompressible/lumpedPointMotion/bridge/steady</code></a>。</p></section><!-- /reference-case-contexts --><p>桥梁算例用分段网格覆盖桥梁附近与较远的外流区域，随后配合桥体几何及运动处理。</p>
 <ul>
 <li><code>x</code> 从 −50 到 50，分 50 格，对应均匀间距 2 m。</li>
 <li><code>y</code> 分成 −300～−25、−25～25、25～300 三段，每段 10 格；中间段间距 5 m，两侧间距 27.5 m，桥梁附近分辨率更高。</li>
@@ -358,7 +359,7 @@ boundary
 <li>面 2 是 <code>outlet</code>，3 是 <code>inlet</code>，4 是 <code>ground</code> 壁面，5 是 <code>sky</code>，其余为 <code>sides</code>；这些名称会被后续场文件引用。</li>
 </ul>
 <p>本文件 <code>ratios 1</code> 使每一段内部均匀。需要平滑过渡时，同时调整分段位置、单元数和扩张比，并检查相邻单元尺寸跳变。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/2-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/pdrblockmeshdict/2-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict"><code>incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -437,7 +438,7 @@ boundary
     }
 );
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · combustion/PDRFoam/pipeLattice</summary><p>pipeLattice 在管阵列附近布置较细网格，向外部开阔区域扩展。<code>PDRblockMeshDict</code> 决定这层背景网格。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · combustion/PDRFoam/pipeLattice</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/PDRFoam/pipeLattice"><h3>算例问题：pipeLattice</h3><p class="reference-case-problem">预混可燃气体中的火焰传播受到管架或障碍物影响，障碍物会改变阻力、湍流和燃烧传播速度。PDR 方法用网格上的等效堵塞与阻力描述未逐一解析的结构；预处理算例负责生成这些场，燃烧算例再求解压力和火焰演化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice"><code>combustion/PDRFoam/pipeLattice</code></a>。</p></section><!-- /reference-case-contexts --><p>pipeLattice 在管阵列附近布置较细网格，向外部开阔区域扩展。<code>PDRblockMeshDict</code> 决定这层背景网格。</p>
 <ul>
 <li><code>x</code> 的三段为 −19.4～0、0～4.26、4.26～23.66，分别用 14、13、14 格；<code>y</code> 采用对应的三段划分。</li>
 <li>中间区域扩张比为 1，外侧比值约 0.0887 和 10.699，使网格向障碍物附近收缩、向远处增大。</li>
@@ -445,7 +446,7 @@ boundary
 <li><code>outer</code> 包含四个侧面与顶面，<code>wallFaces</code> 对应底面 4；<code>blockedFaces</code>、<code>mergingFaces</code> 预留给后续障碍物处理。</li>
 </ul>
 <p>调整阵列尺寸后同步修改分段位置和障碍物几何，检查细网格是否覆盖全部管阵列。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/3-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/pdrblockmeshdict/3-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict"><code>combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">80 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -297,14 +298,14 @@ baffles
         }
     }
 }</code></pre></div>
-<p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><p>cpuCabinet 的这份文件保留了创建薄挡板的配置入口，但没有定义实际挡板。</p>
+<p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 的这份文件保留了创建薄挡板的配置入口，但没有定义实际挡板。</p>
 <ul>
 <li><code>internalFacesOnly true</code> 限定操作对象为内部面。</li>
 <li><code>baffles {}</code> 为空，因此这里没有要分离的面区、主面或从面。</li>
 <li>要在内部面建立挡板，需要新增选择规则和成对边界信息。</li>
 </ul>
 <p>添加散热片或薄壁时，先确认几何应采用实际固体区还是零厚度挡板，再选择对应建模方式。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/1-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createbafflesdict/1-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -327,7 +328,7 @@ baffles
 {
 }
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/reactingFoam/RAS/membrane</summary><p>膜算例把同一个内部面区拆为两侧边界，便于分别指定膜两侧条件。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/reactingFoam/RAS/membrane</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/RAS/membrane"><h3>算例问题：membrane</h3><p class="reference-case-problem">膜两侧的气体具有不同组分，部分组分可穿过膜并与两侧流动或反应过程耦合。算例需要为组分透过和总质量通量分别设置边界，用于检查选择性传质与组分守恒。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane"><code>combustion/reactingFoam/RAS/membrane</code></a>。</p><figure class="reference-case-figure"><img alt="membrane 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/membrane.svg" width="720"><figcaption><code>membrane</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>膜算例把同一个内部面区拆为两侧边界，便于分别指定膜两侧条件。</p>
 <ul>
 <li><code>internalFacesOnly true</code> 只处理内部面。</li>
 <li><code>type faceZone</code>、<code>zoneName membrane</code> 选择已有膜面区。</li>
@@ -335,7 +336,7 @@ baffles
 <li>生成后两侧空间位置重合，但各自有边界面与场条件。</li>
 </ul>
 <p>更换膜模型时在两侧场边界中设置相应耦合或传输规律；网格分面本身只建立边界。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/2-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createbafflesdict/2-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/createBafflesDict"><code>combustion/reactingFoam/RAS/membrane/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -377,7 +378,7 @@ baffles
 }
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleFoam/RAS/annularThermalMixer</summary><p>环形热混合器将 <code>rotatingZone</code> 面区分为 <code>AMI1</code>、<code>AMI2</code>，构造不共形网格的配对接口。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleFoam/RAS/annularThermalMixer</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleFoam/RAS/annularThermalMixer"><h3>算例问题：annularThermalMixer</h3><p class="reference-case-problem">不同热状态的流体在环形通道中汇合并混合。速度分布决定冷热流体的接触与输运，热物性和热边界决定温度响应，主要观察混合后的温度均匀性及压力损失。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer"><code>compressible/rhoPimpleFoam/RAS/annularThermalMixer</code></a>。</p></section><!-- /reference-case-contexts --><p>环形热混合器将 <code>rotatingZone</code> 面区分为 <code>AMI1</code>、<code>AMI2</code>，构造不共形网格的配对接口。</p>
 <ul>
 <li><code>zoneName rotatingZone</code> 给出被拆分的面区。</li>
 <li>主面为 <code>cyclicAMI</code>，<code>neighbourPatch AMI2</code> 指向对面，<code>matchTolerance 0.0001</code> 指定匹配容差。</li>
@@ -385,7 +386,7 @@ baffles
 <li><code>internalFacesOnly true</code> 将分面限制在内部面，<code>transform noOrdering</code> 保留此接口的变换设置。</li>
 </ul>
 <p>改动区域名称时成对更新 <code>neighbourPatch</code>，并检查两侧覆盖和插值权重。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/3-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">47 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/createbafflesdict/3-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict"><code>compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">47 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

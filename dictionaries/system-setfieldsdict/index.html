@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -302,7 +303,7 @@ regions
     }
 );</code></pre></div>
 <p><code>boxToCell</code> 按单元位置选取长方体区域；<code>sphereToCell</code> 通过 <code>centre</code> 和 <code>radius</code> 定义球形区域；<code>cylinderToCell</code> 通过 <code>p1</code>、<code>p2</code> 和 <code>radius</code> 定义圆柱区域。边界面可采用 <code>boxToFace</code> 等选择器。</p>
-<p>赋值后检查 <code>alpha.water</code> 的极值与空间分布，边界条件在场文件中另行设置。需采用数学表达式赋值时，使用 <code>setExprFields</code>。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">defaultFieldValues              <span class="hljs-comment">// 先把全场设成默认值</span>
+<p>赋值后检查 <code>alpha.water</code> 的极值与空间分布，边界条件在场文件中另行设置。需采用数学表达式赋值时，使用 <code>setExprFields</code>。</p><h3 id="example-2">示例 2 · 基本配置</h3><p class="reference-code-source">示例来源：本站整理，示例 2 · 基本配置的第 1 段配置。以下片段用于说明参数写法，需与本节列出的其余文件配套使用。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">defaultFieldValues              <span class="hljs-comment">// 先把全场设成默认值</span>
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
     volVectorFieldValue U (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
@@ -329,14 +330,14 @@ regions                          <span class="hljs-comment">// 再覆盖指定�
     }
 );</code></pre></div>
 <p>常用区域类型：<code>boxToCell</code>、<code>sphereToCell</code>、<code>cylinderToCell</code>、<code>rotatedBoxToCell</code>、<code>surfaceToCell</code>（用 STL 划区）、<code>cellToCell</code>（用已有 <code>cellSet</code>）、<code>zoneToCell</code>。</p>
-<p>注意：<code>setFields</code> 直接修改 0/ 里的文件。跑之前先 <code>cp</code> <code>-r</code> 0.orig 0，否则第二次运行是在被改过的场上再改一次。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interIsoFoam/notchedDiscInSolidBodyRotation</summary><p>带缺口圆盘的刚体旋转测试先生成液相圆盘，再用一个长方体切出缺口。</p>
+<p>注意：<code>setFields</code> 直接修改 0/ 里的文件。跑之前先 <code>cp</code> <code>-r</code> 0.orig 0，否则第二次运行是在被改过的场上再改一次。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interIsoFoam/notchedDiscInSolidBodyRotation</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interIsoFoam/notchedDiscInSolidBodyRotation"><h3>算例问题：notchedDiscInSolidBodyRotation</h3><p class="reference-case-problem">带缺口的圆盘状相区在规定的刚体旋转速度场中转动。经过一周后比较圆盘和缺口的形状及总体积，用于判断界面输运的扩散和形状误差。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation"><code>multiphase/interIsoFoam/notchedDiscInSolidBodyRotation</code></a>。</p></section><!-- /reference-case-contexts --><p>带缺口圆盘的刚体旋转测试先生成液相圆盘，再用一个长方体切出缺口。</p>
 <ul>
 <li><code>regions</code> 中选择 <code>boxToCell</code>，按单元中心是否落入盒子来赋值。</li>
 <li>盒子范围为 <code>x</code>: 0.47～0.53、<code>y</code>: −1～1、<code>z</code>: 0～0.85，定义狭长切除区域。</li>
 <li><code>volScalarFieldValue alpha.water 0</code> 将选中区域变为另一相，从已存在的水相形状中去掉缺口。</li>
 </ul>
 <p>改变缺口宽度时修改 <code>x</code> 两端，并比较缺口内的网格分辨率；本文件没有重新定义盒外初场。</p>
-<p><a href="/assets/examples/v2512/setfieldsdict/1-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/setfieldsdict/1-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/notchedDiscInSolidBodyRotation/system/setFieldsDict"><code>multiphase/interIsoFoam/notchedDiscInSolidBodyRotation/system/setFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -366,14 +367,14 @@ regions
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/laminar/waves/waveMakerFlap</summary><p>翻板造波算例在启动前用水平高度初始化水层。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/laminar/waves/waveMakerFlap</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/waves/waveMakerFlap"><h3>算例问题：waveMakerFlap</h3><p class="reference-case-problem">铰接式造波板在水槽端部摆动，板面运动推动水体并产生传播波。板的摆动规律、运动网格与水气界面需要共同设置，结果可用测点水位和波高沿程变化检查。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap"><code>multiphase/interFoam/laminar/waves/waveMakerFlap</code></a>。</p><figure class="reference-case-figure"><img alt="waveMakerFlap 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/wave-tank.svg" width="720"><figcaption>waveMakerFlap 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>翻板造波算例在启动前用水平高度初始化水层。</p>
 <ul>
 <li><code>defaultFieldValues</code> 先把 <code>alpha.water</code> 全域设为 0，表示背景为非水相。</li>
 <li><code>boxToCell</code> 的盒子从 (−100,−100,−1) 到 (100,100,0.25)，选取 <code>z</code>≤0.25 的初始水域。</li>
 <li>盒内 <code>alpha.water 1</code> 表示纯水，几何水面由盒子上缘给出。</li>
 </ul>
 <p>改变静水深时修改高度并对应调整造波参数；贴近初始界面的部分单元由网格中心判据划分。</p>
-<p><a href="/assets/examples/v2512/setfieldsdict/2-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/setfieldsdict/2-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap/system/setFieldsDict"><code>multiphase/interFoam/laminar/waves/waveMakerFlap/system/setFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -404,14 +405,14 @@ regions
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom</summary><p>浮力热房间先给空气统一温度，再在底部局部面上设置加热区。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom"><h3>算例问题：hotRoom</h3><p class="reference-case-problem">房间内的温差改变流体密度或浮力项，驱动热空气上升、冷空气回流。算例用于研究浮力对流，应同时设置重力、热边界和压力变量，主要结果为温度分布与室内循环流动。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom"><code>heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom</code></a>。</p></section><!-- /reference-case-contexts --><p>浮力热房间先给空气统一温度，再在底部局部面上设置加热区。</p>
 <ul>
 <li>默认 <code>T 300</code> 给体场 300 K 的初值。</li>
 <li><code>boxToFace</code> 按面位置选择区域，盒子 <code>x</code>、<code>z</code> 范围为 4.5～5.5，<code>y</code> 上限为 1e-5，定位底部中央热源。</li>
 <li>选中面的 <code>T 600</code> 形成 600 K 加热区，使用的是面选择而非整块体积升温。</li>
 </ul>
 <p>热源移动时修改盒子范围，并检查温度边界类型是否按预期维持或演化该值。</p>
-<p><a href="/assets/examples/v2512/setfieldsdict/3-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/setfieldsdict/3-setFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom/system/setFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom/system/setFieldsDict"><code>heatTransfer/buoyantBoussinesqPimpleFoam/hotRoom/system/setFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |

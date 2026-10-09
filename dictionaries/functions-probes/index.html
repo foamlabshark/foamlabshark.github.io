@@ -13,7 +13,7 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=0e3245cf61c3">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e96828806404">
   
   
   <script src="/assets/runtime-account.js?v=2450cd87bb6a" defer></script>
@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=d88fb7259894">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="reference" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
@@ -300,14 +301,14 @@
 </code></pre></div>
 <p><code>probeLocations</code> 以米给出探针坐标，两个位置位于基础方腔内部。<code>cell</code> 读取探针所在单元的值；需要插值到点时，可以研究 <code>cellPoint</code>。<code>writeInterval 1</code> 表示每步记录，独立于全场写出间隔。</p>
 <p>数据位于 <code>postProcessing/cavityProbes/&lt;起始时间&gt;/p</code> 和 <code>U</code>。文件头记录探针编号，数据第一列为时间，之后按探针顺序排列；速度每个点有三个分量。变时间步计算的时间列一般不等间隔，做频谱前需要采用适合非均匀采样的方法，或先重采样。</p>
-<p>探针落在域外时，日志会提示定位失败。几何缩放后更新坐标，移动网格中还需确认固定探针在整个采样阶段都位于目标流体区域。增加温度采样只需把 <code>fields</code> 改为 <code>(p U T)</code>，前提是案例中存在温度场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><p>平面 Poiseuille 算例在一个固定位置监测速度随时间的变化。</p>
+<p>探针落在域外时，日志会提示定位失败。几何缩放后更新坐标，移动网格中还需确认固定探针在整个采样阶段都位于目标流体区域。增加温度采样只需把 <code>fields</code> 改为 <code>(p U T)</code>，前提是案例中存在温度场。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common"><h3>算例问题：common</h3><p class="reference-case-problem">流体在两平行壁面之间受压力梯度或等效驱动力作用形成通道流。壁面黏性约束决定速度剖面，算例可用于比较不同本构模型的速度与应力分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common"><code>incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common</code></a>。</p><figure class="reference-case-figure"><img alt="common 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/channel.svg" width="720"><figcaption>common 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>平面 Poiseuille 算例在一个固定位置监测速度随时间的变化。</p>
 <ul>
 <li><code>#includeEtc .../probes.cfg</code> 引入 <code>probes</code> 函数对象的公共设置。</li>
 <li><code>fields (U)</code> 只采样速度向量。</li>
 <li><code>probeLocations ((0 1 0))</code> 指定一个物理位置，应落在对应网格范围内。</li>
 </ul>
 <p>移动探针时按实际坐标修改位置；比较发展过程时保持采样间隔能够解析速度变化。</p>
-<p><a href="/assets/examples/v2512/probes/1-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
+<p><a href="/assets/examples/v2512/probes/1-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes"><code>incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
 
 <span class="hljs-meta">#includeEtc "caseDicts/postProcessing/probes/probes.cfg"</span>
 
@@ -318,7 +319,7 @@ probeLocations
 );
 
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><p>cpuCabinet 同时监测部件平均温度和局部探针，用于区分整体温升与局部热点。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 同时监测部件平均温度和局部探针，用于区分整体温升与局部热点。</p>
 <ul>
 <li><code>Volume1_v_CPU</code>、<code>Volume3_v_fins</code> 采用 <code>volAverage</code> 对各自区域的 <code>T</code> 做体积加权平均。</li>
 <li><code>probesFins/region v_fins</code> 在两个给定位置采样固体温度。</li>
@@ -326,7 +327,7 @@ probeLocations
 <li><code>writeControl timeStep</code>、<code>writeInterval 1</code> 每个求解步记录，<code>interpolationScheme cell</code> 读取所在单元值。</li>
 </ul>
 <p>改动部件几何后重新检查 <code>region</code> 名称和探针坐标，避免采样点落到其他区域或域外。</p>
-<p><a href="/assets/examples/v2512/probes/2-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">76 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
+<p><a href="/assets/examples/v2512/probes/2-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">76 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
 
 _volFieldValue
 {
@@ -401,7 +402,7 @@ probesFluid
 }
 <span class="hljs-meta">#remove (_volFieldValue _surfaceFieldValue)</span>
 
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></summary><p>Rutland 涡算例在两个对称位置记录压力，以观察可压缩涡运动的时间变化。</p>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D"><h3>算例问题：rutlandVortex2D</h3><p class="reference-case-problem">规定的二维涡旋在可压缩、绝热流动条件下演化。算例用于观察涡结构和热力学状态的耦合，重点检查速度、压力、密度及数值耗散对涡旋保持的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D"><code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></a>。</p></section><!-- /reference-case-contexts --><p>Rutland 涡算例在两个对称位置记录压力，以观察可压缩涡运动的时间变化。</p>
 <ul>
 <li><code>functions/probes</code> 的 <code>type probes</code> 与 <code>libs (sampling)</code> 启用点采样。</li>
 <li>位置为 <code>(3 2 0)</code> 和 <code>(3 -2 0)</code>，<code>fields (p)</code> 保存压力。</li>
@@ -409,7 +410,7 @@ probesFluid
 <li><code>writeFormat binary</code> 使用二进制主场文件，采样文件由函数对象自身的输出设置管理。</li>
 </ul>
 <p>比较两个探针的相位和幅值时使用同一时间轴，并核对采样频率是否满足目标频率范围。</p>
-<p><a href="/assets/examples/v2512/probes/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">69 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/probes/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict"><code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">69 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
