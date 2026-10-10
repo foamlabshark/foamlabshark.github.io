@@ -134,7 +134,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 'use strict';
 (() => {
  const box=document.querySelector('[data-site-stats]');if(!box)return;
- const visits=box.querySelector('[data-site-visits]'),online=box.querySelector('[data-site-online]');
+ const visits=box.querySelector('[data-site-visits]'),today=box.querySelector('[data-site-today-visits]'),online=box.querySelector('[data-site-online]');
  const key='foamlab.site.visitor',valid=id=>/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id||'');
  const tab=crypto.randomUUID(),sessionKey='foamlab.site.continuation',sharedKey='foamlab.site.session',countKey='foamlab.site.counted',pagePrefix='foamlab.site.page:',initLock='foamlab.site.session.init';
  let visitor=crypto.randomUUID(),visit=null,seq=0,counted=false,client=null,config=null,leaving=false,latest=0,releasePage=null,joining=null;
@@ -192,10 +192,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
  function payload(active){try{const saved=localStorage.getItem(key);if(valid(saved))visitor=saved;}catch{}if(read('localStorage',countKey)?.visit===visit)counted=true;return {p_visitor:visitor,p_tab:tab,p_seq:++seq,p_visit:active&&!counted?visit:null,p_active:active};}
  async function update(){if(!client||document.hidden||leaving)return;let order=seq;
   try{await ensureSession();if(document.hidden||leaving||!visit)return;const body=payload(true);order=body.p_seq;
-   const {data,error}=await client.rpc('foamlab_site_stats',body);if(error||!Number.isSafeInteger(data?.visits)||!Number.isSafeInteger(data?.online))throw error||Error('Invalid statistics');
+   const {data,error}=await client.rpc('foamlab_site_stats',body);if(error||!Number.isSafeInteger(data?.visits)||!Number.isSafeInteger(data?.today_visits)||!Number.isSafeInteger(data?.online))throw error||Error('Invalid statistics');
    if(body.p_visit===visit){counted=true;if(read('localStorage',sharedKey)?.visit===visit)save('localStorage',countKey,{visit});}if(order<latest||document.hidden||leaving)return;latest=order;
-   visits.textContent=data.visits.toLocaleString('zh-CN');online.textContent=data.online.toLocaleString('zh-CN');box.dataset.state='ready';box.removeAttribute('title');
-  }catch{if(order<latest||document.hidden||leaving)return;box.dataset.state='unavailable';online.textContent='—';box.title='访问统计暂时不可用，稍后自动重试';}
+   visits.textContent=data.visits.toLocaleString('zh-CN');if(today)today.textContent=data.today_visits.toLocaleString('zh-CN');online.textContent=data.online.toLocaleString('zh-CN');box.dataset.state='ready';box.removeAttribute('title');
+  }catch{if(order<latest||document.hidden||leaving)return;box.dataset.state='unavailable';if(today)today.textContent='—';online.textContent='—';box.title='访问统计暂时不可用，稍后自动重试';}
  }
  function leave(){if(!config)return;const body=payload(false);
   // Keepalive reaches the counter when the page is closed, without waiting for a session refresh.
