@@ -3,7 +3,7 @@
 Python 3; standard library only. All inputs are in SI units.
 The printed values are calculations from prescribed inputs, not CFD results.
 """
-from math import sqrt
+from math import exp, sqrt
 
 PIPE = dict(length=0.02, speed=0.5, rho=1000.0, mu=0.001,
             conductivity=0.6, cp=4180.0, dx=0.0005, dt=0.0002,
@@ -71,8 +71,48 @@ def results():
     }
 
 
+def teaching_examples():
+    """Small/large-value comparisons used in the illustrated explanations."""
+    out = {}
+    for label, length, speed in [("microchannel", 0.0001, 0.001), ("water pipe", 0.02, 0.5)]:
+        out["Reynolds time scales: " + label] = dict(
+            Re=speed * length / 1e-6, advection_time_s=length / speed,
+            viscous_time_s=length**2 / 1e-6)
+    for speed in [0.2, 2.0]:
+        wave_speed = sqrt(9.81 * 0.1)
+        out[f"Shallow-water waves, U={speed} m/s"] = dict(
+            c_m_per_s=wave_speed, Fr=speed / wave_speed,
+            upstream_branch_m_per_s=speed - wave_speed,
+            downstream_branch_m_per_s=speed + wave_speed)
+    for pe in [0.1, 100.0]:
+        out[f"Peclet spreading, Pe={pe}"] = dict(diffusion_length_over_L=1 / sqrt(pe))
+    out["Diffusion lengths at t=0.1 s"] = dict(
+        momentum_mm=sqrt(1e-6 * 0.1) * 1000, heat_mm=sqrt(1.4e-7 * 0.1) * 1000,
+        species_mm=sqrt(1e-9 * 0.1) * 1000, Pr=1e-6 / 1.4e-7, Sc=1000)
+    for nu_number in [10, 80]:
+        h = nu_number * 0.6 / 0.02
+        out[f"Heat transfer, Nu={nu_number}"] = dict(h_W_per_m2_K=h, heat_flux_W_per_m2=h * 20)
+    for conductivity in [200.0, 0.2]:
+        out[f"Solid cooling, k={conductivity} W/(m K)"] = dict(Bi=100 * 0.005 / conductivity)
+    for elapsed in [0.01, 10.0]:
+        out[f"Thermal diffusion, t={elapsed} s"] = dict(
+            Fo=1e-5 * elapsed / 0.005**2, diffusion_length_mm=sqrt(1e-5 * elapsed) * 1000)
+    for speed in [0.05, 0.5, 5.0]:
+        out[f"Mixed convection, U={speed} m/s"] = dict(Ri=9.81 / 300 * 20 * 0.1 / speed**2)
+    for da in [0.1, 1.0, 10.0]:
+        out[f"First-order plug flow, Da={da}"] = dict(conversion_percent=(1 - exp(-da)) * 100)
+    for sh in [2.0, 20.0]:
+        out[f"Mass transfer, Sh={sh}"] = dict(km_m_per_s=sh * 1e-9 / 0.001)
+    for tau in [0.01, 1.0]:
+        out[f"Stokes response, relaxation={tau} s"] = dict(
+            Stk=tau / 0.1, velocity_percent_at_0_1s=(1 - exp(-0.1 / tau)) * 100)
+    for dt in [0.0002, 0.002]:
+        out[f"Time step, dt={dt} s"] = dict(Co=dt / 0.001, displacement_mm=dt * 1000)
+    return out
+
+
 if __name__ == "__main__":
-    for title, values in results().items():
+    for title, values in {**results(), **teaching_examples()}.items():
         print("\n" + title)
         for name, value in values.items():
             print(f"  {name:30s} = {value:.9g}")
