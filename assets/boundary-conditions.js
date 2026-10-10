@@ -39,7 +39,7 @@
       item.parameters.split(/[、；，]/).map(part => part.replace(/`/g, '').trim()).filter(Boolean).forEach(part => value.append(el('span', part)));
       list.append(el('dt', '配置重点'), value); article.append(list);
     }
-    const detail = el('a', item.linkLabel + ' →', 'text-link'); detail.href = item.url;
+    const detail = el('a', '参数、配置与示例 →', 'text-link'); detail.href = item.url;
     article.append(detail);
     return article;
   }
@@ -87,7 +87,7 @@
       entries = rows.filter(row => /^\/boundary-conditions\/[a-z0-9-]+\/$/.test(row.metadata?.canonical_path || '')).map(row => ({
         ...(original.get(row.metadata.canonical_path) || {}),
         name: row.title, description: row.summary, category: row.series,
-        url: original.has(row.metadata.canonical_path) ? row.metadata.canonical_path : '/read/?slug=' + encodeURIComponent(row.slug), linkLabel: '参数、配置与源码'
+        url: original.has(row.metadata.canonical_path) ? row.metadata.canonical_path : '/read/?slug=' + encodeURIComponent(row.slug), linkLabel: '参数、配置与示例'
       }));
       render();
     } catch { render(); /* Network fallback uses the verified local index. */ }
