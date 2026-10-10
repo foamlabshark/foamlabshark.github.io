@@ -5,7 +5,13 @@
  const D=window.FoamDirectory={nodes:[],available:false};
  D.get=id=>D.nodes.find(n=>n.id===id);
  D.children=id=>D.nodes.filter(n=>n.parent_id===(id||null)).sort((a,b)=>a.sort_order-b.sort_order||a.name.localeCompare(b.name));
- D.descendants=(id,nodes=D.nodes)=>{const ids=new Set([id]);for(let i=0;i<nodes.length;i++)for(const n of nodes)if(ids.has(n.parent_id))ids.add(n.id);return [...ids];};
+ const directoryIndexes=new WeakMap();
+ D.descendants=(id,nodes=D.nodes)=>{
+  let index=directoryIndexes.get(nodes);
+  if(!index){const children=new Map();for(const n of nodes){if(!children.has(n.parent_id))children.set(n.parent_id,[]);children.get(n.parent_id).push(n.id);}index={children,descendants:new Map()};directoryIndexes.set(nodes,index);}
+  if(!index.descendants.has(id)){const seen=new Set([id]),queue=[id];for(let i=0;i<queue.length;i++)for(const child of index.children.get(queue[i])||[])if(!seen.has(child)){seen.add(child);queue.push(child);}index.descendants.set(id,queue);}
+  return [...index.descendants.get(id)];
+ };
  D.ancestors=id=>{const out=[],seen=new Set();for(let n=D.get(id);n&&!seen.has(n.id);n=D.get(n.parent_id)){seen.add(n.id);out.unshift(n);}return out;};
  D.path=id=>D.ancestors(id).map(n=>n.name).join(' / ');
  D.isVisible=n=>D.ancestors(n.id).every(x=>x.visible);
