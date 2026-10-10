@@ -17,6 +17,30 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
  const $=s=>document.querySelector(s);const shortcuts={"courses":"系统学习","topics":"专题学习","start":"快速开始","commands":"命令速查","dictionaries":"配置与字典速查","algorithms":"有限体积法","linux":"Linux 入门","cpp":"C++ 入门","programming":"OpenFOAM 编程","tools":"工具生态","resources":"资料中心","sharing":"实践与分享","community":"讨论中心","assignments":"作业与实践","announcements":"网站公告"};const defaultShortcuts=["courses", "topics", "commands", "dictionaries", "programming", "resources", "sharing", "community"];const selectedShortcuts=value=>Array.isArray(value)?[...new Set(value.map(key=>({authors:'sharing',recommendations:'resources'})[key]||key))].filter(key=>Object.hasOwn(shortcuts,key)):defaultShortcuts;
  const state={client:null,user:null,profile:null,progress:[],pet:null,petError:false,configured:false,githubEnabled:false,dataError:false,loading:true,dataLoading:false,signingOut:false};window.foamAuth=state;
  let session=null,revision=0,initializing=true,reloadTimer,renderedProfile='',accountController=null,accountLoad=null;
+ let activityOwner=null,activityAt=-Infinity,activityRequest=null;
+ // Record visible, authenticated visits using the database clock. The callback
+ // runs outside the Auth lock; a failed activity request never blocks sign-in.
+ function recordMemberVisit(){
+  const uid=state.user?.id;
+  if(!uid||!state.client||state.signingOut||document.hidden)return Promise.resolve();
+  if(activityOwner!==uid){activityOwner=uid;activityAt=-Infinity;activityRequest=null;}
+  if(activityRequest)return activityRequest.promise;
+  const tick=performance.now();if(tick-activityAt<60000)return Promise.resolve();
+  const task={uid};activityAt=tick;activityRequest=task;
+  task.promise=Promise.resolve().then(async()=>{
+   if(state.user?.id!==uid||state.signingOut||document.hidden){if(activityRequest===task)activityAt=-Infinity;return;}
+   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),3000);
+   try{const result=await state.client.rpc('foamlab_record_member_visit').abortSignal(controller.signal);if(result.error)throw result.error;}
+   finally{clearTimeout(timeout);}
+  }).catch(()=>{if(activityRequest===task)activityAt=-Infinity;})
+   .finally(()=>{if(activityRequest===task)activityRequest=null;});
+  return task.promise;
+ }
+ state.recordMemberVisit=recordMemberVisit;
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)recordMemberVisit();});
+ window.addEventListener('pageshow',()=>recordMemberVisit());
+ window.addEventListener('online',()=>recordMemberVisit());
+ setInterval(recordMemberVisit,60000);
  // A deadline and caller cancellation also work on Safari versions without AbortSignal.any.
  function authFetch(input,options={}){const controller=new AbortController(),abort=()=>controller.abort(),signal=options.signal;if(signal?.aborted)abort();else signal?.addEventListener('abort',abort,{once:true});const timer=setTimeout(abort,12000);return fetch(input,{...options,signal:controller.signal}).finally(()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);});}
  const report=message=>{const box=$('#account-error');if(box){box.hidden=false;box.textContent=message;}else window.foamNotify?.(message);};
@@ -40,8 +64,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   const identityChanged=state.user?.id!==next?.user?.id;
   if(changed){revision++;accountController?.abort();}
   session=next;state.user=next?.user||null;state.loading=false;
+  if(identityChanged||!next){activityOwner=null;activityAt=-Infinity;activityRequest=null;}
   if(identityChanged||!next){state.profile=null;state.progress=[];state.pet=null;state.petError=false;state.dataError=false;state.dataLoading=!!next;renderedProfile='';delete state.visibleCompleted;delete state.totalLessons;}
-  if(changed||initializing){render();emit();}
+  if(changed||initializing){render();emit();if(next)setTimeout(recordMemberVisit,0);}
   return changed;
  }
  async function loadAccount(){

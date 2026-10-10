@@ -2241,12 +2241,16 @@ if(__exports != exports)module.exports = exports;return module.exports}));
  // Ambiguous unit symbols use ordinary prose; explicit code and parameter cells
  // still identify a configuration entry with the same spelling.
  const units=new Set(['m','s','ms','kg','g','mm','cm','km','K','N','Pa','kPa','MPa','W','kW','Hz','kHz','MHz','rad','rpm','deg','mol','J','kJ']);
+ // Accented Latin letters and combining marks remain part of a word, so a
+ // field such as P must not be extracted from Péclet. Chinese prose can still
+ // sit directly beside an OpenFOAM keyword without surrounding spaces.
+ const wordBoundary=/[\w@.\/\-\p{Script=Latin}\p{M}]/u;
  function parts(text,parameter=false){
   const result=[];let offset=0;
   const pattern=/\$[A-Za-z_][\w]*(?:\/[\w.*-]+)*|--?[A-Za-z][\w-]*|[A-Za-z_][\w]*(?:(?:[.:/]|::)[\w*]+)*/g;
   for(const match of text.matchAll(pattern)){
    const token=match[0],before=text[match.index-1]||'',after=text[match.index+token.length]||'';
-   if(/[\w@.\/-]/.test(before)||/[\w@.\/-]/.test(after))continue;
+   if(wordBoundary.test(before)||wordBoundary.test(after))continue;
    if(!parameter&&units.has(token))continue;
    if(!parameter&&!terms.has(token)&&!/^\$|^--?[A-Za-z]|^(?:system|constant)\//.test(token))continue;
    if(match.index>offset)result.push({text:text.slice(offset,match.index),code:false});

@@ -19,10 +19,12 @@
    clearTimeout(timer);const id=++request;if(!view.isConnected)return;
    results.inert=true;pager.inert=true;results.setAttribute('aria-busy','true');status.textContent='正在读取注册成员…';status.classList.remove('is-error');
    try{
+    await window.foamAuth?.recordMemberVisit?.();
+    if(id!==request||!view.isConnected)return;
     const data=L.check(await L.client.rpc('foamlab_admin_members',{p_query:state.q.trim(),p_role:state.role,p_sort:state.sort,p_direction:state.direction,p_page:state.page,p_size:Number(state.size)}));
     if(id!==request||!view.isConnected)return;
     members=data.items;state.page=data.page;table();pager.innerHTML=UI.pager(state.page,data.total,Number(state.size));
-    status.textContent='共 '+data.total+' 位成员'+(state.q.trim()||state.role?' · 已应用筛选':'')+' · 时间按当前设备时区显示';
+    status.textContent='共 '+data.total+' 位成员'+(state.q.trim()||state.role?' · 已应用筛选':'')+' · 最近登录按已登录状态下的访问时间记录；时间按当前设备时区显示';
    }catch(e){
     if(id!==request||!view.isConnected)return;
     members=[];results.innerHTML='<div class="cms-empty"><button type="button" class="button secondary" data-members-refresh>重新加载</button></div>';pager.replaceChildren();status.textContent=e.message||'成员列表加载失败，请重试。';status.classList.add('is-error');
