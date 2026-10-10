@@ -2,16 +2,22 @@
 (() => {
  const L=window.FoamLab,esc=L.esc;
  const D=window.FoamDirectory={nodes:[],available:false};
- D.get=id=>D.nodes.find(n=>n.id===id);
- D.children=id=>D.nodes.filter(n=>n.parent_id===(id||null)).sort((a,b)=>a.sort_order-b.sort_order||a.name.localeCompare(b.name));
  const directoryIndexes=new WeakMap();
+ function indexFor(nodes=D.nodes){
+  let index=directoryIndexes.get(nodes);if(index)return index;
+  const byId=new Map(nodes.map(n=>[n.id,n])),children=new Map();
+  for(const n of nodes){const parent=n.parent_id||null;if(!children.has(parent))children.set(parent,[]);children.get(parent).push(n.id);}
+  for(const list of children.values())list.sort((a,b)=>(byId.get(a).sort_order||0)-(byId.get(b).sort_order||0)||String(byId.get(a).name||'').localeCompare(String(byId.get(b).name||'')));
+  index={byId,children,descendants:new Map(),ancestors:new Map()};directoryIndexes.set(nodes,index);return index;
+ }
+ D.get=id=>indexFor().byId.get(id);
+ D.children=id=>(indexFor().children.get(id||null)||[]).map(D.get);
  D.descendants=(id,nodes=D.nodes)=>{
-  let index=directoryIndexes.get(nodes);
-  if(!index){const children=new Map();for(const n of nodes){if(!children.has(n.parent_id))children.set(n.parent_id,[]);children.get(n.parent_id).push(n.id);}index={children,descendants:new Map()};directoryIndexes.set(nodes,index);}
+  const index=indexFor(nodes);
   if(!index.descendants.has(id)){const seen=new Set([id]),queue=[id];for(let i=0;i<queue.length;i++)for(const child of index.children.get(queue[i])||[])if(!seen.has(child)){seen.add(child);queue.push(child);}index.descendants.set(id,queue);}
   return [...index.descendants.get(id)];
  };
- D.ancestors=id=>{const out=[],seen=new Set();for(let n=D.get(id);n&&!seen.has(n.id);n=D.get(n.parent_id)){seen.add(n.id);out.unshift(n);}return out;};
+ D.ancestors=id=>{const index=indexFor();if(!index.ancestors.has(id)){const out=[],seen=new Set();for(let n=D.get(id);n&&!seen.has(n.id);n=D.get(n.parent_id)){seen.add(n.id);out.unshift(n);}index.ancestors.set(id,out);}return [...index.ancestors.get(id)];};
  D.path=id=>D.ancestors(id).map(n=>n.name).join(' / ');
  D.isVisible=n=>D.ancestors(n.id).every(x=>x.visible);
  // A database array is an unordered set of placements. Prefer the programming

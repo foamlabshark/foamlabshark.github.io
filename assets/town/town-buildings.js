@@ -21,7 +21,7 @@
   hospital:{icon:'🏥',sub:'答疑医院 · 与讨论中心同步的问答',tabs:[['forum','问诊大厅'],['clinic','报错诊室']],full:'/community/'},
   library:{icon:'📚',sub:'图书馆 · 检索、资料与知识卡',tabs:[['search','全站检索'],['shelf','资料书架'],['knowledge','知识卡']],full:'/resources/'},
   gallery:{icon:'🖼️',sub:'展览馆 · 实践与分享、算例成果',tabs:[['images','图片展览'],['works','实践文章'],['run','实训成果']],full:'/sharing/'},
-  spot:{icon:'⛲',sub:'小镇景点 · 街道里的 CFD',tabs:[['story','景点故事']],full:null},
+  spot:{icon:'⛲',sub:'流体力学知识收藏',tabs:[['knowledge','知识手记']],full:'/topics/'},
   institute:{icon:'🔬',sub:'研究所 · 同一学校或团队的邻居',tabs:[['members','成员']],full:null},
  };
 
@@ -162,7 +162,7 @@
   async 'gallery:images'(host){await window.FoamTownGallery.render(host);},
   async 'gallery:works'(host){const rows=check(await contentQuery(['article','log']).order('created_at',{ascending:false}).range(0,119)).filter(r=>r.track!=='熊猫小镇');await L().names(rows.map(r=>r.author_id));
    host.innerHTML=`<p class="tb-intro">大家的计算案例、技术文章和研究笔记。读完可以直接在这里评论。</p>${cards(rows,{cover:true,cls:'is-gallery',empty:'展览馆还在布展，欢迎投稿。',meta:r=>E((L().authorMeta(r).match(/<strong>(.*?)<\/strong>/)?.[1])||'社区成员')+' · '+date(r.published_at||r.created_at)})}<p class="tb-actions"><a class="button secondary" href="/studio/">我也要投稿 ↗</a></p>`;},
-  async 'spot:story'(host){await reader(host,'town-landmark-'+ctx.spot);},
+  'spot:knowledge'(host){window.FoamTownPlay.mountCollection(host);},
   async 'institute:members'(host){const members=ctx.members||[];host.innerHTML=members.length?`<div class="tb-members">${members.map(m=>`<a class="tb-member" href="#${E(ctx.province)}/house/${E(m.user_id)}"><strong>${E(m.name)}</strong><small>Lv.${E(m.level)} · ${E(m.title||'')}</small></a>`).join('')}</div>`:empty('研究所里暂时没有成员。');},
  };
  TABS['gallery:run']=TABS.run;TABS['school:run']=TABS.run;TABS['workshop:run']=TABS.run;

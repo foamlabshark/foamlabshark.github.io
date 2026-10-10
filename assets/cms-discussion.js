@@ -8,7 +8,7 @@ window.FoamCMSDiscussion=async C=>{
  async function show(mode){
   state.mode=mode;host.replaceChildren();workspace=null;
   p.querySelectorAll('[data-discussion-tab]').forEach(b=>{const selected=b.dataset.discussionTab===mode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
-  workspace=mode==='questions'?await window.FoamCMSQuestions({...C,panel:host}):await window.FoamCMSModeration({...C,panel:host,mode,discussion:true});
+  workspace=mode==='questions'?await window.FoamCMSQuestions({...C,panel:host}):await window.FoamCMSModeration({...C,panel:host,mode,discussion:true,contentScope:row=>!UI.isTownContent(row)});
  }
  p.querySelector('#cms-discussion-tabs').onclick=e=>{const b=e.target.closest('[data-discussion-tab]');if(!b||b.dataset.discussionTab===state.mode)return;
   run(async()=>{if(isDirty()&&!await UI.confirmAction({title:'放弃尚未保存的问题修改？',message:'已保存的版本会保留。',action:'放弃修改'}))return;await show(b.dataset.discussionTab);});

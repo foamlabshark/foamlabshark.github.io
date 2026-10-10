@@ -36,5 +36,15 @@
  });
  const pager=(page,total,size=25)=>{const pages=Math.max(1,Math.ceil(total/size));return '<div class="cms-pagination"><span>共 '+total+' 项 · 第 '+page+' / '+pages+' 页</span><div><button class="button secondary" data-page="'+(page-1)+'" '+(page<=1?'disabled':'')+'>上一页</button><button class="button secondary" data-page="'+(page+1)+'" '+(page>=pages?'disabled':'')+'>下一页</button></div></div>';};
  const locationLabel=row=>window.FoamDirectory?.available?(window.FoamDirectory.locations(row).join('；')||'未归类'):legacyLocationLabel(row);
- window.FoamCMSUI={placements,key,placement,locationLabel,confirmAction,pager:(page,total,size=25)=>window.FoamPagination?'<div class="cms-pagination"><span>共 '+total+' 项 · 第 '+page+' / '+Math.max(1,Math.ceil(total/size))+' 页</span>'+window.FoamPagination.html(page,total,size,'data-page')+'</div>':pager(page,total,size)};
+ const managementTarget=id=>{
+  const ancestors=window.FoamDirectory?.ancestors(id)||[];
+  for(const node of ancestors){
+   let path='';try{path=new URL(node.href,location.origin).pathname;}catch{}
+   if(node.key==='town'||/^\/town(?:\/|$)/.test(path))return 'town';
+   if(node.key==='community'||/^\/community(?:\/|$)/.test(path))return 'questions';
+  }
+  return '';
+ };
+ const isTownContent=row=>!!row&&((row.section_ids||[]).some(id=>managementTarget(id)==='town')||row.track==='熊猫小镇'||/^town(?:-|\/)/.test(row.slug||'')||!!row.metadata?.town_spot||row.metadata?.town===true||/^\/town(?:\/|$)/.test(row.metadata?.canonical_path||'')||/^town-/.test(row.metadata?.release||''));
+ window.FoamCMSUI={placements,key,placement,locationLabel,managementTarget,isTownContent,confirmAction,pager:(page,total,size=25)=>window.FoamPagination?'<div class="cms-pagination"><span>共 '+total+' 项 · 第 '+page+' / '+Math.max(1,Math.ceil(total/size))+' 页</span>'+window.FoamPagination.html(page,total,size,'data-page')+'</div>':pager(page,total,size)};
 })();

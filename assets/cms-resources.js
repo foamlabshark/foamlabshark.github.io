@@ -14,7 +14,7 @@ window.FoamCMSResources=async C=>{
  $('#cms-file-search').value=query;$('#cms-file-source').value=source;
  function prepare(){
   const ids=new Set(root?D.descendants(root.id):[]);rowsById=new Map(content.map(r=>[r.id,r]));
-  entries=content.filter(r=>['resource','recommendation'].includes(r.kind)||r.section_ids?.some(id=>ids.has(id)));
+  entries=content.filter(r=>!UI.isTownContent(r)&&(['resource','recommendation'].includes(r.kind)||r.section_ids?.some(id=>ids.has(id))));
   entrySearch=new Map(entries.map(r=>[r.id,[r.title,r.track,r.series,UI.locationLabel(r)].join(' ').toLowerCase()]));
  }
  async function reload(){generation++;await C.load();content=C.getRows();prepare();filesReady=false;fileError='';}
