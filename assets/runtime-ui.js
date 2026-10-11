@@ -434,7 +434,22 @@
   let introduction='';if(intro){const record=L.check(await L.client.from('foamlab_content').select('body').eq('id',intro.id).single());introduction=L.markdown(record.body);}
   const crumbs=D.ancestors(node.id).map(n=>n.id===node.id?'<span aria-current="page">'+esc(n.name)+'</span>':'<a href="'+esc(D.url(n))+'">'+esc(n.name)+'</a>').join('<span aria-hidden="true">/</span>');
   document.title=node.name+' · FoamLab';hub.innerHTML='<nav class="topic-breadcrumbs" aria-label="专题导航">'+crumbs+'</nav><header class="topic-detail-header"><div><h1>'+esc(node.name)+'</h1><p>'+esc(node.description||intro?.summary||'')+'</p><nav class="topic-section-links" aria-label="专题内容"><a href="#topic-courses">内容目录 · '+selected.length+' 篇 ↓</a></nav></div>'+(intro?figure(intro):'')+'</header>'+(introduction?'<section class="topic-introduction"><div class="prose">'+introduction+'</div></section>':'')+(subtopics.length?'<section id="topic-branches"><h2>'+ (node.key==='topic-meshes'?'选择网格主题':'子专题') +'</h2><div class="topic-collection-grid">'+collection(subtopics)+'</div></section>':'')+'<section id="topic-courses"><h2>'+'内容目录'+'</h2><div class="lab-card-grid"></div></section>';
-  const grid=hub.querySelector('.lab-card-grid');window.foamListState.remember(grid);await L.names(selected.filter(r=>['article','log'].includes(r.kind)).map(r=>r.author_id));const render=()=>{grid.innerHTML=window.FoamPagination.slice(grid,selected,render,12).map(L.card).join('')||'<p>这里还没有发布内容。</p>';};render();window.addEventListener('popstate',render);return;
+  const grid=hub.querySelector('.lab-card-grid');window.foamListState.remember(grid);await L.names(selected.filter(r=>['article','log'].includes(r.kind)).map(r=>r.author_id));
+  let industrySelect,countLabel;
+  if(node.key==='topic-engineering'){
+   const industries=[...new Set(selected.map(r=>r.metadata?.industry).filter(Boolean))];
+   const filters=document.createElement('div');filters.className='engineering-filters';
+   filters.innerHTML='<label>按行业选择 <select aria-label="工程案例行业"><option value="">全部行业</option>'+industries.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'</select></label><span role="status" aria-live="polite"></span>';
+   grid.before(filters);industrySelect=filters.querySelector('select');countLabel=filters.querySelector('[role="status"]');
+   industrySelect.onchange=()=>{window.foamListState.write({industry:industrySelect.value,page:''},true);render();};
+  }
+  const render=()=>{
+   const industry=new URLSearchParams(location.search).get('industry')||'';
+   if(industrySelect)industrySelect.value=industry;
+   const visible=industrySelect&&industrySelect.value?selected.filter(r=>r.metadata?.industry===industrySelect.value):selected;
+   if(countLabel)countLabel.textContent='共 '+visible.length+' 个案例';
+   grid.innerHTML=window.FoamPagination.slice(grid,visible,render,12).map(L.card).join('')||'<p>这里还没有发布内容。</p>';
+  };render();window.addEventListener('popstate',render);return;
  }
  if(programming)throw D?.error||new Error('编程目录暂时无法读取，请刷新重试。');
  const [rawModules,lessons]=await Promise.all([readAll(()=>L.client.from('foamlab_content').select('*').eq('kind','module').eq('status','published').order('sort_order').order('slug')),readAll(()=>L.client.from('foamlab_content').select('id,slug,kind,title,summary,track,series,cover_url,metadata,sort_order').eq('kind','lesson').eq('status','published').order('sort_order').order('slug'))]);const modules=rawModules.filter(x=>typeof x.metadata?.topic_key==='string'&&x.metadata.topic_key);
