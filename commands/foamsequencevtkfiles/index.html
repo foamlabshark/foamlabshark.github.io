@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,36 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>foamSequenceVTKFiles</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>为 VTK 文件建立连续编号的链接，便于 ParaView 按时间序列读取。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>分散在各时间目录中的 VTK 文件不一定能直接按动画序列识别。<code>foamSequenceVTKFiles</code> 为它们建立连续编号的链接，便于 ParaView 按顺序加载并播放已有结果。</p>
-<!-- /reference-introduction -->
-<h2>开始前</h2>
-<p>准备按时间目录存放的 VTK 采样结果。此脚本创建符号链接序列，不重写网格数据；示例在支持符号链接的 Linux 文件系统中运行。 输入目录中相邻时间的文件需保持相同文件名。<code>-out</code> 分支在 <code>v2512</code> 中会多消耗一个参数，下例将其置于末尾并附加 --，用于吸收该次参数移动；输出目录中原有内容会被清理。</p>
-<h2>示例 1：整理默认 VTK 结果</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA
-</code></pre></div>
-<p>搜索 postProcessing 下的 .vtk 文件，在默认 sequencedVTK 输出连续编号链接。</p>
-<h2>示例 2：指定采样目录</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -<span class="hljs-built_in">dir</span> postProcessing/surfaces
-</code></pre></div>
-<p><code>-dir</code> 限定数据目录，避免合并无关采样。</p>
-<h2>示例 3：处理 VTP 表面</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -vtp
-</code></pre></div>
-<p>选择 XML PolyData 扩展名 .vtp。</p>
-<h2>示例 4：处理 VTU 网格</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -vtu
-</code></pre></div>
-<p>选择 XML UnstructuredGrid 扩展名 .vtu。</p>
-<h2>示例 5：分开保存两组序列</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -<span class="hljs-built_in">dir</span> postProcessing/planeA -out sequence-planeA --
-foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -<span class="hljs-built_in">dir</span> postProcessing/planeB -out sequence-planeB --
-</code></pre></div>
-<p>分别生成两组独立链接序列。末尾 -- 用于兼容此版本 <code>-out</code> 分支的额外 shift；各输出目录专门用于本工具，原有内容会先被清理。</p>
-<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-c | -case &lt;dir&gt;</code></td><td>指定算例目录，默认使用当前目录。</td></tr><tr><td><code>-d | -dir &lt;dir&gt;</code></td><td>指定后处理目录，默认为 postProcessing。</td></tr><tr><td><code>-o | -out &lt;dir&gt;</code></td><td>指定输出链接目录，默认为 sequencedVTK。</td></tr><tr><td><code>-vtk</code></td><td>生成 VTK 文件序列，此项为默认设置。</td></tr><tr><td><code>-vtp</code></td><td>生成 VTP 文件序列。</td></tr><tr><td><code>-vtu</code></td><td>生成 VTU 文件序列。</td></tr><tr><td><code>-h | -help</code></td><td>显示帮助。</td></tr></tbody></table></div><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/foamSequenceVTKFiles">源码与说明</a> · <a href="/assets/command-help/foamsequencevtkfiles.txt">帮助文本</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -335,6 +306,6 @@ foamSequenceVTKFiles -<span class="hljs-keyword">case</span> caseA -<span class=
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

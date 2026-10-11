@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,37 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>snappyHexMesh</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>细化背景网格，贴合几何表面，并按设置生成边界层。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>snappyHexMesh</code> 从已有背景体网格出发，根据三角化几何逐步细化单元、将网格点贴到表面，并可在壁面附近增加层状单元。它常用于复杂外形的内流或外流建网，几何、局部细化和边界层设置共同决定最终分辨率。</p>
-<!-- /reference-introduction -->
-<h2>开始前</h2>
-<p>先有<code>blockMesh</code>背景网格、<code>snappyHexMeshDict</code>和表面几何。每个网格方案在独立副本生成。</p>
-<h2>示例 1：检查几何输入</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">snappyHexMesh -checkGeometry
-</code></pre></div>
-<p>检查字典引用的几何与区域，先定位表面缺陷和尺寸问题。</p>
-<h2>示例 2：检查算例设置</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">snappyHexMesh -dry-run
-</code></pre></div>
-<p>执行简化设置检查流程，便于发现缺失几何、字典条目和不合理选择。</p>
-<h2>示例 3：生成贴体网格</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">snappyHexMesh
-</code></pre></div>
-<p>执行字典启用的细化、贴合、层生成阶段，默认保留各阶段对应的网格输出。</p>
-<h2>示例 4：使用另一套控制</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">snappyHexMesh -dict system/snappyHexMeshDict.fine
-</code></pre></div>
-<p>已准备<code>fine</code>字典时选择它，比较表面细化等级、间隙分辨率和边界层厚度。</p>
-<h2>示例 5：并行生成并检查</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">decomposePar
-mpirun -np 4 snappyHexMesh -parallel
-mpirun -np 4 checkMesh -parallel -latestTime
-</code></pre></div>
-<p><code>decomposeParDict</code>的<code>numberOfSubdomains</code>设为4；在各分区生成最新网格，再检查并行网格质量。</p>
-<h2>常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-case &lt;dir&gt;</code></td><td>指定算例目录；省略时使用当前目录。</td></tr><tr><td><code>-checkGeometry</code></td><td>检查全部表面几何的质量。</td></tr><tr><td><code>-decomposeParDict &lt;file&gt;</code></td><td>使用指定的 <code>decomposeParDict</code> 并行分解字典。</td></tr><tr><td><code>-dict &lt;file&gt;</code></td><td>使用指定的 <code>snappyHexMeshDict</code> 文件。</td></tr><tr><td><code>-dry-run</code></td><td>通过一个时间步检查算例设置。</td></tr><tr><td><code>-outFile &lt;file&gt;</code></td><td>指定简化后表面的输出文件名。</td></tr><tr><td><code>-overwrite</code></td><td>覆盖已有网格或结果文件。</td></tr><tr><td><code>-parallel</code></td><td>以并行模式运行，通常由 mpirun 启动。</td></tr><tr><td><code>-patches &lt;(patch0 .. patchN)&gt;</code></td><td>仅对选中的边界面进行三角化；支持通配符。</td></tr><tr><td><code>-profiling</code></td><td>启用应用层性能分析。</td></tr><tr><td><code>-region &lt;name&gt;</code></td><td>指定网格区域，默认为 <code>region0</code>。</td></tr><tr><td><code>-surfaceSimplify &lt;boundBox&gt;</code></td><td>从指定包围盒出发，用 <code>snappyHexMesh</code> 简化表面。</td></tr><tr><td><code>-help</code></td><td>显示简要帮助并退出。</td></tr><tr><td><code>-help-full</code></td><td>显示完整帮助并退出。</td></tr></tbody></table></div><h2>相关配置</h2><p><a href="/dictionaries/system-snappyhexmeshdict/">snappyHexMeshDict</a> · <a href="/dictionaries/system-meshqualitydict/">meshQualityDict</a></p><h2>配套算例</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/refineMesh/cylinder"><h3>算例问题：cylinder</h3><p class="reference-case-problem">在含圆柱几何的网格上选择局部区域细化，比较细化前后的单元尺寸与过渡。该示例侧重网格操作，应检查细化区域、边界保持和网格质量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder"><code>mesh/refineMesh/cylinder</code></a>。</p><figure class="reference-case-figure"><img alt="cylinder 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption><code>cylinder</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/snappyHexMesh/gap_detection"><h3>算例问题：gap_detection</h3><p class="reference-case-problem">在含狭缝或相近表面的几何中生成网格，利用间隙检测控制局部单元保留与细化。该示例关注窄间隙能否被网格正确表示，以及局部质量和连通性。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection"><code>mesh/snappyHexMesh/gap_detection</code></a>。</p><figure class="reference-case-figure"><img alt="gap_detection 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption>gap_detection 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><ul><li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder">mesh/refineMesh/cylinder</a></li><li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/flange">mesh/snappyHexMesh/flange</a></li><li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/insidePoints">mesh/snappyHexMesh/insidePoints</a></li><li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection">mesh/snappyHexMesh/gap_detection</a></li><li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/rotated_block">mesh/snappyHexMesh/rotated_block</a></li></ul><details class="command-more-options"><summary>更多参数（17 项）</summary><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>参数</th><th>作用</th></tr></thead><tbody><tr><td><code>-debug-switch &lt;name=val&gt;</code></td><td>设置指定的 DebugSwitch 调试开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-fileHandler &lt;handler&gt;</code></td><td>指定文件读写处理器类型。</td></tr><tr><td><code>-hostRoots &lt;((host1 dir1) .. (hostN dirN))&gt;</code></td><td>为分布式运行的各子进程指定主机与根目录；主机名支持正则表达式。</td></tr><tr><td><code>-info-switch &lt;name=val&gt;</code></td><td>设置指定的 InfoSwitch 信息输出开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-lib &lt;name&gt;</code></td><td>额外加载一个或一组共享库；可重复使用。</td></tr><tr><td><code>-mpi-no-comm-dup</code></td><td>跳过初始化时的 MPI_Comm_dup() 调用。</td></tr><tr><td><code>-mpi-split-by-appnum</code></td><td>按 APPNUM 对全局通信器进行分组。</td></tr><tr><td><code>-mpi-threads</code></td><td>请求启用 MPI 线程支持。</td></tr><tr><td><code>-no-libs</code></td><td>跳过 <code>controlDict</code> 中 <code>libs</code> 条目指定的库。</td></tr><tr><td><code>-opt-switch &lt;name=val&gt;</code></td><td>设置指定的 OptimisationSwitch 优化开关，默认值为 1；可重复使用。</td></tr><tr><td><code>-roots &lt;(dir1 .. dirN)&gt;</code></td><td>为分布式运行的各子进程指定根目录。</td></tr><tr><td><code>-world &lt;name&gt;</code></td><td>指定并行通信使用的局部通信域名称。</td></tr><tr><td><code>-doc</code></td><td>在浏览器中打开文档。</td></tr><tr><td><code>-doc-source</code></td><td>在浏览器中打开源码。</td></tr><tr><td><code>-help-compat</code></td><td>显示兼容性选项并退出。</td></tr><tr><td><code>-help-man</code></td><td>显示完整帮助，以 <code>man</code> 手册格式输出，然后退出。</td></tr><tr><td><code>-help-notes</code></td><td>显示程序功能说明并退出。</td></tr></tbody></table></div></details><h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/utilities/mesh/generation/snappyHexMesh/snappyHexMesh.C">源码与说明</a> · <a href="/assets/command-help/snappyhexmesh.txt">帮助文本</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -336,6 +306,6 @@ mpirun -np 4 checkMesh -parallel -latestTime
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

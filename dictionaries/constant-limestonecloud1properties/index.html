@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,136 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>limestoneCloud1Properties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>名为 limestoneCloud1 的石灰石颗粒云配置，用于对应反应颗粒教程。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>这个字典为相应教程中的石灰石颗粒云组织物性、注入和反应设置。它与气相及其他颗粒云配合，描述颗粒运动、传热和所选反应过程产生的交换。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/limestoneCloud1Properties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>solution</code></td><td>颗粒云的求解控制，包含稳态/瞬态、载体耦合、源项与时间积分等。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>radiation</code></td><td>辐射计算开关，需与模型、壁面辐射条件及能量方程配合。</td></tr><tr><td><code>rho</code></td><td>密度或密度场引用；是否为量纲标量、常量或场名由模型定义。</td></tr><tr><td><code>Cp</code></td><td>定压比热容，单位通常为焦耳每千克每开尔文。</td></tr><tr><td><code>kappa</code></td><td>热导率或模型特定参数，按所选模型及其量纲填写。</td></tr><tr><td><code>T</code></td><td>温度值或温度场引用，通常采用热力学温度 K。</td></tr><tr><td><code>constantProperties</code></td><td>单个颗粒或材料的基本属性，例如密度、温度和热容；具体键由云类型决定。</td></tr><tr><td><code>subModels</code></td><td>颗粒云注入、力、传热、碰撞和相变等子模型集合。</td></tr><tr><td><code>particleForces</code></td><td>作用于颗粒的力模型列表，例如阻力和重力，实际可选模型由云类型决定。</td></tr><tr><td><code>injectionModels</code></td><td>注入时间、位置、流量与粒径分布等设置；需要同时满足总注入质量与统计分辨率要求。</td></tr><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patchInteractionModel</code></td><td>颗粒与边界接触时的反弹、粘附或逸出处理。</td></tr><tr><td><code>surfaceFilmModel</code></td><td>表面液膜模型选择，需与液膜区域和主流体耦合条件配套。</td></tr><tr><td><code>mu</code></td><td>通常表示动力黏度，也可能在特定模型中表示其他系数；必须结合量纲和源码语境确认。</td></tr><tr><td><code>cloudFunctions</code></td><td>按自定义对象名添加颗粒统计。<code>GName</code> 指定热或辐射模型引用的辐射场。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><p>按 <code>solution</code>、<code>constantProperties</code>、<code>subModels</code> 和注入器子字典分别设置求解、物性、物理模型与注入参数。</p><p>物种和固体组分按计算对象命名，例如 <code>H2O</code>、<code>C7H16</code>、<code>CH4</code>、<code>CO2</code>、<code>H2</code>、<code>ash</code>、<code>C</code>。<code>U</code>、<code>h</code>、<code>Yi</code> 表示交换量，<code>model1</code> 为可自定的实例名。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>solution.active / coupled / transient</code></td><td>启用颗粒云、开启双向耦合、选择瞬态跟踪。<code>coupled</code> <code>false</code> 仍可跟踪颗粒，但不把交换源项反馈给载体。</td></tr><tr><td><code>solution.cellValueSourceCorrection / maxCo</code></td><td>是否在跟踪过程中修正单元内载体源项，以及限制颗粒跟踪子步的 Courant 数。</td></tr><tr><td><code>solution.sourceTerms.schemes</code></td><td>按 <code>U</code>、<code>h</code>、<code>Yi</code> 等交换量选择源项处理方案与松弛参数；这些字段键必须对应所用云类型。</td></tr><tr><td><code>solution.interpolationSchemes</code></td><td>载体字段到颗粒位置的插值方式，按云模型选用 <code>rho</code>、<code>U</code>、<code>T</code>、<code>p</code>、<code>thermo:mu</code>、<code>Cp</code>、<code>kappa</code>、<code>G</code> 等字段；<code>G</code> 为辐射入射量。</td></tr><tr><td><code>solution.integrationSchemes</code></td><td>按 <code>U</code>、<code>T</code> 等颗粒变量选择 <code>Euler</code>、<code>analytical</code> 等时间积分方案；选择取决于变量方程。</td></tr><tr><td><code>constantProperties.rho0 / T0 / Cp0</code></td><td>初始密度、温度与比热容。热物性型云可能随后按组成、压力和温度更新这些量。</td></tr><tr><td><code>constantProperties.constantVolume</code></td><td>指定相应颗粒模型是否维持体积，需与其质量与密度更新方式配套。</td></tr><tr><td><code>constantProperties.epsilon0 / f0</code></td><td>颗粒辐射发射率与散射因子；只在支持相应辐射模型的云中使用。</td></tr><tr><td><code>subModels.injectionModels.&lt;名称&gt;</code></td><td>每个注入器自己的 <code>type</code> 与系数字典；<code>model1</code> 是自定义注入器名。多个注入器可并列。</td></tr><tr><td><code>SOI / duration / massTotal</code></td><td>注入器内的开始时刻、持续时间与总注入质量；某些从已有液滴记录导入的模型会重新计算 <code>massTotal</code>。</td></tr><tr><td><code>parcelBasisType / nParticle</code></td><td>用 <code>mass</code>、<code>number</code> 或 <code>fixed</code> 等方式确定每个计算包代表的真实颗粒数；<code>fixed</code> 模式明确给出 <code>nParticle</code>。</td></tr><tr><td><code>positionsFile / U0 / patch</code></td><td>按注入器填写几何和初始速度：<code>manualInjection</code> 使用位置文件，<code>patchInjection</code> 使用注入边界。</td></tr><tr><td><code>parcelsPerSecond / flowRateProfile</code></td><td>计算包抽样率与注入流量的时间分布。抽样率控制统计分辨率，不等于真实粒子数流率。</td></tr><tr><td><code>sizeDistribution</code></td><td>注入粒径分布子字典：<code>type</code> 选择模型。<code>RosinRammler</code> 使用 <code>RosinRammlerDistribution</code>，<code>uniform</code> 使用 <code>uniformDistribution</code>。</td></tr><tr><td><code>RosinRammlerDistribution.minValue / maxValue / lambda / n</code></td><td>粒径上下限、尺度参数与形状指数。长度与网格采用相同单位；使用米制时，将微米数值乘以 1e-6。</td></tr><tr><td><code>dispersionModel / stochasticCollisionModel</code></td><td>选择湍流弥散和随机碰撞模型，<code>none</code> 关闭相应过程。使用 <code>collisionModel</code> 的云按其碰撞模型配置。</td></tr><tr><td><code>standardWallInteractionCoeffs.type / e / mu</code></td><td>标准壁面相互作用的处理方式、恢复系数与摩擦系数；<code>rebound</code>、stick、escape 的含义不同。</td></tr><tr><td><code>heatTransferModel / RanzMarshallCoeffs.BirdCorrection</code></td><td><code>RanzMarshall</code> 换热模型的 Bird 修正开关，用于考虑传质对换热的影响。</td></tr><tr><td><code>compositionModel / phaseChangeModel</code></td><td>选择颗粒组成与相变模型，在 <code>singlePhaseMixtureCoeffs</code> 或 <code>singleMixtureFractionCoeffs</code> 的 <code>phases</code> 中填写组分。</td></tr><tr><td><code>liquidEvaporationCoeffs / liquidEvaporationBoilCoeffs</code></td><td>相变模型的 <code>activeLiquids</code> 指定可蒸发液体；<code>enthalpyTransfer</code> 选择焓交换的计算方式。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/coalChemistryFoam/simplifiedSiwek</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/coalChemistryFoam/simplifiedSiwek"><h3>算例问题：simplifiedSiwek</h3><p class="reference-case-problem">容器内的煤颗粒与气体相互作用，颗粒受热后可发生挥发分析出及表面反应。算例将煤颗粒的运动、传热、组分变化与气相化学反应耦合，重点检查温度、压力及颗粒质量变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek"><code>lagrangian/coalChemistryFoam/simplifiedSiwek</code></a>。</p></section><!-- /reference-case-contexts --><p><code>simplifiedSiwek</code> 中的石灰石颗粒云用于描述随煤粉加入的另一类颗粒，主要参与运动、吸热与辐射交换。</p>
-<ul>
-<li><code>parcelTypeId 2</code> 区分这类颗粒；<code>rho0 2500</code> kg/m³、<code>T0 300</code> K、<code>Cp0 900</code> J/(kg·K) 给出初始材料性质。</li>
-<li><code>manualInjection</code> 从 <code>limestonePositions</code> 读取位置，总质量为 <code>0.0001</code> kg，初速度为零。Rosin–Rammler 粒径范围为 5–565 μm，<code>lambda 48 μm</code>、<code>n 0.5</code> 控制分布。</li>
-<li><code>sphereDrag</code>、<code>gravity</code> 与 <code>stochasticDispersionRAS</code> 分别处理阻力、重力和 <code>RAS</code> 湍流弥散。</li>
-<li><code>RanzMarshall</code> 提供换热，<code>BirdCorrection false</code> 关闭相应质量传递修正；本文件的子模型没有加入分解反应。</li>
-<li><code>radiation on</code> 参与辐射换热，<code>cloudFunctions/particleDose1</code> 从 <code>G</code> 读取辐射场并累计颗粒所受辐射剂量。</li>
-</ul>
-<p>增大石灰石总质量可增加体系中的热容量，改变粒径则会改变升温时间与表面积。可比较颗粒温度分布、气相温度和辐射剂量；若研究煅烧，还需另行配置分解反应及产物成分。</p>
-<p><a href="/assets/examples/v2512/limestonecloud1properties/1-limestoneCloud1Properties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/limestoneCloud1Properties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/limestoneCloud1Properties"><code>lagrangian/coalChemistryFoam/simplifiedSiwek/constant/limestoneCloud1Properties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">112 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> limestoneCloud1Properties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solution
-{
-    active <span class="hljs-literal">true</span>;
-    coupled <span class="hljs-literal">true</span>;
-    transient <span class="hljs-literal">yes</span>;
-    cellValueSourceCorrection <span class="hljs-literal">on</span>;
-    maxCo <span class="hljs-number">0.3</span>;
-    sourceTerms
-    {
-        schemes
-        {
-            U explicit <span class="hljs-number">1</span>;
-            h explicit <span class="hljs-number">1</span>;
-            radiation explicit <span class="hljs-number">1</span>;
-        }
-    }
-    interpolationSchemes
-    {
-        rho cell;
-        thermo:mu cell;
-        U cellPoint;
-        Cp cell;
-        kappa cell;
-        T cell;
-        G cell;
-    }
-    integrationSchemes
-    {
-        U <span class="hljs-built_in">Euler</span>;
-        T analytical;
-    }
-}
-constantProperties
-{
-    parcelTypeId <span class="hljs-number">2</span>;
-    rho0 <span class="hljs-number">2500</span>;
-    T0 <span class="hljs-number">300</span>;
-    Cp0 <span class="hljs-number">900</span>;
-    epsilon0 <span class="hljs-number">1</span>;
-    f0 <span class="hljs-number">0.5</span>;
-}
-subModels
-{
-    particleForces
-    {
-        sphereDrag;
-        gravity;
-    }
-    injectionModels
-    {
-        model1
-        {
-            <span class="hljs-keyword">type</span> manualInjection;
-            massTotal <span class="hljs-number">0.0001</span>;
-            parcelBasisType mass;
-            SOI <span class="hljs-number">0</span>;
-            positionsFile <span class="hljs-string">"limestonePositions"</span>;
-            U0 (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            sizeDistribution
-            {
-                <span class="hljs-keyword">type</span> RosinRammler;
-                RosinRammlerDistribution
-                {
-                    minValue <span class="hljs-number">5e-06</span>;
-                    maxValue <span class="hljs-number">0.000565</span>;
-                    lambda <span class="hljs-number">4.8e-05</span>;
-                    n <span class="hljs-number">0.5</span>;
-                }
-            }
-        }
-    }
-    dispersionModel stochasticDispersionRAS;
-    patchInteractionModel standardWallInteraction;
-    heatTransferModel RanzMarshall;
-    stochasticCollisionModel none;
-    surfaceFilmModel none;
-    radiation <span class="hljs-literal">on</span>;
-    standardWallInteractionCoeffs
-    {
-        <span class="hljs-keyword">type</span> rebound;
-        e <span class="hljs-number">1</span>;
-        mu <span class="hljs-number">0</span>;
-    }
-    RanzMarshallCoeffs
-    {
-        BirdCorrection <span class="hljs-literal">false</span>;
-    }
-}
-cloudFunctions
-{
-    particleDose1
-    {
-        <span class="hljs-keyword">type</span> particleDose;
-        GName G;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/coalchemistryfoam/">coalChemistryFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -435,6 +306,6 @@ cloudFunctions
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

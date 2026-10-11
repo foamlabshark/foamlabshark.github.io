@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,197 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>多孔过滤段中的液滴输运与蒸发</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>模拟多孔过滤通道中的空气压降、液滴输运与蒸发，建立气液质量收支。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>含湿气流经过过滤段时，气体受到多孔阻力，液滴则受惯性、壁面碰撞与传热传质影响。气相压降、液滴蒸发和表面捕集属于不同过程，各自需要对应的模型和统计量。仅凭出口液滴减少，尚不能确定其中多少来自蒸发或沉积。</p>
-<p>算例在扩张通道内设置等效多孔区，通过查表方式注入水滴，并计算液滴升温与蒸发。基准壁面采用反弹，分析内容为输运和穿透；研究捕集时，对指定滤面施加黏附条件并单独输出沉积质量。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/particle-filter-geometry.webp" alt="多孔过滤段中的液滴输运与蒸发：配套模型与基准输入"></p>
-<p>通道长 4 m，进出口高度 0.5 m，扩张段高度 1 m，展向厚度 0.1 m，采用二维边界。<code>topoSet</code> 建立 <code>filter</code> 单元区，<code>createBaffles</code> 构造循环挡板连接。</p>
-<p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter">OpenFOAM v2512 · lagrangian/reactingParcelFoam/filter</a>。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>设置位置与作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>空气入口</td>
-<td>5 m/s、350 K</td>
-<td><code>0.orig/U</code>、<code>T</code></td>
-</tr>
-<tr>
-<td>壁面温度</td>
-<td>400 K</td>
-<td><code>0.orig/T/walls</code></td>
-</tr>
-<tr>
-<td>轴向黏性阻力系数</td>
-<td>500000 m⁻²</td>
-<td><code>constant/fvOptions/filter1</code></td>
-</tr>
-<tr>
-<td>液滴注入</td>
-<td>0.5 s 开始、持续 1 s、总质量 0.01 kg</td>
-<td><code>constant/reactingCloud1Properties</code></td>
-</tr>
-<tr>
-<td>注入状态</td>
-<td>由 <code>parcelInjectionProperties</code> 读取</td>
-<td>位置、速度、温度与粒径统一在查表文件中</td>
-</tr>
-</tbody></table></div>
-<h2 id="求解方法与物理模型"><a href="#求解方法与物理模型" class="headerlink" title="求解方法与物理模型"></a>求解方法与物理模型</h2><p>过滤区动量损失采用 Darcy–Forchheimer 形式，沿主流方向可写为 <span class="math-formula" data-tex="\Delta p/L=\mu D U+\tfrac12\rho F|U|U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>p</mi><mi mathvariant="normal">/</mi><mi>L</mi><mo>=</mo><mi>μ</mi><mi>D</mi><mi>U</mi><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mi>ρ</mi><mi>F</mi><mi mathvariant="normal">∣</mi><mi>U</mi><mi mathvariant="normal">∣</mi><mi>U</mi></mrow><annotation encoding="application/x-tex">\Delta p/L=\mu D U+\tfrac12\rho F|U|U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Δ</span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathnormal" style="margin-right:0.1389em;">ρF</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span></span>。液滴惯性以 <span class="math-formula" data-tex="St=\tau_pU/L_c"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>t</mi><mo>=</mo><msub><mi>τ</mi><mi>p</mi></msub><mi>U</mi><mi mathvariant="normal">/</mi><msub><mi>L</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">St=\tau_pU/L_c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 衡量，蒸发则改变液滴质量与气相水分。若配置沉积边界，捕集效率由 <span class="math-formula" data-tex="\eta=m_{\mathrm{deposit}}/m_{\mathrm{in}}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><msub><mi>m</mi><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">t</mi></mrow></msub><mi mathvariant="normal">/</mi><msub><mi>m</mi><mrow><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\eta=m_{\mathrm{deposit}}/m_{\mathrm{in}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">deposit</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">in</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 定义，并与蒸发损失分别统计。</p>
-<p>本例使用 <code>reactingParcelFoam</code>。网格与边界定义在 <code>constant</code> 和初始场目录，离散格式和方程求解设置分别位于 <code>system/fvSchemes</code>、<code>system/fvSolution</code>；多区域模型在相应区域子目录中保存这些文件。</p>
-<h2 id="获取文件与准备网格"><a href="#获取文件与准备网格" class="headerlink" title="获取文件与准备网格"></a>获取文件与准备网格</h2><p><a href="/downloads/engineering/particle-filter.zip">下载完整算例包</a>。包内包含模型资源、初始场、物性、数值设置、运行脚本和来源记录。</p>
-<p>先在 Linux 终端加载 OpenCFD OpenFOAM <code>v2512</code>。采用标准软件包安装路径时执行下列命令；安装在其他目录时，将路径改为该安装目录下的 <code>etc/bashrc</code>。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-</code></pre></div>
-<p>输出应为 <code>v2512</code>。随后进入下载目录，解压并生成网格：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">unzip particle-filter.zip
-<span class="hljs-built_in">cd</span> particle-filter
-bash Allmesh
-</code></pre></div>
-<p><code>Allmesh</code> 按下表顺序生成网格并执行 <code>checkMesh</code>，每一步的输出保存在相应 <code>log.*</code> 文件中。脚本在命令失败或网格检查不通过时停止。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>网格步骤</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>复制初始场</td>
-<td>把 0.orig 中的初始场复制到 0 目录。</td>
-</tr>
-<tr>
-<td><code>blockMesh</code></td>
-<td>按顶点、块结构和加密比例生成背景网格。</td>
-</tr>
-<tr>
-<td><code>topoSet</code></td>
-<td>按位置或曲面生成网格选区，供运动、热源、阻力或初始场使用。</td>
-</tr>
-<tr>
-<td><code>createBaffles -overwrite</code></td>
-<td>把指定内部面转成成对边界，形成挡板或叶片表面。</td>
-</tr>
-</tbody></table></div>
-<p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-过滤区阻力"><a href="#1-过滤区阻力" class="headerlink" title="1. 过滤区阻力"></a>1. 过滤区阻力</h3><p>文件：<code>constant/fvOptions</code>。本段设置过滤区阻力。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">filter1
-{
-    <span class="hljs-keyword">type</span> explicitPorositySource;
-    explicitPorositySourceCoeffs
-    {
-        selectionMode cellZone;
-        cellZone filter;
-        <span class="hljs-keyword">type</span> DarcyForchheimer;
-        d (<span class="hljs-number">500000</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
-        f (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        coordinateSystem
-        {
-            origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
-        }
-    }
-}
-</code></pre></div>
-<p><code>cellZone filter</code> 指定阻力区域，<code>d</code> 和局部坐标系共同规定各方向黏性阻力。检查选区范围和方向后，才能将压差变化归因于阻力系数。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/fvOptions">查看该配置的官方原文件</a>。</p>
-<h3 id="2-液滴注入状态"><a href="#2-液滴注入状态" class="headerlink" title="2. 液滴注入状态"></a>2. 液滴注入状态</h3><p>文件：<code>constant/reactingCloud1Properties</code>。本段设置液滴注入状态。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">model1
-{
-    <span class="hljs-keyword">type</span> reactingMultiphaseLookupTableInjection;
-    massTotal <span class="hljs-number">1e-2</span>;
-    parcelBasisType mass;
-    SOI <span class="hljs-number">0.5</span>;
-    inputFile <span class="hljs-string">"parcelInjectionProperties"</span>;
-    duration <span class="hljs-number">1.0</span>;
-    parcelsPerSecond <span class="hljs-number">250</span>;
-    randomise <span class="hljs-literal">true</span>;
-}
-</code></pre></div>
-<p>查表注入文件逐项给出位置、速度、温度和粒径，<code>massTotal</code> 规定整个注入阶段的质量。该方式可组织多个入口或不同液滴状态。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/reactingCloud1Properties">查看该配置的官方原文件</a>。</p>
-<h3 id="3-反弹、流出与沉积"><a href="#3-反弹、流出与沉积" class="headerlink" title="3. 反弹、流出与沉积"></a>3. 反弹、流出与沉积</h3><p>文件：<code>constant/reactingCloud1Properties</code>。本段设置反弹、流出与沉积。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">localInteractionCoeffs
-{
-    patches
-    (
-        <span class="hljs-string">"(walls|cyc.*)"</span>
-        {
-            <span class="hljs-keyword">type</span> rebound;
-        }
-        <span class="hljs-string">"(inlet|outlet)"</span>
-        {
-            <span class="hljs-keyword">type</span> escape;
-        }
-    );
-    writeToFile <span class="hljs-literal">yes</span>;
-}
-</code></pre></div>
-<p>壁面 <code>rebound</code> 计算反弹，进出口 <code>escape</code> 记录离开。研究沉积时将目标滤面设为 <code>stick</code>，并保留其他壁面的独立统计。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/reactingCloud1Properties">查看该配置的官方原文件</a>。</p>
-<h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
-<span class="hljs-built_in">tail</span> -n 40 log.reactingParcelFoam
-</code></pre></div>
-<p><code>Allsolve</code> 读取生成的网格和初始场，调用 <code>reactingParcelFoam</code>；日志用于观察残差、连续性误差及本模型的迭代信息。时间控制给出计算起止位置和输出频率。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>控制项</th>
-<th>配置值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>startFrom</code></td>
-<td><code>startTime</code></td>
-</tr>
-<tr>
-<td><code>startTime</code></td>
-<td><code>0</code></td>
-</tr>
-<tr>
-<td><code>endTime</code></td>
-<td><code>5</code></td>
-</tr>
-<tr>
-<td><code>deltaT</code></td>
-<td><code>0.001</code></td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>adjustable</code></td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td><code>0.1</code></td>
-</tr>
-<tr>
-<td><code>adjustTimeStep</code></td>
-<td><code>yes</code></td>
-</tr>
-<tr>
-<td><code>maxCo</code></td>
-<td><code>1.0</code></td>
-</tr>
-</tbody></table></div>
-<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选流体内部与液滴，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>利用 <code>pressureDifference</code> 读取过滤段压差，观察扩张段内液滴轨迹、温度和直径。统计入口质量、出口液滴质量、域内存量及进入气相的蒸发水分，使各项质量去向闭合。</p>
-<p>先改变多孔阻力系数，分析压降与流量分布；再保持流场参数一致，比较初始粒径和壁温对蒸发的影响。采用黏附边界后，增加沉积质量曲线，将捕集与蒸发分别计入收支。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 多孔阻力作用于气相动量，液滴捕集由颗粒相互作用模型定义。评价过滤效率时，使用明确的沉积质量统计。</p>
-</blockquote>
-<h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
-<li><a href="/downloads/engineering/particle-filter.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter">v2512 官方算例目录</a>：核对原始几何、物性和网格流程。</li>
-<li><code>SOURCE.json</code> 记录来源与本站调整；<code>files.sha256</code> 用于核对包内文件；<code>VALIDATION.json</code> 记录网格检查和短步运行结果。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -496,6 +306,6 @@ bash Allmesh
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

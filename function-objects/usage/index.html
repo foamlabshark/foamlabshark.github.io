@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   <script src="/assets/function-objects.js?v=2d3cba1704ad" defer></script>
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -272,144 +272,11 @@
 </section>
 
   <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/function-objects/">← 返回函数对象速查</a></div><div class="article-shell">
-  <article class="article" data-cms-slug="">
+  <article class="article" data-cms-slug="reference-function-object-usage" data-cms-state="loading">
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>functionObject 配置方法</h1>
-    
-    <div class="prose"><p><code>functionObject</code> 在求解过程中完成场运算、采样、统计和结果输出。例如 <code>probes</code> 记录测点压力，<code>forces</code> 积分壁面载荷，<code>mag</code> 把速度向量转换为速度大小。一个算例可以同时配置多个对象。</p>
-<h2 id="1-在-controlDict-中添加对象"><a href="#1-在-controlDict-中添加对象" class="headerlink" title="1. 在 controlDict 中添加对象"></a>1. 在 controlDict 中添加对象</h2><p>在已有算例的 <code>system/controlDict</code> 中找到 <code>functions</code>，加入下面的对象：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    speed
-    {
-        <span class="hljs-keyword">type</span> mag;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        field U;
-        result speed;
-        executeControl timeStep;
-        executeInterval <span class="hljs-number">1</span>;
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-    }
-}
-</code></pre></div>
-<p><code>speed</code> 是对象名；<code>type mag</code> 选择求模运算。输入为速度场 <code>U</code>，输出为标量场 <code>speed</code>。每一步更新结果，在求解器保存完整场时同时保存它。运行原算例的求解器后，时间目录中会出现 <code>speed</code>，可在 ParaView 中选择该场查看速度云图。</p>
-<h2 id="2-把对象放在单独文件"><a href="#2-把对象放在单独文件" class="headerlink" title="2. 把对象放在单独文件"></a>2. 把对象放在单独文件</h2><p>对象较多时，可以把 <code>functions</code> 内的对象放到 <code>system/functions</code> 中，主文件保留：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    <span class="hljs-meta">#include "functions"</span>
-}
-</code></pre></div>
-<p>这里的 <code>system/functions</code> 直接从 <code>speed { ... }</code> 这样的对象开始写。若原算例已经使用这一方式，就在已有的 <code>system/functions</code> 中添加新对象。</p>
-<h2 id="3-对已有结果执行后处理"><a href="#3-对已有结果执行后处理" class="headerlink" title="3. 对已有结果执行后处理"></a>3. 对已有结果执行后处理</h2><p>对于只依赖已保存字段的运算，可以使用 <code>postProcess</code>。例如处理已保存的速度场：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># 最新时刻的速度大小</span>
-postProcess -func <span class="hljs-string">'mag(U)'</span> -latestTime
-
-<span class="hljs-comment"># 指定时间区间的速度梯度</span>
-postProcess -func <span class="hljs-string">'grad(U)'</span> -<span class="hljs-keyword">time</span> <span class="hljs-string">'0.1:0.5'</span>
-
-<span class="hljs-comment"># 指定算例的涡量</span>
-postProcess -<span class="hljs-keyword">case</span> ../cavity -func vorticity -latestTime
-</code></pre></div>
-<p>这些命令调用已安装的预配置模板。需要修改输出名或更多参数时，使用完整字典。以另存的 <code>system/myPostProcess</code> 为例，文件内放置一个 <code>functions { ... }</code> 字典，然后运行：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">postProcess -dict system/myPostProcess -fields <span class="hljs-string">'(U p)'</span> -latestTime
-</code></pre></div>
-<p><code>forces</code>、<code>yPlus</code> 等需要动量或湍流模型的工具，通常随求解器运行最方便。求解器提供 <code>-postProcess</code> 接口时，也可由该求解器建立所需模型后执行，例如：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleFoam -postProcess -dict system/myPostProcess -latestTime
-</code></pre></div>
-<h2 id="4-常用参数"><a href="#4-常用参数" class="headerlink" title="4. 常用参数"></a>4. 常用参数</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>设置方法</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>type</code></td>
-<td><code>probes</code>、<code>forces</code> 等类型名</td>
-<td>选择功能对象</td>
-</tr>
-<tr>
-<td><code>libs</code></td>
-<td>例如 <code>(sampling)</code>、<code>(forces)</code></td>
-<td>加载对应共享库</td>
-</tr>
-<tr>
-<td><code>enabled</code></td>
-<td><code>true</code> 或 <code>false</code></td>
-<td>启用或暂时停用对象</td>
-</tr>
-<tr>
-<td><code>region</code></td>
-<td>默认 <code>region0</code>，或填写区域名</td>
-<td>基于网格的对象选择工作区域</td>
-</tr>
-<tr>
-<td><code>executeControl</code></td>
-<td><code>timeStep</code>、<code>writeTime</code>、<code>runTime</code> 等</td>
-<td>何时计算或更新</td>
-</tr>
-<tr>
-<td><code>executeInterval</code></td>
-<td>与执行方式配套的数值</td>
-<td>执行间隔</td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>timeStep</code>、<code>writeTime</code>、<code>runTime</code> 等</td>
-<td>何时保存结果</td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td>与写出方式配套的数值</td>
-<td>保存间隔</td>
-</tr>
-<tr>
-<td><code>timeStart</code> / <code>timeEnd</code></td>
-<td>模拟时间</td>
-<td>工作时间范围</td>
-</tr>
-</tbody></table></div>
-<p><code>timeStep</code> 的间隔是步数；<code>runTime</code> 的间隔是模拟时间；<code>writeTime</code> 跟随主计算的保存时刻。<code>onEnd</code> 在计算结束时调用，<code>none</code> 关闭对应调度。还有按实际耗时触发的 <code>clockTime</code>、<code>cpuTime</code>，以及参与输出时间对齐的 <code>adjustableRunTime</code>。</p>
-<p>例如平均场应每步累积，而文件可以每十步保存一次：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">executeControl timeStep;
-executeInterval <span class="hljs-number">1</span>;
-writeControl timeStep;
-writeInterval <span class="hljs-number">10</span>;
-</code></pre></div>
-<h2 id="5-查看输出"><a href="#5-查看输出" class="headerlink" title="5. 查看输出"></a>5. 查看输出</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>输出内容</th>
-<th>常见位置</th>
-<th>查看方式</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>速度模、梯度等场</td>
-<td>算例的时间目录</td>
-<td>ParaView 中选择相应字段</td>
-</tr>
-<tr>
-<td>探针时序与统计值</td>
-<td><code>postProcessing/对象名/起始时间/</code></td>
-<td>文本、Python 或其他绘图工具</td>
-</tr>
-<tr>
-<td>VTK、EnSight 等导出文件</td>
-<td>工具的输出目录</td>
-<td>用对应格式读取器打开</td>
-</tr>
-<tr>
-<td>运行信息与诊断</td>
-<td>求解日志</td>
-<td>按对象名搜索</td>
-</tr>
-</tbody></table></div>
-<p>多个对象有输入依赖时，按生成顺序排列。例如先用 <code>mag</code> 生成 <code>speed</code>，再让 <code>histogram</code> 统计 <code>speed</code> 的分布。时间平均等对象需要连续采样，统计区间和执行频率应在计算前设好。</p>
-<p><a href="/function-objects/">返回 functionObject 速查</a></p>
-</div>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -439,6 +306,6 @@ writeInterval <span class="hljs-number">10</span>;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

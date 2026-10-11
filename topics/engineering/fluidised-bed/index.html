@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,172 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>Goldschmidt 流化床的颗粒膨胀</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>模拟 Goldschmidt 准二维颗粒床的通气膨胀，计算床层高度、压降和颗粒混合。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>向上的气流通过颗粒床时，曳力逐渐抵消颗粒有效重量。达到流化条件后，床层膨胀并出现随时间变化的稀疏区和致密区，改变颗粒混合、停留时间及相间交换。床高与压降因此是理解流态化过程的两个基本量。</p>
-<p>算例按给定位置装填玻璃颗粒，以 <code>MPPICFoam</code> 求解气流和颗粒团运动，颗粒应力模型限制高浓度区域的过度堆积。在相同装料条件下改变入口表观气速，比较床层膨胀、波动与压力支撑。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/fluidised-bed-geometry.webp" alt="Goldschmidt 流化床的颗粒膨胀：配套模型与基准输入"></p>
-<p>床体宽 150 mm、高 450 mm、厚 15 mm，厚度方向为单层单元和对称边界。颗粒直径 2.5 mm、密度 2526 kg/m³。<code>kinematicCloudPositions</code> 给出初始装料位置，手动注入模型在 <code>t</code> = 0 读取该文件。</p>
-<p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt">OpenFOAM v2512 · lagrangian/MPPICFoam/Goldschmidt</a>。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>设置位置与作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>入口表观速度</td>
-<td>1.875 m/s</td>
-<td><code>0/U.air/bottom/inletVelocity</code></td>
-</tr>
-<tr>
-<td>颗粒直径、密度</td>
-<td>2.5 mm、2526 kg/m³</td>
-<td><code>constant/kinematicCloudProperties</code></td>
-</tr>
-<tr>
-<td>初始速度</td>
-<td>颗粒与域内气体均为零</td>
-<td>初始场及 <code>manualInjection/U0</code></td>
-</tr>
-<tr>
-<td>曳力模型</td>
-<td>PlessisMasliyahDrag</td>
-<td>颗粒受力配置</td>
-</tr>
-</tbody></table></div>
-<h2 id="求解方法与物理模型"><a href="#求解方法与物理模型" class="headerlink" title="求解方法与物理模型"></a>求解方法与物理模型</h2><p>气固体积分数满足 <span class="math-formula" data-tex="\alpha_g+\alpha_s=1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mi>g</mi></msub><mo>+</mo><msub><mi>α</mi><mi>s</mi></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha_g+\alpha_s=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span>。床层达到近似悬浮平衡时，压降可与单位截面颗粒有效重量比较：<span class="math-formula" data-tex="\Delta p\approx(\rho_s-\rho_g)(1-\varepsilon)gH"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>p</mi><mo>≈</mo><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>s</mi></msub><mo>−</mo><msub><mi>ρ</mi><mi>g</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>ε</mi><mo stretchy="false">)</mo><mi>g</mi><mi>H</mi></mrow><annotation encoding="application/x-tex">\Delta p\approx(\rho_s-\rho_g)(1-\varepsilon)gH</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">Δ</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ε</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></span>。入口边界将表观速度 <span class="math-formula" data-tex="U_s"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mi>s</mi></msub></mrow><annotation encoding="application/x-tex">U_s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 转为孔隙内速度 <span class="math-formula" data-tex="U_g=U_s/\alpha_g"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mi>g</mi></msub><mo>=</mo><msub><mi>U</mi><mi>s</mi></msub><mi mathvariant="normal">/</mi><msub><mi>α</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">U_g=U_s/\alpha_g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span>，因此床层固相比例变化会影响局部气速。</p>
-<p>本例使用 <code>MPPICFoam</code>。网格与边界定义在 <code>constant</code> 和初始场目录，离散格式和方程求解设置分别位于 <code>system/fvSchemes</code>、<code>system/fvSolution</code>；多区域模型在相应区域子目录中保存这些文件。</p>
-<h2 id="获取文件与准备网格"><a href="#获取文件与准备网格" class="headerlink" title="获取文件与准备网格"></a>获取文件与准备网格</h2><p><a href="/downloads/engineering/fluidised-bed.zip">下载完整算例包</a>。包内包含模型资源、初始场、物性、数值设置、运行脚本和来源记录。</p>
-<p>先在 Linux 终端加载 OpenCFD OpenFOAM <code>v2512</code>。采用标准软件包安装路径时执行下列命令；安装在其他目录时，将路径改为该安装目录下的 <code>etc/bashrc</code>。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-</code></pre></div>
-<p>输出应为 <code>v2512</code>。随后进入下载目录，解压并生成网格：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">unzip fluidised-bed.zip
-<span class="hljs-built_in">cd</span> fluidised-bed
-bash Allmesh
-</code></pre></div>
-<p><code>Allmesh</code> 按下表顺序生成网格并执行 <code>checkMesh</code>，每一步的输出保存在相应 <code>log.*</code> 文件中。脚本在命令失败或网格检查不通过时停止。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>网格步骤</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>blockMesh</code></td>
-<td>按顶点、块结构和加密比例生成背景网格。</td>
-</tr>
-</tbody></table></div>
-<p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-表观气速边界"><a href="#1-表观气速边界" class="headerlink" title="1. 表观气速边界"></a>1. 表观气速边界</h3><p>文件：<code>0/U.air</code>。本段设置表观气速边界。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">bottom
-{
-    <span class="hljs-keyword">type</span> interstitialInletVelocity;
-    inletVelocity <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
-    phi phi.air;
-    alpha alpha.air;
-}
-</code></pre></div>
-<p><code>interstitialInletVelocity</code> 将 1.875 m/s 的表观速度除以局部气相体积分数，得到孔隙内速度，从而维持所需气体流量。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/0/U.air">查看该配置的官方原文件</a>。</p>
-<h3 id="2-初始颗粒装填"><a href="#2-初始颗粒装填" class="headerlink" title="2. 初始颗粒装填"></a>2. 初始颗粒装填</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置初始颗粒装填。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">model1
-{
-    <span class="hljs-keyword">type</span> manualInjection;
-    massTotal <span class="hljs-number">0</span>;
-    parcelBasisType fixed;
-    nParticle <span class="hljs-number">1</span>;
-    SOI <span class="hljs-number">0</span>;
-    positionsFile <span class="hljs-string">"kinematicCloudPositions"</span>;
-    U0 (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    sizeDistribution
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        fixedValueDistribution
-        {
-            <span class="hljs-keyword">value</span> <span class="hljs-number">0.0025</span>;
-        }
-    }
-}
-</code></pre></div>
-<p>初始粒子位置、粒径、材料密度与 <code>nParticle 1</code> 共同确定装料质量。<code>parcelBasisType fixed</code> 固定粒子团权重，此时 <code>massTotal 0</code> 不承担装料量定义。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
-<h3 id="3-高浓度颗粒应力"><a href="#3-高浓度颗粒应力" class="headerlink" title="3. 高浓度颗粒应力"></a>3. 高浓度颗粒应力</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置高浓度颗粒应力。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">packingModel explicit;
-explicitCoeffs
-{
-    particleStressModel
-    {
-        <span class="hljs-keyword">type</span> HarrisCrighton;
-        alphaPacked <span class="hljs-number">0.65</span>;
-        pSolid <span class="hljs-number">10.0</span>;
-        beta <span class="hljs-number">2.0</span>;
-        eps <span class="hljs-number">1.0e-7</span>;
-    }
-    correctionLimitingMethod
-    {
-        <span class="hljs-keyword">type</span> absolute;
-        e <span class="hljs-number">0.9</span>;
-    }
-}
-implicitCoeffs
-</code></pre></div>
-<p>颗粒应力随固相浓度上升而加强，抵抗局部过度压缩。<code>alphaPacked</code> 规定堆积相关尺度，会影响致密区和床层膨胀。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
-<h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
-<span class="hljs-built_in">tail</span> -n 40 log.MPPICFoam
-</code></pre></div>
-<p><code>Allsolve</code> 读取生成的网格和初始场，调用 <code>MPPICFoam</code>；日志用于观察残差、连续性误差及本模型的迭代信息。时间控制给出计算起止位置和输出频率。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>控制项</th>
-<th>配置值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>startFrom</code></td>
-<td><code>startTime</code></td>
-</tr>
-<tr>
-<td><code>startTime</code></td>
-<td><code>0</code></td>
-</tr>
-<tr>
-<td><code>endTime</code></td>
-<td><code>5</code></td>
-</tr>
-<tr>
-<td><code>deltaT</code></td>
-<td><code>2e-4</code></td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>runTime</code></td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td><code>0.01</code></td>
-</tr>
-</tbody></table></div>
-<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选气相内部与颗粒，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.air</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>由气相体积分数得到固相分布，结合粒子位置观察床面和内部稀疏区的演化。以统一阈值识别床面，统计平均床高及波动幅度，并输出床底与床上方压差。</p>
-<p>在相同装料下逐级调整入口气速，覆盖多个床层波动周期后比较平均结果。网格、计算粒子数量和颗粒应力参数分别变化，用于分析空间分辨率、统计分辨率和闭合模型的影响。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 入口设置为表观气速，即体积流量除以空床截面积。与实验比较时采用同一速度定义。</p>
-</blockquote>
-<h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
-<li><a href="/downloads/engineering/fluidised-bed.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt">v2512 官方算例目录</a>：核对原始几何、物性和网格流程。</li>
-<li><code>SOURCE.json</code> 记录来源与本站调整；<code>files.sha256</code> 用于核对包内文件；<code>VALIDATION.json</code> 记录网格检查和短步运行结果。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -471,6 +306,6 @@ implicitCoeffs
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

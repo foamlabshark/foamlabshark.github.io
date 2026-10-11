@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,66 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>快速开始</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>OpenFOAM 的一次计算通常包括准备文件、生成网格、运行求解器和查看结果。这里用顶盖驱动方腔完成这四步。</p>
-<h2 id="加载环境"><a href="#加载环境" class="headerlink" title="加载环境"></a>加载环境</h2><p>以下命令在 Linux 终端运行。还未安装时，先阅读<a href="/read/?slug=start-openfoam-v2512">安装课程</a>；第一次接触终端，可以从 <a href="/linux/">Linux 入门</a>开始。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-icoFoam -<span class="hljs-built_in">help</span>
-</code></pre></div>
-<p>第一行适用于安装到该路径的 Ubuntu 软件包。其他安装位置请替换为实际的 <code>etc/bashrc</code>。第二行应输出 <code>v2512</code>；第三行显示方腔所用求解器的参数。</p>
-<h2 id="复制方腔算例"><a href="#复制方腔算例" class="headerlink" title="复制方腔算例"></a>复制方腔算例</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/icoFoam/cavity/cavity"</span> cavity-first
-<span class="hljs-built_in">cd</span> cavity-first
-<span class="hljs-built_in">ls</span>
-</code></pre></div>
-<p><code>cp -r</code> 复制整个目录，<code>cavity-first</code> 是本次练习的名称。若已经用过这个名称，换一个新名称。复制后可以看到三个主要目录：</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>目录</th>
-<th>本例包含什么</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>0</code></td>
-<td>速度 <code>U</code>、压力 <code>p</code> 的初值与边界条件</td>
-</tr>
-<tr>
-<td><code>constant</code></td>
-<td>流体黏度；生成网格后还会出现 <code>polyMesh</code></td>
-</tr>
-<tr>
-<td><code>system</code></td>
-<td>网格描述、离散格式、线性求解和时间控制</td>
-</tr>
-</tbody></table></div>
-<h2 id="生成网格"><a href="#生成网格" class="headerlink" title="生成网格"></a>生成网格</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">blockMesh
-checkMesh
-</code></pre></div>
-<p><code>blockMesh</code> 按 <code>system/blockMeshDict</code> 生成 <span class="math-formula" data-tex="20\times20\times1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn><mo>×</mo><mn>20</mn><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">20\times20\times1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span> 个单元。<code>checkMesh</code> 随后检查连接与几何，正常输出包含 <code>Mesh OK</code>。</p>
-<p><img src="/assets/science/cavity-mesh.png" alt="方腔网格"></p>
-<p>本例是二维方腔。厚度方向只有一层单元，前后边界设置为 <code>empty</code>；顶盖以 <span class="math-formula" data-tex="1\,\mathrm{m/s}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mtext> </mtext><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">s</mi></mrow></mrow><annotation encoding="application/x-tex">1\,\mathrm{m/s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">m/s</span></span></span></span></span></span> 沿水平方向运动，其余壁面静止。</p>
-<h2 id="运行计算"><a href="#运行计算" class="headerlink" title="运行计算"></a>运行计算</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">icoFoam &gt; log.icoFoam 2&gt;&amp;1
-<span class="hljs-built_in">tail</span> -n 20 log.icoFoam
-</code></pre></div>
-<p>第一行运行求解器，把输出与错误信息保存到 <code>log.icoFoam</code>。程序结束后，第二行显示日志最后 20 行。计算至 <span class="math-formula" data-tex="0.5\,\mathrm{s}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5</mn><mtext> </mtext><mi mathvariant="normal">s</mi></mrow><annotation encoding="application/x-tex">0.5\,\mathrm{s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathrm">s</span></span></span></span></span>，结果按 <code>controlDict</code> 中的写出间隔保存在时间目录中。</p>
-<p>日志中的 <code>Time</code> 是当前时刻，<code>Solving for</code> 后是所求的场，<code>Initial residual</code> 和 <code>Final residual</code> 是线性方程求解前后的残差。各项的计算含义在<a href="/read/?slug=first-cavity-result">方腔课程</a>中展开。</p>
-<h2 id="查看速度场"><a href="#查看速度场" class="headerlink" title="查看速度场"></a>查看速度场</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">paraFoam -<span class="hljs-built_in">builtin</span>
-</code></pre></div>
-<p>在 ParaView 中点击 <strong>Apply</strong>，切换到最后一个时刻，着色字段选择 <strong><code>U</code> → Magnitude</strong>。可以看到顶盖驱动的回流。</p>
-<p><img src="/assets/science/cavity-velocity.png" alt="方腔速度大小"></p>
-<p>若计算在无图形界面的服务器上进行，可创建读取入口，再把算例复制到安装了 ParaView 的电脑：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">touch</span> cavity.foam
-</code></pre></div>
-<p>打开 <code>cavity.foam</code> 时，保留同目录下的网格和结果文件。</p>
-<h2 id="接着学什么"><a href="#接着学什么" class="headerlink" title="接着学什么"></a>接着学什么</h2><ul>
-<li><a href="/read/?slug=case-structure-dimensions">算例结构与字典语法</a>：看懂文件中的条目、列表和量纲。</li>
-<li><a href="/read/?slug=first-cavity-result">顶盖驱动方腔</a>：解释边界、雷诺数和计算结果。</li>
-<li><a href="/read/?slug=blockmesh-first-principles">blockMesh</a>：修改网格并比较结果。</li>
-<li><a href="/cpp/">C++ 入门</a>：为自定义 OpenFOAM 程序准备基础。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -365,6 +306,6 @@ checkMesh
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

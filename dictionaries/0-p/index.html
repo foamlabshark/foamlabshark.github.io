@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,169 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>p</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>压力标量场。不可压缩求解器常使用运动学压力，可压缩求解器通常使用 Pa。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>p</code> 既参与压力梯度的动量作用，也在压力速度耦合中帮助满足流量守恒。配置前应明确求解器使用实际压力还是运动学压力，再设置初值、出口或壁面条件；封闭不可压缩区域还需安排压力参考基准。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>0/p</code></p><h2>配置方法</h2><p><code>p</code> 保存压力。字段名相同，但单位由求解器决定：<code>simpleFoam</code>、<code>icoFoam</code> 等常密度不可压缩案例常使用运动学压力；可压缩热物性求解器通常使用 Pa。查看文件的 <code>dimensions</code> 可以区分。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">场量纲与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>分别为字段量纲与内部单元初值；<code>uniform</code> 表示统一值，<code>nonuniform</code> 列表长度需匹配网格。</td></tr><tr><td><code>boundaryField.&lt;patch&gt;.type / value</code></td><td><code>type</code> 选择该字段的边界条件。<code>value</code> 在 <code>fixedValue</code> 中为指定值，在许多派生条件中仅作初始化。</td></tr><tr><td><code>&lt;patch&gt;</code></td><td><code>movingWall</code>、<code>fixedWalls</code>、<code>upperWall</code>、<code>lowerWall</code>、<code>inlet</code>、<code>outlet</code> 等均为算例自定名称，要与 <code>constant/polyMesh/boundary</code> 对应。</td></tr></tbody></table></div><p><a href="/boundary-conditions/p-total-pressure/">totalPressure 的参数、示例与配套算例</a></p><p><a href="/boundary-conditions/p-fixed-value/">fixedValue 的参数、示例与配套算例</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 不可压缩通道压力</h3><p>以下片段放在 <code>0/p</code> 的文件头之后，文件头使用 <code>class volScalarField</code> 和 <code>object p</code>。网格具有表中列出的四个 <code>patch</code>。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-</code></pre></div>
-<p><code>[0 2 -2 0 0 0 0]</code> 对应 m²/s²，即物理压力除以恒定密度。出口固定为零，建立压力参考；入口与静止壁面使用此通道案例中的零梯度设置。与给定入口速度配合后，压力分布由动量与连续性求出。</p>
-<p>两点压差换算为 Pa 时，使用 <span class="math-formula" data-tex="\Delta p_{\mathrm{Pa}}=\rho\Delta p"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">a</mi></mrow></msub><mo>=</mo><mi>ρ</mi><mi mathvariant="normal">Δ</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">\Delta p_{\mathrm{Pa}}=\rho\Delta p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">Δ</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">Pa</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mord">Δ</span><span class="mord mathnormal">p</span></span></span></span></span>。例如密度为 1000 kg/m³，字段压差 0.2 m²/s² 对应 200 Pa。</p>
-<p>可压缩案例的量纲为 <code>[1 -1 -2 0 0 0 0]</code>，理想气体状态方程需要绝对压力，例如 <code>internalField uniform 100000</code>。封闭的不可压缩域如果压力边界全部为梯度型，还需要在相应的 <code>PISO</code>、<code>SIMPLE</code> 或 <code>PIMPLE</code> 设置中指定压力参考。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity"><code>incompressible/icoFoam/cavity/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>不可压缩方腔的 <code>p</code> 是运动学压力，配合速度边界求解压力校正。</p>
-<ul>
-<li><code>dimensions [0 2 -2 0 0 0 0]</code> 表示 m²/s²，即物理压力除以恒定密度。</li>
-<li><code>internalField uniform 0</code> 给出统一初值。</li>
-<li>移动顶盖与固定侧壁均采用 <code>zeroGradient</code>；前后面采用 <code>empty</code>。</li>
-<li>全域压力缺少固定值边界时，配套 <code>fvSolution</code> 中的 <code>pRefCell 0</code>、<code>pRefValue 0</code> 提供参考。</li>
-</ul>
-<p>比较物理压差时再乘流体密度；变更开口边界后重新安排压力参考与速度条件。</p>
-<p><a href="/assets/examples/v2512/p/1-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p"><code>incompressible/icoFoam/cavity/cavity/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> p;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    movingWall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    fixedWalls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDaily 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption><code>pitzDaily</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>pitzDaily</code> 在出口给定运动学压力参考，让入口速度决定通过流量。</p>
-<ul>
-<li>压力量纲 <code>[0 2 -2 0 0 0 0]</code>，初值为零。</li>
-<li><code>outlet/fixedValue 0</code> 固定出口参考压力。</li>
-<li>入口与上下壁面为 <code>zeroGradient</code>，与入口定速、壁面无滑移配合。</li>
-<li><code>frontAndBack/empty</code> 保持二维约束。</li>
-</ul>
-<p>若改为压差驱动，应成组调整入口出口的 <code>p</code> 与 <code>U</code> 条件，并按目标物理问题设置压力值。</p>
-<p><a href="/assets/examples/v2512/p/2-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p"><code>incompressible/simpleFoam/pitzDaily/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> p;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    upperWall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    lowerWall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoSimpleFoam/gasMixing/injectorPipe</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoSimpleFoam/gasMixing/injectorPipe"><h3>算例问题：injectorPipe</h3><p class="reference-case-problem">流体从不同入口进入管道并混合，组分随速度场输运。算例用于检查气体混合物物性、组分入口和质量守恒，结果包括组分浓度、速度及混合区的位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe"><code>compressible/rhoSimpleFoam/gasMixing/injectorPipe</code></a>。</p></section><!-- /reference-case-contexts --><p>气体混合喷管使用可压缩求解器，这里的 <code>p</code> 是绝对物理压力。</p>
-<ul>
-<li>量纲 <code>[1 -1 -2 0 0 0 0]</code> 对应 Pa。</li>
-<li><code>internalField uniform 1e5</code> 给出 100000 Pa 初始压力。</li>
-<li>出口 <code>fixedValue</code> 通过 <code>$internalField</code> 复用同一个数值，形成给定背压。</li>
-<li><code>".*"/zeroGradient</code> 给其他一般边界默认梯度条件，公共 <code>include</code> 处理几何约束类型。</li>
-</ul>
-<p>改变背压时结合入口总压、温度和气体状态方程检查流动，尤其关注是否发生阻塞或激波。</p>
-<p><a href="/assets/examples/v2512/p/3-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p"><code>compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> p;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/icofoam/">icoFoam</a> · <a href="/commands/simplefoam/">simpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -468,6 +306,6 @@
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

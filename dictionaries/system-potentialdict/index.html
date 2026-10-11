@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,227 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>potentialDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>分子动力学势函数配置，定义粒子间相互作用、截断距离等。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>分子动力学通过相互作用势计算粒子之间的力，<code>potentialDict</code> 指定势函数及截断等参数。它与分子种类及初始状态配合，决定微观相互作用和后续运动的基础规律。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/potentialDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>sigma</code></td><td>常见为表面张力系数，但在电磁模型中可表示电导率；以模型与量纲为准。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>pair.&lt;组分对&gt;.pairPotential</code></td><td>两体势类型；O-O、Ar-Ar 是当前分子类型间的配对名称。</td></tr><tr><td><code>rMin / rCut / dr</code></td><td>两体势表的最小距离、截断距离和采样步长。</td></tr><tr><td><code>lennardJonesCoeffs.sigma / epsilon</code></td><td>Lennard–Jones 的长度与能量尺度。</td></tr><tr><td><code>maitlandSmithCoeffs.m / gamma / rm</code></td><td>Maitland–Smith 势函数的指数参数与参考距离。</td></tr><tr><td><code>energyScalingFunction</code></td><td>势能的截断/缩放函数，选择后读取其对应 <code>Coeffs</code>，例如 <code>doubleSigmoidCoeffs</code>。</td></tr><tr><td><code>doubleSigmoidCoeffs.shift1 / scale1 / shift2 / scale2</code></td><td>两段 sigmoid 的平移与尺度参数，用于调整势能切换。</td></tr><tr><td><code>electrostatic / dampedCoulombCoeffs.alpha</code></td><td>静电项及阻尼 Coulomb 模型的阻尼参数。</td></tr><tr><td><code>tether.&lt;位置类型&gt;.tetherPotential</code></td><td>系留势类型；<code>restrainedHarmonicSpringCoeffs</code> 的 <code>springConstant</code> 和 <code>rR</code> 控制弹簧与约束长度尺度。</td></tr><tr><td><code>external.gravity</code></td><td>外部重力项，作用于分子质量；与两体势分开组织。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater"><h3>算例问题：periodicCubeWater</h3><p class="reference-case-problem">周期立方体内布置水分子，通过分子相互作用计算平衡过程。分子结构、势函数和初始热状态共同决定运动，应从足够长的统计样本中检查温度、压力和能量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater"><code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater</code></a>。</p><figure class="reference-case-figure"><img alt="periodicCubeWater 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/periodic-cube.svg" width="720"><figcaption><code>periodicCubeWater</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>周期水分子体系使用分子间势计算相互作用，<code>potentialDict</code> 把短程作用与静电作用分别配置。</p>
-<ul>
-<li>氧位点之间采用 Lennard–Jones 势，<code>sigma 3.154e-10</code> m 给出长度尺度，<code>epsilon 1.07690722e-21</code> J 给出能量尺度。</li>
-<li><code>rCut 1e-9</code> 将这组作用截断在 1 nm，<code>rMin</code>、<code>dr</code> 控制查表区间和分辨率，<code>writeTables yes</code> 输出势能表。</li>
-<li>静电部分使用 <code>dampedCoulomb</code>，<code>alpha 2e9</code> 控制阻尼，<code>shiftedForce</code> 处理截断处的力连续性。</li>
-<li><code>potentialEnergyLimit 1e-18</code> 配合 <code>removalOrder</code> 处理初始化时能量过高的分子重叠。</li>
-<li><code>tether</code> 中为 <code>O</code> 定义弹簧参数，只有被标记为系留位点的分子才使用该约束；外加重力为零。</li>
-</ul>
-<p>修改势参数后先检查导出的势能及力曲线，再比较平衡密度、温度和能量波动。</p>
-<p><a href="/assets/examples/v2512/potentialdict/1-potentialDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater/system/potentialDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater/system/potentialDict"><code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeWater/system/potentialDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">95 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> potentialDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Subdictionaries specifying types of intermolecular potential.</span>
-<span class="hljs-comment">// Sub-sub dictionaries specify the potentials themselves.</span>
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Removal order</span>
-<span class="hljs-comment">// This is the order in which to remove overlapping pairs if more than one</span>
-<span class="hljs-comment">// type of molecule is present.  The most valuable molecule type is at the</span>
-<span class="hljs-comment">// right hand end, the molecule that will be removed 1st is 1st on the list.</span>
-<span class="hljs-comment">// Not all types need to be present, a molecule that is not present is</span>
-<span class="hljs-comment">// automatically less valuable than any on the list.  For molecules of the</span>
-<span class="hljs-comment">// same type there is no control over which is removed.</span>
-removalOrder ( water );
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Potential Energy Limit</span>
-<span class="hljs-comment">// Maximum permissible pair energy allowed at startup.  Used to remove</span>
-<span class="hljs-comment">// overlapping molecules created during preprocessing.</span>
-potentialEnergyLimit <span class="hljs-number">1e-18</span>;
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Pair potentials</span>
-<span class="hljs-comment">// If a pair are not present here it is assumed that they do not interact.</span>
-<span class="hljs-comment">// Electrostatic pair interactions are not listed here - they are handled</span>
-<span class="hljs-comment">// separately.</span>
-<span class="hljs-comment">// If there are r different type of molecules, and a pair force is required</span>
-<span class="hljs-comment">// between all combinations, then there are C = r(r+1)/2 combinations,</span>
-<span class="hljs-comment">// i.e. for r = {1,2,3,4}, C = {1,3,6,10} (sum of triangular numbers).</span>
-<span class="hljs-comment">// Pair potentials are specified by the combination of their ids,</span>
-<span class="hljs-comment">// for MOLA and MOLB, "MOLA-MOLB" OR "MOLB-MOLA" is acceptable</span>
-<span class="hljs-comment">// (strictly OR, both or neither will throw an error)</span>
-pair
-{
-    O-O
-    {
-        pairPotential lennardJones;
-        rCut <span class="hljs-number">1.0e-9</span>;
-        rMin <span class="hljs-number">0.1e-9</span>;
-        dr <span class="hljs-number">1e-13</span>;
-        lennardJonesCoeffs
-        {
-            sigma <span class="hljs-number">3.154e-10</span>;
-            epsilon <span class="hljs-number">1.07690722e-21</span>;
-        }
-        energyScalingFunction noScaling;
-        writeTables <span class="hljs-literal">yes</span>;
-    }
-    electrostatic
-    {
-        pairPotential dampedCoulomb;
-        rCut <span class="hljs-number">1e-9</span>;
-        rMin <span class="hljs-number">2e-11</span>;
-        dr <span class="hljs-number">2e-12</span>;
-        dampedCoulombCoeffs
-        {
-            alpha <span class="hljs-number">2e9</span>;
-        }
-        energyScalingFunction shiftedForce;
-        writeTables <span class="hljs-literal">yes</span>;
-    }
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Tethering Potentials</span>
-tether
-{
-    O
-    {
-        tetherPotential restrainedHarmonicSpring;
-        restrainedHarmonicSpringCoeffs
-        {
-            springConstant <span class="hljs-number">0.277</span>;
-            rR <span class="hljs-number">1.2e-9</span>;
-        }
-    }
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// External Forces</span>
-<span class="hljs-comment">// Bulk external forces (namely gravity) will be specified as forces rather</span>
-<span class="hljs-comment">// than potentials to allow their direction to be controlled.</span>
-external
-{
-    gravity (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon"><h3>算例问题：periodicCubeArgon</h3><p class="reference-case-problem">周期立方体内布置氩原子，通过原子间势力和牛顿运动方程计算其微观运动。平衡过程用于建立所需温度与统计状态，主要观察动能、势能、温度及压力的时间变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon"><code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon</code></a>。</p><figure class="reference-case-figure"><img alt="periodicCubeArgon 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/periodic-cube.svg" width="720"><figcaption><code>periodicCubeArgon</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>氩原子算例以 <code>Ar</code>–<code>Ar</code> 对势描述分子间作用，并输出查表结果供检查。</p>
-<ul>
-<li><code>pairPotential maitlandSmith</code> 选择 Maitland–Smith 势，<code>m 13</code>、<code>gamma 7.5</code> 控制势形状。</li>
-<li><code>rm 0.3756e-9</code> m 和 <code>epsilon 1.990108438e-21</code> J 设置长度与能量尺度。</li>
-<li><code>rCut 1e-9</code>、<code>rMin 0.15e-9</code>、<code>dr 5e-14</code> 给出势表范围与步长；<code>doubleSigmoid</code> 用 0.9 nm、0.97 nm 附近的过渡平滑处理截断。</li>
-<li>本算例 <code>Ar</code> 电荷为零，文件中保留的静电配置对这些中性粒子的库仑作用为零；tether/O 也只有对应的系留位点才使用。</li>
-</ul>
-<p><code>gravity (0 0 0)</code> 关闭外重力。改变势参数前后可比较势阱位置、势阱深度和体系平衡状态。</p>
-<p><a href="/assets/examples/v2512/potentialdict/2-potentialDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon/system/potentialDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon/system/potentialDict"><code>discreteMethods/molecularDynamics/mdEquilibrationFoam/periodicCubeArgon/system/potentialDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">101 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-n|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> potentialDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Subdictionaries specifying types of intermolecular potential.</span>
-<span class="hljs-comment">// Sub-sub dictionaries specify the potentials themselves.</span>
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Removal order</span>
-<span class="hljs-comment">// This is the order in which to remove overlapping pairs if more than one</span>
-<span class="hljs-comment">// type of molecule is present.  The most valuable molecule type is at the</span>
-<span class="hljs-comment">// right hand end, the molecule that will be removed 1st is 1st on the list.</span>
-<span class="hljs-comment">// Not all types need to be present, a molecule that is not present is</span>
-<span class="hljs-comment">// automatically less valuable than any on the list.  For molecules of the</span>
-<span class="hljs-comment">// same type there is no control over which is removed.</span>
-removalOrder ( Ar );
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Potential Energy Limit</span>
-<span class="hljs-comment">// Maximum permissible pair energy allowed at startup.  Used to remove</span>
-<span class="hljs-comment">// overlapping molecules created during preprocessing.</span>
-potentialEnergyLimit <span class="hljs-number">1e-18</span>;
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Pair potentials</span>
-<span class="hljs-comment">// If there are r different type of molecules, and a pair force is required</span>
-<span class="hljs-comment">// between all combinations, then there are C = r(r+1)/2 combinations,</span>
-<span class="hljs-comment">// i.e. for r = {1,2,3,4}, C = {1,3,6,10} (sum of triangular numbers).</span>
-<span class="hljs-comment">// Pair potentials are specified by the combination of their ids,</span>
-<span class="hljs-comment">// for MOLA and MOLB, "MOLA-MOLB" OR "MOLB-MOLA" is acceptable</span>
-<span class="hljs-comment">// (strictly OR, both or neither is an error)</span>
-pair
-{
-    Ar-Ar
-    {
-        pairPotential maitlandSmith;
-        rCut <span class="hljs-number">1.0e-9</span>;
-        rMin <span class="hljs-number">0.15e-9</span>;
-        dr <span class="hljs-number">5e-14</span>;
-        maitlandSmithCoeffs
-        {
-            m <span class="hljs-number">13.0</span>;
-            gamma <span class="hljs-number">7.5</span>;
-            rm <span class="hljs-number">0.3756e-9</span>;
-            epsilon <span class="hljs-number">1.990108438e-21</span>;
-        }
-        energyScalingFunction doubleSigmoid;
-        doubleSigmoidCoeffs
-        {
-            shift1 <span class="hljs-number">0.9e-9</span>;
-            scale1 <span class="hljs-number">0.3e11</span>;
-            shift2 <span class="hljs-number">0.97e-9</span>;
-            scale2 <span class="hljs-number">1.2e11</span>;
-        }
-        writeTables <span class="hljs-literal">yes</span>;
-    }
-    electrostatic
-    {
-        pairPotential dampedCoulomb;
-        rCut <span class="hljs-number">1.0e-9</span>;
-        rMin <span class="hljs-number">0.1e-9</span>;
-        dr <span class="hljs-number">2e-12</span>;
-        dampedCoulombCoeffs
-        {
-            alpha <span class="hljs-number">2e9</span>;
-        }
-        energyScalingFunction shiftedForce;
-        writeTables <span class="hljs-literal">yes</span>;
-    }
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Tethering Potentials</span>
-tether
-{
-    O
-    {
-        tetherPotential restrainedHarmonicSpring;
-        restrainedHarmonicSpringCoeffs
-        {
-            springConstant <span class="hljs-number">0.277</span>;
-            rR <span class="hljs-number">1.2e-9</span>;
-        }
-    }
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// External Forces</span>
-<span class="hljs-comment">// Bulk external forces (namely gravity) will be specified as forces rather</span>
-<span class="hljs-comment">// than potentials to allow their direction to be controlled.</span>
-external
-{
-    gravity (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/mdfoam/">mdFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -526,6 +306,6 @@ external
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

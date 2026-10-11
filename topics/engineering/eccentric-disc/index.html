@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,281 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>偏心圆盘旋转：水轮机背腔与周期载荷</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>依据水轮机背腔试验尺寸建立偏心圆盘，计算固定偏心轴旋转引起的间隙流动、力矩与周期载荷。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>转轮、泵叶轮与密封壳体之间的间隙流动同时受到旋转壁面和泄漏压差驱动。偏心使周向间隙不均，局部阻力与压力随位置变化，形成非对称载荷。研究这些变化有助于解释转子耗功和流体激励。</p>
-<p>流体载荷包括阻力矩、径向力和倾覆力矩。载荷与转子运动的相位关系决定流体向振动输入或吸收能量，因此平均驱动转矩与动态载荷需要分别提取。</p>
-<p>几何依据为 Song 等的 Francis 水轮机背腔转子试验。水从圆盘外周间隙进入，沿背腔向内流出；装置分别控制圆盘自转与圆心绕行。公开尺寸和转速用于重建三维间隙模型。</p>
-<p>本例采用自转与圆心绕行同速、同向的同步工况。此时圆盘等效为绕固定偏心轴作刚体旋转，圆心相对该轴运动形成圆轨迹。</p>
-<p><img src="/assets/engineering/eccentric-disc-geometry.webp" alt="偏心圆盘、圆心轨迹与水轮机背腔间隙"></p>
-<p>尺寸依据：<a href="https://www.jstage.jst.go.jp/article/ijfms/3/1/3_1_67/_article">Song 等，International Journal of Fluid Machinery and Systems 3(1), 67–79，2010，第 2 节及图 3</a>。圆盘厚度和详细试验说明见 <a href="https://doi.org/10.1115/1.4001802">Journal of Fluids Engineering 132, 071102</a>。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>取值</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>圆盘半径 <code>R</code></td>
-<td>149.5 mm</td>
-<td>外径为 299 mm</td>
-</tr>
-<tr>
-<td>圆盘厚度</td>
-<td>10 mm</td>
-<td>保留三维端面和外圆柱面</td>
-</tr>
-<tr>
-<td>平均径向间隙 <code>c</code>₁</td>
-<td>1 mm</td>
-<td>静止壳体内半径 150.5 mm</td>
-</tr>
-<tr>
-<td>轴向背腔间隙 <code>c</code>₂</td>
-<td>4 mm</td>
-<td>基准工况；再比较 2 mm 与 6 mm</td>
-</tr>
-<tr>
-<td>内侧流出半径</td>
-<td>47.5 mm</td>
-<td>背腔内侧截断边界</td>
-</tr>
-<tr>
-<td>偏心距 <code>e</code></td>
-<td>0.5 mm</td>
-<td>圆心相对固定旋转轴的距离</td>
-</tr>
-<tr>
-<td>转速 <code>n</code></td>
-<td>400 r/min</td>
-<td>自转和圆心绕行同速、同向</td>
-</tr>
-<tr>
-<td>工作介质</td>
-<td>水</td>
-<td>本节取 ρ=997.07 kg/m³、ν=1.0×10⁻⁶ m²/s</td>
-</tr>
-</tbody></table></div>
-<p>计算域包含外周密封间隙和盘后背腔，外部供水以入口条件表示，内侧在 47.5 mm 半径处设置压力出口。两段间隙保留压力分配与泄漏的主要流动路径，模型图给出截断边界和尺寸。</p>
-<p>基准工况采用论文中的无预旋输入，并以名义间隙流速与叶尖速度之比 <span class="math-formula" data-tex="v_l/U_T=0.170"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>l</mi></msub><mi mathvariant="normal">/</mi><msub><mi>U</mi><mi>T</mi></msub><mo>=</mo><mn>0.170</mn></mrow><annotation encoding="application/x-tex">v_l/U_T=0.170</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.170</span></span></span></span></span> 设定泄漏流量。这里</p>
-<p><span class="math-formula math-display" data-tex="
-U_T=\omega R,\qquad
-Q=2\pi R c_1 v_l.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>U</mi><mi>T</mi></msub><mo>=</mo><mi>ω</mi><mi>R</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mi>Q</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>R</mi><msub><mi>c</mi><mn>1</mn></msub><msub><mi>v</mi><mi>l</mi></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-U_T=\omega R,\qquad
-Q=2\pi R c_1 v_l.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">.</span></span></span></span></span></span></p>
-<p>400 r/min 对应 <span class="math-formula" data-tex="\omega=41.8879\ {\rm rad/s}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mn>41.8879</mn><mtext>&nbsp;</mtext><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">s</mi></mrow></mrow><annotation encoding="application/x-tex">\omega=41.8879\ {\rm rad/s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">41.8879</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord"><span class="mord mathrm">rad/s</span></span></span></span></span></span></span>，叶尖速度约 6.262 m/s。由此计算的名义流量约为 1.00×10⁻³ m³/s，即约 60 L/min。该流量施加在外周供水截面，背腔内侧由压力条件决定流出。</p>
-<h2 id="运动学：转轴必须放在正确位置"><a href="#运动学：转轴必须放在正确位置" class="headerlink" title="运动学：转轴必须放在正确位置"></a>运动学：转轴必须放在正确位置</h2><p>取固定旋转轴经过 <code>O</code>=(0,0,0)，方向为 <code>z</code>；初始圆心 <code>C</code>₀=(0.0005,0,0)。角速度恒定时，圆心轨迹为</p>
-<p><span class="math-formula math-display" data-tex="
-\mathbf C(t)=
-\begin{pmatrix}e\cos\omega t\\e\sin\omega t\\0\end{pmatrix}.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="bold">C</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>e</mi><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>e</mi><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\mathbf C(t)=
-\begin{pmatrix}e\cos\omega t\\e\sin\omega t\\0\end{pmatrix}.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">C</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.6em;vertical-align:-1.55em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.875em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.875em" height="3.6em" viewBox="0 0 875 3600"><path d="M863,9c0,-2,-2,-5,-6,-9c0,0,-17,0,-17,0c-12.7,0,-19.3,0.3,-20,1
-c-5.3,5.3,-10.3,11,-15,17c-242.7,294.7,-395.3,682,-458,1162c-21.3,163.3,-33.3,349,
--36,557 l0,84c0.2,6,0,26,0,60c2,159.3,10,310.7,24,454c53.3,528,210,
-949.7,470,1265c4.7,6,9.7,11.7,15,17c0.7,0.7,7,1,19,1c0,0,18,0,18,0c4,-4,6,-7,6,-9
-c0,-2.7,-3.3,-8.7,-10,-18c-135.3,-192.7,-235.5,-414.3,-300.5,-665c-65,-250.7,-102.5,
--544.7,-112.5,-882c-2,-104,-3,-167,-3,-189
-l0,-92c0,-162.7,5.7,-314,17,-454c20.7,-272,63.7,-513,129,-723c65.3,
--210,155.3,-396.3,270,-559c6.7,-9.3,10,-15.3,10,-18z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.875em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.875em" height="3.6em" viewBox="0 0 875 3600"><path d="M76,0c-16.7,0,-25,3,-25,9c0,2,2,6.3,6,13c21.3,28.7,42.3,60.3,
-63,95c96.7,156.7,172.8,332.5,228.5,527.5c55.7,195,92.8,416.5,111.5,664.5
-c11.3,139.3,17,290.7,17,454c0,28,1.7,43,3.3,45l0,9
-c-3,4,-3.3,16.7,-3.3,38c0,162,-5.7,313.7,-17,455c-18.7,248,-55.8,469.3,-111.5,664
-c-55.7,194.7,-131.8,370.3,-228.5,527c-20.7,34.7,-41.7,66.3,-63,95c-2,3.3,-4,7,-6,11
-c0,7.3,5.7,11,17,11c0,0,11,0,11,0c9.3,0,14.3,-0.3,15,-1c5.3,-5.3,10.3,-11,15,-17
-c242.7,-294.7,395.3,-681.7,458,-1161c21.3,-164.7,33.3,-350.7,36,-558
-l0,-144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
--470,-1265c-4.7,-6,-9.7,-11.7,-15,-17c-0.7,-0.7,-6.7,-1,-18,-1z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">.</span></span></span></span></span></span></p>
-<p>圆盘表面任意一点的速度为</p>
-<p><span class="math-formula math-display" data-tex="
-\mathbf U_w(\mathbf x,t)=\boldsymbol\omega\times(\mathbf x-\mathbf O).
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">U</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="bold-italic">ω</mi><mo>×</mo><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo>−</mo><mi mathvariant="bold">O</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\mathbf U_w(\mathbf x,t)=\boldsymbol\omega\times(\mathbf x-\mathbf O).
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.037em;">ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">O</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></span></p>
-<p><code>motion_check.csv</code> 提供四分之一转等相位的圆心坐标，用于核对网格动画。400 r/min 对应周期 0.15 s，经过 0.0375 s 后圆心位于 (0,0.0005,0)；运动原点 <code>O</code> 保持固定。</p>
-<p>最小径向间隙为 <span class="math-formula" data-tex="c_{\min}=c_1-e=0.5\ {\rm mm}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>min</mi><mo>⁡</mo></msub><mo>=</mo><msub><mi>c</mi><mn>1</mn></msub><mo>−</mo><mi>e</mi><mo>=</mo><mn>0.5</mn><mtext>&nbsp;</mtext><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">m</mi></mrow></mrow><annotation encoding="application/x-tex">c_{\min}=c_1-e=0.5\ {\rm mm}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">i</span><span class="mtight">n</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord"><span class="mord mathrm">mm</span></span></span></span></span></span></span>，最大间隙为 1.5 mm。一个周期内，窄间隙的位置沿圆周移动，这也是压力峰值和径向载荷随时间变化的来源。</p>
-<h2 id="配置文件与网格建立"><a href="#配置文件与网格建立" class="headerlink" title="配置文件与网格建立"></a>配置文件与网格建立</h2><p>同步偏心旋转采用绕固定轴 <code>O</code> 的滑移网格。转子区包含圆盘外周密封间隙及盘后背腔，随圆盘作刚体旋转；壳体附近的外环网格保持静止。两区通过半径 150.25 mm 的圆柱形 AMI 界面交换通量和场量。</p>
-<p>该界面位于圆盘最大扫掠半径 150 mm 与壳体半径 150.5 mm 之间。转子与壳体网格分别由随包的两个 <code>blockMeshDict</code> 建立，使用圆弧描述圆周；合并后由 <code>createPatch</code> 建立 <code>rotorAMI</code>、<code>backgroundAMI</code> 配对边界。圆盘轴向范围为 −10～0 mm，背腔为 0～4 mm，内侧流出半径为 47.5 mm。</p>
-<p>本例采用不可压缩瞬态流动与 <code>kOmegaSST</code> 模型；按角速度、半径和运动黏度估算的旋转雷诺数约为 9.36×10⁵。每圈设 192 个周向单元。转子侧外周间隙有 8 层径向单元，壳体侧有 6 层；背腔沿半径分为 40 层，并向圆盘外缘加密。窄间隙单元沿壁面呈各向异性，网格质量字典保留相应行列式阈值，同时检查非正交性、面插值权重和体积比。加密比较同时关注最小间隙和 AMI 两侧分辨率。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下配置来自下载包的同名文件。</p>
-<h3 id="constant-dynamicMeshDict"><a href="#constant-dynamicMeshDict" class="headerlink" title="constant/dynamicMeshDict"></a><code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
-motionSolverLibs (fvMotionSolvers);
-motionSolver solidBody;
-cellZone rotating;
-solidBodyMotionFunction rotatingMotion;
-origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-omega <span class="hljs-number">41.88790205</span>;
-</code></pre></div>
-<p><code>rotating</code> 单元区随圆盘转动，固定轴经过原点并沿 <code>z</code> 方向。初始几何已包含 0.5 mm 偏心，运动原点保持为 <code>O</code>；因此圆心在计算过程中绕 <code>O</code> 运动。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.060825</span>);
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    disc
-    {
-        <span class="hljs-keyword">type</span> movingWallVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    casing
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
-    }
-    rotorAMI
-    {
-        <span class="hljs-keyword">type</span> cyclicAMI;
-    }
-    backgroundAMI
-    {
-        <span class="hljs-keyword">type</span> cyclicAMI;
-    }
-}
-</code></pre></div>
-<p><code>movingWallVelocity</code> 使圆盘壁面速度跟随网格，固定壳体为无滑移。入口沿 <code>z</code> 正方向供水，速度 1.060825 m/s 对应约 60 L/min；AMI 两侧使用配对耦合边界。出口在背腔内圆处由压力约束流出。</p>
-<h3 id="system-fvSolution"><a href="#system-fvSolution" class="headerlink" title="system/fvSolution"></a><code>system/fvSolution</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">72 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solvers
-{
-    p
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
-        tolerance <span class="hljs-number">1e-6</span>;
-        relTol <span class="hljs-number">0.02</span>;
-        smoother DICGaussSeidel;
-        nPreSweeps <span class="hljs-number">2</span>;
-        nPostSweeps <span class="hljs-number">2</span>;
-        nFinestSweeps <span class="hljs-number">2</span>;
-    }
-    pFinal
-    {
-        <span class="hljs-variable">$p</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-    <span class="hljs-string">"pcorr.*"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
-        tolerance <span class="hljs-number">1e-5</span>;
-        relTol <span class="hljs-number">0.01</span>;
-        smoother DICGaussSeidel;
-        nPreSweeps <span class="hljs-number">2</span>;
-        nPostSweeps <span class="hljs-number">2</span>;
-        nFinestSweeps <span class="hljs-number">2</span>;
-    }
-    <span class="hljs-string">"(U|k|omega|epsilon|h|tracer|rho)"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
-        smoother symGaussSeidel;
-        tolerance <span class="hljs-number">1e-8</span>;
-        relTol <span class="hljs-number">0.05</span>;
-    }
-    <span class="hljs-string">"(U|k|omega|epsilon|h)Final"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
-        smoother symGaussSeidel;
-        tolerance <span class="hljs-number">1e-8</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-    <span class="hljs-string">"alpha.water.*"</span>
-    {
-        nAlphaCorr <span class="hljs-number">2</span>;
-        nAlphaSubCycles <span class="hljs-number">2</span>;
-        cAlpha <span class="hljs-number">1</span>;
-        MULESCorr <span class="hljs-literal">yes</span>;
-        nLimiterIter <span class="hljs-number">3</span>;
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
-        smoother symGaussSeidel;
-        tolerance <span class="hljs-number">1e-9</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-built_in">PIMPLE</span>
-{
-    correctPhi <span class="hljs-literal">true</span>;
-    checkMeshCourantNo <span class="hljs-literal">true</span>;
-    momentumPredictor <span class="hljs-literal">yes</span>;
-    nOuterCorrectors <span class="hljs-number">2</span>;
-    nCorrectors <span class="hljs-number">2</span>;
-    nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    pRefCell <span class="hljs-number">0</span>;
-    pRefValue <span class="hljs-number">0</span>;
-}
-relaxationFactors
-{
-    equations
-    {
-        <span class="hljs-string">".*"</span> <span class="hljs-number">1</span>;
-    }
-}
-</code></pre></div>
-<p><code>PIMPLE</code> 每个时间步执行两次外迭代、两次压力修正，<code>correctPhi</code> 在网格运动后修正通量。压力使用运动学量纲，参考值为零；SST 模型的 <code>k</code> 和 <code>omega</code> 与速度一起更新。</p>
-<p>压力与通量修正均采用 <code>GAMG</code>，配合 <code>DICGaussSeidel</code> 平滑和各层预、后扫掠。普通压力求解以 <code>relTol 0.02</code> 控制相对下降幅度，最后一次压力修正令 <code>relTol 0</code>，以 <code>tolerance 1e-6</code> 作为停止阈值；网格运动后的 <code>pcorr</code> 修正采用 <code>tolerance 1e-5</code>。瞬态方程松弛因子设为 1，时间推进仍由 <code>maxCo 0.3</code> 和最大时间步 <span class="math-formula" data-tex="10^{-5}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-5}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span></span> s 控制。结合入口、出口流量记录检查每步通量平衡。</p>
-<h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p><a href="/downloads/engineering/eccentric-disc.zip">下载完整算例与配置代码</a>，解压后进入 <code>eccentric-disc</code> 目录：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-bash Allmesh
-bash Allsolve
-</code></pre></div>
-<p>第一行加载 OpenCFD OpenFOAM <code>v2512</code>，安装位置不同则调整路径。<code>Allmesh</code> 完成网格建立、区域处理和质量检查，再将 <code>0.orig/</code> 复制为运行所用初始场。<code>Allsolve</code> 运行 <code>pimpleFoam</code> 并将最新监测记录整理到 <code>analysis/last-monitors.json</code>。在 ParaView 中打开 <code>case.foam</code> 查看场文件。</p>
-<p>网格修改在新解压目录进行，保留基准算例便于比较。建网格前修改 <code>0.orig/</code>，网格完成后修改 <code>0/</code>；求解范围与输出频率在 <code>system/controlDict</code> 中调整。详细记录保存在 <code>log.*</code>，运行脚本遇到错误会停止并显示对应日志。</p>
-<p>默认计算到 0.45 s，即三个旋转周期，场输出间隔为 0.00125 s。检查初始阶段的 AMI 权重、流量收支和圆心轨迹，再根据载荷周期重复性延长计算。分析多个完整周期时，将结束时间延长到所选统计窗口之后。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>程序同时输出 <code>analysis/loads.csv</code>，包含时间或迭代序号、三向总力以及关于转轴原点的三向总力矩。分别从 <code>force.dat</code> 和 <code>moment.dat</code> 按相同时间对齐，后续功率和周期统计使用这一文件。</p>
-<p>在 <code>controlDict</code> 的 <code>functions</code> 中记录圆盘载荷：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">discLoads
-{
-    <span class="hljs-keyword">type</span> forces;
-    <span class="hljs-keyword">libs</span> (forces);
-    patches (disc);
-    rho rhoInf;
-    rhoInf <span class="hljs-number">997.07</span>;
-    CofR (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-}
-</code></pre></div>
-<p>这里积分的是流体作用于圆盘的力和关于固定轴 <code>O</code> 的力矩。主轴所需驱动功率由 <span class="math-formula" data-tex="-M_{O,z}\omega"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mi>M</mi><mrow><mi>O</mi><mo separator="true">,</mo><mi>z</mi></mrow></msub><mi>ω</mi></mrow><annotation encoding="application/x-tex">-M_{O,z}\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord">−</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.044em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></span> 估算；符号取决于流体力矩方向，输出时保留原始符号并注明正方向。</p>
-<p>需要与关于瞬时圆心 <code>C</code> 的试验力矩比较时，先变换力矩参考点：</p>
-<p><span class="math-formula math-display" data-tex="
-\mathbf M_C=\mathbf M_O-(\mathbf C-\mathbf O)\times\mathbf F.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">M</mi><mi>C</mi></msub><mo>=</mo><msub><mi mathvariant="bold">M</mi><mi>O</mi></msub><mo>−</mo><mo stretchy="false">(</mo><mi mathvariant="bold">C</mi><mo>−</mo><mi mathvariant="bold">O</mi><mo stretchy="false">)</mo><mo>×</mo><mi mathvariant="bold">F</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\mathbf M_C=\mathbf M_O-(\mathbf C-\mathbf O)\times\mathbf F.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">O</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">F</span><span class="mord">.</span></span></span></span></span></span></p>
-<p>参考点变换计入偏心力臂产生的附加力矩。进一步定义随圆心运动的径向和切向单位向量：</p>
-<p><span class="math-formula math-display" data-tex="
-\mathbf e_r=(\cos\omega t,\sin\omega t,0),\qquad
-\mathbf e_t=(-\sin\omega t,\cos\omega t,0).
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">e</mi><mi>r</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi mathvariant="bold">e</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\mathbf e_r=(\cos\omega t,\sin\omega t,0),\qquad
-\mathbf e_t=(-\sin\omega t,\cos\omega t,0).
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></span></p>
-<p>将 <code>F</code> 投影到这两个方向，可得到径向与切向载荷；对横向力矩也作相同坐标变换。资料包的 <code>analyse_loads.py</code> 读取明确列名的载荷 CSV，计算参考点转换、周期平均、峰峰值以及第一谐波。</p>
-<p>将圆周压力分布与径向载荷相位对应，并核对边界质量收支。比较 2、4、6 mm 背腔间隙下的平均阻力矩和载荷幅值，解释泄漏阻力与动量交换的变化。</p>
-<p>网格比较考察最小间隙单元数和 AMI 两侧网格尺度，时间步比较考察载荷幅值与相位。评价指标为平均转矩、径向载荷幅值和相位。进一步计算转子振动时，将流体载荷与轴系质量、刚度及阻尼耦合。</p>
-<p>例如，将计算结束时间延长至 1.5 s，待启动影响减弱后，使用下列命令分析从 0.75 s 开始的五个完整周期：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">python3 analyse_loads.py analysis/loads.csv --start 0.75 --cycles 5
-</code></pre></div>
-<p>该工具需要 NumPy，输出 <code>load-summary.json</code> 中的均值、峰峰值及第一谐波幅值和相位。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 初始圆心、固定旋转轴和力矩参考点分别承担几何、运动和受力定义。用圆心轨迹核对运动，再将力矩换算到同一参考点。</p>
-</blockquote>
-<h2 id="模型与配置资料"><a href="#模型与配置资料" class="headerlink" title="模型与配置资料"></a>模型与配置资料</h2><ul>
-<li><a href="/downloads/engineering/eccentric-disc.zip">下载完整偏心圆盘算例、模型与载荷分析程序</a>。几何按公开尺寸重建，背腔入口、出口截断位置在图中标出。</li>
-<li><a href="https://www.jstage.jst.go.jp/article/ijfms/3/1/3_1_67/_article">原始试验与动力学分析论文</a>。</li>
-<li><a href="https://doi.org/10.1115/1.4001802">圆盘厚度及绕行试验说明</a>。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/constant/dynamicMeshDict">v2512 rotatingFanInRoom 运动字典</a>：本文运动配置的出处。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/solvers/incompressible/pimpleFoam">v2512 pimpleFoam 源码</a>。</li>
-</ul>
-<p>配套 <code>VALIDATION.json</code> 与 <code>validation/</code> 保存本配置的网格检查和短程启动记录，<code>files.sha256</code> 用于核对文件完整性。</p>
-<p><a href="/topics/engineering/">返回实际工程应用</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -580,6 +306,6 @@ bash Allsolve
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

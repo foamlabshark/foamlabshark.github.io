@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,115 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 4 章　环境变量参考（$WM_* 与 $FOAM_*）</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>4.1 先理解：这些变量是干什么的</h2>
-<p><code>source</code> etc/bashrc 之后，你的终端里会多出上百个变量。它们分两类：</p>
-<p>WM_ 开头（WM = <code>wmake</code>）：编译期用的。决定用哪个编译器、什么精度、装在哪儿。改了它们要重新编译才生效。</p>
-<p>FOAM_ 开头：使用期用的。基本都是路径，让你不用记一长串目录就能跳过去。</p>
-<p>环境变量提供稳定的安装、教程和用户工作目录入口。使用 <code>FOAM_TUTORIALS</code>、<code>FOAM_RUN</code>、<code>FOAM_USER_LIBBIN</code> 等变量，可以减少脚本对个人绝对路径的依赖；首次使用仍需确认变量已定义且指向预期版本。</p>
-<p>查看方法：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>              <span class="hljs-comment"># 看单个变量</span>
-<span class="hljs-built_in">env</span> | grep FOAM_ | <span class="hljs-built_in">sort</span>           <span class="hljs-comment"># 看所有 FOAM_ 变量</span>
-<span class="hljs-built_in">env</span> | grep WM_ | <span class="hljs-built_in">sort</span>             <span class="hljs-comment"># 看所有 WM_ 变量</span></code></pre></div><!-- example-reading --><p><code>echo</code> 显示环境变量或简单文本。<code>grep</code> 按文本模式检索文件。</p><!-- /example-reading -->
-<h2>4.2 FOAM_*：路径类（最常用）</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>变量</th><th>指向</th><th>典型用途</th></tr>
-<tr><td><code>$FOAM_TUTORIALS</code></td><td>官方算例库</td><td>最常用。找相似算例照抄设置</td></tr>
-<tr><td><code>$FOAM_RUN</code></td><td>$HOME/OpenFOAM/&lt;用户名&gt;-v2512/run</td><td>你自己的工作目录，算例都放这</td></tr>
-<tr><td><code>$FOAM_SRC</code></td><td>src/ 核心库源码</td><td>查边界条件、湍流模型怎么实现的</td></tr>
-<tr><td><code>$FOAM_APP</code></td><td>applications/</td><td>求解器和工具的源码总目录</td></tr>
-<tr><td><code>$FOAM_SOLVERS</code></td><td>applications/solvers/</td><td>查某个求解器解了哪几个方程</td></tr>
-<tr><td><code>$FOAM_UTILITIES</code></td><td>applications/utilities/</td><td>查某个工具的源码与默认字典</td></tr>
-<tr><td><code>$FOAM_APPBIN</code></td><td>可执行文件目录</td><td><code>ls</code> <code>$FOAM_APPBIN</code> 列出本机所有命令</td></tr>
-<tr><td><code>$FOAM_LIBBIN</code></td><td>动态库目录</td><td>排查共享库加载失败（<code>cannot open shared object file</code>）</td></tr>
-<tr><td><code>$FOAM_ETC</code></td><td>etc/</td><td>官方字典模板都在 <code>$FOAM_ETC/caseDicts</code></td></tr>
-<tr><td><code>$FOAM_USER_APPBIN</code></td><td>你自己编译的可执行文件</td><td>自写求解器编译后进这里</td></tr>
-<tr><td><code>$FOAM_USER_LIBBIN</code></td><td>你自己编译的库</td><td>自写边界条件/模型编译后进这里</td></tr>
-<tr><td><code>$FOAM_SITE_APPBIN</code></td><td>全站共享（多用户集群用）</td><td>单机基本用不到</td></tr>
-<tr><td><code>$FOAM_MPI</code></td><td>当前 MPI 实现的名字</td><td>如 openmpi-system，排查并行问题时看</td></tr>
-<tr><td><code>$FOAM_API</code></td><td>2512</td><td>脚本里判断版本用</td></tr>
-<tr><td><code>$FOAM_JOB_DIR</code></td><td><code>foamJob</code> 的日志目录</td><td>集群批量作业时用</td></tr>
-<tr><td><code>$WM_PROJECT_USER_DIR</code></td><td>$HOME/OpenFOAM/&lt;用户名&gt;<code>-v2512</code></td><td>你的私有开发目录（源码放这，见第 10 章）</td></tr>
-</tbody></table></div>
-<p>四个”调试开关”型变量（不是路径，是行为控制，排错时极有用）：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>变量</th><th>作用</th><th>怎么用</th></tr>
-<tr><td><code>FOAM_SIGFPE</code></td><td>捕获浮点异常（除零、NaN）并立即中止 + 打印调用栈</td><td><code>export FOAM_SIGFPE=true</code></td></tr>
-<tr><td><code>FOAM_SETNAN</code></td><td>把新分配的内存初始化成 NaN，让”用了未初始化变量”立刻暴露</td><td><code>export FOAM_SETNAN=true</code></td></tr>
-<tr><td><code>FOAM_ABORT</code></td><td>让 FatalError 触发 <code>abort</code> 并生成 <code>core</code> <code>dump</code>，方便 gdb 调试</td><td><code>export FOAM_ABORT=true</code></td></tr>
-<tr><td><code>FOAM_CODE_TEMPLATES</code></td><td><code>codedFixedValue</code> 等动态编译功能的模板目录</td><td>自定义模板时改</td></tr>
-</tbody></table></div>
-<p><code>FOAM_SIGFPE</code> 用于启用浮点异常捕获。在运行环境支持的情况下，它可帮助定位除零、无效浮点运算等异常。异常位置仍需结合调用栈、初始场、边界条件及离散设置分析。</p>
-<h2>4.3 WM_*：编译类</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>变量</th><th>典型值</th><th>含义</th></tr>
-<tr><td><code>$WM_PROJECT</code></td><td>OpenFOAM</td><td>项目名</td></tr>
-<tr><td><code>$WM_PROJECT_VERSION</code></td><td><code>v2512</code></td><td>版本</td></tr>
-<tr><td><code>$WM_PROJECT_DIR</code></td><td>~/OpenFOAM/OpenFOAM-v2512</td><td>安装根目录</td></tr>
-<tr><td><code>$WM_OPTIONS</code></td><td>linux64GccDPInt32Opt</td><td>平台串，platforms/ 下的子目录名</td></tr>
-<tr><td><code>$WM_ARCH</code></td><td>linux64</td><td>系统架构</td></tr>
-<tr><td><code>$WM_COMPILER</code></td><td>Gcc / Clang</td><td>编译器</td></tr>
-<tr><td><code>$WM_COMPILER_TYPE</code></td><td><code>system</code> / ThirdParty</td><td>用系统编译器还是自带的</td></tr>
-<tr><td><code>$WM_COMPILE_OPTION</code></td><td>Opt / <code>Debug</code> / Prof</td><td>优化 / 调试 / 性能剖析</td></tr>
-<tr><td><code>$WM_PRECISION_OPTION</code></td><td>DP / SP / <code>SPDP</code></td><td>双精度 / 单精度 / 混合</td></tr>
-<tr><td><code>$WM_LABEL_SIZE</code></td><td>32 / 64</td><td>网格标签整型位宽。超过 20 亿网格才需要 64</td></tr>
-<tr><td><code>$WM_MPLIB</code></td><td>SYSTEMOPENMPI</td><td>用哪个 MPI</td></tr>
-<tr><td><code>$WM_NCOMPPROCS</code></td><td>8</td><td>编译时并行核数</td></tr>
-<tr><td><code>$WM_THIRD_PARTY_DIR</code></td><td>~/OpenFOAM/ThirdParty-v2512</td><td>第三方库目录</td></tr>
-<tr><td><code>$WM_DIR</code></td><td><code>$WM_PROJECT_DIR/wmake</code></td><td>编译系统所在</td></tr>
-<tr><td><code>$WM_PROJECT_SITE</code></td><td>（常为空）</td><td>多用户站点共享目录</td></tr>
-</tbody></table></div>
-<p>比较不同环境的编译设置时，查看 <code>echo</code> <code>$WM_OPTIONS</code>；程序和库应使用相同的精度（DP 或 SP）与标签位宽（Int32 或 Int64）。</p>
-<h2>4.4 快捷别名：tut、sol、run……</h2>
-<p>etc/config.sh/aliases 里预定义了一批别名，全是”跳目录”和”改编译选项”的：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>别名</th><th>等价于</th><th>说明</th></tr>
-<tr><td><code>foam</code></td><td><code>cd</code> <code>$WM_PROJECT_DIR</code></td><td>回安装根目录</td></tr>
-<tr><td><code>run</code></td><td><code>cd</code> <code>$FOAM_RUN</code></td><td>回你的工作目录</td></tr>
-<tr><td><code>tut</code></td><td><code>cd</code> <code>$FOAM_TUTORIALS</code></td><td>去官方算例库</td></tr>
-<tr><td><code>src</code></td><td><code>cd</code> <code>$FOAM_SRC</code></td><td>去核心库源码</td></tr>
-<tr><td><code>app</code></td><td><code>cd</code> <code>$FOAM_APP</code></td><td>去应用源码</td></tr>
-<tr><td><code>sol</code></td><td><code>cd</code> <code>$FOAM_SOLVERS</code></td><td>去求解器源码</td></tr>
-<tr><td><code>util</code></td><td><code>cd</code> <code>$FOAM_UTILITIES</code></td><td>去工具源码</td></tr>
-<tr><td><code>lib</code></td><td><code>cd</code> <code>$FOAM_LIBBIN</code></td><td>去库目录</td></tr>
-<tr><td><code>wmSet</code></td><td>重新 <code>source</code> etc/bashrc</td><td>改完编译选项后刷新环境</td></tr>
-<tr><td><code>wmUnset</code></td><td>清除全部 OpenFOAM 环境变量</td><td>切版本前用</td></tr>
-<tr><td><code>wmRefresh</code></td><td>清环境 + 重新 <code>source</code></td><td>相当于 <code>wmUnset</code>; <code>wmSet</code></td></tr>
-<tr><td><code>wmDP</code> / <code>wmSP</code></td><td>切双精度 / 单精度</td><td>切完要重新编译</td></tr>
-<tr><td><code>wmInt32</code> / <code>wmInt64</code></td><td>切标签位宽</td><td>同上</td></tr>
-<tr><td><code>wmSchedOn</code> / <code>wmSchedOff</code></td><td>开/关分布式编译调度</td><td>集群编译用</td></tr>
-</tbody></table></div>
-<p>查看你这台机器上实际有哪些别名（不同版本略有出入，以本机为准）：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">alias | grep -E 'cd \$(FOAM|WM)'</code></pre></div>
-<p>示例：别名到底省了多少事</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">tut                                    <span class="hljs-comment"># 一步跳到教程库</span>
-<span class="hljs-built_in">cd</span> incompressible/simpleFoam/pitzDaily <span class="hljs-comment"># 打开经典的后台阶算例</span>
-run                                    <span class="hljs-comment"># 一步跳回工作目录</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/simpleFoam/pitzDaily .   <span class="hljs-comment"># 复制到工作目录</span></code></pre></div>
-<h2>4.5 常用”找东西”套路（把变量真正用起来）</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext"># ① 本机所有可执行命令（求解器 + 工具），约 200 多个
-ls $FOAM_APPBIN | sort | less
-
-# ② 所有 foam 开头的脚本类命令
-ls $WM_PROJECT_DIR/bin
-
-# ③ 找出所有可压缩求解器
-ls $FOAM_SOLVERS/compressible
-
-# ④ 哪些教程用了 interFoam（找相似算例）
-grep -rl "application *interFoam" $FOAM_TUTORIALS --include=controlDict
-
-# ⑤ 别人的 fvSolution 里 p 用什么线性求解器（学习别人的参数选择）
-grep -rA3 "^ *p$" $FOAM_TUTORIALS/incompressible/simpleFoam/*/system/fvSolution | grep solver
-
-# ⑥ 某个边界条件的源码在哪、有哪些可选参数
-find $FOAM_SRC -name "*inletOutlet*"
-
-# ⑦ 官方字典模板（functionObject 模板全在这）
-ls $FOAM_ETC/caseDicts/postProcessing/</code></pre></div>
-<p>设置参数时，在 <code>$FOAM_TUTORIALS</code> 中找到物理条件相近的官方算例，参考其配置并按当前工况调整。</p>
-<h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -414,6 +306,6 @@ ls $FOAM_ETC/caseDicts/postProcessing/</code></pre></div>
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

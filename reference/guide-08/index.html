@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,246 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 8 章　后处理命令与 functionObject</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>后处理有两条路：算完再处理（<code>postProcess</code> 等命令）和边算边处理（<code>controlDict</code> 里的 <code>functionObject</code>）。能用后者就用后者——因为很多量（比如受力时程、探针时间序列）需要每个时间步的数据，而你不可能把每个时间步的整场都写到硬盘上。</p>
-<h2>8.1 postProcess —— 通用后处理命令</h2>
-<p>用法</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">postProcess -func &lt;功能名&gt; [-<span class="hljs-keyword">time</span> &lt;范围&gt;] [-latestTime] [-fields <span class="hljs-string">'(U p)'</span>] [-noZero] [-parallel]
-postProcess -funcs <span class="hljs-string">'(func1 func2)'</span>
-postProcess -list                    <span class="hljs-comment"># 列出预配置函数对象入口</span></code></pre></div><!-- example-reading --><p><code>postProcess</code> 在已有结果上执行功能对象。只读取最新结果时刻。<code>postProcess</code> 在已有结果上执行功能对象。</p><!-- /example-reading -->
-<p>示例</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 看有哪些功能可用</span>
-postProcess -list
-
-<span class="hljs-comment"># ② 计算速度大小，写成新场 mag(U)</span>
-postProcess -func <span class="hljs-string">"mag(U)"</span>
-
-<span class="hljs-comment"># ③ 计算 Q 判据（涡识别），只处理最后一个时刻</span>
-postProcess -func Q -latestTime
-
-<span class="hljs-comment"># ④ 计算涡量</span>
-postProcess -func vorticity -<span class="hljs-keyword">time</span> <span class="hljs-string">'1:10'</span>
-
-<span class="hljs-comment"># ⑤ 沿一条线取样（需要 system/singleGraph 配置文件）</span>
-postProcess -func singleGraph -latestTime
-
-<span class="hljs-comment"># ⑥ 求某个边界上的面积分（不用改 controlDict）</span>
-postProcess -func <span class="hljs-string">"patchAverage(name=outlet, field=p)"</span> -latestTime
-
-<span class="hljs-comment"># ⑦ 依赖湍流模型的量必须用求解器 + -postProcess</span>
-simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
-<p>函数对象类型与预配置模板名称需要区分。先用 <code>postProcess</code> <code>-list</code> 查询预配置入口；<code>mag</code>、<code>grad</code>、<code>Q</code>、<code>probes</code>、<code>forces</code> 等功能还需要各自的字段和参数。<code>fieldAverage</code> 等类型通常应在 <code>functions</code> 中显式配置。线性求解器历史使用 <code>solverInfo</code>，并在求解时记录。</p>
-<h2>8.2 #includeFunc —— 一行开启一个后处理功能</h2>
-<p>在 <code>controlDict</code> 的 <code>functions</code> 里，官方模板可以一行引入：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    <span class="hljs-meta">#includeFunc solverInfo</span>
-    <span class="hljs-meta">#includeFunc  yPlus</span>
-    <span class="hljs-meta">#includeFunc  Q</span>
-    <span class="hljs-meta">#includeFunc  mag(U)</span>
-    <span class="hljs-meta">#includeFunc  probes</span>
-    <span class="hljs-meta">#includeFunc  patchAverage(name=outlet,fields=(p))</span>
-    <span class="hljs-meta">#includeFunc  flowRatePatch(name=outlet)</span>
-    <span class="hljs-meta">#includeFunc  singleGraph</span>
-}</code></pre></div>
-<p>预配置函数位于 etc/caseDicts/postProcessing。用 <code>postProcess</code> <code>-list</code> 查看预配置入口，<code>foamGetDict</code> 复制模板，再设置场名、边界名称及执行、输出频率。#<code>includeFunc</code> 可载入模板或本地配置。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">ls $FOAM_ETC/caseDicts/postProcessing/*        # 看看有哪些现成模板</code></pre></div>
-<h2>8.3 常用 functionObject 的写法</h2>
-<p>写在 <code>system/controlDict</code> 的 <code>functions</code> {} 里（也可以单独放文件再 #<code>include</code>）。所有 <code>functionObject</code> 都有这几个公共关键字：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>关键字</th><th>含义</th></tr>
-<tr><td><code>type</code></td><td>功能类型</td></tr>
-<tr><td><code>libs</code></td><td>需要加载的库，如 ("libfieldFunctionObjects.so")</td></tr>
-<tr><td><code>writeControl</code></td><td><code>timeStep</code> / <code>runTime</code> / <code>writeTime</code> / <code>onEnd</code></td></tr>
-<tr><td><code>writeInterval</code></td><td>间隔</td></tr>
-<tr><td><code>executeControl</code> / <code>executeInterval</code></td><td>计算频率（可以算得勤、写得少）</td></tr>
-<tr><td><code>enabled</code></td><td><code>true/false</code>，临时关掉某个功能</td></tr>
-<tr><td><code>timeStart</code> / <code>timeEnd</code></td><td>只在某段时间内工作（如统计平均只从流动充分发展后开始）</td></tr>
-</tbody></table></div>
-<p>① 探针：监测某几个点的时间序列</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">probes
-{
-    <span class="hljs-keyword">type</span> probes;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-    fields (p U);
-    probeLocations
-    (
-        (<span class="hljs-number">0.1</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
-        (<span class="hljs-number">0.2</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
-    );
-}</code></pre></div>
-<p>输出在 postProcessing/probes/0/p。用途：看涡脱落频率、判断是否进入统计定常。</p>
-<p>② 力与力系数：算阻力升力</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">forceCoeffs
-{
-    <span class="hljs-keyword">type</span> forceCoeffs;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libforces.so"</span>);
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-    patches (cylinder); <span class="hljs-comment">// 作用在哪个边界上</span>
-    rho rhoInf; <span class="hljs-comment">// 不可压时写 rhoInf</span>
-    rhoInf <span class="hljs-number">1.0</span>; <span class="hljs-comment">// 参考密度</span>
-    liftDir (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
-    dragDir (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    CofR (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 力矩参考点</span>
-    pitchAxis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    magUInf <span class="hljs-number">1.0</span>; <span class="hljs-comment">// 参考速度</span>
-    lRef <span class="hljs-number">0.1</span>; <span class="hljs-comment">// 参考长度</span>
-    Aref <span class="hljs-number">0.001</span>; <span class="hljs-comment">// 参考面积</span>
-}</code></pre></div>
-<p><code>forceCoeffs</code> 的输出目录由函数对象实例名和起始时刻决定。使用运动学压力的不可压缩求解器时，应按 forces/forceCoeffs 的接口配置密度引用（常见为 <code>rho</code> <code>rhoInf</code> 与 <code>rhoInf</code> 数值）；如果使用热力学压力或可压缩密度场，则应采用相应处理。还应检查参考面积、参考长度、来流速度与力矩中心。</p>
-<p>③ 场平均：LES/URANS 的统计量</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">fieldAverage
-{
-    <span class="hljs-keyword">type</span> fieldAverage;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    timeStart <span class="hljs-number">5</span>; <span class="hljs-comment">// ★ 等流动充分发展后再开始统计</span>
-    writeControl writeTime;
-    fields
-    (
-        U
-        {
-            mean <span class="hljs-literal">on</span>;
-            prime2Mean <span class="hljs-literal">on</span>;
-            base time;
-        }
-        p
-        {
-            mean <span class="hljs-literal">on</span>;
-            prime2Mean <span class="hljs-literal">on</span>;
-            base time;
-        }
-    );
-}</code></pre></div>
-<p>得到 <code>UMean</code>、<code>UPrime2Mean</code>（雷诺应力）等。<code>timeStart</code> 不设对，统计里会混入初始瞬态，结果没法用。</p>
-<p>④ 沿线取样（画剖面图）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">singleGraph
-{
-    <span class="hljs-keyword">type</span> sets;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl writeTime;
-    setFormat raw; <span class="hljs-comment">// csv / raw / gnuplot</span>
-    interpolationScheme cellPoint;
-    fields (U p);
-    sets
-    (
-        line1
-        {
-            <span class="hljs-keyword">type</span> <span class="hljs-keyword">uniform</span>; <span class="hljs-comment">// 均匀取 N 个点</span>
-            axis distance; <span class="hljs-comment">// 横坐标用弧长；也可 x/y/z</span>
-            start (<span class="hljs-number">0</span> <span class="hljs-number">-0.025</span> <span class="hljs-number">0.005</span>);
-            end (<span class="hljs-number">0</span>  <span class="hljs-number">0.025</span> <span class="hljs-number">0.005</span>);
-            nPoints <span class="hljs-number">100</span>;
-        }
-    );
-}</code></pre></div>
-<p>输出在 postProcessing/singleGraph/&lt;时间&gt;/line1_U_p.xy，可直接用 gnuplot/Python 画。</p>
-<p>⑤ 切面取样（导出面数据给 ParaView 或做面积分）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">surfaces
-{
-    <span class="hljs-keyword">type</span> surfaces;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl writeTime;
-    surfaceFormat vtk;
-    fields (p U);
-    surfaces
-    (
-        zNormal
-        {
-            <span class="hljs-keyword">type</span> cuttingPlane;
-            point (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.005</span>);
-            normal (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-            interpolate <span class="hljs-literal">true</span>;
-        }
-        isoQ
-        {
-            <span class="hljs-keyword">type</span> isoSurface;
-            isoField Q;
-            isoValue <span class="hljs-number">100</span>;
-            interpolate <span class="hljs-literal">true</span>;
-        }
-    );
-}</code></pre></div>
-<p>在求解或后处理阶段直接输出所需截面，可减少保存的场数据量。实际节省程度取决于网格规模、输出变量和时间采样频率；仍应保存满足后续验证需要的数据。</p>
-<p>⑥ 积分与极值</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">outletFlux
-{
-    <span class="hljs-keyword">type</span> surfaceFieldValue;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    regionType patch;
-    <span class="hljs-keyword">name</span> outlet;
-    operation sum; <span class="hljs-comment">// sum/areaAverage/areaIntegrate/min/max/CoV</span>
-    fields (phi);
-    writeControl timeStep;
-}
-volAvgT
-{
-    <span class="hljs-keyword">type</span> volFieldValue;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    regionType all; <span class="hljs-comment">// 或 cellZone + name</span>
-    operation volAverage;
-    fields (T);
-    writeControl timeStep;
-}</code></pre></div>
-<p>用途：检查质量守恒（进出口 <code>phi</code> 之和应接近 0）、监测平均温度等全局量随时间的变化。</p>
-<p>⑦ 残差与求解器信息</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#includeFunc solverInfo</span></code></pre></div>
-<p>或</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solverInfo
-{
-    <span class="hljs-keyword">type</span> solverInfo;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libutilityFunctionObjects.so"</span>);
-    fields (U p);
-    writeResidualFields <span class="hljs-literal">yes</span>; <span class="hljs-comment">// 把残差也写成场，可在 ParaView 里看"哪儿不收敛"</span>
-}</code></pre></div>
-<p><code>writeResidualFields</code> 可以输出初始残差的空间分布，辅助定位离散误差或局部迭代困难，同时会增加输出量。高残差区域也可能来自启动瞬态或物理源项，需要结合网格、边界和方程分析。</p>
-<h2>8.4 foamToVTK / foamToEnsight —— 导出到别的软件</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamToVTK                                   <span class="hljs-comment"># 全部时刻导出成 VTK</span>
-foamToVTK -latestTime -fields <span class="hljs-string">'(U p)'</span>       <span class="hljs-comment"># 只导最后一个时刻的两个场</span>
-foamToVTK -ascii                            <span class="hljs-comment"># 文本格式，可以直接用编辑器看</span>
-foamToVTK -cellSet c0                       <span class="hljs-comment"># 只导出某个 cellSet</span>
-foamToVTK -no-boundary                      <span class="hljs-comment"># 不导边界数据</span>
-foamToEnsight -latestTime                   <span class="hljs-comment"># 导 EnSight 格式</span></code></pre></div>
-<p>什么时候需要：给合作者（用 Tecplot/EnSight）传数据，或者自己用 Python（pyvista/vtk）做定制分析时。日常用 ParaView 直接读算例目录即可，不需要转换。</p>
-<h2>8.5 ParaView：paraFoam 与 .foam 文件</h2>
-<p>两种打开方式</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">paraFoam                     <span class="hljs-comment"># 方式一：自动生成临时文件并启动 ParaView</span>
-paraFoam -vtk -<span class="hljs-built_in">touch</span>              <span class="hljs-comment"># 只生成 .foam 标记文件，不启动 ParaView</span>
-<span class="hljs-built_in">touch</span> case.foam &amp;&amp; paraview case.foam &amp;   <span class="hljs-comment"># 方式二：手动（推荐，兼容自装的 ParaView）</span>
-paraFoam -block              <span class="hljs-comment"># 打开 blockMeshDict 定义的块结构（调试 blockMesh 用）</span>
-paraFoam -region solid       <span class="hljs-comment"># 打开指定区域</span>
-paraFoam -<span class="hljs-keyword">case</span> ../run1</code></pre></div>
-<p><code>v2512</code> 的 <code>paraFoam</code> 调用 <code>PATH</code> 中的 <code>paraview</code>。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> <code>paraview</code> 查看程序位置，再选择所需读取器。</p>
-<p>并行结果怎么看：不需要先 <code>reconstructPar</code>。在 ParaView 里打开 .foam 后，属性面板里把 Case Type 从 Reconstructed Case 改成 Decomposed Case 即可直接读 <code>processor</code>* 目录。省时间也省硬盘。</p>
-<p>六个必会操作</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>目的</th><th>操作</th></tr>
-<tr><td>看内部流场</td><td><code>Filters</code> → Slice（切面），法向选 <code>z</code></td></tr>
-<tr><td>看等值面</td><td>等值面：<code>Filters → Contour</code>（先用“单元数据转点数据”过滤器）</td></tr>
-<tr><td>看涡结构</td><td>先 <code>postProcess</code> <code>-func</code> <code>Q</code>，再 <code>Contour</code> 取 <code>Q</code> 的正值</td></tr>
-<tr><td>看矢量</td><td><code>Filters</code> → Glyph，Scale Array 选 <code>U</code>，Scale Factor 调到合适</td></tr>
-<tr><td>取一条线的数据</td><td><code>Filters</code> → Plot Over Line，右侧直接出曲线，可 Save <code>Data</code> 成 <code>csv</code></td></tr>
-<tr><td>看流线</td><td><code>Filters</code> → Stream Tracer</td></tr>
-</tbody></table></div>
-<p>使用 ParaView 过滤器前，应检查输入数组是单元数据还是点数据。对需要点数据的操作，可根据过滤器要求使用“单元数据转点数据”（<code>Cell Data to Point Data</code>），或检查 OpenFOAM 读取器的转换选项。转换会引入插值，分析结果时应明确其数据位置。</p>
-<p>导出动画：View → Animation，或者 File → Save Animation 存成 png 序列，再用</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamCreateVideo -<span class="hljs-built_in">dir</span> images -image <span class="hljs-built_in">seq</span> -out movie      <span class="hljs-comment"># 需要 ffmpeg</span>
-<span class="hljs-comment"># 或者直接：</span>
-ffmpeg -r 25 -i images/seq.%04d.png -pix_fmt yuv420p movie.mp4</code></pre></div>
-<h2>8.6 其他后处理小工具</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>作用</th></tr>
-<tr><td><code>reconstructPar</code></td><td>合并并行结果（见第 9 章）</td></tr>
-<tr><td><code>foamListTimes</code> <code>-rm</code></td><td>清时间目录</td></tr>
-<tr><td><code>foamLog</code></td><td>日志转数据（见 5.10）</td></tr>
-<tr><td><code>foamMonitor</code></td><td>实时画曲线（见 5.11）</td></tr>
-<tr><td><code>postProcess</code> <code>-func</code> <code>writeCellCentres</code></td><td>输出单元中心坐标场，做自定义分析时常用</td></tr>
-<tr><td><code>particleTracks</code></td><td>拉格朗日颗粒轨迹重建</td></tr>
-<tr><td><code>noise</code></td><td>声压级/频谱分析（气动噪声）</td></tr>
-</tbody></table></div><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -545,6 +306,6 @@ ffmpeg -r 25 -i images/seq.%04d.png -pix_fmt yuv420p movie.mp4</code></pre></div
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

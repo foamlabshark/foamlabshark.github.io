@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,192 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>汽车风挡玻璃的送风除霜</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算汽车风挡和冰层在暖风作用下的升温与融化，评价送风条件对除霜速度的影响。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>车辆冷启动时，暖风输入的热量先用于提高风挡与冰层温度，达到融点后继续用于相变。冰层因吸收潜热可在融点附近维持较长时间，因此除霜分析需要同时计算温度和融化程度。送风覆盖不均还会使风挡不同位置具有明显不同的融化时间。</p>
-<p>算例将乘员舱、冰层和外部空气划分为三个区域，以界面热耦合传递能量，并用等效热阻表示玻璃导热。送风温度随启动过程上升，冰层通过固化熔化源项更新相变状态。由融化分布、热流和累计送风能量评价除霜效果。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/windshield-defrost-geometry.webp" alt="汽车风挡玻璃的送风除霜：配套模型与基准输入"></p>
-<p>风挡与送风通道采用 <code>windshieldDefrost</code> 曲面，展向宽 0.7 m。冰层由相邻曲面沿 <code>x</code> 方向偏移 0.5 mm 构造，玻璃则以厚度 3 mm 的导热层计入界面。三个区域名为 <code>cabin</code>、<code>ice</code>、<code>exterior</code>。</p>
-<p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">OpenFOAM v2512 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</a>。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>设置位置与作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>初始温度</td>
-<td>260 K</td>
-<td>三个区域初始 <code>T</code></td>
-</tr>
-<tr>
-<td>送风速度</td>
-<td>2 m/s，沿负 <code>x</code> 方向</td>
-<td><code>0.orig/cabin/U</code></td>
-</tr>
-<tr>
-<td>送风升温</td>
-<td>0～10 s 从 260 K 升到 293 K</td>
-<td><code>0.orig/cabin/T</code></td>
-</tr>
-<tr>
-<td>融点与潜热</td>
-<td>273 K、334000 J/kg</td>
-<td><code>system/ice/fvOptions</code></td>
-</tr>
-<tr>
-<td>等效玻璃层</td>
-<td>3 mm、0.9 W/(m·K)</td>
-<td>温度耦合边界中的 <code>thicknessLayers</code>、<code>kappaLayers</code></td>
-</tr>
-</tbody></table></div>
-<h2 id="求解方法与物理模型"><a href="#求解方法与物理模型" class="headerlink" title="求解方法与物理模型"></a>求解方法与物理模型</h2><p>融化所需能量包括显热与潜热：<span class="math-formula" data-tex="Q=m c_p(T_m-T_0)+mL f_l"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>=</mo><mi>m</mi><msub><mi>c</mi><mi>p</mi></msub><mo stretchy="false">(</mo><msub><mi>T</mi><mi>m</mi></msub><mo>−</mo><msub><mi>T</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>+</mo><mi>m</mi><mi>L</mi><msub><mi>f</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">Q=m c_p(T_m-T_0)+mL f_l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">m</span><span class="mord mathnormal">L</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>，其中 <span class="math-formula" data-tex="f_l"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">f_l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 是液相比例。能量方程将潜热变化表示为 <span class="math-formula" data-tex="\rho L\,\partial f_l/\partial t"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mi>L</mi><mtext> </mtext><mi mathvariant="normal">∂</mi><msub><mi>f</mi><mi>l</mi></msub><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\rho L\,\partial f_l/\partial t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ρ</span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span></span></span>。玻璃等效热阻为 <span class="math-formula" data-tex="R^{\prime\prime}=\delta/k"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo>=</mo><mi>δ</mi><mi mathvariant="normal">/</mi><mi>k</mi></mrow><annotation encoding="application/x-tex">R^{\prime\prime}=\delta/k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span></span>，它决定热风侧与冰层侧之间的温差。</p>
-<p>本例使用 <code>chtMultiRegionFoam</code>。网格与边界定义在 <code>constant</code> 和初始场目录，离散格式和方程求解设置分别位于 <code>system/fvSchemes</code>、<code>system/fvSolution</code>；多区域模型在相应区域子目录中保存这些文件。</p>
-<h2 id="获取文件与准备网格"><a href="#获取文件与准备网格" class="headerlink" title="获取文件与准备网格"></a>获取文件与准备网格</h2><p><a href="/downloads/engineering/windshield-defrost.zip">下载完整算例包</a>。包内包含模型资源、初始场、物性、数值设置、运行脚本和来源记录。</p>
-<p>先在 Linux 终端加载 OpenCFD OpenFOAM <code>v2512</code>。采用标准软件包安装路径时执行下列命令；安装在其他目录时，将路径改为该安装目录下的 <code>etc/bashrc</code>。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-</code></pre></div>
-<p>输出应为 <code>v2512</code>。随后进入下载目录，解压并生成网格：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">unzip windshield-defrost.zip
-<span class="hljs-built_in">cd</span> windshield-defrost
-bash Allmesh
-</code></pre></div>
-<p><code>Allmesh</code> 按下表顺序生成网格并执行 <code>checkMesh</code>，每一步的输出保存在相应 <code>log.*</code> 文件中。脚本在命令失败或网格检查不通过时停止。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>网格步骤</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>blockMesh</code></td>
-<td>按顶点、块结构和加密比例生成背景网格。</td>
-</tr>
-<tr>
-<td><code>topoSet</code></td>
-<td>按位置或曲面生成网格选区，供运动、热源、阻力或初始场使用。</td>
-</tr>
-<tr>
-<td><code>subsetMesh c0 -patch walls -overwrite</code></td>
-<td>从背景网格选出实际计算区域，并生成新的边界面。</td>
-</tr>
-<tr>
-<td><code>splitMeshRegions -cellZones -overwrite</code></td>
-<td>按区域标记分离流体与固体网格，建立配对界面。</td>
-</tr>
-<tr>
-<td>复制初始场</td>
-<td>把 0.orig 中的初始场复制到 0 目录。</td>
-</tr>
-</tbody></table></div>
-<p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-暖风启动曲线"><a href="#1-暖风启动曲线" class="headerlink" title="1. 暖风启动曲线"></a>1. 暖风启动曲线</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置暖风启动曲线。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
-{
-    <span class="hljs-keyword">type</span> uniformFixedValue;
-    uniformValue table
-    (
-        (<span class="hljs-number">0</span> <span class="hljs-number">260</span>)
-        (<span class="hljs-number">10</span> <span class="hljs-number">293</span>)
-        (<span class="hljs-number">1000</span> <span class="hljs-number">293</span>)
-    );
-}
-</code></pre></div>
-<p>入口温度表规定 0～10 s 的升温过程，以秒为时间单位。该曲线决定初期热量输入，最终 293 K 对应升温结束后的送风状态。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
-<h3 id="2-冰层潜热"><a href="#2-冰层潜热" class="headerlink" title="2. 冰层潜热"></a>2. 冰层潜热</h3><p>文件：<code>system/ice/fvOptions</code>。本段设置冰层潜热。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">iceZone
-{
-    <span class="hljs-keyword">type</span> solidificationMeltingSource;
-    active <span class="hljs-literal">on</span>;
-    solidificationMeltingSourceCoeffs
-    {
-        selectionMode all;
-        Tmelt <span class="hljs-number">273</span>;
-        L <span class="hljs-number">334000</span>; <span class="hljs-comment">// enthalpy of fusion for water [J/kg]</span>
-        thermoMode thermo; <span class="hljs-comment">// retrieve thermo properties from thermo model</span>
-        beta <span class="hljs-number">50e-6</span>; <span class="hljs-comment">// thermal expansion coeff [1/K]</span>
-        rhoRef <span class="hljs-number">1000</span>;
-    }
-}
-</code></pre></div>
-<p><code>solidificationMeltingSource</code> 在整个 <code>ice</code> 区域计算相变。<code>Tmelt</code> 规定融化温度，<code>L</code> 规定单位质量相变潜热，二者共同决定升温转入融化的时刻及所需能量。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/ice/fvOptions">查看该配置的官方原文件</a>。</p>
-<h3 id="3-玻璃导热热阻"><a href="#3-玻璃导热热阻" class="headerlink" title="3. 玻璃导热热阻"></a>3. 玻璃导热热阻</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置玻璃导热热阻。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">cabin_to_ice
-{
-    <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">260</span>;
-    Tnbr T;
-    kappaMethod fluidThermo;
-    kappa none;
-    <span class="hljs-comment">// windshield 3 mm</span>
-    thicknessLayers (<span class="hljs-number">0.003</span>);
-    kappaLayers (<span class="hljs-number">0.9</span>);
-}
-</code></pre></div>
-<p>耦合温度边界中的附加层表示玻璃导热热阻。<code>thicknessLayers</code> 与 <code>kappaLayers</code> 分别给出厚度和导热系数，玻璃两侧温降由热流与该热阻共同确定。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
-<h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
-<span class="hljs-built_in">tail</span> -n 40 log.chtMultiRegionFoam
-</code></pre></div>
-<p><code>Allsolve</code> 读取生成的网格和初始场，调用 <code>chtMultiRegionFoam</code>；日志用于观察残差、连续性误差及本模型的迭代信息。时间控制给出计算起止位置和输出频率。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>控制项</th>
-<th>配置值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>startFrom</code></td>
-<td><code>startTime</code></td>
-</tr>
-<tr>
-<td><code>startTime</code></td>
-<td><code>0</code></td>
-</tr>
-<tr>
-<td><code>endTime</code></td>
-<td><code>400</code></td>
-</tr>
-<tr>
-<td><code>deltaT</code></td>
-<td><code>0.0001</code></td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>adjustable</code></td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td><code>1</code></td>
-</tr>
-<tr>
-<td><code>adjustTimeStep</code></td>
-<td><code>yes</code></td>
-</tr>
-<tr>
-<td><code>maxCo</code></td>
-<td><code>5</code></td>
-</tr>
-</tbody></table></div>
-<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选<code>cabin</code>、ice 与 exterior，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>显示冰层液相比例，统计达到指定融化比例的面积或体积，并与平均温度曲线对照。升温、相变平台和融化后升温对应不同的能量分配阶段，曲线与空间分布共同说明除霜进程。</p>
-<p>分别改变送风温度和速度，比较融化时间及累计输入热量。重点比较直接冲击区与风挡远端：若热风集中通过局部区域，流量增加对远端融化的改善可能有限。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 冰厚通过几何设置，玻璃厚度通过界面热阻设置。改变其中一项时，保持另一项不变才能区分两种传热影响。</p>
-</blockquote>
-<h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
-<li><a href="/downloads/engineering/windshield-defrost.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">v2512 官方算例目录</a>：核对原始几何、物性和网格流程。</li>
-<li><code>SOURCE.json</code> 记录来源与本站调整；<code>files.sha256</code> 用于核对包内文件；<code>VALIDATION.json</code> 记录网格检查和短步运行结果。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -491,6 +306,6 @@ bash Allmesh
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

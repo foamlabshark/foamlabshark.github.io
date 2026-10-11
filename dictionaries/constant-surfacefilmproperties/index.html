@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,175 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>surfaceFilmProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>壁面液膜区域的模型与耦合参数，包括液膜热物性、相变、颗粒与壁面相互作用等。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>surfaceFilmProperties</code> 描述壁面液膜的材料和模型，并安排相变、颗粒或壁面相互作用。它用于表面液膜区域与主体流动之间的耦合，膜厚、温度和交换过程由配套字段及模型共同确定。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/surfaceFilmProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>surfaceFilmModel</code></td><td>表面液膜模型选择，需与液膜区域和主流体耦合条件配套。</td></tr><tr><td><code>region</code></td><td>目标网格区域名称；多区域场与网格路径中应保持一致。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>injectionModels</code></td><td>注入时间、位置、流量与粒径分布等设置；需要同时满足总注入质量与统计分辨率要求。</td></tr><tr><td><code>radiationModel</code></td><td>辐射传输模型名称，例如 <code>P1</code>、fvDOM 或 <code>viewFactor</code>；不同模型需要不同附加文件。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>surfaceFilmModel / thermoSingleLayerCoeffs</code></td><td>液膜模型与其系数字典；下面的子模型属于该系数字典。</td></tr><tr><td><code>filmThermoModel / liquidCoeffs</code></td><td>液膜热物性模型；<code>liquid</code> 指定液体，<code>useReferenceValues</code> 决定是否按参考状态取值。</td></tr><tr><td><code>filmViscosityModel / turbulence / laminarCoeffs.Cf</code></td><td>液膜黏度、湍流模型与层流闭合系数。</td></tr><tr><td><code>deltaWet / hydrophilic</code></td><td>判断湿润区域的液膜厚度阈值与亲液处理开关。</td></tr><tr><td><code>upperSurfaceModels.heatTransferModel / lowerSurfaceModels.heatTransferModel</code></td><td>分别定义液膜上表面与下表面的换热关联，常量模型在 <code>constantCoeffs</code> 中填 <code>c0</code>。</td></tr><tr><td><code>phaseChangeModel / injectionModels / forces</code></td><td>液膜相变、液滴注入以及 <code>thermocapillary</code> 等力模型；只有被选中的过程才读取相应系数字典。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/smallPoolFire3D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/smallPoolFire3D"><h3>算例问题：smallPoolFire3D</h3><p class="reference-case-problem">池火向上方气体释放燃料和热量，浮力使高温气体形成火羽流。算例用于研究三维燃烧流动与辐射换热，主要结果为火焰温度、流速、组分和热辐射。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/smallPoolFire3D"><code>combustion/fireFoam/LES/smallPoolFire3D</code></a>。</p></section><!-- /reference-case-contexts --><p><code>smallPoolFire3D</code> 的当前配置关闭表面液膜区域，池火计算由气相及配套边界模型组织。</p>
-<ul>
-<li><code>surfaceFilmModel none</code> 选择空液膜模型；<code>active false</code> 关闭液膜演化。</li>
-<li><code>region none</code> 与这个关闭状态一致，当前无需读取名为液膜区域的网格与场。</li>
-<li>要改变池火供燃料方式，应先检查气相边界和燃烧设置；本文件当前没有液膜厚度、流速或蒸发参数可调。</li>
-</ul>
-<p>若改成显式液膜供燃料的模型，需要建立膜区域、初始化膜厚与温度，并选择液膜传热和相变子模型。可以比较边界供给的燃料流率与液膜蒸发流率，明确两种建模方法的输入差别。</p>
-<p><a href="/assets/examples/v2512/surfacefilmproperties/1-surfaceFilmProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/smallPoolFire3D/constant/surfaceFilmProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/smallPoolFire3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/smallPoolFire3D/constant/surfaceFilmProperties"><code>combustion/fireFoam/LES/smallPoolFire3D/constant/surfaceFilmProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> surfaceFilmProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-surfaceFilmModel none;
-region none;
-active <span class="hljs-literal">false</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/cylinder</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/cylinder"><h3>算例问题：cylinder</h3><p class="reference-case-problem">水滴在重力和流体阻力作用下运动，与圆柱表面的液膜交换质量。本例启用表面液膜模型，而液滴换热、相变及化学反应模型设为 <code>none</code>；主要检查液滴轨迹、碰壁处理和液膜分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder"><code>lagrangian/reactingParcelFoam/cylinder</code></a>。</p></section><!-- /reference-case-contexts --><p><code>cylinder</code> 使用单层热液膜模型描述液滴落到圆柱表面后的铺展和沿壁面流动。</p>
-<ul>
-<li><code>thermoSingleLayer</code>、<code>active true</code> 开启膜的质量、动量和热过程；<code>region wallFilmRegion</code> 指向独立的薄层网格区域。</li>
-<li><code>filmThermoModel liquid</code>、<code>liquid H2O</code>、<code>useReferenceValues no</code> 采用水的液体物性模型；<code>filmViscosityModel liquid</code> 同样从液体物性得到黏度。</li>
-<li><code>deltaWet 1e-4</code> m 给出干湿判别的膜厚尺度，<code>hydrophilic no</code> 采用非强制亲水的润湿设置。</li>
-<li><code>turbulence laminar</code> 与 <code>Cf 0.005</code> 配置层流膜内的摩擦处理；<code>thermocapillary</code> 根据表面张力梯度产生切向作用。</li>
-<li>上下表面的常数换热系数均为 <code>c0 1e-8</code>，对应近似隔热的设置；蒸发、辐射和膜主动注入模型在此关闭。</li>
-</ul>
-<p>可改变 <code>deltaWet</code> 比较润湿面积的判定，再改变入射液滴流率观察膜厚。若研究壁面加热，应设置有物理依据的下表面换热系数与壁温，并观察膜温及表面张力梯度。</p>
-<p><a href="/assets/examples/v2512/surfacefilmproperties/2-surfaceFilmProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder/constant/surfaceFilmProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder/constant/surfaceFilmProperties"><code>lagrangian/reactingParcelFoam/cylinder/constant/surfaceFilmProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">59 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> surfaceFilmProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-surfaceFilmModel thermoSingleLayer;
-region wallFilmRegion;
-active <span class="hljs-literal">true</span>;
-thermoSingleLayerCoeffs
-{
-    filmThermoModel liquid;
-    liquidCoeffs
-    {
-        useReferenceValues <span class="hljs-literal">no</span>;
-        liquid H2O;
-    }
-    filmViscosityModel liquid;
-    deltaWet <span class="hljs-number">1e-4</span>;
-    hydrophilic <span class="hljs-literal">no</span>;
-    turbulence <span class="hljs-built_in">laminar</span>;
-    laminarCoeffs
-    {
-        Cf <span class="hljs-number">0.005</span>;
-    }
-    forces
-    (
-        thermocapillary
-    );
-    injectionModels ();
-    phaseChangeModel none;
-    radiationModel none;
-    upperSurfaceModels
-    {
-        heatTransferModel constant;
-        constantCoeffs
-        {
-            c0 <span class="hljs-number">1e-8</span>;
-        }
-    }
-    lowerSurfaceModels
-    {
-        heatTransferModel constant;
-        constantCoeffs
-        {
-            c0 <span class="hljs-number">1e-8</span>;
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/splashPanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/splashPanel"><h3>算例问题：splashPanel</h3><p class="reference-case-problem">液滴撞击板面后与表面液膜发生交换，部分质量可能沉积或重新形成飞溅液滴。算例用于配套设置液滴碰壁和液膜模型，并检查沉积、飞溅与液膜质量之间的收支。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/splashPanel"><code>lagrangian/reactingParcelFoam/splashPanel</code></a>。</p></section><!-- /reference-case-contexts --><p><code>splashPanel</code> 将颗粒撞壁过程与平板液膜耦合，用膜区域记录液体的铺展和累积。</p>
-<ul>
-<li><code>thermoSingleLayer</code> 在 <code>wallFilmRegion</code> 上推进液膜，液体为 <code>H2O</code>，黏度与热物性通过液体模型求取。</li>
-<li><code>deltaWet 2e-4</code> m 对应 0.2 mm 的润湿判别尺度，比圆柱示例的阈值更大；其影响体现在薄膜区域的干湿识别。</li>
-<li><code>hydrophilic no</code>、<code>turbulence laminar</code> 和 <code>Cf 0.005</code> 分别控制润湿处理与膜内摩擦。</li>
-<li><code>forces (thermocapillary)</code> 包含热毛细作用；上下表面 <code>c0 1e-8</code> 使该例的换热接近关闭。</li>
-<li>膜自身的 <code>injectionModels</code> 为空，膜蒸发和辐射均关闭。液滴撞击、吸收或飞溅的判据需要与颗粒云端的膜相互作用模型一起阅读。</li>
-</ul>
-<p>提高注入速度可改变撞击动量，增加流量可提高膜内积液量。比较时分别记录入射颗粒、离开壁面的颗粒和液膜质量，并保持同一膜网格与干湿阈值。</p>
-<p><a href="/assets/examples/v2512/surfacefilmproperties/3-surfaceFilmProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/splashPanel/constant/surfaceFilmProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/splashPanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/splashPanel/constant/surfaceFilmProperties"><code>lagrangian/reactingParcelFoam/splashPanel/constant/surfaceFilmProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">59 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> surfaceFilmProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-surfaceFilmModel thermoSingleLayer;
-region wallFilmRegion;
-active <span class="hljs-literal">true</span>;
-thermoSingleLayerCoeffs
-{
-    filmThermoModel liquid;
-    liquidCoeffs
-    {
-        useReferenceValues <span class="hljs-literal">no</span>;
-        liquid H2O;
-    }
-    filmViscosityModel liquid;
-    deltaWet <span class="hljs-number">2e-4</span>;
-    hydrophilic <span class="hljs-literal">no</span>;
-    turbulence <span class="hljs-built_in">laminar</span>;
-    laminarCoeffs
-    {
-        Cf <span class="hljs-number">0.005</span>;
-    }
-    forces
-    (
-        thermocapillary
-    );
-    injectionModels ();
-    phaseChangeModel none;
-    radiationModel none;
-    upperSurfaceModels
-    {
-        heatTransferModel constant;
-        constantCoeffs
-        {
-            c0 <span class="hljs-number">1e-8</span>;
-        }
-    }
-    lowerSurfaceModels
-    {
-        heatTransferModel constant;
-        constantCoeffs
-        {
-            c0 <span class="hljs-number">1e-8</span>;
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/reactingparcelfoam/">reactingParcelFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -474,6 +306,6 @@ thermoSingleLayerCoeffs
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

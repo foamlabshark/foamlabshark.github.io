@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,97 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>PDRMeshDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>PDR 网格处理工作流中的专用配置。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>PDRMeshDict</code> 控制 PDR 网格处理中的选区和拓扑调整，配合阻塞单元及面集合使用。它用于把障碍物预处理得到的信息落实到网格，随后与 PDR 相关场一起进入求解流程。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/PDRMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>blockedFaces</code></td><td><code>faceSet</code> 与封闭挡板 <code>patch</code> 的映射。</td></tr><tr><td><code>coupledFaces</code></td><td>耦合挡板的面集合及相关壁面/周期边界配置。</td></tr><tr><td><code>wallPatch</code></td><td>用于挡板壁面的 <code>patch</code> 名称。</td></tr><tr><td><code>cyclicMasterPatch</code></td><td>周期耦合主边界名称。</td></tr><tr><td><code>blockedCells</code></td><td>需要从网格中移除的单元集合。</td></tr><tr><td><code>defaultPatch</code></td><td>新暴露且没有明确指定去向的面归入此边界。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>combustion/PDRFoam/flamePropagationWithObstacles</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/PDRFoam/flamePropagationWithObstacles"><h3>算例问题：flamePropagationWithObstacles</h3><p class="reference-case-problem">预混可燃气体中的火焰传播受到管架或障碍物影响，障碍物会改变阻力、湍流和燃烧传播速度。PDR 方法用网格上的等效堵塞与阻力描述未逐一解析的结构；预处理算例负责生成这些场，燃烧算例再求解压力和火焰演化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/flamePropagationWithObstacles"><code>combustion/PDRFoam/flamePropagationWithObstacles</code></a>。</p></section><!-- /reference-case-contexts --><p>障碍物火焰传播算例先用集合标记被固体占据的单元和被阻挡的面，再由 <code>PDRMesh</code> 改造网格。</p>
-<ul>
-<li><code>blockedCells blockedCellsSet</code> 指向要从计算域移除的单元集合；这个集合应在运行前生成。</li>
-<li><code>blockedFaces ((blockedFacesSet blockedFaces))</code> 把指定面集合转换到名为 <code>blockedFaces</code> 的边界。</li>
-<li><code>coupledFacesSet</code> 对应混合耦合挡板，<code>wallPatch baffleWall</code> 与 <code>cyclicMasterPatch baffleCyclic_half0</code> 指定其壁面和周期耦合部分。</li>
-<li><code>defaultPatch outer</code> 接收剔除单元后暴露、又未单独指定归属的面。</li>
-</ul>
-<p>更换障碍物后重新生成集合，再检查新边界的名称、面积和相邻单元；场文件中的边界条件应覆盖这些新边界。</p>
-<p><a href="/assets/examples/v2512/pdrmeshdict/1-PDRMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/flamePropagationWithObstacles/system/PDRMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/flamePropagationWithObstacles">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/flamePropagationWithObstacles/system/PDRMeshDict"><code>combustion/PDRFoam/flamePropagationWithObstacles/system/PDRMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> PDRMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">//- Per faceSet the patch the faces should go into blocked baffles</span>
-blockedFaces
-(
-    (blockedFacesSet blockedFaces)
-);
-<span class="hljs-comment">//- Per faceSet the patch the faces should go into coupled baffles</span>
-coupledFaces
-{
-    coupledFacesSet
-    {
-        wallPatch baffleWall;
-        cyclicMasterPatch baffleCyclic_half0;
-    }
-}
-<span class="hljs-comment">//- Name of cellSet that holds the cells to fully remove</span>
-blockedCells blockedCellsSet;
-<span class="hljs-comment">//- All exposed faces that are not specified in blockedFaces go into</span>
-<span class="hljs-comment">//  this patch</span>
-defaultPatch outer;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · etc/caseDicts/annotated</summary><p>这个注释模板列出 PDR 网格处理中使用的单元集合、面集合和挡板边界。移植时可与上一个完整火焰传播算例对照。</p>
-<ul>
-<li><code>blockedCellsSet</code> 定义被实体堵塞的单元，<code>blockedFacesSet</code> 定义受阻面。</li>
-<li><code>blockedFaces</code> 列表给出“面集合—目标边界”的对应关系，<code>defaultPatch outer</code> 指定其余暴露面的归属。</li>
-<li>模板中的 <code>wallPatchName</code>、<code>cyclicMasterPatchName</code> 保留了旧写法；<code>v2512</code> 的 <code>PDRMesh</code> 实际读取 <code>wallPatch</code>、<code>cyclicMasterPatch</code>。使用本模板时将这两个键分别改成后者，值仍为 <code>baffleWall</code> 和 <code>baffleCyclic_half0</code>。</li>
-</ul>
-<p>用网格工具生成的集合名称替换示例名称，并让各个场文件使用生成后的边界名称。</p>
-<p><a href="/assets/examples/v2512/pdrmeshdict/2-PDRMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/PDRMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> PDRMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">//- Per faceSet the patch the faces should go into blocked baffles</span>
-blockedFaces
-(
-    (blockedFacesSet blockedFaces)
-);
-<span class="hljs-comment">//- Per faceSet the duplicate baffles to generate (one 'normal', wall baffle,</span>
-<span class="hljs-comment">//  one cyclic baffle). For use with active baffle boundary conditions.</span>
-coupledFaces
-{
-    coupledFacesSet
-    {
-        wallPatchName baffleWall;
-        cyclicMasterPatchName baffleCyclic_half0;
-    }
-}
-<span class="hljs-comment">//- Name of cellSet that holds the cells to fully remove</span>
-blockedCells blockedCellsSet;
-<span class="hljs-comment">//- All exposed faces that are not specified in blockedFaces go into</span>
-<span class="hljs-comment">//  this patch</span>
-defaultPatch outer;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/pdrmesh/">PDRMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -396,6 +306,6 @@ defaultPatch outer;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

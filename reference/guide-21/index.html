@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,92 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 21 章　常见报错速查</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>先学会读 OpenFOAM 的报错。它的格式是固定的：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">--&gt; FOAM FATAL ERROR: (openfoam-2512)
-cannot find file "/home/chen/run/cavity/0/U"
-
-    From ... in file db/regIOobject/regIOobjectRead.C at line 132.
-FOAM exiting</code></pre></div>
-<p>阅读错误日志中的具体说明、文件位置及相邻信息。FATAL IO ERROR 通常涉及文件读取或字典解析；按日志指向检查相关文件和参数。</p>
-<h2>21.1 环境与文件类</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>症状</th><th>原因</th><th>处理</th></tr>
-<tr><td>终端未找到 <code>blockMesh</code>：<code>blockMesh: command not found</code></td><td>没 <code>source</code> 环境</td><td>of2512（或 <code>source</code> .../etc/bashrc），再 <code>foamVersion</code> 确认</td></tr>
-<tr><td><code>cannot</code> <code>find</code> <code>file</code> ".../0/U"</td><td>缺场文件，或 0/ 被 <code>Allclean</code> 删了</td><td><code>cp</code> <code>-r</code> 0.orig 0</td></tr>
-<tr><td>字典中缺少条目 <code>xxx</code>：<code>keyword xxx is undefined in dictionary</code></td><td>字典里缺关键字</td><td>报错会给出字典路径，去补；不确定填什么就去 <code>$FOAM_TUTORIALS</code> 找同类算例抄</td></tr>
-<tr><td>缺少对应边界的场设置：<code>Cannot find patchField entry for &lt;名字&gt;</code></td><td>0/ 里某个场漏了某个 <code>patch</code></td><td>在该场的 <code>boundaryField</code> 里补上；或加 ".*" { <code>type</code> <code>zeroGradient</code>; } 兜底</td></tr>
-<tr><td>条目语法有误：<code>ill defined primitiveEntry starting at ...</code></td><td>语法错：漏分号、括号不配对、有中文全角符号</td><td>从报错行往上找；从 PDF 复制的内容尤其要检查全角字符</td></tr>
-<tr><td>参与运算的量纲不匹配：<code>incompatible dimensions for operation</code></td><td>量纲不匹配</td><td>检查 <code>dimensions</code>。最常见：不可压求解器里把 <code>p</code> 写成了 Pa 的量纲</td></tr>
-<tr><td>边界条件类型 <code>xxx</code> 未识别：<code>Unknown patchField type xxx</code></td><td>边界条件名拼错，或该类型需要额外的库</td><td><code>foamHelp</code> <code>boundary</code> <code>-field</code> <code>U</code> 看正确名字；或在 <code>controlDict</code> 里 <code>libs</code> 加载对应库</td></tr>
-<tr><td>未找到所需类型的对象：<code>object of type ... not found</code></td><td><code>object</code> 名与文件名不一致</td><td>改文件头里的 <code>object</code></td></tr>
-</tbody></table></div>
-<h2>21.2 网格类</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>症状</th><th>原因</th><th>处理</th></tr>
-<tr><td>块网格的体积为负：<code>Block ... has negative volume</code></td><td><code>blockMeshDict</code> 顶点顺序错</td><td>按 15.2 的规则重排；用 <code>paraFoam</code> <code>-block</code> 看</td></tr>
-<tr><td>***Number <code>of</code> severely non-orthogonal <code>faces</code>: N</td><td>网格质量差</td><td><code>fvSolution</code> 加 <code>nNonOrthogonalCorrectors</code> 2；<code>fvSchemes</code> 改 <code>limited</code> <code>corrected</code> 0.33；根本办法是改网格</td></tr>
-<tr><td>检测到零体积或负体积单元：<code>Zero or negative cell volume detected</code></td><td>网格坏</td><td>必须重建；<code>checkMesh</code> <code>-writeSets</code> <code>vtk</code> 定位坏单元</td></tr>
-<tr><td><code>snappyHexMesh</code> 跑完没有网格 / 只剩一点</td><td><code>locationInMesh</code> 点在固体内或落在面上</td><td>挪到明确的流体区，坐标带零头（如 (0.501 0.301 0.201)）</td></tr>
-<tr><td>加层几乎全失败（layer ratio &lt; 0.5）</td><td>几何尖角、层太厚、质量阈值太严</td><td>减 <code>nSurfaceLayers</code>、减 <code>finalLayerThickness</code>、<code>minTetQuality</code> 放宽到 -1e30</td></tr>
-<tr><td>结果里壁面函数没起作用</td><td>边界类型设为 <code>patch</code>。</td><td>改 <code>constant/polyMesh/boundary</code> 里的 <code>type</code>，或用 <code>createPatch</code></td></tr>
-</tbody></table></div>
-<h2>21.3 计算发散类（最常见）</h2>
-<p>典型现象</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">Courant Number mean: 1.2e+15 max: 3.4e+18
-bounding k, min: -1.2e+03 max: 5.6e+05 average: 12.3
-#0  Foam::error::printStack(...)
-Floating point exception</code></pre></div><!-- example-reading --><p>日志中的 Courant 数已经极大，同时 <code>k</code> 出现负值并被限制，随后发生浮点异常。这说明数值解在报错前已经失稳。应从最早出现异常的时间步检查速度、网格质量、边界和时间步，单独放宽 <code>k</code> 的限制不会消除失稳原因。</p><!-- /example-reading -->
-<p>排查步骤</p>
-<p>网格：<code>checkMesh</code> <code>-allGeometry</code> <code>-allTopology</code> 有没有 ***？非正交角多少？</p>
-<p>边界条件：进出口是不是都定了？封闭腔体给了 <code>pRefCell</code> 吗？出口用 <code>inletOutlet</code> 了吗？</p>
-<p>初场：初场是不是物理上不可能（比如压力给了负值、<code>alpha</code> 超出 [0,1]）？</p>
-<p>时间步：<code>maxCo</code> 是不是太大？先降到 0.3 试试。</p>
-<p>格式：把 <code>divSchemes</code> 全改成 <code>Gauss</code> <code>upwind</code>（一阶最稳），如果这样能跑说明是格式问题，再逐步换回二阶。</p>
-<p>松弛因子：稳态算例把 <code>p</code> 降到 0.1、<code>U</code> 降到 0.3。</p>
-<p>这个顺序的道理：从”不可能算对”的问题（网格、边界条件）查到”可能只是不稳”的问题（格式、松弛）。反过来查会浪费大量时间——网格有负体积时，你把松弛因子调到 0.01 也没用。</p>
-<p>几个具体信号的含义</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>日志里的话</th><th>含义</th><th>处理</th></tr>
-<tr><td>bounding <code>k</code> / bounding <code>epsilon</code> 偶尔出现</td><td>湍流量被限幅（正常现象）</td><td>忽略；持续大量出现才是问题</td></tr>
-<tr><td>bounding 每步都出现</td><td>湍流量在发散</td><td>检查入口湍流量估算、壁面函数、<span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span></td></tr>
-<tr><td>Continuity <code>error</code> 越来越大</td><td>连续性不满足</td><td>增加 <code>nCorrectors</code>、<code>nNonOrthogonalCorrectors</code>；检查 <code>fixedFluxPressure</code></td></tr>
-<tr><td><code>deltaT</code> 一直缩小到 1e-12</td><td>局部有坏点或数值爆炸</td><td>用 ParaView 找 <code>U</code> 或 <code>p</code> 最大的位置，八成是网格坏点</td></tr>
-<tr><td>Floating <code>point</code> exception</td><td>出现了 0/0 或 sqrt(负数)</td><td>开 <code>export FOAM_SIGFPE=true 重新计算</code>，定位第一次出错的位置</td></tr>
-<tr><td><code>GAMG</code> 求解器不收敛 / singular matrix</td><td>压力无基准</td><td>给 <code>pRefCell/pRefValue</code>（全封闭算例必需）</td></tr>
-<tr><td>达到最大迭代次数：<code>Maximum number of iterations exceeded</code></td><td>线性求解器达到上限</td><td>放宽 <code>tolerance</code> 或换求解器；也可能是矩阵已经坏了，先查上面几条</td></tr>
-</tbody></table></div>
-<h2>21.4 并行类</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>症状</th><th>原因</th><th>处理</th></tr>
-<tr><td>结果错乱、日志重复 8 遍</td><td>漏了 <code>-parallel</code></td><td>mpirun <code>-np</code> 8 <code>solver</code> <code>-parallel</code></td></tr>
-<tr><td>分区目录数与启动进程数不一致：<code>number of processor directories = 4 is not equal to the number of processors = 8</code></td><td><code>-np</code> 与 <code>numberOfSubdomains</code> 不一致</td><td>改一致，或 <code>decomposePar</code> <code>-force</code> 重分</td></tr>
-<tr><td>mpirun 报共享库错误</td><td>集群 MPI 与编译时的 MPI 不同</td><td><code>module</code> <code>load</code> 与编译一致的 MPI，或重新编译</td></tr>
-<tr><td>并行比串行还慢</td><td>每核网格太少</td><td>减核数，保证每核 <span class="math-formula" data-tex="\ge  5"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">\ge  5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span></span> 万单元</td></tr>
-<tr><td>大规模并行写文件极慢</td><td>小文件太多</td><td>加 <code>-fileHandler</code> <code>collated</code></td></tr>
-</tbody></table></div>
-<h2>21.5 编译类</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>症状</th><th>原因</th><th>处理</th></tr>
-<tr><td>找不到头文件 <code>xxx.H</code>：<code>xxx.H: No such file or directory</code></td><td><code>Make/options</code> 里 <code>EXE_INC</code> 缺路径</td><td>加对应的 <code>-I</code>$(LIB_SRC)/.../lnInclude</td></tr>
-<tr><td><code>undefined</code> <code>reference</code> <code>to</code> ...</td><td><code>EXE_LIBS</code> 缺库</td><td>加对应的 <code>-lxxx</code></td></tr>
-<tr><td>编译成功但 <code>command</code> <code>not</code> <code>found</code></td><td>装到了 <code>$FOAM_USER_APPBIN</code> 但环境没刷新，或 <code>Make/files</code> 里 <code>EXE</code> 路径写错</td><td><code>wmake</code> 后看输出路径；<code>which</code> 命令名</td></tr>
-<tr><td>改了 <code>codedFixedValue</code> 不生效</td><td>dynamicCode/ 缓存</td><td><code>rm</code> <code>-rf</code> dynamicCode</td></tr>
-<tr><td><code>error</code>: '<code>xxx</code>' was <code>not</code> declared</td><td>版本 API 变了</td><td>去 <code>$FOAM_SRC</code> 找同名新接口</td></tr>
-</tbody></table></div>
-<h2>21.6 无运行报错情况下的结果偏差</h2>
-<p>这类问题没有报错信息，只能靠检查清单：</p>
-<p>单位：STL 是毫米吗？<code>transformPoints</code> <code>-scale</code> 做了吗？</p>
-<p><code>patch</code> 类型：壁面是 <code>wall</code> 不是 <code>patch</code> 吗？</p>
-<p>不可压里的压力：<code>p</code> 的单位是 <span class="math-formula" data-tex="m^{2}/s^{2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi>s</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">m^{2}/s^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>，算力时给 <code>rhoInf</code> 了吗？</p>
-<p>重力方向：g 的方向与网格坐标系一致吗？</p>
-<p><code>setFields</code> 跑在干净的 0/ 上吗？（跑两次结果不同就是这个问题）</p>
-<p>湍流模型开了吗：<code>turbulenceProperties</code> 里 <code>turbulence</code> <code>on</code>;？</p>
-<p>统计平均的起始时间：<code>fieldAverage</code> 的 <code>timeStart</code> 是不是把初始瞬态也统计进去了？</p>
-<p>收敛了吗：稳态算例残差降到 1e-4 以下了吗？监测量（如阻力系数）平了吗？残差降下来 <span class="math-formula" data-tex="\ne"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo mathvariant="normal">≠</mo></mrow><annotation encoding="application/x-tex">\ne</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel"><span class="mrel"><span class="mord katex-vbox"><span class="katex-thinbox"><span class="rlap"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="katex-inner"><span class="mord"><span class="mrel"></span></span></span><span class="katex-fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span></span></span></span></span> 收敛，还要看物理量不再变化。</p>
-<p>网格无关性：加密一倍，结果变化超过 5% 吗？</p>
-<p>养成一个习惯：任何一个新算例，先用你知道答案的简化工况验证一遍（层流管流对比 Hagen–Poiseuille、圆柱绕流对比 <span class="math-formula" data-tex="\mathrm{Re}=100"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">\mathrm{Re}=100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">Re</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></span> 的 St 数）。这一步花半天，能省掉后面几周的怀疑。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -391,6 +306,6 @@ Floating point exception</code></pre></div><!-- example-reading --><p>日志中�
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

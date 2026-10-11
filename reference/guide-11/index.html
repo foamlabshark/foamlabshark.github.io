@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,163 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 11 章　字典文件的通用语法</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>OpenFOAM 的设置文件称为字典，使用统一的语法。掌握条目、列表与子字典的写法后，即可阅读和修改不同配置文件。</p>
-<h2>11.1 文件头 FoamFile</h2>
-<p>每个字典文件开头都有这一段，缺了会直接报错：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii; <span class="hljs-comment">// ascii 或 binary</span>
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-comment">// 这个文件装的是什么类型的数据</span>
-    <span class="hljs-keyword">object</span> controlDict; <span class="hljs-comment">// 文件名，必须与实际文件名一致</span>
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span></code></pre></div>
-<p><code>class</code> 常见取值</p>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>class</code></th><th>用在</th></tr>
-<tr><td><code>dictionary</code></td><td>所有 system/、constant/ 下的设置文件</td></tr>
-<tr><td><code>volScalarField</code></td><td>0/ 下的标量场（<code>p</code>、<code>T</code>、<code>k</code>…）</td></tr>
-<tr><td><code>volVectorField</code></td><td>0/ 下的矢量场（<code>U</code>）</td></tr>
-<tr><td><code>volSymmTensorField</code></td><td>对称张量场（<code>R</code>）</td></tr>
-<tr><td><code>pointVectorField</code></td><td>点场（动网格位移）</td></tr>
-<tr><td><code>surfaceScalarField</code></td><td>面场（<code>phi</code>）</td></tr>
-</tbody></table></div>
-<p><code>object</code> 与文件名不一致时，多数命令会警告甚至读错。手工复制文件时记得改 <code>object</code>——这是初学者的高频低级错误。</p>
-<h2>11.2 基本语法规则</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">关键字   值;                       // 每条以分号结尾
-
-子字典
-{
-    关键字   值;
-}
-
-列表 ( a b c );                    // 括号 + 空格分隔
-带长度的列表 3 ( a b c );           // 也可以显式写长度
-
-// 单行注释
-/* 多行
-   注释 */</code></pre></div>
-<p>三条容易犯的错：① 忘记分号（报错信息通常指向下一行，所以要往上找）；② 子字典 {} 后面不加分号；③ 中文全角符号混进来（从 PDF 复制时常发生），报 <code>ill</code> <code>defined</code> <code>primitiveEntry</code>。</p>
-<h2>11.3 量纲 dimensions</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]; <span class="hljs-comment">// 这是不可压求解器里 p 的量纲：m²/s²</span></code></pre></div>
-<p>七个数字依次是：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>位置</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
-<tr><td>物理量</td><td>质量</td><td>长度</td><td>时间</td><td>温度</td><td>物质的量</td><td>电流</td><td>光强</td></tr>
-<tr><td>单位</td><td>kg</td><td>m</td><td>s</td><td>K</td><td>mol</td><td>A</td><td><code>cd</code></td></tr>
-</tbody></table></div>
-<p>常见量纲</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>量</th><th>写法</th><th>单位</th></tr>
-<tr><td>速度 <code>U</code></td><td>[0 1 -1 0 0 0 0]</td><td>m/s</td></tr>
-<tr><td>压力 <code>p</code>（不可压，已除以 <span class="math-formula" data-tex="\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span></span>）</td><td>[0 2 -2 0 0 0 0]</td><td><span class="math-formula" data-tex="m^{2}/s^{2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi>s</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">m^{2}/s^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></td></tr>
-<tr><td>压力 <code>p</code>（可压，真实压力）</td><td>[1 -1 -2 0 0 0 0]</td><td>Pa</td></tr>
-<tr><td>运动粘度 <span class="math-formula" data-tex="\nu"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi></mrow><annotation encoding="application/x-tex">\nu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0637em;">ν</span></span></span></span></span></td><td>[0 2 -1 0 0 0 0]</td><td><span class="math-formula" data-tex="m^{2}/s"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">m^{2}/s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal">s</span></span></span></span></span></td></tr>
-<tr><td>动力粘度 <span class="math-formula" data-tex="\mu"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi></mrow><annotation encoding="application/x-tex">\mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span></span></td><td>[1 -1 -1 0 0 0 0]</td><td>Pa·s</td></tr>
-<tr><td>密度 <span class="math-formula" data-tex="\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span></span></td><td>[1 -3 0 0 0 0 0]</td><td><span class="math-formula" data-tex="\mathrm{kg}/m^{3}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">k</mi><mi mathvariant="normal">g</mi></mrow><mi mathvariant="normal">/</mi><msup><mi>m</mi><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">\mathrm{kg}/m^{3}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm" style="margin-right:0.0139em;">kg</span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span></span></td></tr>
-<tr><td>温度 <code>T</code></td><td>[0 0 0 1 0 0 0]</td><td>K</td></tr>
-<tr><td><code>k</code>（湍动能）</td><td>[0 2 -2 0 0 0 0]</td><td><span class="math-formula" data-tex="m^{2}/s^{2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi>s</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">m^{2}/s^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></td></tr>
-<tr><td><span class="math-formula" data-tex="\varepsilon"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi></mrow><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span></span></td><td>[0 2 -3 0 0 0 0]</td><td><span class="math-formula" data-tex="m^{2}/s^{3}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi>s</mi><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">m^{2}/s^{3}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span></span></td></tr>
-<tr><td><span class="math-formula" data-tex="\omega"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi></mrow><annotation encoding="application/x-tex">\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></span></td><td>[0 0 -1 0 0 0 0]</td><td>1/s</td></tr>
-</tbody></table></div>
-<p>场运算会检查量纲一致性；压力 Pa 与运动学压力 <span class="math-formula" data-tex="p/\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mi mathvariant="normal">/</mi><mi>ρ</mi></mrow><annotation encoding="application/x-tex">p/\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal">ρ</span></span></span></span></span> 使用不同量纲。出现 <code>incompatible</code> <code>dimensions</code> 时，先确认求解器对 <code>p</code> 的定义，再检查物性、源项与边界中的单位。</p>
-<h2>11.4 场的赋值：uniform / nonuniform</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 全场同一个值</span>
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">nonuniform</span> List&lt;vector&gt; <span class="hljs-comment">// 逐单元给值（一般由程序生成）</span>
-<span class="hljs-number">400</span>
-(
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    ...
-);</code></pre></div>
-<p><code>nonuniform</code> 按网格位置逐项保存场值，适合非均匀初始场和计算结果。批量修改宜使用 <code>setFields</code>、<code>setExprFields</code> 或其他明确的场处理流程，避免改变元素数量或破坏网格编号对应关系。</p>
-<h2>11.5 边界条件块 boundaryField 与正则匹配</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    <span class="hljs-string">"(top|bottom)"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    <span class="hljs-comment">// 正则：同时匹配 top 和 bottom</span>
-    <span class="hljs-string">"wall.*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
-    }
-    <span class="hljs-comment">// 所有以 wall 开头的 patch</span>
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    <span class="hljs-comment">// 兜底：其余全部</span>
-}</code></pre></div>
-<p>正则的两条规则：① 必须用双引号包起来，不然被当作普通名字；② 精确名字优先于正则，多个正则匹配时后面的优先。兜底 ".*" 放最后是个好习惯，可以避免”漏了一个 <code>patch</code> 导致启动失败”。</p>
-<h2>11.6 变量、宏与文件包含（把重复的东西提出来）</h2>
-<p>① 定义与引用变量</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">flowVelocity (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-pressure <span class="hljs-number">0</span>;
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$flowVelocity</span>; <span class="hljs-comment">// 用 $ 引用</span></code></pre></div>
-<p>② 引用嵌套条目</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">$..solvers/p/tolerance      // .. 表示上一层
-$:solvers.p.tolerance       // 从文件根部开始的绝对路径</code></pre></div>
-<p>③ 包含另一个文件（最有用的技巧）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#include        "initialConditions"          // 相对本文件的路径</span>
-<span class="hljs-meta">#includeIfPresent "myOverrides"              // 存在才包含，不存在不报错</span>
-<span class="hljs-meta">#includeEtc     "caseDicts/setConstraintTypes"   // 从 $FOAM_ETC 里包含</span>
-<span class="hljs-meta">#includeFunc solverInfo               // 引入官方 functionObject 模板</span></code></pre></div>
-<p>典型用法：在算例根目录建一个 <code>initialConditions</code> 文件</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// &lt;算例&gt;/initialConditions
-flowVelocity        (10 0 0);
-pressure            0;
-turbulentKE         0.375;
-turbulentEpsilon    14.855;</code></pre></div>
-<p>然后 0/U、0/p、0/k、0/epsilon 全都 #<code>include</code> "../initialConditions" 并用 <code>$flowVelocity</code> 这样引用。好处：改工况只改一个文件，不会出现”<code>U</code> 改了 <code>k</code> 忘了改”的错误。做参数扫描时这更是必须的。</p>
-<p>④ 表达式计算</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#include "initialConditions"</span>
-<span class="hljs-comment">// 用 #calc 写一段 C++ 表达式（会动态编译）</span>
-nu <span class="hljs-meta">#calc "1.0/$Re";</span>
-endTime <span class="hljs-meta">#calc "10.0*$period";</span>
-<span class="hljs-comment">// v2012 起也可以用更轻量的 #eval（不需要编译，速度快）</span>
-deltaT <span class="hljs-meta">#eval "1e-3/2";</span></code></pre></div>
-<p>⑤ 删除继承来的条目</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">#remove         someKeyword;
-#remove         ( key1 key2 );</code></pre></div>
-<p>⑥ 检查展开结果</p>
-<p>用了一堆 #<code>include</code> 和 #<code>calc</code> 后，怎么知道程序最终读到了什么？</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -<span class="hljs-built_in">expand</span>
-foamDictionary 0/U -<span class="hljs-built_in">expand</span> -entry boundaryField/inlet</code></pre></div>
-<p>这条命令能省掉大量猜测。</p>
-<h2>11.7 常用”填空词”</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>写法</th><th>含义</th></tr>
-<tr><td><code>uniform</code> &lt;值&gt;</td><td>均匀场</td></tr>
-<tr><td><code>constant</code> &lt;值&gt;</td><td>常数（部分模型用）</td></tr>
-<tr><td><code>table</code> ((<code>t1</code> <code>v1</code>) (<code>t2</code> <code>v2</code>))</td><td>分段线性表（随时间变化）</td></tr>
-<tr><td><code>tableFile</code> { <code>file</code> "..."; }</td><td>从文件读表</td></tr>
-<tr><td><code>polynomial</code> ((<code>c0</code> 0)(<code>c1</code> 1))</td><td>多项式</td></tr>
-<tr><td><code>expression</code> "..."</td><td>表达式（v2012+ 的 exprValue 类边界条件）</td></tr>
-<tr><td><code>$internalField</code></td><td>用内部场的值（边界 <code>value</code> 里常见）</td></tr>
-<tr><td>#<code>include</code> "..."</td><td>包含文件</td></tr>
-<tr><td><code>yes/no</code>、<code>true/false</code>、<code>on/off</code></td><td>开关都通用</td></tr>
-</tbody></table></div><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -462,6 +306,6 @@ foamDictionary 0/U -<span class="hljs-built_in">expand</span> -entry boundaryFie
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

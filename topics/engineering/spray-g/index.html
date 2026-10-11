@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,213 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>汽油直喷 Spray G：八孔喷雾与蒸发</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>建立 ECN Spray <code>G</code> 八孔非反应喷雾模型，计算液滴破碎、蒸发、贯穿和喷束相互作用。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>缸内直喷将液体燃油在毫秒尺度内送入高温气体。燃油射流破碎为液滴，在气动阻力下减速，并通过换热蒸发。喷射结束后，液态燃油、蒸气与局部降温气体仍同时存在，其空间分布决定后续点火区域的混合状态。</p>
-<p>贯穿距离关系到空气利用和壁面液膜形成，液滴尺寸影响蒸发时间，多喷束卷吸则改变扩散与偏转。喷油器计算因此需要同时描述孔位、孔轴方向、流量分配和液滴演化。</p>
-<p>本例采用 ECN Spray <code>G</code> 喷油器的 G1 工况，计算喷孔出口至外部气体中的非反应混合。喷孔数、名义孔径、孔轴倾角及燃油与环境条件取自公开资料，孔外等效注入采用下文给定的等角圆周排列。通过液相和气相贯穿检验喷雾发展。</p>
-<p>名义设计 STL 用于查看喷嘴结构与尺度，<code>sprayFoam</code> 以颗粒追踪描述孔外液滴。喷孔内部流动另需界面解析网格，本例将出口喷射状态作为外部喷雾的输入。</p>
-<p><img src="/assets/engineering/spray-g-geometry.webp" alt="Spray G 公开喷油器几何与八束喷雾布置"></p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>项目</th>
-<th>G1 输入</th>
-<th>对计算的影响</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>喷孔数</td>
-<td>8</td>
-<td>需要 8 个注入位置与方向</td>
-</tr>
-<tr>
-<td>名义喷孔直径</td>
-<td>0.165 mm</td>
-<td>决定出口尺度和名义流通面积</td>
-</tr>
-<tr>
-<td>喷孔轴与喷油器轴夹角</td>
-<td>37°</td>
-<td>用于构造各孔中心线方向</td>
-</tr>
-<tr>
-<td>燃油</td>
-<td>异辛烷</td>
-<td>液体物性与气相燃油组分需一致</td>
-</tr>
-<tr>
-<td>燃油温度</td>
-<td>363 K</td>
-<td>影响密度、黏度、表面张力和蒸发</td>
-</tr>
-<tr>
-<td>喷射前燃油压力</td>
-<td>20 MPa</td>
-<td>试验供油条件；本配置由流量、面积与 <code>Cd</code> 确定注入速度</td>
-</tr>
-<tr>
-<td>环境温度</td>
-<td>573 K</td>
-<td>提供蒸发所需热量</td>
-</tr>
-<tr>
-<td>环境密度</td>
-<td>3.5 kg/m³</td>
-<td>影响阻力、卷吸与贯穿</td>
-</tr>
-<tr>
-<td>标称喷射总质量</td>
-<td>10 mg</td>
-<td>八个孔的注入质量之和</td>
-</tr>
-<tr>
-<td>液力喷射持续时间</td>
-<td>0.78 ms</td>
-<td>从实际开始出油到结束出油</td>
-</tr>
-</tbody></table></div>
-<p>这些数值见 <a href="https://ecn.sandia.gov/gasoline-spray-combustion/target-condition/spray-g-operating-condition/">ECN G1 目标条件</a> 与 <a href="https://ecn.sandia.gov/gasoline-spray-combustion/computational-method/mesh-and-geometry/">喷孔几何说明</a>。0.68 ms 的电子驱动时间与 0.78 ms 的液力持续时间对应不同过程，在注入模型中应使用液力时间及相应的流量曲线。</p>
-<p>约 600 kPa 的环境压力与指定组成对应 3.5 kg/m³ 密度。预燃气体的体积分数组成为 89.71% N₂、6.52% <code>CO</code>₂、3.77% <code>H</code>₂<code>O</code>。改变气体组成时，由状态方程重新确定同一密度对应的压力。</p>
-<h3 id="几何文件怎样使用"><a href="#几何文件怎样使用" class="headerlink" title="几何文件怎样使用"></a>几何文件怎样使用</h3><p>本节链接 ECN 第一代名义几何的 <code>3mm.stl</code>，其中针阀处于打开状态。原文件包围盒约为 3.699×6.323×3.700 个坐标单位；与毫米级喷嘴外形和 0.165 mm 喷孔共同核对后，导入米制算例时使用 10⁻³ 的长度变换。该旧 CAD 的长轴与当前喷雾测量坐标不同，旋转和平移要在几何预览中确认。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">python3 fetch_geometry.py
-surfaceTransformPoints -scale <span class="hljs-string">'(0.001 0.001 0.001)'</span> geometry/3mm.stl geometry/3mm-metres.stl
-surfaceCheck geometry/3mm-metres.stl
-</code></pre></div>
-<p>下载程序校验几何文件，<code>surfaceCheck</code> 核对缩放尺寸。计算坐标以喷油器轴为 <code>z</code> 轴、下游为正方向，从 CAD 提取孔位替换基准注入中心时，对出口中心和孔轴方向采用相同的坐标变换。</p>
-<p>结果表记录几何代次和喷油器编号，用于对应名义 CAD、CT 重建及实测孔径。改变孔径后，同步更新流通面积和质量分配。</p>
-<h2 id="sprayFoam-中的气相和液滴"><a href="#sprayFoam-中的气相和液滴" class="headerlink" title="sprayFoam 中的气相和液滴"></a><code>sprayFoam</code> 中的气相和液滴</h2><p>气相求解欧拉质量、动量、能量和组分方程，液滴采用拉格朗日追踪。计算颗粒代表一定数量的真实液滴，沿轨迹与周围单元交换质量、动量和能量。</p>
-<p>液滴运动的基本关系可写成</p>
-<p><span class="math-formula math-display" data-tex="
-m_d\frac{d\mathbf u_d}{dt}
-=\frac12 C_D\rho_g A_d|\mathbf U_g-\mathbf u_d|
-(\mathbf U_g-\mathbf u_d)+m_d\mathbf g,
-\qquad \frac{d\mathbf x_d}{dt}=\mathbf u_d.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>m</mi><mi>d</mi></msub><mfrac><mrow><mi>d</mi><msub><mi mathvariant="bold">u</mi><mi>d</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>C</mi><mi>D</mi></msub><msub><mi>ρ</mi><mi>g</mi></msub><msub><mi>A</mi><mi>d</mi></msub><mi mathvariant="normal">∣</mi><msub><mi mathvariant="bold">U</mi><mi>g</mi></msub><mo>−</mo><msub><mi mathvariant="bold">u</mi><mi>d</mi></msub><mi mathvariant="normal">∣</mi><mo stretchy="false">(</mo><msub><mi mathvariant="bold">U</mi><mi>g</mi></msub><mo>−</mo><msub><mi mathvariant="bold">u</mi><mi>d</mi></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>m</mi><mi>d</mi></msub><mi mathvariant="bold">g</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mfrac><mrow><mi>d</mi><msub><mi mathvariant="bold">x</mi><mi>d</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi mathvariant="bold">u</mi><mi>d</mi></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-m_d\frac{d\mathbf u_d}{dt}
-=\frac12 C_D\rho_g A_d|\mathbf U_g-\mathbf u_d|
-(\mathbf U_g-\mathbf u_d)+m_d\mathbf g,
-\qquad \frac{d\mathbf x_d}{dt}=\mathbf u_d.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathbf" style="margin-right:0.016em;">g</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">.</span></span></span></span></span></span></p>
-<p>下标 <code>d</code>、g 分别表示液滴和气体。液滴相对气体的速度越大，阻力通常越强；直径变化又会改变质量与迎风面积之比，使小液滴更容易跟随气体运动。</p>
-<p>液滴从气体吸热，显热提高液滴温度，汽化潜热用于相变。燃油蒸气进入气相组分方程，液滴减少、蒸气增加与气体降温因而构成同一耦合过程。</p>
-<p>气相采用 RANS，液滴采用球形阻力、<code>RanzMarshall</code> 换热和 <code>liquidEvaporationBoil</code> 相变。基准保持非反应，破碎从 <code>ReitzDiwakar</code> 开始比较。初始粒径和破碎参数分别结合粒径分布与贯穿数据评价。</p>
-<h2 id="配置文件与网格建立"><a href="#配置文件与网格建立" class="headerlink" title="配置文件与网格建立"></a>配置文件与网格建立</h2><p>下载包提供八孔外部喷雾的完整配置。气相域为 100 mm×100 mm×100 mm 的封闭立方体，网格为 50×50×50，喷雾沿 <code>z</code> 正方向发展。喷嘴内部流动由出口注入条件代替，公开 CAD 随包保留用于尺寸与喷孔构型对照。</p>
-<p>八个注入中心在半径 0.5 mm 的圆周上等间隔布置，位于 <code>z</code>=0.2 mm 平面，各孔轴与 <code>z</code> 轴夹角为 37°。这里的出口圆周半径、10° 局部半锥角、流量系数 0.6 和初始粒径分布构成外部喷雾基准参数，汇总于 <code>injection-design.json</code>。后续与特定喷油器比较时，用该喷油器的测量或几何数据替换对应条目。</p>
-<p>基准流量曲线在前 100 μs 线性上升、中间保持平台、最后 100 μs 下降，总持续时间 780 μs。每孔 <code>massTotal</code> 为 1.25 mg，八孔合计 10 mg；注入模型按曲线积分归一分配质量。该梯形曲线用于配置基准，实测喷射率可直接替换 <code>flowRateProfile</code> 的时间—权重表。表末将零流量延伸至 0.003 s，使喷射结束附近的时间积分仍落在表格范围内；喷射持续时间仍为 780 μs，总喷油量保持 10 mg。</p>
-<p>环境体积分数按分子量换算后，N₂、<code>CO</code>₂、<code>H</code>₂<code>O</code> 的质量分数分别为 0.876266819、0.100051526、0.023681655。温度为 573 K，按理想气体状态方程由 3.5 kg/m³ 密度得到压力 581415.411 Pa。异辛烷气相 NASA 系数取自 <a href="https://combustion.llnl.gov/sites/combustion/files/prf_v3_therm_dat.txt">LLNL 热力学数据</a>，液相物性使用 OpenFOAM 的 <code>IC8H18</code>；化学反应关闭。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下配置来自下载包的同名文件。</p>
-<h3 id="constant-thermophysicalProperties"><a href="#constant-thermophysicalProperties" class="headerlink" title="constant/thermophysicalProperties"></a><code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">thermoType
-{
-    <span class="hljs-keyword">type</span> hePsiThermo;
-    mixture reactingMixture;
-    transport sutherland;
-    thermo janaf;
-    energy sensibleEnthalpy;
-    equationOfState perfectGas;
-    specie specie;
-}
-chemistryReader foamChemistryReader;
-foamChemistryFile <span class="hljs-string">"&lt;case&gt;/constant/reactions"</span>;
-foamChemistryThermoFile <span class="hljs-string">"&lt;case&gt;/constant/thermo"</span>;
-inertSpecie N2;
-liquids
-{
-    IC8H18;
-}
-solids
-{
-}
-</code></pre></div>
-<p>气相采用理想气体混合物和温度相关 JANAF 热力学性质。<code>foamChemistryReader</code> 读取随包的 <code>reactions</code> 与 <code>thermo</code>；反应列表为空，组分输运与液滴蒸发仍然求解。液相与气相均使用 <code>IC8H18</code> 名称。</p>
-<h3 id="constant-sprayCloudProperties"><a href="#constant-sprayCloudProperties" class="headerlink" title="constant/sprayCloudProperties"></a><code>constant/sprayCloudProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">hole1
-{
-    <span class="hljs-keyword">type</span> coneNozzleInjection;
-    SOI <span class="hljs-number">0</span>;
-    massTotal <span class="hljs-number">1.25e-6</span>;
-    parcelBasisType mass;
-    injectionMethod disc;
-    flowType flowRateAndDischarge;
-    outerDiameter <span class="hljs-number">0.000165</span>;
-    innerDiameter <span class="hljs-number">0</span>;
-    duration <span class="hljs-number">0.00078</span>;
-    position (<span class="hljs-number">0.0005</span> <span class="hljs-number">0</span> <span class="hljs-number">0.0002</span>);
-    direction (<span class="hljs-number">0.601815023152</span> <span class="hljs-number">0</span> <span class="hljs-number">0.798635510047</span>);
-    parcelsPerSecond <span class="hljs-number">2000000</span>;
-    flowRateProfile table
-    (
-        (<span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-        (<span class="hljs-number">0.0001</span> <span class="hljs-number">1</span>)
-        (<span class="hljs-number">0.00068</span> <span class="hljs-number">1</span>)
-        (<span class="hljs-number">0.00078</span> <span class="hljs-number">0</span>)
-        (<span class="hljs-number">0.003</span> <span class="hljs-number">0</span>)
-    );
-    Cd constant <span class="hljs-number">0.6</span>;
-    thetaInner constant <span class="hljs-number">0</span>;
-    thetaOuter constant <span class="hljs-number">10</span>;
-    sizeDistribution
-    {
-        <span class="hljs-keyword">type</span> RosinRammler;
-        RosinRammlerDistribution
-        {
-            minValue <span class="hljs-number">1e-6</span>;
-            maxValue <span class="hljs-number">0.000165</span>;
-            lambda <span class="hljs-number">0.00012</span>;
-            n <span class="hljs-number">3</span>;
-        }
-    }
-}
-</code></pre></div>
-<p>这是八孔中的第一孔。<code>position</code> 的单位为 m，<code>direction</code> 为孔轴单位向量；<code>thetaOuter</code> 定义围绕该孔轴的局部喷雾半锥角。Rosin–Rammler 分布在 1～165 μm 范围内选取初始液滴直径，<code>lambda</code> 为 120 μm，<code>n</code> 为 3。其余七孔采用旋转后的中心和方向。</p>
-<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">application</span> sprayFoam;
-startFrom startTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">0.003</span>;
-deltaT <span class="hljs-number">1e-7</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>;
-maxCo <span class="hljs-number">0.3</span>;
-maxDeltaT <span class="hljs-number">2e-6</span>;
-writeControl adjustableRunTime;
-writeInterval <span class="hljs-number">2e-5</span>;
-purgeWrite <span class="hljs-number">0</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">10</span>;
-writeCompression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">10</span>;
-runTimeModifiable <span class="hljs-literal">true</span>;
-</code></pre></div>
-<p>计算覆盖喷射及喷后发展到 3 ms，最大时间步为 2 μs。初始气相网格为 2 mm；网格和颗粒数比较需要共同进行，以检查液滴源项分布、贯穿和卷吸对空间及统计分辨率的敏感性。</p>
-<h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p><a href="/downloads/engineering/spray-g.zip">下载完整算例与配置代码</a>，解压后进入 <code>spray-g</code> 目录：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-bash Allmesh
-bash Allsolve
-</code></pre></div>
-<p>第一行加载 OpenCFD OpenFOAM <code>v2512</code>，安装位置不同则调整路径。<code>Allmesh</code> 完成网格建立、区域处理和质量检查，再将 <code>0.orig/</code> 复制为运行所用初始场。<code>Allsolve</code> 运行 <code>sprayFoam</code> 并将最新监测记录整理到 <code>analysis/last-monitors.json</code>。在 ParaView 中打开 <code>case.foam</code> 查看场文件。</p>
-<p>网格修改在新解压目录进行，保留基准算例便于比较。建网格前修改 <code>0.orig/</code>，网格完成后修改 <code>0/</code>；求解范围与输出频率在 <code>system/controlDict</code> 中调整。详细记录保存在 <code>log.*</code>，运行脚本遇到错误会停止并显示对应日志。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>ECN 分别发布液相、三维液体分布和气相贯穿数据。本节使用 <a href="https://ecn.sandia.gov/data/sandia-spray-g-data/">Sandia 当前 Spray G 数据入口</a> 中的 G1 异辛烷数据，并记录液相识别阈值。该入口已经指出早期部分气相数据存在问题，选择文件时应沿用当前页面推荐的数据。</p>
-<p>先统一时间零点和质量：计算 0 ms 对应液力喷射开始，实验信号按其定义换算。累计喷入量与剩余液滴、燃油蒸气及边界流出燃油共同构成质量收支。</p>
-<p>贯穿比较采用与测量一致的投影和识别阈值。将颗粒质量或液相体积投影到相同像素尺度后提取液相贯穿，蒸气贯穿则采用对应浓度判据。</p>
-<p>沿轴向设置多个截面，比较喷束中心、液体分布和向中心的偏转。结合气相速度判断卷吸影响，再分析注入方向、粒径及破碎设置的作用。</p>
-<p>粒径统计采用带真实液滴数量权重的 Sauter 平均直径：</p>
-<p><span class="math-formula math-display" data-tex="
-D_{32}=\frac{\sum n_id_i^3}{\sum n_id_i^2},
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>D</mi><mn>32</mn></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><msub><mi>n</mi><mi>i</mi></msub><msubsup><mi>d</mi><mi>i</mi><mn>3</mn></msubsup></mrow><mrow><mo>∑</mo><msub><mi>n</mi><mi>i</mi></msub><msubsup><mi>d</mi><mi>i</mi><mn>2</mn></msubsup></mrow></mfrac><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">
-D_{32}=\frac{\sum n_id_i^3}{\sum n_id_i^2},
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">32</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.454em;vertical-align:-0.9629em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4413em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2587em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9629em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span></span></span></span></span></span></p>
-<p>其中 <span class="math-formula" data-tex="n_i"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 是第 <code>i</code> 个计算颗粒代表的液滴数。直接对计算颗粒直径求算术平均，会丢失颗粒权重，得到另一个统计量。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 八孔总质量为 10 mg，均匀分配时每孔 1.25 mg。37° 表示孔轴倾角，每束喷雾绕自身孔轴展开的锥角另行设置。</p>
-</blockquote>
-<h2 id="几何、数据与配置资料"><a href="#几何、数据与配置资料" class="headerlink" title="几何、数据与配置资料"></a>几何、数据与配置资料</h2><ul>
-<li><a href="/downloads/engineering/spray-g.zip">下载八孔喷雾完整算例、几何与数据</a>。随包包含 ECN 原始 STL、八孔配置、气液物性、初始场和运行程序。</li>
-<li><a href="https://ecn.sandia.gov/gasoline-spray-combustion/computational-method/mesh-and-geometry/">ECN 喷油器名义 CAD 与 CT 几何</a>。</li>
-<li><a href="https://ecn.sandia.gov/gasoline-spray-combustion/target-condition/">ECN 喷射率数据入口</a>：选择与喷油器编号、压力和驱动条件一致的数据。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/sprayFoam/aachenBomb/constant/sprayCloudProperties">v2512 aachenBomb 喷雾配置原文件</a>：本文文件结构与注入类型的出处。</li>
-</ul>
-<p>配套 <code>VALIDATION.json</code> 与 <code>validation/</code> 保存本配置的网格检查和短程启动记录，<code>files.sha256</code> 用于核对文件完整性。</p>
-<p><a href="/topics/engineering/">返回实际工程应用</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -512,6 +306,6 @@ D_{32}=\frac{\sum n_id_i^3}{\sum n_id_i^2},
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

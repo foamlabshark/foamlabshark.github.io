@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,82 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>particleTrackProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>粒子轨迹重建或轨迹输出的控制。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>particleTrackProperties</code> 保存对应教程中的轨迹重建和输出控制。它用于从离散粒子记录恢复可视化路径，使用时需核对颗粒云名称、保存数据和后处理调用之间的关系。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/particleTrackProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>cloud</code></td><td>输入颗粒云名称。</td></tr><tr><td><code>sampleFrequency</code></td><td>轨迹取样频率；改变它会影响每条输出轨迹的稠密程度。</td></tr><tr><td><code>maxPositions</code></td><td>单条轨迹保留位置数量的上限，较大的值增加内存或输出需求。</td></tr><tr><td><code>fields</code></td><td>目标场列表。场名、数据类型和计算时刻必须满足相应函数对象的要求。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>setFormat / formatOptions</code></td><td>轨迹文件格式及其专用写出选项。</td></tr><tr><td><code>formatOptions.&lt;格式&gt;.animate</code></td><td>该格式是否按时间组织动画输出；支持情况取决于 <code>writer</code>。</td></tr><tr><td><code>animationInfo.colour / colourField</code></td><td>轨迹动画着色方式及所用颗粒字段；所选字段须已被输出。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/airRecirculationRoom/transient</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/airRecirculationRoom/transient"><h3>算例问题：transient</h3><p class="reference-case-problem">房间内的循环气流输运反应性或可蒸发颗粒，颗粒同时与空气交换质量和热量。瞬态计算用于观察颗粒在房间内的迁移、停留及对温度和组分的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/airRecirculationRoom/transient"><code>lagrangian/reactingParcelFoam/airRecirculationRoom/transient</code></a>。</p></section><!-- /reference-case-contexts --><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/filter"><h3>算例问题：filter</h3><p class="reference-case-problem">含水滴的气流经过多孔过滤区域，Darcy 阻力改变载气流动，水滴同时与气体换热并蒸发。壁面采用反弹，入口和出口允许颗粒离开；可观察多孔区压降、颗粒轨迹、温度及水蒸气分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter"><code>lagrangian/reactingParcelFoam/filter</code></a>。</p><figure class="reference-case-figure"><img alt="filter 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/porous-duct.svg" width="720"><figcaption><code>filter</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>airRecirculationRoom 将不同时刻保存的 <code>reactingCloud1</code> 粒子位置连成轨迹，用于观察颗粒在室内回流中的运动。</p>
-<ul>
-<li><code>cloud reactingCloud1</code> 选择已有粒子云。</li>
-<li><code>sampleFrequency 1</code> 表示按粒子编号采样时每个粒子都保留；增大此值会减少展示的轨迹数量。</li>
-<li><code>maxPositions 1000000</code> 给每条轨迹允许保存的位置数设置上限。轨迹在时间上的分辨率来自已保存的计算时刻。</li>
-</ul>
-<p>粒子过多导致图像难以辨认时先提高 <code>sampleFrequency</code>；需要更清晰的时间变化则调整原计算的颗粒输出间隔。</p>
-<p><a href="/assets/examples/v2512/particletrackproperties/1-particleTrackProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/airRecirculationRoom/transient/constant/particleTrackProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/airRecirculationRoom/transient">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/airRecirculationRoom/transient/constant/particleTrackProperties"><code>lagrangian/reactingParcelFoam/airRecirculationRoom/transient/constant/particleTrackProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> particleTrackProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-cloud reactingCloud1;
-sampleFrequency <span class="hljs-number">1</span>;
-maxPositions <span class="hljs-number">1000000</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/filter</summary><p><code>filter</code> 算例把粒子轨迹导出为可播放的 glTF 文件，并用粒径着色。</p>
-<ul>
-<li><code>cloud reactingCloud1</code>、<code>sampleFrequency 1</code> 选择全部采样粒子，<code>maxPositions 1000000</code> 限制单条轨迹的位置数。</li>
-<li><code>setFormat gltf</code> 选择 glTF 格式，<code>animate yes</code> 生成动画信息。</li>
-<li><code>colour yes</code>、<code>colour field</code> 和 <code>colourField d</code> 让颜色随粒径字段变化，<code>fields (d)</code> 同时指定该导出字段。</li>
-</ul>
-<p>如果粒径变化范围很窄，可换用温度等已保存字段，并同时更新 <code>fields</code> 与 <code>colourField</code>。</p>
-<p><a href="/assets/examples/v2512/particletrackproperties/2-particleTrackProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/particleTrackProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> particleTrackProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-cloud reactingCloud1;
-sampleFrequency <span class="hljs-number">1</span>;
-maxPositions <span class="hljs-number">1000000</span>;
-<span class="hljs-comment">//maxTracks       5;</span>
-setFormat gltf;
-formatOptions
-{
-    animate <span class="hljs-literal">yes</span>;
-    colour <span class="hljs-literal">yes</span>;
-    animationInfo
-    {
-        colour field;
-        colourField d;
-        <span class="hljs-comment">//min             0;</span>
-        <span class="hljs-comment">//max             0.002;</span>
-        <span class="hljs-comment">//alpha           1.0;</span>
-    }
-}
-fields (d);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/particletracks/">particleTracks</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>未找到指定场或函数对象：<code>No field / No functionObject</code></td><td>确认场已写出、当前时刻正确且所需库已加载；派生量可能必须先生成。</td></tr><tr><td>结果坐标或单位错误</td><td>记录采样坐标、截面法向和物理单位，尤其注意压力定义与法向通量符号。</td></tr><tr><td>峰值随采样方式改变</td><td>比较插值方案与网格分辨率；点值、面平均和体平均不是同一个量。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -381,6 +306,6 @@ fields (d);
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

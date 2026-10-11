@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,206 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>dsmcProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>DSMC 模拟的分子物种、碰撞和壁面相互作用模型。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>dsmcProperties</code> 定义 DSMC 使用的分子物种及碰撞、壁面相互作用等模型。它决定模拟粒子如何交换动量与能量，常与粒子初始化和宏观统计字段一起配置。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/dsmcProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>omega</code></td><td>角速度参数或湍流比耗散率场名，二者物理意义与量纲不同。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>WallInteractionModel / BinaryCollisionModel / InflowBoundaryModel</code></td><td>分别选择壁面碰撞、分子碰撞和入流抽样模型；模型名称区分大小写。</td></tr><tr><td><code>moleculeProperties.&lt;组分&gt;</code></td><td>每个 <code>typeIdList</code> 中组分的 <code>mass</code>、<code>diameter</code>、<code>internalDegreesOfFreedom</code>、<code>omega</code> 等分子属性。</td></tr><tr><td><code>VariableHardSphereCoeffs.Tref</code></td><td>VHS 碰撞模型的参考温度。</td></tr><tr><td><code>LarsenBorgnakkeVariableHardSphereCoeffs.relaxationCollisionNumber</code></td><td>包含内能再分配的碰撞模型的弛豫碰撞数；它不属于普通 VHS 的通用设置。</td></tr><tr><td><code>nEquivalentParticles</code></td><td>每个模拟颗粒代表的真实分子数，影响统计分辨率与计算成本。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · discreteMethods/dsmcFoam/supersonicCorner</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="discreteMethods/dsmcFoam/supersonicCorner"><h3>算例问题：supersonicCorner</h3><p class="reference-case-problem">高速稀薄气体经过转角或楔形表面，分子与壁面及其他分子碰撞后形成非平衡流动。DSMC 用粒子统计代替连续介质闭合，主要观察密度、温度和壁面载荷。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/supersonicCorner"><code>discreteMethods/dsmcFoam/supersonicCorner</code></a>。</p></section><!-- /reference-case-contexts --><p><code>supersonicCorner</code> 的工作气体为单原子氩。这个文件定义模拟粒子的统计权重、分子碰撞规律以及壁面与入口模型。</p>
-<ul>
-<li><code>nEquivalentParticles 1.2e12</code> 使一个计算粒子代表 <span class="math-formula" data-tex="1.2\times10^{12}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.2</mn><mo>×</mo><msup><mn>10</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">1.2\times10^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></span> 个氩原子；降低该值会增加抽样粒子数量。</li>
-<li><code>VariableHardSphere</code> 使用可变硬球碰撞模型，<code>Tref 273</code> 是碰撞参考温度；<code>omega 0.81</code> 控制碰撞截面随相对速度变化的规律。</li>
-<li><code>mass 66.3e-27</code> kg 与 <code>diameter 4.17e-10</code> m 描述氩原子的质量和参考碰撞直径。<code>internalDegreesOfFreedom 0</code> 与单原子气体相符。</li>
-<li><code>MaxwellianThermal</code> 按壁面温度重新抽样反射速度，体现与壁面热交换；墙温来自配套边界场。</li>
-<li><code>FreeStream</code> 配合 <code>Ar 1e20</code> 持续补充来流，和初始化文件中的物种及数密度一致。</li>
-</ul>
-<p>要比较壁面热适应效应，可与镜面反射模型对照；要降低统计噪声，可增加粒子数和采样时长。改变碰撞直径后，平均自由程会随之改变，网格尺度也应重新检查。</p>
-<p><a href="/assets/examples/v2512/dsmcproperties/1-dsmcProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/supersonicCorner/constant/dsmcProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/supersonicCorner">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/supersonicCorner/constant/dsmcProperties"><code>discreteMethods/dsmcFoam/supersonicCorner/constant/dsmcProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> dsmcProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// General Properties</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~</span>
-nEquivalentParticles <span class="hljs-number">1.2e12</span>;
-<span class="hljs-comment">// Wall Interaction Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-WallInteractionModel MaxwellianThermal;
-<span class="hljs-comment">// Binary Collision Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-BinaryCollisionModel VariableHardSphere;
-VariableHardSphereCoeffs
-{
-    Tref <span class="hljs-number">273</span>;
-}
-<span class="hljs-comment">// Inflow Boundary Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~</span>
-InflowBoundaryModel FreeStream;
-FreeStreamCoeffs
-{
-    numberDensities
-    {
-        Ar <span class="hljs-number">1.0e20</span>;
-    };
-}
-<span class="hljs-comment">// Molecular species</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~</span>
-typeIdList (Ar);
-moleculeProperties
-{
-    Ar
-    {
-        mass <span class="hljs-number">66.3e-27</span>;
-        diameter <span class="hljs-number">4.17e-10</span>;
-        internalDegreesOfFreedom <span class="hljs-number">0</span>;
-        omega <span class="hljs-number">0.81</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>discreteMethods/dsmcFoam/freeSpacePeriodic</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="discreteMethods/dsmcFoam/freeSpacePeriodic"><h3>算例问题：freeSpacePeriodic</h3><p class="reference-case-problem">稀薄气体分子在周期空间内自由飞行并发生统计碰撞。分子穿过周期边界后重新进入另一侧，算例用于检查 DSMC 的粒子运动、碰撞及宏观量统计。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpacePeriodic"><code>discreteMethods/dsmcFoam/freeSpacePeriodic</code></a>。</p><figure class="reference-case-figure"><img alt="freeSpacePeriodic 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/periodic-cube.svg" width="720"><figcaption><code>freeSpacePeriodic</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>freeSpacePeriodic</code> 使用氮氧双原子混合气，在周期区域中观察碰撞与能量分配。</p>
-<ul>
-<li><code>nEquivalentParticles 1e12</code> 给出统计权重；<code>typeIdList (N2 O2)</code> 定义可出现的两种分子。</li>
-<li>两种分子的 <code>internalDegreesOfFreedom</code> 均为 2，对应这里采用的转动内能自由度。质量分别为 <code>46.5e-27</code>、<code>53.12e-27</code> kg。</li>
-<li><code>LarsenBorgnakkeVariableHardSphere</code> 在可变硬球碰撞基础上加入平动与内能再分配。<code>relaxationCollisionNumber 5.0</code> 对应模型中 <span class="math-formula" data-tex="1/5"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>5</mn></mrow><annotation encoding="application/x-tex">1/5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/5</span></span></span></span></span> 的内能再分配抽样概率。</li>
-<li><code>Tref 273</code>、氮气 <code>omega 0.74</code> 和氧气 <code>omega 0.77</code> 决定各物种的碰撞温度依赖。</li>
-<li><code>InflowBoundaryModel none</code> 与周期体系配合；<code>SpecularReflection</code> 是遇到实体壁面时使用的镜面反射模型，周期面继续按周期拓扑处理。</li>
-</ul>
-<p>可改变 <code>relaxationCollisionNumber</code> 比较内能向平衡状态靠近的速度。调整模拟粒子权重时，保持真实数密度和分子物性不变，以单独评估统计分辨率。</p>
-<p><a href="/assets/examples/v2512/dsmcproperties/2-dsmcProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpacePeriodic/constant/dsmcProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpacePeriodic">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpacePeriodic/constant/dsmcProperties"><code>discreteMethods/dsmcFoam/freeSpacePeriodic/constant/dsmcProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">53 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> dsmcProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// General Properties</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~</span>
-nEquivalentParticles <span class="hljs-number">1e12</span>;
-<span class="hljs-comment">// Wall Interaction Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-WallInteractionModel SpecularReflection;
-<span class="hljs-comment">// Binary Collision Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-BinaryCollisionModel LarsenBorgnakkeVariableHardSphere;
-LarsenBorgnakkeVariableHardSphereCoeffs
-{
-    Tref <span class="hljs-number">273</span>;
-    relaxationCollisionNumber <span class="hljs-number">5.0</span>;
-}
-<span class="hljs-comment">// Inflow Boundary Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~</span>
-InflowBoundaryModel none;
-<span class="hljs-comment">// Molecular species</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~</span>
-typeIdList (N2 O2);
-moleculeProperties
-{
-    N2
-    {
-        mass <span class="hljs-number">46.5e-27</span>;
-        diameter <span class="hljs-number">4.17e-10</span>;
-        internalDegreesOfFreedom <span class="hljs-number">2</span>;
-        omega <span class="hljs-number">0.74</span>;
-    }
-    O2
-    {
-        mass <span class="hljs-number">53.12e-27</span>;
-        diameter <span class="hljs-number">4.07e-10</span>;
-        internalDegreesOfFreedom <span class="hljs-number">2</span>;
-        omega <span class="hljs-number">0.77</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · discreteMethods/dsmcFoam/freeSpaceStream</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="discreteMethods/dsmcFoam/freeSpaceStream"><h3>算例问题：freeSpaceStream</h3><p class="reference-case-problem">稀薄气体通过开放计算域，入口向域内注入代表分子，出口允许分子离开。算例通过分子运动和碰撞统计得到密度、速度及温度，需协调入口分布、时间步和网格尺度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpaceStream"><code>discreteMethods/dsmcFoam/freeSpaceStream</code></a>。</p></section><!-- /reference-case-contexts --><p><code>freeSpaceStream</code> 把氮氧混合气持续送入计算域，适合检查入口统计与下游流场是否保持一致。</p>
-<ul>
-<li><code>FreeStreamCoeffs/numberDensities</code> 给出氮气 <code>0.777e20</code>、氧气 <code>0.223e20</code> m⁻³；入口速度和温度还需与配套边界场一致。</li>
-<li><code>nEquivalentParticles 1e12</code> 将真实分子流率转化为有限数量的模拟粒子注入事件。</li>
-<li><code>LarsenBorgnakkeVariableHardSphere</code> 处理碰撞及内能交换，<code>relaxationCollisionNumber 5.0</code> 设置内能交换的统计频率。</li>
-<li><code>internalDegreesOfFreedom 2</code> 给两种双原子分子分配转动自由度。<code>mass</code>、<code>diameter</code>、<code>omega</code> 分别控制惯性、参考碰撞尺度和速度依赖。</li>
-<li><code>MaxwellianThermal</code> 指定实体壁面的热反射处理。开放入口与出口由对应边界类型决定。</li>
-</ul>
-<p>增大入口数密度后，应同时比较入口与出口的分子数流率。延长统计时段可减小抽样噪声；提高流速后则应重新选择粒子跟踪时间步。</p>
-<p><a href="/assets/examples/v2512/dsmcproperties/3-dsmcProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpaceStream/constant/dsmcProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpaceStream">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/discreteMethods/dsmcFoam/freeSpaceStream/constant/dsmcProperties"><code>discreteMethods/dsmcFoam/freeSpaceStream/constant/dsmcProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> dsmcProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// General Properties</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~</span>
-nEquivalentParticles <span class="hljs-number">1e12</span>;
-<span class="hljs-comment">// Wall Interaction Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-WallInteractionModel MaxwellianThermal;
-<span class="hljs-comment">// Binary Collision Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-BinaryCollisionModel LarsenBorgnakkeVariableHardSphere;
-LarsenBorgnakkeVariableHardSphereCoeffs
-{
-    Tref <span class="hljs-number">273</span>;
-    relaxationCollisionNumber <span class="hljs-number">5.0</span>;
-}
-<span class="hljs-comment">// Inflow Boundary Model</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~</span>
-InflowBoundaryModel FreeStream;
-FreeStreamCoeffs
-{
-    numberDensities
-    {
-        N2 <span class="hljs-number">0.777e20</span>;
-        O2 <span class="hljs-number">0.223e20</span>;
-    };
-}
-<span class="hljs-comment">// Molecular species</span>
-<span class="hljs-comment">// ~~~~~~~~~~~~~~~~~</span>
-typeIdList (N2 O2);
-moleculeProperties
-{
-    N2
-    {
-        mass <span class="hljs-number">46.5e-27</span>;
-        diameter <span class="hljs-number">4.17e-10</span>;
-        internalDegreesOfFreedom <span class="hljs-number">2</span>;
-        omega <span class="hljs-number">0.74</span>;
-    }
-    O2
-    {
-        mass <span class="hljs-number">53.12e-27</span>;
-        diameter <span class="hljs-number">4.07e-10</span>;
-        internalDegreesOfFreedom <span class="hljs-number">2</span>;
-        omega <span class="hljs-number">0.77</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/dsmcfoam/">dsmcFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -505,6 +306,6 @@ moleculeProperties
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

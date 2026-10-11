@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,255 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 19 章　0/ 目录与边界条件参考</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>19.1 场文件的结构</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volVectorField;
-    <span class="hljs-keyword">object</span> U;
-}
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]; <span class="hljs-comment">// 量纲</span>
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 内部场初值</span>
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}</code></pre></div>
-<p>三条强制规则：① <code>boundaryField</code> 里的 <code>patch</code> 名必须与 <code>constant/polyMesh/boundary</code> 完全对应（可用正则），漏一个就报 <code>Cannot</code> <code>find</code> <code>patchField</code> <code>entry</code> <code>for</code> <code>xxx</code>；② <code>empty</code>、<code>symmetryPlane</code>、<code>wedge</code>、<code>cyclic</code> 这类约束型边界，场里的 <code>type</code> 必须与网格里的 <code>type</code> 一致，否则报错；③ 很多边界条件即使值用不上也要写 <code>value</code> 一行（它是”当前值”的存储位置，重启时要用）。</p>
-<h2>19.2 通用边界条件</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>type</code></th><th>数学含义</th><th>用在</th></tr>
-<tr><td><code>fixedValue</code></td><td><span class="math-formula" data-tex="\varphi"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi></mrow><annotation encoding="application/x-tex">\varphi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">φ</span></span></span></span></span>= 给定值（Dirichlet）</td><td>进口速度、给定温度</td></tr>
-<tr><td><code>zeroGradient</code></td><td><span class="math-formula" data-tex="\partial \varphi /\partial n = 0"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∂</mi><mi>φ</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>n</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\partial \varphi /\partial n = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">φ</span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span>（Neumann）</td><td>出口、绝热壁</td></tr>
-<tr><td><code>fixedGradient</code></td><td><span class="math-formula" data-tex="\partial \varphi /\partial n"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∂</mi><mi>φ</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">\partial \varphi /\partial n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">φ</span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">n</span></span></span></span></span>= 给定值</td><td>给定热流</td></tr>
-<tr><td><code>mixed</code></td><td>Dirichlet 与 Neumann 的加权混合</td><td>大多数复合条件的基类</td></tr>
-<tr><td><code>calculated</code></td><td>由其他场算出，不独立求解</td><td><code>nut</code>、<code>rho</code> 等</td></tr>
-<tr><td><code>noSlip</code></td><td><span class="math-formula" data-tex="U = 0"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">U = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span>（等价于 <code>fixedValue</code> <code>uniform</code> (0 0 0)）</td><td>静止壁面</td></tr>
-<tr><td><code>slip</code></td><td>法向为 0，切向零梯度</td><td>无摩擦壁</td></tr>
-<tr><td><code>symmetry</code> / <code>symmetryPlane</code></td><td>对称</td><td>对称面</td></tr>
-<tr><td><code>empty</code></td><td>该方向不求解</td><td>二维算例前后面</td></tr>
-<tr><td><code>wedge</code></td><td>轴对称</td><td>楔形算例</td></tr>
-<tr><td><code>cyclic</code></td><td>周期性</td><td>槽道流、叶栅</td></tr>
-<tr><td><code>cyclicAMI</code></td><td>非匹配周期</td><td>旋转机械交界面</td></tr>
-<tr><td><code>processor</code></td><td>并行内部边界</td><td>自动生成，不用手写</td></tr>
-</tbody></table></div>
-<h2>19.3 速度 U 的常用边界条件</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>type</code></th><th>作用</th><th>示例</th></tr>
-<tr><td><code>fixedValue</code></td><td>给定速度</td><td><code>value</code> <code>uniform</code> (10 0 0);</td></tr>
-<tr><td><code>noSlip</code></td><td>无滑移壁</td><td>——</td></tr>
-<tr><td><code>inletOutlet</code></td><td>流入时用 <code>inletValue</code>，流出时零梯度</td><td>防回流发散，出口首选</td></tr>
-<tr><td><code>pressureInletOutletVelocity</code></td><td>由压力边界推速度，允许双向</td><td>配 <code>totalPressure</code> 用</td></tr>
-<tr><td><code>pressureInletVelocity</code></td><td>由通量反推速度</td><td>只允许流入</td></tr>
-<tr><td><code>flowRateInletVelocity</code></td><td>给定体积/质量流量</td><td><code>volumetricFlowRate</code> 0.01;</td></tr>
-<tr><td><code>swirlFlowRateInletVelocity</code></td><td>带旋流的流量入口</td><td>旋流燃烧器</td></tr>
-<tr><td><code>movingWallVelocity</code></td><td>动网格壁面（自动扣除网格运动通量）</td><td>用于随网格运动的壁面，按网格速度更新速度边界。</td></tr>
-<tr><td><code>rotatingWallVelocity</code></td><td>旋转壁</td><td><code>origin</code>,<code>axis</code>,<code>omega</code></td></tr>
-<tr><td><code>translatingWallVelocity</code></td><td>平移壁</td><td>顶盖驱动腔</td></tr>
-<tr><td><code>freestreamVelocity</code></td><td>远场（自动判进出）</td><td>外流远场</td></tr>
-<tr><td><code>codedFixedValue</code></td><td>自定义分布（见 10.3）</td><td>抛物线入口</td></tr>
-<tr><td><code>timeVaryingMappedFixedValue</code></td><td>从文件读随时间/空间变化的入口</td><td>用实测或前驱算例数据</td></tr>
-<tr><td><code>turbulentDFSEMInlet</code></td><td>合成湍流入口（<code>LES</code> 用）</td><td>生成带脉动的入口</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 典型出口写法：允许流出，万一回流也不会炸</span>
-outlet
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-    inletValue <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-<span class="hljs-comment">// 给定流量入口</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> flowRateInletVelocity;
-    volumetricFlowRate <span class="hljs-number">0.001</span>; <span class="hljs-comment">// m³/s；也可用 massFlowRate</span>
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}</code></pre></div>
-<h2>19.4 压力 p / p_rgh 的常用边界条件</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>type</code></th><th>作用</th></tr>
-<tr><td><code>zeroGradient</code></td><td>壁面标准做法（不可压）</td></tr>
-<tr><td><code>fixedValue</code></td><td>出口给定压力（不可压时值是 <span class="math-formula" data-tex="p/\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mi mathvariant="normal">/</mi><mi>ρ</mi></mrow><annotation encoding="application/x-tex">p/\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal">ρ</span></span></span></span></span>）</td></tr>
-<tr><td><code>totalPressure</code></td><td>给定总压，静压随速度自动调整</td></tr>
-<tr><td><code>fixedFluxPressure</code></td><td>壁面与动网格的正确做法：保证边界通量与速度边界一致</td></tr>
-<tr><td><code>prghPressure</code> / <code>prghTotalPressure</code></td><td>多相流的 <code>p_rgh</code>（已扣除静水压）</td></tr>
-<tr><td><code>freestreamPressure</code></td><td>远场</td></tr>
-<tr><td><code>waveTransmissive</code></td><td>无反射出口（可压缩，防激波反射回来）</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 不可压出口</span>
-outlet
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}
-<span class="hljs-comment">// 壁面（含浮力/动网格时必须这样写）</span>
-walls
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}
-<span class="hljs-comment">// 可压超声速出口，防止反射</span>
-outlet
-{
-    <span class="hljs-keyword">type</span> waveTransmissive;
-    field p;
-    gamma <span class="hljs-number">1.4</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
-}</code></pre></div>
-<p>压力边界应与离散动量方程和法向通量约束一致。<code>fixedFluxPressure</code> 可在支持该更新流程的求解器中设置与通量相容的压力梯度；含重力或网格运动时尤其需要核对 <code>p</code> 与 <code>p_rgh</code> 的定义。<code>zeroGradient</code> 是否合理，应按具体方程和边界条件判断。</p>
-<p><code>p</code> 和 <code>p_rgh</code> 的区别：多相流和浮力问题里求解的是 <span class="math-formula" data-tex="p_{\mathrm{rgh}}=p-\rho\boldsymbol g\cdot\boldsymbol h"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">g</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>=</mo><mi>p</mi><mo>−</mo><mi>ρ</mi><mi mathvariant="bold-italic">g</mi><mo>⋅</mo><mi mathvariant="bold-italic">h</mi></mrow><annotation encoding="application/x-tex">p_{\mathrm{rgh}}=p-\rho\boldsymbol g\cdot\boldsymbol h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rgh</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.037em;">g</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">h</span></span></span></span></span></span></span>（扣掉静水压），这样数值上更好解。你在 0/ 里给的是 <code>p_rgh</code>，<code>p</code> 由程序算出。边界条件要给在 <code>p_rgh</code> 上。</p>
-<h2>19.5 湍流量的边界条件</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>场</th><th>入口</th><th>壁面</th><th>出口</th></tr>
-<tr><td><code>k</code></td><td><code>turbulentIntensityKineticEnergyInlet</code> 或 <code>fixedValue</code></td><td><code>kqRWallFunction</code></td><td><code>inletOutlet</code></td></tr>
-<tr><td><code>epsilon</code></td><td><code>turbulentMixingLengthDissipationRateInlet</code></td><td><code>epsilonWallFunction</code></td><td><code>inletOutlet</code></td></tr>
-<tr><td><code>omega</code></td><td><code>turbulentMixingLengthFrequencyInlet</code></td><td><code>omegaWallFunction</code></td><td><code>inletOutlet</code></td></tr>
-<tr><td><code>nut</code></td><td><code>calculated</code></td><td><code>nutkWallFunction</code> 或 <code>nutUSpaldingWallFunction</code></td><td><code>calculated</code></td></tr>
-<tr><td><code>nuTilda</code></td><td><code>fixedValue</code></td><td><code>fixedValue</code> <code>uniform</code> 0</td><td><code>inletOutlet</code></td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/k</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> turbulentIntensityKineticEnergyInlet;
-    intensity <span class="hljs-number">0.05</span>; <span class="hljs-comment">// 湍流度 5%</span>
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
-}
-walls
-{
-    <span class="hljs-keyword">type</span> kqRWallFunction;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
-}
-<span class="hljs-comment">// 0/epsilon</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> turbulentMixingLengthDissipationRateInlet;
-    mixingLength <span class="hljs-number">0.007</span>; <span class="hljs-comment">// 特征长度的 7% 是常用估计</span>
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
-}
-walls
-{
-    <span class="hljs-keyword">type</span> epsilonWallFunction;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
-}</code></pre></div>
-<p>入口湍流量可以根据湍流强度和特征长度估算；下式依赖各向同性及所选湍流模型的常见假设，实验数据可用时应优先核对：</p>
-<p><span class="math-formula" data-tex="k = 1.5 (U\cdot I)^{2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1.5</mn><mo stretchy="false">(</mo><mi>U</mi><mo>⋅</mo><mi>I</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">k = 1.5 (U\cdot I)^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.5</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>，<code>I</code> 是湍流度（管流取 5%，风洞取 1%）</p>
-<p><span class="math-formula" data-tex="\varepsilon=\frac{C_\mu^{0.75}k^{1.5}}{l}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>=</mo><mfrac><mrow><msubsup><mi>C</mi><mi>μ</mi><mn>0.75</mn></msubsup><msup><mi>k</mi><mn>1.5</mn></msup></mrow><mi>l</mi></mfrac></mrow><annotation encoding="application/x-tex">\varepsilon=\frac{C_\mu^{0.75}k^{1.5}}{l}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.5763em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2313em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6074em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.214em;margin-left:-0.0715em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">0.75</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4249em;"><span></span></span></span></span></span></span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1.5</span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>，<span class="math-formula" data-tex="C_\mu = 0.09"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>μ</mi></msub><mo>=</mo><mn>0.09</mn></mrow><annotation encoding="application/x-tex">C_\mu = 0.09</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.09</span></span></span></span></span>，<span class="math-formula" data-tex="l \approx  0.07"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mo>≈</mo><mn>0.07</mn></mrow><annotation encoding="application/x-tex">l \approx  0.07</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.07</span></span></span></span></span>× 水力直径</p>
-<p><span class="math-formula" data-tex="\omega=\frac{k^{0.5}}{C_\mu^{0.25}l}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mfrac><msup><mi>k</mi><mn>0.5</mn></msup><mrow><msubsup><mi>C</mi><mi>μ</mi><mn>0.25</mn></msubsup><mi>l</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\omega=\frac{k^{0.5}}{C_\mu^{0.25}l}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.6603em;vertical-align:-0.6424em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0179em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.214em;margin-left:-0.0715em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">0.25</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4249em;"><span></span></span></span></span></span></span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">0.5</span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.6424em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
-<p>壁面函数怎么选</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>壁面函数</th><th><span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span> 适用范围</th><th>说明</th></tr>
-<tr><td><code>nutkWallFunction</code></td><td>30–300</td><td>标准壁函数，基于 <code>k</code></td></tr>
-<tr><td><code>nutUSpaldingWallFunction</code></td><td>全 <span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span></td><td>连续壁函数，网格 <span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span> 不好控制时用它最省心</td></tr>
-<tr><td><code>nutUWallFunction</code></td><td>30–300</td><td>基于速度</td></tr>
-<tr><td><code>nutLowReWallFunction</code></td><td><span class="math-formula" data-tex="y^{+} < 1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">y^{+} &lt; 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></td><td>解析近壁</td></tr>
-</tbody></table></div>
-<p>先看 <span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span> 再选：跑几步后 <code>simpleFoam</code> <code>-postProcess</code> <code>-func</code> <code>yPlus</code> <code>-latestTime</code>，看 postProcessing/yPlus/ 里的范围。<span class="math-formula" data-tex="y^{+}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup></mrow><annotation encoding="application/x-tex">y^{+}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span></span></span></span></span> 落在 5–30 的缓冲层是最糟的情况（两种做法都不准），要么加密到 <span class="math-formula" data-tex="y^{+}<1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">y^{+}&lt;1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span>，要么放粗到 <span class="math-formula" data-tex="y^{+}>30"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup><mo>&gt;</mo><mn>30</mn></mrow><annotation encoding="application/x-tex">y^{+}&gt;30</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">30</span></span></span></span></span>——或者直接用 <code>nutUSpaldingWallFunction</code>。</p>
-<h2>19.6 温度与传热</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>type</code></th><th>作用</th></tr>
-<tr><td><code>fixedValue</code></td><td>恒温壁</td></tr>
-<tr><td><code>zeroGradient</code></td><td>绝热壁</td></tr>
-<tr><td><code>externalWallHeatFluxTemperature</code></td><td>给定热流/对流换热系数/外界温度</td></tr>
-<tr><td><code>compressible::turbulentTemperatureCoupledBaffleMixed</code></td><td>共轭传热的流固交界面</td></tr>
-<tr><td><code>wallHeatTransfer</code></td><td>给定传热系数</td></tr>
-<tr><td><code>inletOutlet</code></td><td>出口</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 对流边界：给外界温度和换热系数</span>
-wall
-{
-    <span class="hljs-keyword">type</span> externalWallHeatFluxTemperature;
-    mode coefficient; <span class="hljs-comment">// power / flux / coefficient</span>
-    h <span class="hljs-keyword">uniform</span> <span class="hljs-number">10</span>; <span class="hljs-comment">// W/(m²K)</span>
-    Ta <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>; <span class="hljs-comment">// 环境温度</span>
-    kappaMethod fluidThermo;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
-}</code></pre></div>
-<h2>19.7 多相流的 alpha</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/alpha.water</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
-}
-outlet
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-    inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}
-walls
-{
-    <span class="hljs-keyword">type</span> constantAlphaContactAngle; <span class="hljs-comment">// 接触角（毛细现象重要时）</span>
-    theta0 <span class="hljs-number">90</span>;
-    limit gradient;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}
-atmosphere
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-    inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。规定值为 <code>uniform 1</code>，求解中保持该值。</p><p><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>walls</code> 采用 <code>constantAlphaContactAngle</code>，通过固定接触角控制壁面附近的界面法向。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>atmosphere</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
-<h2>19.8 时变与外部数据</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// ① 用表格给随时间变化的值</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> uniformFixedValue;
-    uniformValue table
-    (
-        (
-            <span class="hljs-number">0</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-        )
-        (
-            <span class="hljs-number">1</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-        )
-        (
-            <span class="hljs-number">5</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-        )
-    );
-}
-<span class="hljs-comment">// ② 从文件读随时间和空间变化的入口（前驱算例 / 实测数据）</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> timeVaryingMappedFixedValue;
-    offset (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    setAverage <span class="hljs-literal">off</span>;
-}
-<span class="hljs-comment">// 数据放在 constant/boundaryData/inlet/{points, 0/U, 0.1/U, ...}</span>
-<span class="hljs-comment">// ③ 把另一处的场映射过来（回收入口，做周期性湍流入口）</span>
-inlet
-{
-    <span class="hljs-keyword">type</span> mapped;
-    field U;
-    setAverage <span class="hljs-literal">true</span>;
-    average (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    interpolationScheme cell;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>uniformFixedValue</code>，用时间函数设置整个入口的速度。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>inlet</code> 采用 <code>timeVaryingMappedFixedValue</code>，将离散位置和时刻给出的边界数据插值到计算边界。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
-<h2>19.9 边界条件查询方法</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamHelp boundary -field U | less          <span class="hljs-comment"># 本机所有可用类型</span>
-pimpleFoam -listVectorBCs                  <span class="hljs-comment"># 同上，另一个入口</span>
-find <span class="hljs-variable">$FOAM_SRC</span> -name <span class="hljs-string">"*inletOutlet*"</span>       <span class="hljs-comment"># 找源码</span>
-grep -rl <span class="hljs-string">"inletOutlet"</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible --include=U | <span class="hljs-built_in">head</span>   <span class="hljs-comment"># 找用例</span></code></pre></div>
-<p>找到使用该边界条件的官方算例，参考其中的完整配置，再调整字段名和参数值。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -554,6 +306,6 @@ grep -rl <span class="hljs-string">"inletOutlet"</span> <span class="hljs-variab
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

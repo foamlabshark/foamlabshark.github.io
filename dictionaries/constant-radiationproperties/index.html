@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,179 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>radiationProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>选择辐射模型及吸收、发射、散射等子模型，为能量方程提供辐射热交换。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>radiationProperties</code> 选择介质与表面之间的辐射传热模型，并提供吸收、发射和散射相关设置。它用于让能量方程计算辐射贡献，热源、介质性质和所选模型共同决定需要的附加输入。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/radiationProperties</code></p><h2>配置方法</h2><p><code>radiationProperties</code> 描述辐射如何在介质和表面之间传递。它位于 <code>constant</code> 下；多区域算例中通常位于 <code>constant/&lt;区域名&gt;/radiationProperties</code>。求解器根据模型将辐射贡献加入能量方程。</p><h3>选择参与介质模型</h3><p>高温气体、烟气或有明显吸收的介质，可考虑 <code>P1</code> 或 fvDOM 等模型。<code>P1</code> 使用辐射传输的近似形式；fvDOM 将方向空间离散成多个方向，计算量通常随角度分辨率增加。它们需要相应吸收、发射和散射系数，模型选择应结合介质光学厚度与方向性需求。</p>
-<p>热辐射与绝对温度的四次方有关。例如理想黑体净交换的量级为 <span class="math-formula" data-tex="\sigma(T_h^4-T_c^4)"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false">(</mo><msubsup><mi>T</mi><mi>h</mi><mn>4</mn></msubsup><mo>−</mo><msubsup><mi>T</mi><mi>c</mi><mn>4</mn></msubsup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sigma(T_h^4-T_c^4)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0972em;vertical-align:-0.2831em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4169em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span>，其中 <span class="math-formula" data-tex="\sigma\approx5.67\times10^{-8}\,\mathrm{W/(m^2K^4)}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>≈</mo><mn>5.67</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>8</mn></mrow></msup><mtext> </mtext><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><msup><mi mathvariant="normal">K</mi><mn>4</mn></msup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma\approx5.67\times10^{-8}\,\mathrm{W/(m^2K^4)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5.67</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">W/</span><span class="mopen">(</span><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathrm">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">4</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></span>。温度必须使用 K。开启辐射后可比较壁面辐射热流与导热、对流热流的量级，分析它对总能量收支的贡献。</p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 表面对表面的 viewFactor 模型</h3><p>下面是 <code>v2512</code> 多区域加热教程中使用的配置主体，放在文件头之后：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">radiation <span class="hljs-literal">on</span>;
-radiationModel viewFactor;
-viewFactorCoeffs
-{
-    smoothing <span class="hljs-literal">true</span>;
-    constantEmissivity <span class="hljs-literal">true</span>;
-}
-solverFreq <span class="hljs-number">3</span>;
-absorptionEmissionModel none;
-scatterModel none;
-sootModel none;
-</code></pre></div>
-<p><code>radiation on</code> 启用辐射，<code>viewFactor</code> 使用表面之间的角系数描述能量交换，适用于主要考虑表面辐射、介质自身参与较弱的设置。<code>constantEmissivity true</code> 允许采用恒定表面发射率的处理；具体壁面发射率和辐射边界仍由相关场及边界配置给出。</p>
-<p><code>solverFreq 3</code> 指定辐射计算与流动迭代之间的调用频率，启动阶段还会进行必要初始化。辐射场变化较快时可先取 1，再比较降低计算频率对温度与热流的影响。</p>
-<p><code>absorptionEmissionModel none</code>、<code>scatterModel none</code> 和 <code>sootModel none</code> 分别关闭体介质的相应吸收发射子模型、散射和烟炱模型。这组设置与表面辐射案例配套。</p><h3 id="example-2">示例 2 · 角系数从哪里来</h3><p>角系数 <span class="math-formula" data-tex="F_{ij}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>F</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">F_{ij}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span> 表示表面 <span class="math-formula" data-tex="i"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span></span> 发出的辐射中，到达表面 <span class="math-formula" data-tex="j"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span></span> 的比例。它由几何位置、遮挡和表面离散决定。封闭系统中，每个表面的各方向贡献满足相应的能量分配关系，互易关系为 <span class="math-formula" data-tex="A_iF_{ij}=A_jF_{ji}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mi>i</mi></msub><msub><mi>F</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>A</mi><mi>j</mi></msub><msub><mi>F</mi><mrow><mi>j</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">A_iF_{ij}=A_jF_{ji}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span>。</p>
-<p>在完整多区域教程完成网格和相关预处理后，可对一个空气区域生成角系数：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">viewFactorsGen -region topAir
-</code></pre></div>
-<p><code>topAir</code> 对应实际区域名。教程同时提供角系数生成、壁面辐射场和必要的预处理字典；只增加 <code>radiationModel viewFactor</code> 尚未提供这些几何及边界数据。<code>smoothing</code> 用于所配置的角系数矩阵平滑处理，适合结合封闭表面的角系数收支检查。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation</summary><p>multiRegionHeaterRadiation 的 <code>topAir</code> 区使用视因子方法处理表面间辐射。</p>
-<ul>
-<li><code>radiation on</code>、<code>radiationModel viewFactor</code> 启用表面辐射模型，视因子描述各表面互相可见的程度。</li>
-<li><code>constantEmissivity true</code> 按固定发射率处理，表面参数要与边界辐射配置对应。</li>
-<li><code>smoothing true</code> 启用视因子模型的平滑处理，<code>solverFreq 3</code> 使辐射求解隔若干求解步更新。</li>
-<li><code>absorptionEmissionModel none</code>、<code>scatterModel none</code>、<code>sootModel none</code> 表示这里没有附加气体吸收、散射或烟炱子模型。</li>
-</ul>
-<p>几何遮挡改变后需要重建视因子；壁面涂层变化则应检查表面发射率。</p>
-<!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation"><h3>算例问题：multiRegionHeaterRadiation</h3><p class="reference-case-problem">加热器及周围固体、流体划分为不同区域，热量通过固体导热、流体对流和表面辐射传递。计算需要连接区域间的温度边界，并为参与辐射的表面设置辐射属性；主要观察各区域温度及界面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation"><code>heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation</code></a>。</p><figure class="reference-case-figure"><img alt="multiRegionHeaterRadiation 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>multiRegionHeaterRadiation 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><a href="/assets/examples/v2512/radiationproperties/authored-multiRegionHeater-viewFactor-radiationProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation/constant/topAir/radiationProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">on</span>;
-radiationModel viewFactor;
-viewFactorCoeffs
-{
-    smoothing <span class="hljs-literal">true</span>; <span class="hljs-comment">//Smooth view factor matrix (use when in a close surface</span>
-    <span class="hljs-comment">//to force Sum(Fij = 1)</span>
-    constantEmissivity <span class="hljs-literal">true</span>; <span class="hljs-comment">//constant emissivity on surfaces.</span>
-}
-<span class="hljs-comment">// Number of flow iterations per radiation iteration</span>
-solverFreq <span class="hljs-number">3</span>;
-absorptionEmissionModel none;
-scatterModel none;
-sootModel none;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/buoyantSimpleFoam/hotRadiationRoom</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/buoyantSimpleFoam/hotRadiationRoom"><h3>算例问题：hotRadiationRoom</h3><p class="reference-case-problem">室内热源加热空气和周围壁面，浮力对流与表面、介质辐射共同传递能量。算例需要同时配置温度、流动和辐射边界，可比较房间温度、循环流动及壁面辐射热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoom"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoom</code></a>。</p></section><!-- /reference-case-contexts --><p>hotRadiationRoom 用 <code>P1</code> 近似描述参与辐射介质中的辐射输运。</p>
-<ul>
-<li><code>radiation on</code>、<code>radiationModel P1</code> 开启 <code>P1</code> 辐射模型，<code>solverFreq 1</code> 每个求解步更新。</li>
-<li><code>constantAbsorptionEmission</code> 采用恒定吸收与发射系数。</li>
-<li><code>absorptivity 0.5</code>、<code>emissivity 0.5</code> 的量纲都是 m⁻¹，描述体介质的吸收、发射能力，含义不同于无量纲壁面发射率。</li>
-<li><code>E 0</code> 不额外加入该模型的体辐射发射源；散射和烟炱模型均为 <code>none</code>。</li>
-</ul>
-<p>改变气体或介质厚度时应重新估计光学厚度与系数，选择适合该辐射条件的模型。</p>
-<p><a href="/assets/examples/v2512/radiationproperties/authored-hotRadiationRoom-P1-radiationProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoom/constant/radiationProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoom">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoom/constant/radiationProperties"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoom/constant/radiationProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">on</span>;
-radiationModel P1;
-<span class="hljs-comment">// Number of flow iterations per radiation iteration</span>
-solverFreq <span class="hljs-number">1</span>;
-absorptionEmissionModel constantAbsorptionEmission;
-constantAbsorptionEmissionCoeffs
-{
-    absorptivity absorptivity [<span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.5</span>;
-    emissivity emissivity [<span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.5</span>;
-    E E [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0</span>;
-}
-scatterModel none;
-sootModel none;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/externalCoupledHeater</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionFoam/externalCoupledHeater"><h3>算例问题：externalCoupledHeater</h3><p class="reference-case-problem">多区域加热器与一个外部计算程序交换边界数据，演示两个程序如何共同推进换热计算。流体和固体仍分别求解，外部耦合文件负责温度或热流信息的交换，应检查交换顺序和接口能量收支。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalCoupledHeater"><code>heatTransfer/chtMultiRegionFoam/externalCoupledHeater</code></a>。</p><figure class="reference-case-figure"><img alt="externalCoupledHeater 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>externalCoupledHeater 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/verticalChannel"><h3>算例问题：verticalChannel</h3><p class="reference-case-problem">颗粒随气流通过通道，在运动过程中与载气交换动量、热量或质量。通道方向决定重力相对来流的方向，主要观察颗粒速度、温度及质量变化；稳态和 LTS 版本采用不同的时间推进方式。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannel"><code>lagrangian/reactingParcelFoam/verticalChannel</code></a>。</p></section><!-- /reference-case-contexts --><p>externalCoupledHeater 的 <code>heater</code> 区在本配置中关闭辐射，只按配套导热及耦合条件处理热量。</p>
-<ul>
-<li><code>radiation off</code> 明确关闭辐射。</li>
-<li><code>radiationModel none</code> 不创建有效辐射传热模型。</li>
-<li>关闭辐射后，温度由能量方程中的其余传热项和外部耦合条件决定。</li>
-</ul>
-<p>启用辐射时需要一并选择模型及边界辐射属性，比较辐射与导热的相对贡献。</p>
-<p><a href="/assets/examples/v2512/radiationproperties/1-radiationProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalCoupledHeater/constant/heater/radiationProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalCoupledHeater">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalCoupledHeater/constant/heater/radiationProperties"><code>heatTransfer/chtMultiRegionFoam/externalCoupledHeater/constant/heater/radiationProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">off</span>;
-radiationModel none;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 4 · lagrangian/reactingParcelFoam/verticalChannel</summary><p>verticalChannel 的颗粒热流动在此不计算辐射。</p>
-<ul>
-<li><code>radiation off</code>、<code>radiationModel none</code> 是实际开关。</li>
-<li><code>solverFreq 10</code> 是保留的辐射更新频率参数，在 <code>none</code> 模型下不会产生实际辐射求解。</li>
-<li>颗粒和连续相的其他传热机制仍由其各自模型控制。</li>
-</ul>
-<p>需要辐射时先选择合适模型，再根据温度变化速度决定更新频率。</p>
-<p><a href="/assets/examples/v2512/radiationproperties/2-radiationProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannel/constant/radiationProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannel">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">off</span>;
-radiationModel none;
-solverFreq <span class="hljs-number">10</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 5 · lagrangian/reactingParcelFoam/parcelInBox</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/parcelInBox"><h3>算例问题：parcelInBox</h3><p class="reference-case-problem">箱体中设置少量颗粒，用于检查颗粒与周围气体之间的动量、热量和质量交换。简单几何便于单独观察颗粒轨迹、温度及粒径变化，并核对所选子模型。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox"><code>lagrangian/reactingParcelFoam/parcelInBox</code></a>。</p></section><!-- /reference-case-contexts --><p>parcelInBox 的这份配置关闭连续相辐射模型。</p>
-<ul>
-<li><code>radiation off</code> 不计算辐射贡献。</li>
-<li><code>radiationModel none</code> 与关闭状态一致。</li>
-<li>箱内温度和颗粒热交换应从热物性、能量边界和云模型配置继续读取。</li>
-</ul>
-<p>研究高温辐射时补充模型与介质属性，再与关闭辐射的结果作同条件比较。</p>
-<p><a href="/assets/examples/v2512/radiationproperties/3-radiationProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox/constant/radiationProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/parcelInBox/constant/radiationProperties"><code>lagrangian/reactingParcelFoam/parcelInBox/constant/radiationProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">location</span> <span class="hljs-string">"constant"</span>;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">off</span>;
-radiationModel none;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/buoyantsimplefoam/">buoyantSimpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -478,6 +306,6 @@ radiationModel none;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

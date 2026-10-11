@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,134 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>alpha.water</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>水相体积分数场：0 表示无水，1 表示充满水，介于两者之间的值表示部分占据。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>alpha.water</code> 用每个单元中水所占的体积比例描述水气等两相界面。初始分布决定水体在哪里，输运方程随后推进界面运动；开口处还需要说明回流进入的是水还是另一相。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>0/alpha.water</code></p><figure class="wolf-figure"><img alt="相分数如何表示网格内的界面" loading="lazy" src="/assets/wolf/wolf-vof-volume-fraction.png"><figcaption><strong>相分数如何表示网格内的界面</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module8.pdf，p. 78</small></figcaption></figure><h2>配置方法</h2><p><code>alpha.water</code> 是水相体积分数场。它没有单位：0 表示单元中没有水，1 表示全是水，0 到 1 之间表示水与另一相共存。字段后缀 <code>water</code> 来自相模型中的相名。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">初始相分数与接触角</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>体积分数为无量纲 [0 0 0 0 0 0 0]；初值通常位于 0 到 1 之间。</td></tr><tr><td><code>boundaryField.&lt;壁面&gt;.type</code></td><td><code>constantAlphaContactAngle</code> 指定恒定接触角，<code>dynamicAlphaContactAngle</code> 让接触角随接触线速度变化。</td></tr><tr><td><code>theta0</code></td><td>平衡接触角，单位为度。</td></tr><tr><td><code>dynamicAlphaContactAngle.uTheta / thetaA / thetaR</code></td><td>速度尺度及前进、后退接触角，三项与 <code>theta0</code> 一起设置。接触角方向必须与当前实现的相与法向约定一致。</td></tr><tr><td><code>limit</code></td><td><code>none</code>、<code>gradient</code>、<code>zeroGradient</code>、<code>alpha</code>；分别不限制、限制梯度、强制零梯度或限制相分数。</td></tr><tr><td><code>value</code></td><td>该壁面字段的初值，不替代 <code>theta0</code> 定义接触角。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/transportModels/twoPhaseProperties/alphaContactAngle/dynamicAlphaContactAngle/dynamicAlphaContactAngleFvPatchScalarField.H">v2512 参数读取实现</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 设置初始水区</h3><p>先在 <code>0/alpha.water</code> 中准备完整场和边界，再把以下主体写入具有标准字典文件头的 <code>system/setFieldsDict</code>：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">defaultFieldValues
-(
-    volScalarFieldValue alpha.water <span class="hljs-number">0</span>
-);
-regions
-(
-    boxToCell
-    {
-        box (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span>) (<span class="hljs-number">0.1461</span> <span class="hljs-number">0.292</span> <span class="hljs-number">1</span>);
-        fieldValues
-        (
-            volScalarFieldValue alpha.water <span class="hljs-number">1</span>
-        );
-    }
-);
-</code></pre></div>
-<p>全部单元先设为空气，再把单元中心位于盒内的区域设为水。盒子的两个坐标是对角点，按当前几何单位填写。<code>blockMesh</code> 生成网格后运行 <code>setFields</code>，工具才有可选择的单元。</p>
-<p>顶部与空气相通的边界通常需要回流值，例如 <code>inletOutlet</code> 的 <code>inletValue uniform 0</code> 表示外部空气进入。壁面若研究润湿和毛细现象，还需选取适用的接触角条件。</p>
-<p>初始化后查看水柱位置，求解中检查相分数范围。域内水体积由 <span class="math-formula" data-tex="V_w=\sum_i\alpha_iV_i"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>w</mi></msub><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>α</mi><mi>i</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">V_w=\sum_i\alpha_iV_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 得到，可用 <code>volFieldValue</code> 的 <code>volIntegrate</code> 输出。水从开口离开时，体积变化还应与水相边界通量配合解释。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/sloshingTank3D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/sloshingTank3D"><h3>算例问题：sloshingTank3D</h3><p class="reference-case-problem">容器运动或初始扰动使内部液体晃动，水面倾斜并形成随时间变化的压力。算例用于研究自由液面与容器运动的耦合，主要观察液面高度、壁面载荷及动网格质量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D"><code>multiphase/interFoam/laminar/sloshingTank3D</code></a>。</p></section><!-- /reference-case-contexts --><p>晃荡水箱的这份 <code>alpha.water</code> 是相分数字段模板，水域几何还需由初始化步骤设置。</p>
-<ul>
-<li>量纲全为零，水体积分数是无量纲量。</li>
-<li><code>internalField uniform 0</code> 先把整个域设为非水相，配套 <code>setFields</code> 等步骤再填入水区。</li>
-<li>壁面 <code>zeroGradient</code> 让相分数沿法向从内部外推。</li>
-</ul>
-<p>调整初始液位时修改初始化区域，并在启动前查看 <code>alpha.water</code> 的实际分布及水体积。</p>
-<p><a href="/assets/examples/v2512/alpha-water/1-alpha.water.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/alpha.water">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/alpha.water"><code>multiphase/interFoam/laminar/sloshingTank3D/0.orig/alpha.water</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> alpha.water;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    walls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interIsoFoam/sphereInReversedVortexFlow</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interIsoFoam/sphereInReversedVortexFlow"><h3>算例问题：sphereInReversedVortexFlow</h3><p class="reference-case-problem">球形相区置于规定的涡旋速度场中，先被拉伸变形，再随反向速度场回到初始状态附近。该算例主要检验界面输运的形状保持与体积守恒，速度场用于驱动界面运动。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow</code></a>。</p></section><!-- /reference-case-contexts --><p>球形界面输运测试先给背景相，再由几何初始化生成球体。</p>
-<ul>
-<li><code>internalField uniform 0</code> 表示背景中水体积分数为零。</li>
-<li><code>sides/fixedValue 0</code> 使外边界保持非水相，与域内球形水相对应。</li>
-<li>字段量纲全为零；球心和半径在 <code>setAlphaFieldDict</code> 中给出。</li>
-</ul>
-<p>放大球体或移动位置时检查它与外边界的距离，以及变形过程是否仍在计算域内。</p>
-<p><a href="/assets/examples/v2512/alpha-water/2-alpha.water.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/alpha.water">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/alpha.water"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/alpha.water</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> alpha.water;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    sides
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/compressibleInterFoam/laminar/waterCooler/fluid</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/compressibleInterFoam/laminar/waterCooler/fluid"><h3>算例问题：fluid</h3><p class="reference-case-problem">冷却装置中的流体区域与周围传热区域连接，流动将热量从受热部位带走。本路径只对应组合算例中的 <code>fluid</code> 区域，阅读其配置时还需同时检查相邻区域的物性和温度接口。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/waterCooler/fluid"><code>multiphase/compressibleInterFoam/laminar/waterCooler/fluid</code></a>。</p><figure class="reference-case-figure"><img alt="fluid 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption><code>fluid</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>waterCooler 的 <code>fluid</code> 区采用二维相分数字段模板。</p>
-<ul>
-<li><code>internalField uniform 0</code> 给出背景相初值。</li>
-<li><code>wall/zeroGradient</code> 按内部相分数延伸到壁面。</li>
-<li><code>defaultFaces/empty</code> 与二维网格的前后约束配合。</li>
-<li>文件属于 <code>fluid</code> 区，因此初始化与求解应使用对应区域的网格。</li>
-</ul>
-<p>改变装液高度时修改该区域的初始化设置，并确认没有把其他区域的字段覆盖到 <code>fluid</code>。</p>
-<p><a href="/assets/examples/v2512/alpha-water/3-alpha.water.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/waterCooler/fluid/0.orig/alpha.water">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/waterCooler/fluid">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/waterCooler/fluid/0.orig/alpha.water"><code>multiphase/compressibleInterFoam/laminar/waterCooler/fluid/0.orig/alpha.water</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> alpha.water;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    wall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    defaultFaces
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/interfoam/">interFoam</a> · <a href="/commands/interisofoam/">interIsoFoam</a> · <a href="/commands/setfields/">setFields</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -433,6 +306,6 @@ regions
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

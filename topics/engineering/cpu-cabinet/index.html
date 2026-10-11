@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,181 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>CPU 机箱与散热鳍片的共轭传热</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算处理器、散热鳍片与机箱空气之间的传热，评价热源功率和风扇转速对芯片温升的影响。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>处理器产生的热量经封装传入散热器，再由机箱气流排出。芯片最高温度取决于固体导热能力和空气侧换热条件。鳍片间流量不足、气流绕过散热器以及热空气回流，均会增加局部温升；风扇总流量相同，芯片温度也可能存在明显差异。</p>
-<p>算例将处理器、鳍片和空气分别建模，通过区域界面传递热量，并以旋转参考系描述风扇作用。基准热源功率为 100 W。计算需确定处理器热点位置、鳍片散热分布和出口热流，进而评价提高转速能否有效降低热阻。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/cpu-cabinet-geometry.webp" alt="CPU 机箱与散热鳍片的共轭传热：配套模型与基准输入"></p>
-<p><code>cpuCabinet</code> 几何包含机箱、处理器、散热鳍片、风扇及风罩。背景网格范围为 <code>x</code> = −0.04478～0.27928 m、<code>y</code> = −0.00550502～0.0845552 m、<code>z</code> = −0.29～0.04 m，内部部件轮廓由配套曲面给出。空气区域名为 <code>domain0</code>，处理器与鳍片区域分别为 <code>v_CPU</code>、<code>v_fins</code>。</p>
-<p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">OpenFOAM v2512 · heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</a>。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>设置位置与作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>CPU</code> 功率</td>
-<td>100 W</td>
-<td><code>system/v_CPU/fvOptions</code> 的 <code>h (100 0)</code>；<code>volumeMode absolute</code> 表示整个选区的总热源</td>
-</tr>
-<tr>
-<td>风扇角速度</td>
-<td>209.44 rad/s，约 2000 r/min</td>
-<td><code>constant/domain0/MRFProperties</code> 的 <code>omega</code></td>
-</tr>
-<tr>
-<td>初始与回流温度</td>
-<td>300 K</td>
-<td>各区域 <code>T</code> 与空气出口 <code>inletValue</code></td>
-</tr>
-<tr>
-<td>固体导热系数</td>
-<td>202.4 W/(m·K)</td>
-<td><code>constant/v_CPU/thermophysicalProperties</code> 与鳍片物性</td>
-</tr>
-</tbody></table></div>
-<h2 id="求解方法与物理模型"><a href="#求解方法与物理模型" class="headerlink" title="求解方法与物理模型"></a>求解方法与物理模型</h2><p>固体区域求解稳态导热方程 <span class="math-formula" data-tex="\nabla\cdot(k_s\nabla T)+q_v=0"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mo stretchy="false">(</mo><msub><mi>k</mi><mi>s</mi></msub><mi mathvariant="normal">∇</mi><mi>T</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>q</mi><mi>v</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\nabla\cdot(k_s\nabla T)+q_v=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∇</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span>，其中 <span class="math-formula" data-tex="k_s"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mi>s</mi></msub></mrow><annotation encoding="application/x-tex">k_s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 为导热系数，<span class="math-formula" data-tex="q_v"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mi>v</mi></msub></mrow><annotation encoding="application/x-tex">q_v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 为体积热源。空气区域求解流动与能量输运，处理器释放的热量经鳍片进入空气，最终随出口焓流排出。</p>
-<p>流固界面满足温度连续条件 <span class="math-formula" data-tex="T_s=T_f"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>s</mi></msub><mo>=</mo><msub><mi>T</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">T_s=T_f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span> 和热流连续条件 <span class="math-formula" data-tex="k_s\partial T_s/\partial n=k_f\partial T_f/\partial n"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mi>s</mi></msub><mi mathvariant="normal">∂</mi><msub><mi>T</mi><mi>s</mi></msub><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>n</mi><mo>=</mo><msub><mi>k</mi><mi>f</mi></msub><mi mathvariant="normal">∂</mi><msub><mi>T</mi><mi>f</mi></msub><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">k_s\partial T_s/\partial n=k_f\partial T_f/\partial n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">n</span></span></span></span></span>，式中两侧导数沿同一法向取值。风扇区域采用 <code>MRF</code> 方法：网格保持固定，区域内方程计入旋转参考系效应。</p>
-<p>本例使用 <code>chtMultiRegionSimpleFoam</code>。网格与边界定义在 <code>constant</code> 和初始场目录，离散格式和方程求解设置分别位于 <code>system/fvSchemes</code>、<code>system/fvSolution</code>；多区域模型在相应区域子目录中保存这些文件。</p>
-<h2 id="获取文件与准备网格"><a href="#获取文件与准备网格" class="headerlink" title="获取文件与准备网格"></a>获取文件与准备网格</h2><p><a href="/downloads/engineering/cpu-cabinet.zip">下载完整算例包</a>。包内包含模型资源、初始场、物性、数值设置、运行脚本和来源记录。</p>
-<p>先在 Linux 终端加载 OpenCFD OpenFOAM <code>v2512</code>。采用标准软件包安装路径时执行下列命令；安装在其他目录时，将路径改为该安装目录下的 <code>etc/bashrc</code>。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-</code></pre></div>
-<p>输出应为 <code>v2512</code>。随后进入下载目录，解压并生成网格：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">unzip cpu-cabinet.zip
-<span class="hljs-built_in">cd</span> cpu-cabinet
-bash Allmesh
-</code></pre></div>
-<p><code>Allmesh</code> 按下表顺序生成网格并执行 <code>checkMesh</code>，每一步的输出保存在相应 <code>log.*</code> 文件中。脚本在命令失败或网格检查不通过时停止。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>网格步骤</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>blockMesh</code></td>
-<td>按顶点、块结构和加密比例生成背景网格。</td>
-</tr>
-<tr>
-<td><code>surfaceFeatureExtract</code></td>
-<td>提取曲面棱边，供贴体网格捕捉结构特征。</td>
-</tr>
-<tr>
-<td><code>snappyHexMesh -overwrite</code></td>
-<td>依据随包曲面裁切、贴合背景网格，并执行局部加密。</td>
-</tr>
-<tr>
-<td><code>splitMeshRegions -cellZones -overwrite</code></td>
-<td>按区域标记分离流体与固体网格，建立配对界面。</td>
-</tr>
-<tr>
-<td>复制初始场</td>
-<td>把 0.orig 中的初始场复制到 0 目录。</td>
-</tr>
-<tr>
-<td><code>topoSet -region domain0</code></td>
-<td>按位置或曲面生成网格选区，供运动、热源、阻力或初始场使用。</td>
-</tr>
-</tbody></table></div>
-<p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<p>贴合网格时，<code>system/meshQualityDict</code> 将内部面和边界面的最大偏斜度均限制为 3.5，常规与 <code>relaxed</code> 设置采用相同限值。区域拆分后分别检查空气、处理器和鳍片网格，三者均通过后再启动共轭传热求解。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-处理器热源"><a href="#1-处理器热源" class="headerlink" title="1. 处理器热源"></a>1. 处理器热源</h3><p>文件：<code>system/v_CPU/fvOptions</code>。本段设置处理器热源。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">v_CPU_AbsoluteEnergySource
-{
-    <span class="hljs-keyword">type</span> scalarSemiImplicitSource;
-    active <span class="hljs-literal">true</span>;
-    selectionMode cellZone;
-    cellZone v_CPU;
-    volumeMode absolute;
-    sources
-    {
-        h ( <span class="hljs-number">100</span> <span class="hljs-number">0</span> );
-    }
-}
-</code></pre></div>
-<p><code>selectionMode cellZone</code> 将热源施加于 <code>v_CPU</code> 单元区，<code>h</code> 对应焓方程。括号中的两项分别为显式热源和线性系数。采用 <code>volumeMode absolute</code> 时，<code>h (100 0)</code> 表示该选区总功率为 100 W。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/v_CPU/fvOptions">查看该配置的官方原文件</a>。</p>
-<h3 id="2-风扇旋转区域"><a href="#2-风扇旋转区域" class="headerlink" title="2. 风扇旋转区域"></a>2. 风扇旋转区域</h3><p>文件：<code>constant/domain0/MRFProperties</code>。本段设置风扇旋转区域。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">VC_1
-{
-    cellZone v_MRF;
-    active <span class="hljs-literal">true</span>;
-    nonRotatingPatches ();
-    origin (<span class="hljs-number">-0.01</span> <span class="hljs-number">0.04</span> <span class="hljs-number">-0.06</span>);
-    axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    omega <span class="hljs-number">209.44</span>;
-}
-</code></pre></div>
-<p><code>origin</code>、<code>axis</code> 和 <code>omega</code> 分别规定旋转轴位置、方向与角速度，<code>cellZone</code> 指定风扇流体区。转速研究保持几何和选区不变；改变风扇位置时，曲面与旋转选区应同步移动。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties">查看该配置的官方原文件</a>。</p>
-<h3 id="3-处理器与空气的热耦合"><a href="#3-处理器与空气的热耦合" class="headerlink" title="3. 处理器与空气的热耦合"></a>3. 处理器与空气的热耦合</h3><p>文件：<code>0.orig/domain0/T</code>。本段设置处理器与空气的热耦合。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">domain0_to_v_CPU
-{
-    <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed;
-    qrNbr none;
-    qr none;
-    Tnbr T;
-    kappaMethod fluidThermo;
-    useImplicit <span class="hljs-literal">true</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-}
-</code></pre></div>
-<p>温度边界根据相邻区域的温度和导热能力计算界面热流。空气侧使用 <code>fluidThermo</code>，固体侧使用 <code>solidThermo</code>；区域分割后，两侧界面通过相应边界名称配对。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/0.orig/domain0/T">查看该配置的官方原文件</a>。</p>
-<h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
-<span class="hljs-built_in">tail</span> -n 40 log.chtMultiRegionSimpleFoam
-</code></pre></div>
-<p><code>Allsolve</code> 读取生成的网格和初始场，调用 <code>chtMultiRegionSimpleFoam</code>；日志用于观察残差、连续性误差及本模型的迭代信息。本求解器采用稳态迭代，日志中的 Time 用作迭代序号。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>控制项</th>
-<th>配置值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>startFrom</code></td>
-<td><code>startTime</code></td>
-</tr>
-<tr>
-<td><code>startTime</code></td>
-<td><code>0</code></td>
-</tr>
-<tr>
-<td><code>endTime</code></td>
-<td><code>200</code></td>
-</tr>
-<tr>
-<td><code>deltaT</code></td>
-<td><code>1</code></td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>timeStep</code></td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td><code>10</code></td>
-</tr>
-</tbody></table></div>
-<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选<code>v_CPU</code>、<code>v_fins</code> 与 <code>domain0</code>，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>同时载入三个区域的温度场，提取处理器最高温度、体积平均温度和鳍片表面温度。隐藏固体后显示空气流线，辨认有效穿过鳍片的气流、旁通流和热空气回流。两个出口的净焓流之和应与 100 W 发热量相对应；温度趋于稳定而热量收支仍不闭合时，应继续检查边界热流与迭代收敛。</p>
-<p>系统热阻定义为 <span class="math-formula" data-tex="R_\theta=(T_{\max}-T_{\mathrm{in}})/Q"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>θ</mi></msub><mo>=</mo><mo stretchy="false">(</mo><msub><mi>T</mi><mi>max</mi><mo>⁡</mo></msub><mo>−</mo><msub><mi>T</mi><mrow><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi></mrow></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">R_\theta=(T_{\max}-T_{\mathrm{in}})/Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">in</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal">Q</span></span></span></span></span>，单位为 K/W。将风扇角速度分别设为基准值的 0.75、1 和 1.25 倍，比较流量与热阻。流量明显增加而热阻变化较小时，可结合鳍片间旁通和固体温度梯度判断主要传热阻力。网格比较重点放在鳍片间隙及热源边缘。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> <code>volumeMode absolute</code> 对应选区总功率。采用体积发热率时，应同时修改热源数值与 <code>volumeMode</code>，并用选区体积核算总输入功率。</p>
-</blockquote>
-<h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
-<li><a href="/downloads/engineering/cpu-cabinet.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">v2512 官方算例目录</a>：核对原始几何、物性和网格流程。</li>
-<li><code>SOURCE.json</code> 记录来源与本站调整；<code>files.sha256</code> 用于核对包内文件；<code>VALIDATION.json</code> 记录网格检查和短步运行结果。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -480,6 +306,6 @@ bash Allmesh
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,155 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>decomposeParDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>设置并行分区数、分区方法和约束，供 <code>decomposePar</code> 分解网格与场。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>并行求解前，这个字典规定把完整网格分成多少份、采用什么分区方法，以及哪些连接需要保留在一起。<code>decomposePar</code> 按此生成处理器子域，分区数随后应与并行启动的进程数对应。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/decomposeParDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>numberOfSubdomains</code></td><td>并行分区数，通常须与 MPI 进程数一致。</td></tr><tr><td><code>method</code></td><td>所采用的分区、插值或模型方法；含义由该字典的读取程序决定。</td></tr><tr><td><code>regions</code></td><td>几何选择区域或多区域列表，按所在字典的格式填写。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">分区方法与约束</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>simpleCoeffs.n / delta</code></td><td><code>simple</code> 分解的三个方向分区数和轻微几何扰动系数；<code>n</code> 的乘积应等于 <code>numberOfSubdomains</code>。</td></tr><tr><td><code>hierarchicalCoeffs.n / delta / order</code></td><td>逐方向分解；<code>order</code>（例如 <code>xyz</code>）决定顺序，其余含义与几何分解匹配。</td></tr><tr><td><code>coeffs</code></td><td>部分分解模型支持通用系数字典；使用模型专名系数字典时先确认当前模型读取路径。</td></tr><tr><td><code>regions.&lt;区域&gt;.numberOfSubdomains / method</code></td><td>按区域指定分解方法和进程数，区域进程数取全局可用进程数以内的整数。</td></tr><tr><td><code>constraints.&lt;名称&gt;.type</code></td><td>例如 <code>preserveBaffles</code>、<code>preserveFaceZones</code>、<code>preservePatches</code>；保护指定连接关系。约束可能影响负载均衡。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/parallel/decompose/decompositionMethods/decompositionMethod/decompositionMethod.H">v2512 参数读取实现</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> decomposeParDict;
-}
-numberOfSubdomains <span class="hljs-number">4</span>;
-method scotch;</code></pre></div>
-<p><code>numberOfSubdomains</code> 指定分区数，与求解阶段 mpirun <code>-np</code> 的进程数一致。<code>scotch</code> 采用图分割，<code>simple</code> 按坐标规则划分，<code>hierarchical</code> 按指定方向依次划分，<code>manual</code> 使用给定的处理器映射，<code>multiLevel</code> 组合多级分解方法。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 用 simple 替换上面的 method 时，加入以下系数</span>
-method simple;
-simpleCoeffs
-{
-    n (<span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>);
-    delta <span class="hljs-number">0.001</span>;
-}</code></pre></div>
-<p>示例中 <code>n</code> 的三个分量乘积为 4。<code>hierarchicalCoeffs</code> 还通过 <code>order</code> 指定划分顺序，如 <code>xyz</code>。多区域算例可在 <code>regions</code> 子字典中分别设置方法和子域数。<code>constraints</code> 用于保持挡板、面区域及指定连接关系，约束范围同时影响负载均衡。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">numberOfSubdomains <span class="hljs-number">8</span>; <span class="hljs-comment">// 必须等于 mpirun -np 的数字</span>
-method scotch; <span class="hljs-comment">// 分区算法</span>
-<span class="hljs-comment">// 各算法的参数（只需写你用的那个）</span>
-simpleCoeffs
-{
-    n (<span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span>);
-    delta <span class="hljs-number">0.001</span>;
-}
-<span class="hljs-comment">// 按 x/y/z 均分</span>
-hierarchicalCoeffs
-{
-    n (<span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span>);
-    delta <span class="hljs-number">0.001</span>;
-    order xyz;
-}
-manualCoeffs
-{
-    dataFile <span class="hljs-string">"decompositionData"</span>;
-}</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th><code>method</code></th><th>说明</th><th>何时用</th></tr>
-<tr><td><code>scotch</code></td><td>自动最小化交界面，默认首选</td><td>绝大多数情况</td></tr>
-<tr><td><code>hierarchical</code></td><td>按指定顺序在 x/y/z 上依次均分</td><td>规则区域、想控制分区形状</td></tr>
-<tr><td><code>simple</code></td><td>直接三向均分</td><td>简单几何</td></tr>
-<tr><td><code>kahip</code> / <code>metis</code></td><td>其他图分区库</td><td>有装才有</td></tr>
-<tr><td><code>multiLevel</code></td><td>多级分区（跨节点/节点内分别优化）</td><td>大规模集群</td></tr>
-<tr><td><code>structured</code></td><td>沿某方向不切（保持结构）</td><td>边界层方向不切分</td></tr>
-<tr><td><code>manual</code></td><td>读文件指定每个单元归谁</td><td>特殊需求</td></tr>
-</tbody></table></div>
-<p>约束条件（保证某些面不被切开）：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">constraints
-{
-    baffles
-    {
-        <span class="hljs-keyword">type</span> preserveBaffles;
-    }
-    cyclics
-    {
-        <span class="hljs-keyword">type</span> preservePatches;
-        patches (cyc1 cyc2);
-    }
-    faces
-    {
-        <span class="hljs-keyword">type</span> singleProcessorFaceSets;
-        sets
-        (
-            (f0 <span class="hljs-number">-1</span>)
-        );
-    }
-}</code></pre></div>
-<p><code>n</code> (2 2 2) 的乘积必须等于 <code>numberOfSubdomains</code>，写不一致会直接报错。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/laminar/filmPanel0</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/laminar/filmPanel0"><h3>算例问题：filmPanel0</h3><p class="reference-case-problem">薄液膜沿固体表面流动，其厚度远小于沿面尺度，因此在表面网格上描述流动。算例用于设置沿面的重力、流量及黏性作用，主要观察膜厚和沿面速度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/filmPanel0"><code>incompressible/pimpleFoam/laminar/filmPanel0</code></a>。</p></section><!-- /reference-case-contexts --><p>filmPanel0 的并行计算把网格分给 12 个进程。</p>
-<ul>
-<li><code>numberOfSubdomains 12</code> 指定子域数，运行 MPI 时的进程数需与之匹配。</li>
-<li><code>method scotch</code> 根据网格连接自动分区，目标是平衡工作量并控制子域接口。</li>
-<li>薄层或局部加密网格应查看每个分区的单元数量与接口分布。</li>
-</ul>
-<p>换电脑或进程数后先修改子域数并重新分解，再启动对应数量的进程。</p>
-<p><a href="/assets/examples/v2512/decomposepardict/1-decomposeParDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/filmPanel0/system/decomposeParDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/filmPanel0">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/filmPanel0/system/decomposeParDict"><code>incompressible/pimpleFoam/laminar/filmPanel0/system/decomposeParDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> decomposeParDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-numberOfSubdomains <span class="hljs-number">12</span>;
-method scotch;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>combustion/fireFoam/LES/compartmentFire</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/compartmentFire"><h3>算例问题：compartmentFire</h3><p class="reference-case-problem">封闭或带开口的房间内发生火灾，热浮力驱动烟气上升并在空间内传播。计算将燃烧、湍流、辐射与通风联系起来，重点观察温度、烟气流动及壁面热负荷。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire"><code>combustion/fireFoam/LES/compartmentFire</code></a>。</p></section><!-- /reference-case-contexts --><p><code>compartmentFire</code> 使用 8 个并行子域计算燃烧室流动。</p>
-<ul>
-<li><code>numberOfSubdomains 8</code> 对应八个计算分区。</li>
-<li><code>method scotch</code> 根据拓扑自动划分，不需要在本字典手工指定各坐标方向份数。</li>
-<li>火源、颗粒和辐射等局部任务可能使计算负载与单元数不完全一致，可结合每步耗时判断平衡。</li>
-</ul>
-<p>调整进程数后重新分解，并比较通信开销与单步时间是否确有改善。</p>
-<p><a href="/assets/examples/v2512/decomposepardict/2-decomposeParDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire/system/decomposeParDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire/system/decomposeParDict"><code>combustion/fireFoam/LES/compartmentFire/system/decomposeParDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> decomposeParDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-numberOfSubdomains <span class="hljs-number">8</span>;
-method scotch;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval"><h3>算例问题：reEval</h3><p class="reference-case-problem">在三维设计区域内优化流体通道分布，使压力损失或流量分配满足设定目标。算例交替更新流动、伴随变量和设计变量，需要结合目标函数与设计约束理解体积源项。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval"><code>incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval</code></a>。</p></section><!-- /reference-case-contexts --><p>拓扑优化中的 reEval 阶段把当前设计的流场复算分成 4 个子域。</p>
-<ul>
-<li><code>numberOfSubdomains 4</code> 决定分区数量。</li>
-<li><code>method scotch</code> 自动划分网格连接，适用于当前三维区域。</li>
-<li>为复算目录中的网格和字段重新生成 <code>processor</code> 分区。</li>
-</ul>
-<p>改变网格或并行规模后重新分解，再比较同一设计的目标函数和流动结果。</p>
-<p><a href="/assets/examples/v2512/decomposepardict/3-decomposeParDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval/system/decomposeParDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval/system/decomposeParDict"><code>incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses-mass-uniformity-SQP-extraVars/reEval/system/decomposeParDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> decomposeParDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-numberOfSubdomains <span class="hljs-number">4</span>;
-method scotch;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/decomposepar/">decomposePar</a> · <a href="/commands/redistributepar/">redistributePar</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>分区数与 MPI 进程数不同</td><td>核对 <code>numberOfSubdomains</code> 与 mpirun <code>-np</code>，修改分区数后重新分解。</td></tr><tr><td>串并行结果差异过大</td><td>保持网格、初值、时间步与收敛准则一致，并检查各进程日志与整体守恒。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -454,6 +306,6 @@ method scotch;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

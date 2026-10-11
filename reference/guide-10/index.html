@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,105 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 10 章　编译与二次开发命令</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>10.1 wmake 系列</h2>
-<p><code>wmake</code> 是 OpenFOAM 自己的编译系统（对 <code>make</code> 的封装），你自己写的求解器、边界条件、<code>functionObject</code> 都用它编译。</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>作用</th></tr>
-<tr><td><code>wmake</code></td><td>编译当前目录的程序或库</td></tr>
-<tr><td><code>wmake</code> <code>-j8</code></td><td>用 8 核并行编译</td></tr>
-<tr><td><code>wmake</code> <code>libso</code></td><td>编译成动态库（写边界条件/模型时用）</td></tr>
-<tr><td><code>wmake</code> <code>all</code></td><td>递归编译子目录</td></tr>
-<tr><td><code>wclean</code></td><td>清理当前目录的编译产物</td></tr>
-<tr><td><code>wclean</code> <code>all</code></td><td>递归清理</td></tr>
-<tr><td><code>wmakeLnInclude</code> &lt;目录&gt;</td><td>生成 <code>lnInclude</code> 符号链接目录（头文件索引）</td></tr>
-<tr><td><code>wmakeFilesAndOptions</code></td><td>生成 <code>Make/files</code> 与 <code>Make/options</code> 模板</td></tr>
-<tr><td><code>wmakeCollect</code></td><td>批量编译加速（编译整个 OpenFOAM 时用）</td></tr>
-</tbody></table></div>
-<h2>10.2 一个自定义求解器的最小流程</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 到你的私有开发目录（不要污染安装目录！）</span>
-<span class="hljs-built_in">mkdir</span> -p <span class="hljs-variable">$WM_PROJECT_USER_DIR</span>/applications/solvers
-<span class="hljs-built_in">cd</span> <span class="hljs-variable">$WM_PROJECT_USER_DIR</span>/applications/solvers
-
-<span class="hljs-comment"># ② 复制官方求解器做起点</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_SOLVERS</span>/incompressible/icoFoam myIcoFoam
-<span class="hljs-built_in">cd</span> myIcoFoam
-<span class="hljs-built_in">mv</span> icoFoam.C myIcoFoam.C
-wclean                       <span class="hljs-comment"># 清掉复制过来的旧编译产物</span>
-
-<span class="hljs-comment"># ③ 改 Make/files</span>
-<span class="hljs-built_in">cat</span> Make/files
-myIcoFoam.C
-EXE = $(FOAM_USER_APPBIN)/myIcoFoam      <span class="hljs-comment"># ★ 指向 USER 目录，不是 FOAM_APPBIN</span>
-
-<span class="hljs-comment"># ④ 编译</span>
-wmake
-<span class="hljs-built_in">which</span> myIcoFoam
-/home/chen/OpenFOAM/chen-v2512/platforms/linux64GccDPInt32Opt/bin/myIcoFoam</code></pre></div>
-<p>建议将自定义源码放在独立的用户工作目录，并通过版本控制管理。代码不必限定在一个固定目录，但编译输出与运行时库路径应按 <code>FOAM_USER_APPBIN</code>、<code>FOAM_USER_LIBBIN</code> 等配置，避免把个人修改混入安装源码。</p>
-<p><code>Make/files</code> 与 <code>Make/options</code> 是什么</p>
-<div class="code-panel" data-language="makefile"><div class="code-toolbar"><span class="code-language">Makefile</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Makefile代码"><code class="hljs language-makefile"><span class="hljs-comment"># Make/files —— 编译哪些源文件、产物叫什么、放哪</span>
-myIcoFoam.C
-EXE = <span class="hljs-variable">$(FOAM_USER_APPBIN)</span>/myIcoFoam
-
-<span class="hljs-comment"># Make/options —— 去哪找头文件（-I）、链接哪些库（-l）</span>
-EXE_INC = \
-    -I<span class="hljs-variable">$(LIB_SRC)</span>/finiteVolume/lnInclude \
-    -I<span class="hljs-variable">$(LIB_SRC)</span>/meshTools/lnInclude
-EXE_LIBS = \
-    -lfiniteVolume \
-    -lmeshTools</code></pre></div>
-<p>找不到头文件可能来自包含路径、文件名大小写、缺失依赖或尚未生成的 <code>lnInclude</code>。<code>undefined</code> <code>reference</code> 还可能来自源文件未参与编译、库依赖、链接顺序或 ABI 不匹配，应结合完整编译/链接命令定位。</p>
-<h2>10.3 codeStream 与 codedFixedValue：在字典中编写并运行 C++</h2>
-<p>是什么：直接在字典里嵌 <code>C</code>++ 代码，OpenFOAM 运行时自动编译成库并加载。</p>
-<p><code>codedFixedValue</code> 可以在字典中嵌入 <code>C</code>++ 实现定制边界，并在运行时编译相关代码。使用时仍需正确设置 <code>name</code>、<code>code</code>、包含项和库依赖，并确认代码在当前 <code>v2512</code> API 下能够编译。</p>
-<div class="code-panel" data-language="cpp"><div class="code-toolbar"><span class="code-language">C++</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="C++代码"><code class="hljs language-cpp"><span class="hljs-comment">// 0/U 里给一个抛物线入口</span>
-inlet
-{
-    type            codedFixedValue;
-    <span class="hljs-function">value           <span class="hljs-title">uniform</span> <span class="hljs-params">(<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)</span></span>;
-    name            parabolicInlet;          <span class="hljs-comment">// 生成的类名，必须唯一</span>
-    code
-    #{
-        <span class="hljs-type">const</span> fvPatch&amp; p = <span class="hljs-built_in">patch</span>();
-        <span class="hljs-type">const</span> vectorField&amp; c = p.<span class="hljs-built_in">Cf</span>();       <span class="hljs-comment">// 面心坐标</span>
-        scalarField y = c.<span class="hljs-built_in">component</span>(<span class="hljs-number">1</span>);
-        <span class="hljs-keyword">operator</span>==(<span class="hljs-built_in">vector</span>(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>)*<span class="hljs-number">1.5</span>*(<span class="hljs-number">1.0</span> - <span class="hljs-built_in">sqr</span>(y/<span class="hljs-number">0.05</span>)));
-    #};
-}
-<span class="hljs-comment">// system/controlDict 里用 #codeStream 动态算一个值</span>
-endTime  #codeStream
-{
-    code #{ os &lt;&lt; <span class="hljs-number">10.0</span>*<span class="hljs-number">2</span>; #};
-};</code></pre></div>
-<p>改了代码不生效？ 动态编译的产物缓存在算例的 dynamicCode/ 目录里。改完 <code>code</code> 块必须清缓存：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">rm</span> -rf dynamicCode
-<span class="hljs-comment"># 或</span>
-. <span class="hljs-variable">$WM_PROJECT_DIR</span>/bin/tools/CleanFunctions &amp;&amp; cleanDynamicCode</code></pre></div>
-<h2>10.4 自定义库的加载</h2>
-<p>不改求解器就用上自己的边界条件/模型：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// controlDict
-libs ("libmyBCs.so" "libmyModels.so");</code></pre></div>
-<p>或命令行：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleFoam -libs <span class="hljs-string">'("libmyBCs.so")'</span></code></pre></div><!-- example-reading --><p><code>simpleFoam</code> 使用 <code>SIMPLE</code> 算法求解不可压缩稳态流动。</p><!-- /example-reading -->
-<h2>10.5 骨架生成器</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamNewApp myApp                 <span class="hljs-comment"># 应用程序骨架（含 Make/files、Make/options）</span>
-foamNewBC -f myFixedValue        <span class="hljs-comment"># 边界条件骨架</span>
-foamNewFunctionObject myProbe    <span class="hljs-comment"># functionObject 骨架</span>
-foamNewSource lib myClass        <span class="hljs-comment"># 库源文件骨架</span></code></pre></div><!-- example-reading --><ol><li><code>foamNewApp</code> 创建新应用程序的源码目录、主程序和编译配置。</li><li><code>foamNewBC</code> 创建自定义边界条件的源码和编译配置。</li><li><code>foamNewFunctionObject</code> 创建自定义 <code>functionObject</code> 的源码和编译配置。</li><li><code>lib</code> 切换到已编译的库目录。</li></ol><!-- /example-reading -->
-<h2>10.6 读源码的路径速查</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>想看什么</th><th>去哪</th></tr>
-<tr><td>某求解器解了哪些方程</td><td>$FOAM_SOLVERS/&lt;类别&gt;/&lt;求解器&gt;/ 下的 UEqn.H、pEqn.H</td></tr>
-<tr><td>边界条件的实现</td><td>$FOAM_SRC/finiteVolume/fields/fvPatchFields/derived/</td></tr>
-<tr><td>湍流模型</td><td>$FOAM_SRC/TurbulenceModels/</td></tr>
-<tr><td>离散格式</td><td>$FOAM_SRC/finiteVolume/interpolation/surfaceInterpolation/limitedSchemes/</td></tr>
-<tr><td><code>functionObject</code></td><td>$FOAM_SRC/functionObjects/</td></tr>
-<tr><td>热物性模型</td><td>$FOAM_SRC/thermophysicalModels/</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">grep -rn "class inletOutletFvPatchField" $FOAM_SRC --include=*.H | head
-find $FOAM_SRC -name "kOmegaSST*"</code></pre></div>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -404,6 +306,6 @@ find $FOAM_SRC -name "kOmegaSST*"</code></pre></div>
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

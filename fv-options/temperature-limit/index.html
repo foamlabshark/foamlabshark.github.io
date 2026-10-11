@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,181 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>limitTemperature · 温度范围</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在选定区域内限制温度上下界，并按热力学模型修正对应的能量场。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>温度限制属于求解后的数值约束，将温度保持在指定区间。上下限应来自所选物性与工况的有效范围；若频繁触发，需检查热源、边界及能量收支。</p><p>温度限制将指定区域内的温度约束在给定范围，可用于热物性模型具有明确适用区间的计算。限制操作会同时改变该区域对应的能量。</p><p>配置应说明上下限的物理依据，结果检查应记录触限位置和能量变化。持续触限的区域需要进一步检查原有热源、边界及数值设置。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoSimpleFoam/aerofoilNACA0012"><h3>算例问题：aerofoilNACA0012</h3><p class="reference-case-problem">来流绕过二维翼型，在表面形成边界层并在下游形成尾流。入口来流、攻角和近壁网格共同影响表面压力及升阻力；重叠网格版本将翼型附近网格与背景网格分别建立。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012"><code>compressible/rhoSimpleFoam/aerofoilNACA0012</code></a>。</p><figure class="reference-case-figure"><img alt="翼型周围的来流、近壁区域与尾迹" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>翼型周围的来流、近壁区域与尾迹。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvOptions</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>min / max</code></td><td>温度下限与上限 K。</td></tr><tr><td><code>selectionMode</code></td><td>修正区域。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>system/fvOptions</code></h3><p>源项、约束与场修正。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvOptions"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-limitT
-{
-    <span class="hljs-keyword">type</span> limitTemperature;
-    min <span class="hljs-number">101</span>;
-    max <span class="hljs-number">1000</span>;
-    selectionMode all;
-}
-<span class="hljs-comment">//************************************************************************** //</span></code></pre></div><div data-reference-reading="v2"><p><code>system/fvOptions</code> 中各项设置的作用如下。</p><ul><li><code>limitT/min</code> 设为 <code>101</code>：温度下限与上限 K。</li><li><code>limitT/max</code> 设为 <code>1000</code>：温度下限与上限 K。</li><li><code>limitT/selectionMode</code> 设为 <code>all</code>：确定源项或约束作用的单元范围。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvOptions">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvOptions.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0.orig/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0.orig/omega</code></td><td>比耗散率，1/s。</td></tr><tr><td><code>0.orig/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0.orig/T：温度，K。</summary><h3><code>0.orig/T</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/T"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/T</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> T;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-Tinlet <span class="hljs-number">298</span>;
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$Tinlet</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    freestream
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$Tinlet</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$inletValue</span>;
-    }
-    wall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/T</code> 设置 <code>T</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform $Tinlet</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>freestream</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform $Tinlet</code>，<code>value</code> <code>$inletValue</code>。</li><li><code>wall</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li></ul><p><code>0.orig/T</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/T">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/T.txt">下载此配置文件</a></p></details><details><summary>0.orig/U：速度向量，m/s。</summary><h3><code>0.orig/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/U"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/U</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volVectorField;
-    <span class="hljs-keyword">object</span> U;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-Uinlet (<span class="hljs-number">250</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$Uinlet</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    freestream
-    {
-        <span class="hljs-keyword">type</span> freestreamVelocity;
-        freestreamValue <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$Uinlet</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$Uinlet</span>;
-    }
-    wall
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
-    }
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform $Uinlet</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>freestream</code> 采用 <code>freestreamVelocity</code>，根据速度相对边界的方向，在远场给定值与零梯度之间连续混合。参数为 <code>freestreamValue</code> <code>uniform $Uinlet</code>，<code>value</code> <code>uniform $Uinlet</code>。</li><li><code>wall</code> 采用 <code>noSlip</code>，壁面速度为零。</li></ul><p><code>0.orig/U</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/U.txt">下载此配置文件</a></p></details><details><summary>0.orig/alphat：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/alphat</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/alphat"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/alphat</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> alphat;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    freestream
-    {
-        <span class="hljs-keyword">type</span> calculated;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    wall
-    {
-        <span class="hljs-keyword">type</span> compressible::alphatWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/alphat</code> 设置 <code>alphat</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 -1 -1 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>freestream</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>wall</code> 采用 <code>compressible::alphatWallFunction</code>，根据湍动黏度和湍流 Prandtl 数设置可压缩热扩散壁面值。参数为 <code>value</code> <code>uniform 0</code>。</li></ul><p><code>0.orig/alphat</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/alphat">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/0.orig/alphat.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvSolution"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvSolution;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solvers
-{
-    p
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
-        smoother GaussSeidel;
-        tolerance <span class="hljs-number">1e-6</span>;
-        relTol <span class="hljs-number">0.01</span>;
-    }
-    <span class="hljs-string">"(U|k|omega|e)"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner DILU;
-        tolerance <span class="hljs-number">1e-6</span>;
-        relTol <span class="hljs-number">0.1</span>;
-    }
-}
-<span class="hljs-built_in">SIMPLE</span>
-{
-    residualControl
-    {
-        p <span class="hljs-number">1e-4</span>;
-        U <span class="hljs-number">1e-4</span>;
-        <span class="hljs-string">"(k|omega|e)"</span> <span class="hljs-number">1e-4</span>;
-    }
-    nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    pMinFactor <span class="hljs-number">0.1</span>;
-    pMaxFactor <span class="hljs-number">2</span>;
-}
-relaxationFactors
-{
-    fields
-    {
-        p <span class="hljs-number">0.7</span>;
-        rho <span class="hljs-number">0.01</span>;
-    }
-    equations
-    {
-        U <span class="hljs-number">0.3</span>;
-        e <span class="hljs-number">0.7</span>;
-        <span class="hljs-string">"(k|omega)"</span> <span class="hljs-number">0.7</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p</code></td><td><code>solver</code> <code>GAMG</code>：线性方程采用 <code>GAMG</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>tolerance</code> <code>1e-6</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.01</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|k|omega|e)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-6</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>SIMPLE/residualControl/p</code> = <code>1e-4</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/U</code> = <code>1e-4</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/"(k|omega|e)"</code> = <code>1e-4</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>relaxationFactors/fields/p</code> = <code>0.7</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/fields/rho</code> = <code>0.01</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/U</code> = <code>0.3</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/e</code> = <code>0.7</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"(k|omega)"</code> = <code>0.7</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/system/fvSolution.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/compressible/rhoSimpleFoam/aerofoilNACA0012"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/aerofoilNACA0012-reference"</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/aerofoilNACA0012-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p><details><summary>Allrun.pre：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun.pre</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun.pre"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun.pre</code></a>（原文件）。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-<span class="hljs-built_in">mkdir</span> -p constant/geometry
-
-<span class="hljs-built_in">cp</span> -f \
-    <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>"</span>/resources/geometry/NACA0012.obj.gz \
-    constant/geometry
-
-restore0Dir
-
-runApplication blockMesh
-
-runApplication transformPoints -scale <span class="hljs-string">'(1 0 1)'</span>
-
-runApplication extrudeMesh
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>mkdir</code> 创建一个或多个目录。</li><li><code>cp</code> 复制文件或目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li><code>transformPoints</code> 平移、旋转或缩放网格坐标，可同步旋转向量与张量场。</li><li><code>extrudeMesh</code> 按指定方向和层数挤出表面或网格边界，生成体网格。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun.pre">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun.pre.txt">下载此配置文件</a></p></details><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun"><code>compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun</code></a>（原文件）。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-./Allrun.pre
-
-runApplication topoSet
-
-runApplication $(getApplication)
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><code>cd</code> 切换当前工作目录。<code>topoSet</code> 按几何、网格属性和集合关系创建或修改 sets/zones。从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/compressible/rhoSimpleFoam/aerofoilNACA0012/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>查看温度触及限制的区域和频率，检查能量收支及边界输入。</p><p><a href="/fv-options/">返回源项、约束与修正</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -480,6 +306,6 @@ runApplication $(getApplication)
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

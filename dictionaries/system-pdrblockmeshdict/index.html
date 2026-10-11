@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,222 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>PDRblockMeshDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p><code>PDRblockMesh</code> 的结构化网格输入，适用于 PDR 工作流。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>这个字典用三个坐标方向的分段信息描述 <code>PDRblockMesh</code> 的直角网格。它适合准备 PDR 障碍物工作流使用的基础结构网格，方向分段决定单元尺寸及需要集中分辨的区域。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/PDRblockMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>x / y / z 中的 points、nCells、ratios</code></td><td>三个方向各自的分段坐标、分段单元数与尺寸渐变比例；每段长度、单元数和比例需成组对应。</td></tr><tr><td><code>boundary.&lt;名称&gt;.faces</code></td><td>PDR 块域的边界面选择，填写 PDR 块定义中的面编号。</td></tr><tr><td><code>defaultPatch.name / type</code></td><td>未分配外边界的默认名称与类型。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity"><code>incompressible/icoFoam/cavity/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>PDRblockMesh</code> 可以沿三个坐标方向给出分段坐标和单元数。本例生成顶盖驱动方腔的二维网格。</p>
-<ul>
-<li><code>scale 0.1</code> 将坐标缩放成米：<code>x</code>、<code>y</code> 的 0～1 对应 0.1 m，<code>z</code> 的 0～0.1 对应 0.01 m。</li>
-<li><code>x</code>、<code>y</code> 均分成 20 个单元，<code>z</code> 只有 1 层，总计 20×20×1=400 个六面体。</li>
-<li><code>ratios 1</code> 表示各段内部均匀分布，面内单元宽度为 0.005 m。</li>
-<li>面编号 3 命名为 <code>movingWall</code>，0、1、2 合并为 <code>fixedWalls</code>；4、5 合并为 <code>empty</code> 类型的 <code>frontAndBack</code>，使求解采用二维设置。</li>
-</ul>
-<p>细化时可把 <code>x</code>、<code>y</code> 的单元数同时改成 40，保持 <code>z</code> 一层和前后 <code>empty</code> 边界，便于比较相同几何上的速度分布。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/1-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict"><code>incompressible/icoFoam/cavity/cavity/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">53 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> PDRblockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-scale <span class="hljs-number">0.1</span>;
-x
-{
-    points (<span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    nCells (<span class="hljs-number">20</span>);
-    ratios (<span class="hljs-number">1</span>);
-}
-y
-{
-    points (<span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    nCells (<span class="hljs-number">20</span>);
-    ratios (<span class="hljs-number">1</span>);
-}
-z
-{
-    points (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span>);
-    nCells (<span class="hljs-number">1</span>);
-    ratios (<span class="hljs-number">1</span>);
-}
-boundary
-(
-    movingWall
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces (<span class="hljs-number">3</span>);
-    }
-    fixedWalls
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span>);
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-        faces (<span class="hljs-number">4</span> <span class="hljs-number">5</span>);
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/lumpedPointMotion/bridge/steady</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/lumpedPointMotion/bridge/steady"><h3>算例问题：steady</h3><p class="reference-case-problem">桥梁结构的运动以若干集中点及连接关系描述，并与周围流体载荷联系。该子目录用于准备稳态流场，后续结构运动需要结合集中点运动参数和流体力信息。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady"><code>incompressible/lumpedPointMotion/bridge/steady</code></a>。</p></section><!-- /reference-case-contexts --><p>桥梁算例用分段网格覆盖桥梁附近与较远的外流区域，随后配合桥体几何及运动处理。</p>
-<ul>
-<li><code>x</code> 从 −50 到 50，分 50 格，对应均匀间距 2 m。</li>
-<li><code>y</code> 分成 −300～−25、−25～25、25～300 三段，每段 10 格；中间段间距 5 m，两侧间距 27.5 m，桥梁附近分辨率更高。</li>
-<li><code>z</code> 的 0～50、50～80、80～250 分别用 2、10、10 格，形成地面到高空的不同网格尺度。</li>
-<li>面 2 是 <code>outlet</code>，3 是 <code>inlet</code>，4 是 <code>ground</code> 壁面，5 是 <code>sky</code>，其余为 <code>sides</code>；这些名称会被后续场文件引用。</li>
-</ul>
-<p>本文件 <code>ratios 1</code> 使每一段内部均匀。需要平滑过渡时，同时调整分段位置、单元数和扩张比，并检查相邻单元尺寸跳变。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/2-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict"><code>incompressible/lumpedPointMotion/bridge/steady/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> PDRblockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Bounding Box : (-23.275 -250 5) (23.275 250 200)</span>
-scale <span class="hljs-number">1</span>;
-x
-{
-    points ( <span class="hljs-number">-50</span> <span class="hljs-number">50</span> );
-    nCells ( <span class="hljs-number">50</span> );
-    ratios ( <span class="hljs-number">1</span> );
-}
-y
-{
-    points ( <span class="hljs-number">-300</span> <span class="hljs-number">-25</span> <span class="hljs-number">25</span> <span class="hljs-number">300</span> );
-    nCells ( <span class="hljs-number">10</span> <span class="hljs-number">10</span> <span class="hljs-number">10</span> );
-    ratios ( <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> );
-}
-z
-{
-    points ( <span class="hljs-number">0</span> <span class="hljs-number">50</span> <span class="hljs-number">80</span> <span class="hljs-number">250</span> );
-    nCells ( <span class="hljs-number">2</span> <span class="hljs-number">10</span> <span class="hljs-number">10</span> );
-    ratios ( <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> );
-}
-<span class="hljs-comment">// Low resolution</span>
-<span class="hljs-comment">// Faces: 0=x-min, 1=x-max, 2=y-min, 3=y-max, 4=z-min, 5=z-max</span>
-boundary
-(
-    sides
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces ( <span class="hljs-number">0</span> <span class="hljs-number">1</span> );
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces ( <span class="hljs-number">2</span> );
-    }
-    inlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces ( <span class="hljs-number">3</span> );
-    }
-    ground
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces ( <span class="hljs-number">4</span> );
-    }
-    sky
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces ( <span class="hljs-number">5</span> );
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · combustion/PDRFoam/pipeLattice</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/PDRFoam/pipeLattice"><h3>算例问题：pipeLattice</h3><p class="reference-case-problem">预混可燃气体中的火焰传播受到管架或障碍物影响，障碍物会改变阻力、湍流和燃烧传播速度。PDR 方法用网格上的等效堵塞与阻力描述未逐一解析的结构；预处理算例负责生成这些场，燃烧算例再求解压力和火焰演化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice"><code>combustion/PDRFoam/pipeLattice</code></a>。</p></section><!-- /reference-case-contexts --><p>pipeLattice 在管阵列附近布置较细网格，向外部开阔区域扩展。<code>PDRblockMeshDict</code> 决定这层背景网格。</p>
-<ul>
-<li><code>x</code> 的三段为 −19.4～0、0～4.26、4.26～23.66，分别用 14、13、14 格；<code>y</code> 采用对应的三段划分。</li>
-<li>中间区域扩张比为 1，外侧比值约 0.0887 和 10.699，使网格向障碍物附近收缩、向远处增大。</li>
-<li><code>z</code> 从地面起分为 0～2.13 的 6 格、2.13～23.17 的 14 格，远离地面后逐渐放粗。</li>
-<li><code>outer</code> 包含四个侧面与顶面，<code>wallFaces</code> 对应底面 4；<code>blockedFaces</code>、<code>mergingFaces</code> 预留给后续障碍物处理。</li>
-</ul>
-<p>调整阵列尺寸后同步修改分段位置和障碍物几何，检查细网格是否覆盖全部管阵列。</p>
-<p><a href="/assets/examples/v2512/pdrblockmeshdict/3-PDRblockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict"><code>combustion/PDRFoam/pipeLattice/system/PDRblockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> PDRblockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-scale <span class="hljs-number">1.0</span>;
-x
-{
-    points ( <span class="hljs-number">-19.4</span> <span class="hljs-number">0</span> <span class="hljs-number">4.26</span> <span class="hljs-number">23.66</span> );
-    nCells ( <span class="hljs-number">14</span> <span class="hljs-number">13</span> <span class="hljs-number">14</span> );
-    ratios ( <span class="hljs-number">0.0887187064230887</span> <span class="hljs-number">1</span> <span class="hljs-number">10.6993205379072</span> );
-}
-y
-{
-    points ( <span class="hljs-number">-19.42</span> <span class="hljs-number">0</span> <span class="hljs-number">4.26</span> <span class="hljs-number">23.68</span> );
-    nCells ( <span class="hljs-number">14</span> <span class="hljs-number">13</span> <span class="hljs-number">14</span> );
-    ratios ( <span class="hljs-number">0.0887187064230887</span> <span class="hljs-number">1</span> <span class="hljs-number">10.6993205379072</span> );
-}
-z
-{
-    points (<span class="hljs-number">0</span> <span class="hljs-number">2.13</span> <span class="hljs-number">23.17</span>  );
-    nCells ( <span class="hljs-number">6</span> <span class="hljs-number">14</span> );
-    ratios ( <span class="hljs-number">1</span> <span class="hljs-number">10.6993205379072</span> );
-}
-<span class="hljs-comment">// Or could use defaultFaces = outer instead</span>
-defaultPatch
-{
-    <span class="hljs-keyword">name</span> defaultFaces;
-    <span class="hljs-keyword">type</span> wall;
-}
-<span class="hljs-comment">// Faces: 0 = xmin, 1 = xmax, 2 = ymin, 3 = ymax, 4 = zmin, 5 = zmax</span>
-boundary
-(
-    <span class="hljs-comment">// Or with defaultFaces = outer</span>
-    outer
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces ( <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">5</span> );
-    }
-    mergingFaces
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces ();
-    }
-    blockedFaces
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces ();
-    }
-    wallFaces
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces ( <span class="hljs-number">4</span> );
-    }
-);
-<span class="hljs-comment">//***************************************************************************//</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/pdrblockmesh/">PDRblockMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -521,6 +306,6 @@ boundary
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

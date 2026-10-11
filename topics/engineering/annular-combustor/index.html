@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,209 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>环形燃烧室与下游涡轮的耦合流动</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>求解环形通道内的旋流预混燃烧及下游叶排运动，评价出口温度分布和总压损失。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>燃气轮机燃烧室将燃料的化学能转化为高温气流的焓。下游叶片承受的热负荷既取决于平均温度，也取决于热点的位置和强度。入口旋流有助于组织混合与燃烧，同时会改变径向压力分布和出口流向，因此温度均匀性与压力损失需要结合评价。</p>
-<p>算例选取包含燃烧通道和叶排的环形扇区。预混气体从上游进入，流经燃烧区后进入旋转叶排；静止区与旋转区通过 AMI 交换场量。计算围绕两项问题展开：入口旋流如何改变热气流分布，叶排转动如何影响出口热点与压力损失。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/annular-combustor-geometry.webp" alt="环形燃烧室与下游涡轮的耦合流动：配套模型与基准输入"></p>
-<p>环形通道及叶片由配套曲面确定，背景半径参数为 34、39、61、66 cm。网格先按厘米构建，再用 <code>transformPoints -scale 0.01</code> 统一转换为米。旋转轴沿 <code>x</code> 方向，运动单元区为 <code>rotating</code>。</p>
-<p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine">OpenFOAM v2512 · combustion/XiDyMFoam/annularCombustorTurbine</a>。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>设置位置与作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>入口温度</td>
-<td>573 K</td>
-<td><code>0.orig/T</code> 的 <code>inletField</code></td>
-</tr>
-<tr>
-<td>初始压力</td>
-<td>1 MPa</td>
-<td><code>0.orig/p</code></td>
-</tr>
-<tr>
-<td>入口轴向、径向速度</td>
-<td>40、20 m/s</td>
-<td><code>0.orig/U</code> 的 <code>cylindricalInletVelocity</code></td>
-</tr>
-<tr>
-<td>旋转区域角速度</td>
-<td>10 rad/s</td>
-<td><code>constant/dynamicMeshDict</code></td>
-</tr>
-<tr>
-<td>甲烷当量比</td>
-<td>0.7</td>
-<td><code>constant/combustionProperties</code></td>
-</tr>
-</tbody></table></div>
-<h2 id="求解方法与物理模型"><a href="#求解方法与物理模型" class="headerlink" title="求解方法与物理模型"></a>求解方法与物理模型</h2><p><code>XiDyMFoam</code> 求解可压缩预混燃烧和运动网格上的流动。火焰褶皱因子 <span class="math-formula" data-tex="\Xi"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Ξ</mi></mrow><annotation encoding="application/x-tex">\Xi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Ξ</span></span></span></span></span> 将层流火焰速度 <span class="math-formula" data-tex="S_u"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>u</mi></msub></mrow><annotation encoding="application/x-tex">S_u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 与湍流传播速度 <span class="math-formula" data-tex="S_T"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">S_T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 联系起来，<span class="math-formula" data-tex="S_T=\Xi S_u"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>T</mi></msub><mo>=</mo><mi mathvariant="normal">Ξ</mi><msub><mi>S</mi><mi>u</mi></msub></mrow><annotation encoding="application/x-tex">S_T=\Xi S_u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord">Ξ</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>；它描述湍流使火焰表面积增大后对整体传播的影响。</p>
-<p>入口周向速度引入角动量，在近似径向平衡下有 <span class="math-formula" data-tex="\partial p/\partial r=\rho U_\theta^2/r"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∂</mi><mi>p</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><mi>r</mi><mo>=</mo><mi>ρ</mi><msubsup><mi>U</mi><mi>θ</mi><mn>2</mn></msubsup><mi mathvariant="normal">/</mi><mi>r</mi></mrow><annotation encoding="application/x-tex">\partial p/\partial r=\rho U_\theta^2/r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0972em;vertical-align:-0.2831em;"></span><span class="mord mathnormal">ρ</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4169em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span></span>。AMI 随叶排转动更新两侧插值关系，使通量跨越转静交界面。截面温度离散程度可用 <span class="math-formula" data-tex="\sigma_T=\sqrt{\langle(T-\langle T\rangle)^2\rangle}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>T</mi></msub><mo>=</mo><msqrt><mrow><mo stretchy="false">⟨</mo><mo stretchy="false">(</mo><mi>T</mi><mo>−</mo><mo stretchy="false">⟨</mo><mi>T</mi><mo stretchy="false">⟩</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">⟩</mo></mrow></msqrt></mrow><annotation encoding="application/x-tex">\sigma_T=\sqrt{\langle(T-\langle T\rangle)^2\rangle}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.24em;vertical-align:-0.305em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.935em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mopen">⟨(</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">⟨</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">⟩</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span><span style="top:-2.895em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
-c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
-c340,-704.7,510.7,-1060.3,512,-1067
-l0 -0
-c4.7,-7.3,11,-11,19,-11
-H40000v40H1012.3
-s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
-c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
-s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
-c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
-M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.305em;"><span></span></span></span></span></span></span></span></span></span> 表示，并结合总压损失评价热气流品质。</p>
-<p>本例使用 <code>XiDyMFoam</code>。网格与边界定义在 <code>constant</code> 和初始场目录，离散格式和方程求解设置分别位于 <code>system/fvSchemes</code>、<code>system/fvSolution</code>；多区域模型在相应区域子目录中保存这些文件。</p>
-<h2 id="获取文件与准备网格"><a href="#获取文件与准备网格" class="headerlink" title="获取文件与准备网格"></a>获取文件与准备网格</h2><p><a href="/downloads/engineering/annular-combustor.zip">下载完整算例包</a>。包内包含模型资源、初始场、物性、数值设置、运行脚本和来源记录。</p>
-<p>先在 Linux 终端加载 OpenCFD OpenFOAM <code>v2512</code>。采用标准软件包安装路径时执行下列命令；安装在其他目录时，将路径改为该安装目录下的 <code>etc/bashrc</code>。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>
-</code></pre></div>
-<p>输出应为 <code>v2512</code>。随后进入下载目录，解压并生成网格：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">unzip annular-combustor.zip
-<span class="hljs-built_in">cd</span> annular-combustor
-bash Allmesh
-</code></pre></div>
-<p><code>Allmesh</code> 按下表顺序生成网格并执行 <code>checkMesh</code>，每一步的输出保存在相应 <code>log.*</code> 文件中。脚本在命令失败或网格检查不通过时停止。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>网格步骤</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>blockMesh</code></td>
-<td>按顶点、块结构和加密比例生成背景网格。</td>
-</tr>
-<tr>
-<td><code>createPatch -dict system/createPatchDict.cyclic -overwrite</code></td>
-<td>重建边界集合及周期、AMI 等边界类型。</td>
-</tr>
-<tr>
-<td><code>snappyHexMesh -overwrite</code></td>
-<td>依据随包曲面裁切、贴合背景网格，并执行局部加密。</td>
-</tr>
-<tr>
-<td><code>createPatch -dict system/createPatchDict.ami -overwrite</code></td>
-<td>重建边界集合及周期、AMI 等边界类型。</td>
-</tr>
-<tr>
-<td><code>transformPoints -scale 0.01</code></td>
-<td>把网格坐标按指定比例换算为米。</td>
-</tr>
-<tr>
-<td><code>mergeOrSplitBaffles -split -overwrite</code></td>
-<td>整理挡板两侧拓扑，使相邻计算区域具有独立的面连接。</td>
-</tr>
-<tr>
-<td>复制初始场</td>
-<td>把 0.orig 中的初始场复制到 0 目录。</td>
-</tr>
-<tr>
-<td><code>potentialFoam -pName pPotential -initialiseUBCs</code></td>
-<td>求解势流初始化问题，使速度与边界通量协调。</td>
-</tr>
-</tbody></table></div>
-<p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-入口旋流"><a href="#1-入口旋流" class="headerlink" title="1. 入口旋流"></a>1. 入口旋流</h3><p>文件：<code>0.orig/U</code>。本段设置入口旋流。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
-{
-    <span class="hljs-keyword">type</span> cylindricalInletVelocity;
-    origin (<span class="hljs-number">-0.64</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span>);
-    axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    axialVelocity <span class="hljs-number">40</span>;
-    radialVelocity <span class="hljs-number">20</span>;
-    rpm <span class="hljs-number">12732</span>; <span class="hljs-comment">// ut=40,r=3e-2,omega=ut/r,rpm=omega*60/(2*pi)</span>
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-</code></pre></div>
-<p><code>cylindricalInletVelocity</code> 以给定轴线为基准组合轴向、径向和周向速度。<code>rpm</code> 规定入口气流的旋转强度；叶排运动由 <code>dynamicMeshDict</code> 中的 <code>omega</code> 规定。两个参数分别控制来流和固体转动。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/0.orig/U">查看该配置的官方原文件</a>。</p>
-<h3 id="2-叶排运动与转静连接"><a href="#2-叶排运动与转静连接" class="headerlink" title="2. 叶排运动与转静连接"></a>2. 叶排运动与转静连接</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置叶排运动与转静连接。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
-<span class="hljs-keyword">solver</span> solidBody;
-solidBodyCoeffs
-{
-    cellZone rotating;
-    solidBodyMotionFunction rotatingMotion;
-    rotatingMotionCoeffs
-    {
-        origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        omega <span class="hljs-number">10</span>;
-    }
-</code></pre></div>
-<p><code>rotating</code> 指定作刚体转动的单元区，外部通道保持静止。该区域的交界面采用 AMI；转动过程中，两侧面的重叠范围决定场量能否连续传递。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
-<h3 id="3-预混燃烧参数"><a href="#3-预混燃烧参数" class="headerlink" title="3. 预混燃烧参数"></a>3. 预混燃烧参数</h3><p>文件：<code>constant/combustionProperties</code>。本段设置预混燃烧参数。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">laminarFlameSpeedCorrelation Gulders;
-fuel Methane;
-Su Su [ <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">0.434</span>;
-SuModel unstrained;
-equivalenceRatio equivalenceRatio [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">0.7</span>;
-sigmaExt sigmaExt [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">100000</span>;
-XiModel transport;
-</code></pre></div>
-<p>燃料、当量比和层流火焰速度关联式确定未燃混合物的基础燃烧特性。<code>XiModel transport</code> 通过输运方程描述火焰褶皱，使湍流对传播速度的影响进入燃烧计算。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/constant/combustionProperties">查看该配置的官方原文件</a>。</p>
-<h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
-<span class="hljs-built_in">tail</span> -n 40 log.XiDyMFoam
-</code></pre></div>
-<p><code>Allsolve</code> 读取生成的网格和初始场，调用 <code>XiDyMFoam</code>；日志用于观察残差、连续性误差及本模型的迭代信息。时间控制给出计算起止位置和输出频率。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>控制项</th>
-<th>配置值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>startFrom</code></td>
-<td><code>latestTime</code></td>
-</tr>
-<tr>
-<td><code>startTime</code></td>
-<td><code>0</code></td>
-</tr>
-<tr>
-<td><code>endTime</code></td>
-<td><code>0.1</code></td>
-</tr>
-<tr>
-<td><code>deltaT</code></td>
-<td><code>1e-4</code></td>
-</tr>
-<tr>
-<td><code>writeControl</code></td>
-<td><code>adjustable</code></td>
-</tr>
-<tr>
-<td><code>writeInterval</code></td>
-<td><code>2e-3</code></td>
-</tr>
-<tr>
-<td><code>adjustTimeStep</code></td>
-<td><code>yes</code></td>
-</tr>
-<tr>
-<td><code>maxCo</code></td>
-<td><code>0.2</code></td>
-</tr>
-</tbody></table></div>
-<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选燃烧通道，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>在叶排前后设置固定轴向截面，提取质量流量加权平均温度、温度标准差及总压。平均温度反映热量输运，标准差反映冷热分布，总压差反映流动损失。截面位置和平均方式在各工况中保持一致。</p>
-<p>按转子周期保存温度场，跟踪热点随相位的变化。先固定叶排角速度、改变入口旋流，再固定旋流、改变叶排角速度，分别比较出口温度分布和总压损失。AMI 两侧通量及插值权重用于检查转静界面的传递质量。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 网格缩放在准备流程中执行一次。完成厘米到米的转换后，旋转轴、点火位置和其他位置参数均按米填写。</p>
-</blockquote>
-<h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
-<li><a href="/downloads/engineering/annular-combustor.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
-<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine">v2512 官方算例目录</a>：核对原始几何、物性和网格流程。</li>
-<li><code>SOURCE.json</code> 记录来源与本站调整；<code>files.sha256</code> 用于核对包内文件；<code>VALIDATION.json</code> 记录网格检查和短步运行结果。</li>
-</ul>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -508,6 +306,6 @@ XiModel transport;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

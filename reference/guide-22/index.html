@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,85 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 22 章　附录</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>附录 A　一页速查表（打印出来贴在桌上）</h2>
-<p>环境</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">of2512                          <span class="hljs-comment"># 激活环境（自定义别名）</span>
-<span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span>
-tut / run / sol / util / src    <span class="hljs-comment"># 跳转到 教程 / 工作目录 / 求解器 / 工具 / 源码</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>            <span class="hljs-comment"># 看变量</span></code></pre></div>
-<p>一个算例的完整生命周期</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/simpleFoam/pitzDaily <span class="hljs-variable">$FOAM_RUN</span>/
-<span class="hljs-built_in">cd</span> <span class="hljs-variable">$FOAM_RUN</span>/pitzDaily
-blockMesh          &gt; log.blockMesh   2&gt;&amp;1      <span class="hljs-comment"># 建网格</span>
-checkMesh          &gt; log.checkMesh   2&gt;&amp;1      <span class="hljs-comment"># 查网格</span>
-setFields          &gt; log.setFields   2&gt;&amp;1      <span class="hljs-comment"># 初场（需要时）</span>
-decomposePar       &gt; log.decomposePar 2&gt;&amp;1     <span class="hljs-comment"># 分区（并行时）</span>
-mpirun -np 8 simpleFoam -parallel &gt; log.simpleFoam 2&gt;&amp;1 &amp;
-<span class="hljs-built_in">tail</span> -f log.simpleFoam                          <span class="hljs-comment"># 盯进度</span>
-reconstructPar -latestTime                      <span class="hljs-comment"># 合并</span>
-foamLog log.simpleFoam                          <span class="hljs-comment"># 残差数据</span>
-paraFoam                                        <span class="hljs-comment"># 看结果</span>
-foamListTimes                                   <span class="hljs-comment"># 先列出时间目录</span>
-<span class="hljs-comment"># 确认保留需求后，才按帮助选择 -rm 删除结果</span></code></pre></div>
-<p>查询</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">命令名 -<span class="hljs-built_in">help</span>  /  -help-full        <span class="hljs-comment"># 命令用法</span>
-foamHelp boundary -field U         <span class="hljs-comment"># 可用边界条件</span>
-postProcess -list                  <span class="hljs-comment"># 可用后处理功能</span>
-simpleFoam -listFunctionObjects    <span class="hljs-comment"># 可用 functionObject</span>
-<span class="hljs-built_in">ls</span> <span class="hljs-variable">$FOAM_APPBIN</span>                    <span class="hljs-comment"># 本机所有命令</span>
-grep -r <span class="hljs-string">"关键字"</span> <span class="hljs-variable">$FOAM_TUTORIALS</span>   <span class="hljs-comment"># 别人怎么写的</span>
-foamDictionary &lt;文件&gt; -<span class="hljs-built_in">expand</span>      <span class="hljs-comment"># 字典最终展开成什么</span></code></pre></div><!-- example-reading --><ol><li><code>foamHelp</code> 查询边界条件、函数对象和求解器的帮助。</li><li><code>postProcess</code> 在已有结果上执行功能对象。</li><li><code>simpleFoam</code> 使用 <code>SIMPLE</code> 算法求解不可压缩稳态流动。</li><li><code>ls</code> 列出文件与目录。</li><li><code>grep</code> 按文本模式检索文件。</li><li><code>foamDictionary</code> 读取、修改和展开 OpenFOAM 字典。</li></ol><!-- /example-reading -->
-<p>改设置</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -entry endTime -<span class="hljs-built_in">set</span> 5
-foamDictionary system/fvSolution  -entry solvers/p/tolerance -<span class="hljs-built_in">set</span> 1e-8
-foamDictionary 0/U -entry boundaryField/inlet/value -<span class="hljs-built_in">set</span> <span class="hljs-string">"uniform (5 0 0)"</span></code></pre></div><!-- example-reading --><p><code>foamDictionary</code> 读取、修改和展开 OpenFOAM 字典。</p><!-- /example-reading -->
-<p>排错</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh -allGeometry -allTopology     <span class="hljs-comment"># 网格</span>
-solver -dry-run                         <span class="hljs-comment"># 设置语法</span>
-<span class="hljs-built_in">export</span> FOAM_SIGFPE=<span class="hljs-literal">true</span>                 <span class="hljs-comment"># 定位第一次浮点异常</span>
-grep -A5 <span class="hljs-string">"FOAM FATAL"</span> log.xxx           <span class="hljs-comment"># 抓错误</span>
-diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑的算例对比</span></code></pre></div><!-- example-reading --><ol><li><code>checkMesh</code> 检查网格拓扑、几何形状与质量，并定位问题区域。</li><li><code>run</code> 切换到个人算例目录。</li><li><code>grep</code> 按文本模式检索文件。</li><li><code>diff</code> 对比两份字典或日志。</li></ol><!-- /example-reading -->
-<h2>附录 B　各文件”必填项”清单</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>文件</th><th>必须有的关键字</th></tr>
-<tr><td><code>system/controlDict</code></td><td><code>application</code>、<code>startFrom</code>、<code>startTime</code>、<code>stopAt</code>、<code>endTime</code>、<code>deltaT</code>、<code>writeControl</code>、<code>writeInterval</code></td></tr>
-<tr><td><code>system/fvSchemes</code></td><td><code>ddtSchemes</code>、<code>gradSchemes</code>、<code>divSchemes</code>、<code>laplacianSchemes</code>、<code>interpolationSchemes</code>、<code>snGradSchemes</code></td></tr>
-<tr><td><code>system/fvSolution</code></td><td><code>solvers</code>；瞬态还要 PISO/PIMPLE，稳态还要 <code>SIMPLE</code> + <code>relaxationFactors</code></td></tr>
-<tr><td><code>system/blockMeshDict</code></td><td><code>scale</code>、<code>vertices</code>、<code>blocks</code>、<code>edges</code>、<code>boundary</code>、<code>mergePatchPairs</code></td></tr>
-<tr><td><code>system/decomposeParDict</code></td><td><code>numberOfSubdomains</code>、<code>method</code></td></tr>
-<tr><td><code>constant/transportProperties</code></td><td><code>transportModel</code>、<code>nu</code>（多相时按相分组 + <code>sigma</code>）</td></tr>
-<tr><td><code>constant/turbulenceProperties</code></td><td><code>simulationType</code>（RAS/LES 时还要对应子字典）</td></tr>
-<tr><td>0/&lt;场&gt;</td><td><code>dimensions</code>、<code>internalField</code>、<code>boundaryField</code>（覆盖全部 <code>patch</code>）</td></tr>
-</tbody></table></div>
-<h2>附录 C　ESI 版与 Foundation 版的主要差异</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>项目</th><th>ESI（<code>v2512</code>，本手册）</th><th>Foundation（v13）</th></tr>
-<tr><td>版本号</td><td>v2506、<code>v2512</code></td><td>11、12、13</td></tr>
-<tr><td>求解器</td><td><code>simpleFoam</code>、<code>interFoam</code> 等独立可执行文件</td><td>较新版本提供 foamRun <code>-solver</code> &lt;模块&gt; 等入口</td></tr>
-<tr><td>物性文件</td><td><code>transportProperties</code>、<code>thermophysicalProperties</code></td><td><code>physicalProperties</code></td></tr>
-<tr><td>湍流文件</td><td><code>turbulenceProperties</code></td><td><code>momentumTransport</code></td></tr>
-<tr><td>网格工具</td><td><code>surfaceFeatureExtract</code></td><td>surfaceFeatures</td></tr>
-<tr><td>官网</td><td>openfoam.com</td><td>openfoam.org</td></tr>
-</tbody></table></div>
-<p>迁移算例时，先确认教程的 OpenFOAM 分支和版本，再逐项调整求解器、物性、湍流、源项和边界类型。foamRun、<code>momentumTransport</code> 等名称有助于识别分支。</p>
-<h2>附录 D　学习路径建议</h2>
-<p>第一阶段（能跑）：cavity（<code>icoFoam</code>）→ <code>pitzDaily</code>（<code>simpleFoam</code>）→ damBreak（<code>interFoam</code>）。目标是把”复制算例 → 建网格 → 检查 → 求解 → 可视化 → 清理”这条链路走顺，能看懂日志。</p>
-<p>第二阶段（能改）：改网格密度看结果变化；改边界条件；改湍流模型；改离散格式。目标是理解每个字典的每一项改了会发生什么——这一步必须自己动手试，看书没用。</p>
-<p>第三阶段（能验证）：做一个有解析解或有实验数据的算例（Poiseuille 流、<span class="math-formula" data-tex="\mathrm{Re}=100"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">\mathrm{Re}=100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">Re</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></span> 圆柱绕流的 St 数、后台阶再附着长度），把误差算出来。目标是建立”我的结果可信吗”的判断力。</p>
-<p>第四阶段（能开发）：从 <code>icoFoam</code> 出发加一个标量输运方程；写一个 <code>codedFixedValue</code> 边界条件；写一个自己的 <code>functionObject</code>。目标是能读懂 <code>$FOAM_SOLVERS</code> 里的代码。</p>
-<h2>附录 E　资源</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>资源</th><th>地址 / 位置</th></tr>
-<tr><td>官方教程库（最重要）</td><td><code>$FOAM_TUTORIALS</code></td></tr>
-<tr><td>官方用户手册</td><td>doc.openfoam.com</td></tr>
-<tr><td>源码文档（Doxygen）</td><td>openfoam.com/documentation/guides/latest/api</td></tr>
-<tr><td>官方源码仓库（<code>v2512</code> 起）</td><td>gitlab.com/openfoam/core/openfoam</td></tr>
-<tr><td>CFD Online 论坛 OpenFOAM 版</td><td>cfd-online.com/Forums/openfoam</td></tr>
-<tr><td>各版本发布说明</td><td>openfoam.com/news</td></tr>
-</tbody></table></div>
-<p>一条最有用的建议：遇到问题时，先在 <code>$FOAM_TUTORIALS</code> 里搜有没有类似的官方算例。官方算例是被验证过、能成功执行的，比论坛帖子和博客可靠得多。<code>grep</code> <code>-rl</code> 加上一个关键字，通常十秒钟就能找到。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -384,6 +306,6 @@ diff -r caseA/system caseB/system       <span class="hljs-comment"># 和能跑�
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

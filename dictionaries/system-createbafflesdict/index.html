@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,160 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>createBafflesDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>把选定的内部面转换成两侧独立的边界面，用于挡板、薄壁或区域接口。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>这个字典指定哪些内部面要成为挡板，以及挡板两侧分别采用什么名称和网格类型。<code>createBaffles</code> 读取后生成两侧独立边界，便于为薄壁、隔板或耦合接口设置不同的场条件。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/createBafflesDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">挡板两侧的边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.name</code></td><td>新边界的名称；<code>master</code>、<code>slave</code> 表示两侧，名称可自定。</td></tr><tr><td><code>baffles.&lt;名称&gt;.patches.&lt;侧&gt;.type</code></td><td>新边界类型，例如 <code>wall</code>、<code>patch</code> 或 <code>cyclic</code>。选择 <code>cyclic</code> 时还需匹配 <code>neighbourPatch</code>、<code>transform</code>、<code>matchTolerance</code> 等耦合设置。</td></tr><tr><td><code>baffleFaces</code></td><td>所选 <code>faceZone</code> 的名称。</td></tr></tbody></table></div><p><a href="/dictionaries/system-createpatchdict/">新建与修改 patch 的参数</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 <code>interfaceZone</code> 面区域。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">internalFacesOnly <span class="hljs-literal">true</span>;
-baffles
-{
-    interface
-    {
-        <span class="hljs-keyword">type</span> faceZone;
-        zoneName interfaceZone;
-        patches
-        {
-            master
-            {
-                <span class="hljs-keyword">name</span> sideA;
-                <span class="hljs-keyword">type</span> wall;
-            }
-            slave
-            {
-                <span class="hljs-keyword">name</span> sideB;
-                <span class="hljs-keyword">type</span> wall;
-            }
-        }
-    }
-}</code></pre></div>
-<p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 的这份文件保留了创建薄挡板的配置入口，但没有定义实际挡板。</p>
-<ul>
-<li><code>internalFacesOnly true</code> 限定操作对象为内部面。</li>
-<li><code>baffles {}</code> 为空，因此这里没有要分离的面区、主面或从面。</li>
-<li>要在内部面建立挡板，需要新增选择规则和成对边界信息。</li>
-</ul>
-<p>添加散热片或薄壁时，先确认几何应采用实际固体区还是零厚度挡板，再选择对应建模方式。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/1-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">location</span> <span class="hljs-string">"system"</span>;
-    <span class="hljs-keyword">object</span> createBafflesDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-internalFacesOnly <span class="hljs-literal">true</span>;
-baffles
-{
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/reactingFoam/RAS/membrane</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/RAS/membrane"><h3>算例问题：membrane</h3><p class="reference-case-problem">膜两侧的气体具有不同组分，部分组分可穿过膜并与两侧流动或反应过程耦合。算例需要为组分透过和总质量通量分别设置边界，用于检查选择性传质与组分守恒。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane"><code>combustion/reactingFoam/RAS/membrane</code></a>。</p><figure class="reference-case-figure"><img alt="membrane 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/membrane.svg" width="720"><figcaption><code>membrane</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>膜算例把同一个内部面区拆为两侧边界，便于分别指定膜两侧条件。</p>
-<ul>
-<li><code>internalFacesOnly true</code> 只处理内部面。</li>
-<li><code>type faceZone</code>、<code>zoneName membrane</code> 选择已有膜面区。</li>
-<li><code>master</code> 命名为 <code>membranePipe</code>，<code>slave</code> 命名为 <code>membraneSleeve</code>，两侧都设为 <code>wall</code>。</li>
-<li>生成后两侧空间位置重合，但各自有边界面与场条件。</li>
-</ul>
-<p>更换膜模型时在两侧场边界中设置相应耦合或传输规律；网格分面本身只建立边界。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/2-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/createBafflesDict"><code>combustion/reactingFoam/RAS/membrane/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> createBafflesDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-internalFacesOnly <span class="hljs-literal">true</span>;
-baffles
-{
-    membrane
-    {
-        <span class="hljs-keyword">type</span> faceZone;
-        zoneName membrane;
-        patches
-        {
-            master
-            {
-                <span class="hljs-keyword">name</span> membranePipe;
-                <span class="hljs-keyword">type</span> wall;
-            }
-            slave
-            {
-                <span class="hljs-keyword">name</span> membraneSleeve;
-                <span class="hljs-keyword">type</span> wall;
-            }
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoPimpleFoam/RAS/annularThermalMixer</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleFoam/RAS/annularThermalMixer"><h3>算例问题：annularThermalMixer</h3><p class="reference-case-problem">不同热状态的流体在环形通道中汇合并混合。速度分布决定冷热流体的接触与输运，热物性和热边界决定温度响应，主要观察混合后的温度均匀性及压力损失。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer"><code>compressible/rhoPimpleFoam/RAS/annularThermalMixer</code></a>。</p></section><!-- /reference-case-contexts --><p>环形热混合器将 <code>rotatingZone</code> 面区分为 <code>AMI1</code>、<code>AMI2</code>，构造不共形网格的配对接口。</p>
-<ul>
-<li><code>zoneName rotatingZone</code> 给出被拆分的面区。</li>
-<li>主面为 <code>cyclicAMI</code>，<code>neighbourPatch AMI2</code> 指向对面，<code>matchTolerance 0.0001</code> 指定匹配容差。</li>
-<li>从面通过 <code>$master</code> 继承设置，再改名 <code>AMI2</code>、把邻面改为 <code>AMI1</code>。</li>
-<li><code>internalFacesOnly true</code> 将分面限制在内部面，<code>transform noOrdering</code> 保留此接口的变换设置。</li>
-</ul>
-<p>改动区域名称时成对更新 <code>neighbourPatch</code>，并检查两侧覆盖和插值权重。</p>
-<p><a href="/assets/examples/v2512/createbafflesdict/3-createBafflesDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict"><code>compressible/rhoPimpleFoam/RAS/annularThermalMixer/system/createBafflesDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> createBafflesDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-internalFacesOnly <span class="hljs-literal">true</span>;
-baffles
-{
-    baffleFaces
-    {
-        <span class="hljs-keyword">type</span> faceZone;
-        zoneName rotatingZone;
-        patches
-        {
-            master
-            {
-                <span class="hljs-keyword">name</span> AMI1;
-                <span class="hljs-keyword">type</span> cyclicAMI;
-                matchTolerance <span class="hljs-number">0.0001</span>;
-                neighbourPatch AMI2;
-                transform noOrdering;
-            }
-            slave
-            {
-                <span class="hljs-variable">$master</span>;
-                <span class="hljs-keyword">name</span> AMI2;
-                neighbourPatch AMI1;
-            }
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/createbaffles/">createBaffles</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -459,6 +306,6 @@ baffles
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

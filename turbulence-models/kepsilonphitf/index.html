@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,334 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>kEpsilonPhitF · k–ε–φt–f 模型</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>通过椭圆松弛和壁面法向应力尺度改善近壁闭合，需要为 phit 和 <code>f</code> 配置独立方程。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>湍流速度可分为平均速度与脉动。平均化后的方程出现 Reynolds 应力，需要用湍流模型确定其与平均流动的关系；湍动能表示脉动强度，耗散尺度描述能量向更小尺度转移的速率。</p><p><code>kEpsilonPhitF</code> 在 <code>k</code>、<code>epsilon</code> 之外引入 <code>phit</code> 和 <code>f</code>，以扩展湍流应力和近壁行为的描述。四个变量共同组成模型。</p><p>每个字段均需初值和边界，数值字典也应包含相应方程。配置应依照完整算例确定入口湍流、壁面处理和首层网格，再比较主要流动量。</p></div><!-- reference-concepts --><p>湍动能表示平均流以外的速度脉动能量，耗散率表示其向小尺度转移并最终转化为内能的速率：</p><p><span class="math-formula math-display" data-tex="k=\tfrac12\langle u_i^{\prime}u_i^{\prime}\rangle,\qquad [k]={\rm m^2/s^2},\qquad[\epsilon]={\rm m^2/s^3}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>k</mi><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">⟨</mo><msubsup><mi>u</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><msubsup><mi>u</mi><mi>i</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo stretchy="false">⟩</mo><mo separator="true">,</mo><mspace width="2em"></mspace><mo stretchy="false">[</mo><mi>k</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mrow><mo separator="true">,</mo><mspace width="2em"></mspace><mo stretchy="false">[</mo><mi>ϵ</mi><mo stretchy="false">]</mo><mo>=</mo><mrow><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi mathvariant="normal">s</mi><mn>3</mn></msup></mrow></mrow><annotation encoding="application/x-tex">k=\tfrac12\langle u_i^{\prime}u_i^{\prime}\rangle,\qquad [k]={\rm m^2/s^2},\qquad[\epsilon]={\rm m^2/s^3}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord mathrm">/</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal">ϵ</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord mathrm">/</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">3</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></p><p>模型通过各自的输运方程、近壁修正或相间源项确定这些量及相应应力。<code>nut</code> 的单位为 m²/s，由模型更新。表中列出的附加变量属于具体闭合的一部分；切换模型时，需要一并修改初始场、边界条件和 <code>fvSolution</code>，不能只替换 <code>RASModel</code> 名称。</p><!-- /reference-concepts --><h2>模型与所需字段</h2><div class="table-scroll"><table><thead><tr><th>字段</th><th>作用</th></tr></thead><tbody><tr><td><code>k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>phit</code></td><td>壁面法向应力比例变量，无量纲。</td></tr><tr><td><code>f</code></td><td>椭圆混合或松弛变量，量纲随模型定义。</td></tr><tr><td><code>nut</code></td><td>由模型计算的运动学湍动黏度；仍需给定其边界类型。</td></tr></tbody></table></div><h2>模型选择与配置示例</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF"><h3>算例问题：kEpsilonPhitF</h3><p class="reference-case-problem">来流越过壁面上的凸起，压力梯度引起边界层增厚、分离或再附着。算例用于研究湍流闭合和近壁处理对回流区、壁面压力及摩擦的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF"><code>incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF</code></a>。</p></section><!-- /reference-case-contexts --><h3><code>constant/turbulenceProperties</code></h3><p>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/constant/turbulenceProperties"><code>incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/constant/turbulenceProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> turbulenceProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-simulationType <span class="hljs-built_in">RAS</span>;
-<span class="hljs-built_in">RAS</span>
-{
-    RASModel kEpsilonPhitF;
-    turbulence <span class="hljs-literal">on</span>;
-    printCoeffs <span class="hljs-literal">on</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/turbulenceProperties</code> 中各项设置的作用如下。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilonPhitF</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/constant/turbulenceProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>0.orig/f</code></td><td>椭圆混合或松弛变量，量纲随模型定义。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/phit</code></td><td>壁面法向应力比例变量，无量纲。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr></tbody></table></div><details><summary>0.orig/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0.orig/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/epsilon"><code>incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> epsilon;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [ <span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">469.872</span>; <span class="hljs-comment">// computed from omega and k</span>
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    top
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    <span class="hljs-string">"(symUp|symDown)"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    bump
-    {
-        <span class="hljs-keyword">type</span> epsilonWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-        lowReCorrection <span class="hljs-literal">on</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[ 0 2 -3 0 0 0 0 ]</code>。<code>internalField</code> 为 <code>uniform 469.872</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>$internalField</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>$internalField</code>，<code>value</code> <code>$internalField</code>。</li><li><code>top</code>、<code>"(symUp|symDown)"</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>bump</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>$internalField</code>，<code>lowReCorrection</code> <code>on</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/epsilon.txt">下载此配置文件</a></p></details><details><summary>0.orig/f：椭圆混合或松弛变量，量纲随模型定义。</summary><h3><code>0.orig/f</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/f"><code>incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/f</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> f;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    top
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    <span class="hljs-string">"(symUp|symDown)"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    bump
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/f</code> 设置 <code>f</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[ 0 0 -1 0 0 0 0 ]</code>。<code>internalField</code> 为 <code>uniform 1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code>、<code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>top</code>、<code>"(symUp|symDown)"</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>bump</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/f">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/f.txt">下载此配置文件</a></p></details><details><summary>0.orig/k：湍动能，m²/s²。</summary><h3><code>0.orig/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/k"><code>incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/k</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> k;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1.08e-3</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    top
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    <span class="hljs-string">"(symUp|symDown)"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
-    }
-    bump
-    {
-        <span class="hljs-keyword">type</span> kqRWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 1.08e-3</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>$internalField</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>$internalField</code>，<code>value</code> <code>$internalField</code>。</li><li><code>top</code>、<code>"(symUp|symDown)"</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>bump</code> 采用 <code>kqRWallFunction</code>，为壁面 <code>k</code> 提供与壁面函数体系配套的零梯度处理。参数为 <code>value</code> <code>$internalField</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/bump2D/setups.orig/kEpsilonPhitF/0.orig/k.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/simpleFoam/bump2D"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/bump2D-reference"</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/bump2D-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">172 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-<span class="hljs-comment"># settings</span>
-
-    <span class="hljs-comment"># operand setups</span>
-    setups=<span class="hljs-string">"
-    kOmegaSST
-    SpalartAllmaras
-    kEpsilonPhitF
-    "</span>
-
-    <span class="hljs-comment"># flag to enable computations</span>
-    run=<span class="hljs-literal">true</span>
-
-    <span class="hljs-comment"># flag to enable computations in parallel mode</span>
-    parallel=<span class="hljs-literal">true</span>
-
-    <span class="hljs-comment"># flag to enable to use a common mesh</span>
-    common_mesh=<span class="hljs-literal">true</span>
-
-    <span class="hljs-comment"># flag to enable to use a common dynamic code</span>
-    common_dynamic_code=<span class="hljs-literal">true</span>
-
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-<span class="hljs-comment">#######################################</span>
-<span class="hljs-comment"># Create the given setup</span>
-<span class="hljs-comment"># Arguments:</span>
-<span class="hljs-comment">#    $1 = Path to create the setup</span>
-<span class="hljs-comment"># Outputs:</span>
-<span class="hljs-comment">#    Writes info to stdout</span>
-<span class="hljs-comment">#######################################</span>
-<span class="hljs-function"><span class="hljs-title">dry_run_setup</span></span>() {
-
-    [ <span class="hljs-variable">$#</span> -eq 0 ] &amp;&amp; { <span class="hljs-built_in">echo</span> <span class="hljs-string">"Usage error: <span class="hljs-variable">$0</span>"</span>; <span class="hljs-built_in">exit</span> 1; }
-
-    setup=<span class="hljs-string">"<span class="hljs-variable">$1</span>"</span>
-    dirSetup=<span class="hljs-string">"setups/<span class="hljs-variable">$setup</span>"</span>
-    dirSetupOrig=<span class="hljs-string">"setups.orig/<span class="hljs-variable">$setup</span>"</span>
-    dirOrig=<span class="hljs-string">"<span class="hljs-variable">$dirSetupOrig</span>/0.orig"</span>
-    dirConstant=<span class="hljs-string">"<span class="hljs-variable">$dirSetupOrig</span>/constant"</span>
-    dirSystem=<span class="hljs-string">"<span class="hljs-variable">$dirSetupOrig</span>/system"</span>
-
-    <span class="hljs-built_in">printf</span> <span class="hljs-string">"\n# Create the setup: %s\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span> ]
-    <span class="hljs-keyword">then</span>
-        <span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span>
-
-        <span class="hljs-built_in">cp</span> -aRfL <span class="hljs-string">"setups.orig/common/."</span> <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span>
-        <span class="hljs-built_in">cp</span> -afL <span class="hljs-string">"<span class="hljs-variable">$dirSetupOrig</span>"</span>/All* <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span> 2&gt;/dev/null || :
-        [ -d <span class="hljs-string">"<span class="hljs-variable">$dirOrig</span>"</span> ] &amp;&amp; <span class="hljs-built_in">cp</span> -aRfL <span class="hljs-string">"<span class="hljs-variable">$dirOrig</span>/."</span> <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>/0.orig"</span>
-        [ -d <span class="hljs-string">"<span class="hljs-variable">$dirConstant</span>"</span> ] &amp;&amp; <span class="hljs-built_in">cp</span> -aRfL <span class="hljs-string">"<span class="hljs-variable">$dirConstant</span>/."</span> <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>/constant"</span>
-        [ -d <span class="hljs-string">"<span class="hljs-variable">$dirSystem</span>"</span> ] &amp;&amp; <span class="hljs-built_in">cp</span> -aRfL <span class="hljs-string">"<span class="hljs-variable">$dirSystem</span>/."</span> <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>/system"</span>
-    <span class="hljs-keyword">else</span>
-        <span class="hljs-built_in">printf</span> <span class="hljs-string">"\n      # Directory %s already exists\n"</span> <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span>
-        <span class="hljs-built_in">printf</span> <span class="hljs-string">"      # Skipping the creation of a new setup\n"</span>
-    <span class="hljs-keyword">fi</span>
-}
-
-
-<span class="hljs-comment">#######################################</span>
-<span class="hljs-comment"># Run the given setup</span>
-<span class="hljs-comment"># Arguments:</span>
-<span class="hljs-comment">#    $1 = Path to the setup to run</span>
-<span class="hljs-comment"># Outputs:</span>
-<span class="hljs-comment">#    Writes info to stdout</span>
-<span class="hljs-comment">#######################################</span>
-<span class="hljs-function"><span class="hljs-title">run_setup</span></span>() {
-
-    [ <span class="hljs-variable">$#</span> -eq 0 ] &amp;&amp; { <span class="hljs-built_in">echo</span> <span class="hljs-string">"Usage error: <span class="hljs-variable">$0</span>"</span>; <span class="hljs-built_in">exit</span> 1; }
-
-    setup=<span class="hljs-string">"<span class="hljs-variable">$1</span>"</span>
-    dirSetup=<span class="hljs-string">"setups/<span class="hljs-variable">$setup</span>"</span>
-    dirResult=<span class="hljs-string">"results/<span class="hljs-variable">$setup</span>"</span>
-
-    dry_run_setup <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-    [ -d results ] || <span class="hljs-built_in">mkdir</span> -p results
-
-    <span class="hljs-built_in">printf</span> <span class="hljs-string">"\n# Run the setup: %s\n\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span> ]
-    <span class="hljs-keyword">then</span>
-        <span class="hljs-built_in">cp</span> -Rf <span class="hljs-string">"<span class="hljs-variable">$dirSetup</span>"</span> <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>
-
-        <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$common_mesh</span>"</span> = <span class="hljs-literal">true</span> ]
-        <span class="hljs-keyword">then</span>
-            <span class="hljs-keyword">if</span> [ -d results/mesh ]
-            <span class="hljs-keyword">then</span>
-                <span class="hljs-built_in">printf</span> <span class="hljs-string">"## Copy the common mesh to the setup: %s\n\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-                <span class="hljs-built_in">cp</span> -Rf results/mesh/polyMesh <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>/constant/.
-            <span class="hljs-keyword">fi</span>
-        <span class="hljs-keyword">fi</span>
-
-        <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$common_dynamic_code</span>"</span> = <span class="hljs-literal">true</span> ]
-        <span class="hljs-keyword">then</span>
-            <span class="hljs-keyword">if</span> [ -d results/dynamicCode ]
-            <span class="hljs-keyword">then</span>
-                <span class="hljs-built_in">printf</span> <span class="hljs-string">"## Copy the common dynamic code to the setup: %s\n\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-                <span class="hljs-built_in">cp</span> -Rf results/dynamicCode <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>/.
-            <span class="hljs-keyword">fi</span>
-        <span class="hljs-keyword">fi</span>
-
-
-        <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$parallel</span>"</span> = <span class="hljs-literal">true</span> ]
-        <span class="hljs-keyword">then</span>
-            ( <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span> &amp;&amp; ./Allrun-parallel )
-        <span class="hljs-keyword">else</span>
-            ( <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span> &amp;&amp; ./Allrun )
-        <span class="hljs-keyword">fi</span>
-
-
-        <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$common_mesh</span>"</span> = <span class="hljs-literal">true</span> ]
-        <span class="hljs-keyword">then</span>
-            <span class="hljs-keyword">if</span> [ ! -d results/mesh ]
-            <span class="hljs-keyword">then</span>
-                <span class="hljs-built_in">printf</span> <span class="hljs-string">"\n## Store the mesh of %s as the common mesh\n\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-                <span class="hljs-built_in">mkdir</span> -p results/mesh
-                <span class="hljs-built_in">cp</span> -Rf <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>/constant/polyMesh results/mesh/.
-            <span class="hljs-keyword">fi</span>
-        <span class="hljs-keyword">fi</span>
-
-        <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$common_dynamic_code</span>"</span> = <span class="hljs-literal">true</span> ]
-        <span class="hljs-keyword">then</span>
-            <span class="hljs-keyword">if</span> [ ! -d results/dynamicCode ] &amp;&amp; [ -d <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>/dynamicCode ]
-            <span class="hljs-keyword">then</span>
-                <span class="hljs-built_in">printf</span> <span class="hljs-string">"\n## Store the dynamic code of %s as the common dynamic code\n\n"</span> <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-                <span class="hljs-built_in">cp</span> -Rf <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>/dynamicCode results/.
-            <span class="hljs-keyword">fi</span>
-        <span class="hljs-keyword">fi</span>
-
-
-    <span class="hljs-keyword">else</span>
-        <span class="hljs-built_in">printf</span> <span class="hljs-string">"      # Directory %s already exists\n"</span> <span class="hljs-string">"<span class="hljs-variable">$dirResult</span>"</span>
-        <span class="hljs-built_in">printf</span> <span class="hljs-string">"      # Skipping the computation of the given setup\n"</span>
-    <span class="hljs-keyword">fi</span>
-}
-
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-<span class="hljs-keyword">for</span> setup <span class="hljs-keyword">in</span> <span class="hljs-variable">$setups</span>
-<span class="hljs-keyword">do</span>
-    dirSetupOrig=<span class="hljs-string">"setups.orig/<span class="hljs-variable">$setup</span>"</span>
-
-    <span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">"<span class="hljs-variable">$dirSetupOrig</span>"</span> ]
-    <span class="hljs-keyword">then</span>
-        <span class="hljs-built_in">echo</span> <span class="hljs-string">"Setup directory: <span class="hljs-variable">$dirSetupOrig</span>"</span> \
-             <span class="hljs-string">"could not be found - skipping execution"</span> 1&gt;&amp;2
-        <span class="hljs-built_in">continue</span>
-    <span class="hljs-keyword">fi</span>
-
-    <span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$run</span>"</span> = <span class="hljs-literal">true</span> ]
-    <span class="hljs-keyword">then</span>
-        run_setup <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-    <span class="hljs-keyword">else</span>
-        dry_run_setup <span class="hljs-string">"<span class="hljs-variable">$setup</span>"</span>
-    <span class="hljs-keyword">fi</span>
-<span class="hljs-keyword">done</span>
-
-
-<span class="hljs-keyword">if</span> notTest <span class="hljs-string">"<span class="hljs-variable">$@</span>"</span> &amp;&amp; [ <span class="hljs-string">"<span class="hljs-variable">$run</span>"</span> = <span class="hljs-literal">true</span> ]
-<span class="hljs-keyword">then</span>
-    ./plot
-<span class="hljs-keyword">fi</span>
-
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>run</code> 切换到个人算例目录。</li><li><code>echo</code> 显示环境变量或简单文本。</li><li><code>mkdir</code> 创建一个或多个目录。</li><li><code>cp</code> 复制文件或目录。</li><li><code>run</code> 切换到个人算例目录；<code>notTest</code> 检查参数列表是否省略 <code>-test</code>。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/bump2D/Allrun.txt">下载此配置文件</a></p></details><h2>入口、壁面与计算检查</h2><p>例如入口平均速度为 10 m/s、湍流强度为 5%、长度尺度为 0.01 m，则 <span class="math-formula" data-tex="k=1.5(UI)^2=0.375\,\mathrm{m^2/s^2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1.5</mn><mo stretchy="false">(</mo><mi>U</mi><mi>I</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mn>0.375</mn><mtext> </mtext><mrow><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mrow></mrow><annotation encoding="application/x-tex">k=1.5(UI)^2=0.375\,\mathrm{m^2/s^2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1.5</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">0.375</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord mathrm">/</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>。取 <span class="math-formula" data-tex="C_\mu=0.09"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>μ</mi></msub><mo>=</mo><mn>0.09</mn></mrow><annotation encoding="application/x-tex">C_\mu=0.09</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.09</span></span></span></span></span>，可得 <span class="math-formula" data-tex="\varepsilon=C_\mu^{3/4}k^{3/2}/L\approx3.773\,\mathrm{m^2/s^3}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>=</mo><msubsup><mi>C</mi><mi>μ</mi><mrow><mn>3</mn><mi mathvariant="normal">/</mi><mn>4</mn></mrow></msubsup><msup><mi>k</mi><mrow><mn>3</mn><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup><mi mathvariant="normal">/</mi><mi>L</mi><mo>≈</mo><mn>3.773</mn><mtext> </mtext><mrow><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi mathvariant="normal">s</mi><mn>3</mn></msup></mrow></mrow><annotation encoding="application/x-tex">\varepsilon=C_\mu^{3/4}k^{3/2}/L\approx3.773\,\mathrm{m^2/s^3}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.2975em;vertical-align:-0.2527em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.5834em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3/4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2527em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3/2</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">3.773</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord mathrm">/</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">3</span></span></span></span></span></span></span></span></span></span></span></span></span>，<span class="math-formula" data-tex="\omega=\frac{\sqrt k}{C_\mu^{1/4}L}\approx111.80\,\mathrm{s^{-1}}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mfrac><msqrt><mi>k</mi></msqrt><mrow><msubsup><mi>C</mi><mi>μ</mi><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>4</mn></mrow></msubsup><mi>L</mi></mrow></mfrac><mo>≈</mo><mn>111.80</mn><mtext> </mtext><msup><mi mathvariant="normal">s</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\omega=\frac{\sqrt k}{C_\mu^{1/4}L}\approx111.80\,\mathrm{s^{-1}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.8102em;vertical-align:-0.7597em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0505em;"><span style="top:-2.4486em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0591em;"><span style="top:-2.377em;margin-left:-0.0715em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5357em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-3.0591em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5357em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1/4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2976em;"><span></span></span></span></span></span></span><span class="mord mathnormal mtight">L</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9378em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal mtight" style="margin-right:0.0315em;padding-left:0.833em;">k</span></span><span style="top:-2.8978em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1022em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7597em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">111.80</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathrm mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></span>。长度尺度应来自入口湍流的物理尺度。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
-{
-    <span class="hljs-keyword">type</span> turbulentIntensityKineticEnergyInlet;
-    intensity <span class="hljs-number">0.05</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
-}</code></pre></div><p>壁面条件取决于模型及首层网格高度。先核对官方算例中的字段边界，再根据目标 <code>y</code>⁺ 设计网格；低 Reynolds 数处理与高 Reynolds 数壁面函数采用不同的近壁假设。</p><p><a href="/boundary-conditions/?field=turbulence">查看湍流入口与壁面条件示例</a> · <a href="/function-objects/?q=yPlus">查看 yPlus 后处理</a></p><h2>版本与模型依据</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/TurbulenceModels/turbulenceModels/RAS/kEpsilonPhitF/kEpsilonPhitF.H">kEpsilonPhitF 的 v2512 模型说明</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/TurbulenceModels/turbulenceModels/RAS/kEpsilonPhitF/kEpsilonPhitF.C">模型字段与系数读取位置</a></p><p><a href="/turbulence-models/">返回湍流模型速查</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -633,6 +306,6 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

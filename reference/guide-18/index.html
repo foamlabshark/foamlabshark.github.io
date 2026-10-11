@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,176 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 18 章　constant/ 目录下的文件</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>18.1 transportProperties（物性）</h2>
-<p>单相不可压</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">transportModel Newtonian;
-nu [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1e-05</span>; <span class="hljs-comment">// 运动粘度 m²/s</span>
-<span class="hljs-comment">// 新版也可以简写（量纲由程序推断）：nu 1e-05;</span></code></pre></div>
-<p>非牛顿流体可选 <code>CrossPowerLaw</code>、BirdCarreau、HerschelBulkley、powerLaw，各自再跟一个系数子字典。</p>
-<p>两相（<code>interFoam</code>）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">phases (water air);
-water
-{
-    transportModel Newtonian;
-    nu <span class="hljs-number">1e-06</span>;
-    rho <span class="hljs-number">1000</span>;
-}
-air
-{
-    transportModel Newtonian;
-    nu <span class="hljs-number">1.48e-05</span>;
-    rho <span class="hljs-number">1</span>;
-}
-sigma <span class="hljs-number">0.07</span>; <span class="hljs-comment">// 表面张力系数 N/m</span></code></pre></div>
-<p><code>laplacianFoam</code></p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">DT              [0 2 -1 0 0 0 0] 4e-05;      // 扩散系数</code></pre></div><!-- example-reading --><p>阅读<code>18.1 transportProperties（物性）</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>DT</code> 设为 <code>[0 2 -1 0 0 0 0] 4e-05</code>：标量扩散率，单位 m²/s；在导热算例中对应热扩散率。</li></ul><!-- /example-reading -->
-<h2>18.2 turbulenceProperties（湍流模型）</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">simulationType <span class="hljs-built_in">RAS</span>; <span class="hljs-comment">// laminar / RAS / LES</span>
-<span class="hljs-built_in">RAS</span>
-{
-    RASModel kOmegaSST;
-    turbulence <span class="hljs-literal">on</span>;
-    printCoeffs <span class="hljs-literal">on</span>; <span class="hljs-comment">// 启动时把模型系数打印到日志，便于确认</span>
-}
-simulationType <span class="hljs-built_in">LES</span>;
-<span class="hljs-built_in">LES</span>
-{
-    LESModel WALE; <span class="hljs-comment">// 或 Smagorinsky / kEqn / dynamicKEqn</span>
-    delta cubeRootVol; <span class="hljs-comment">// 滤波尺度：cubeRootVol / vanDriest / smooth</span>
-    turbulence <span class="hljs-literal">on</span>;
-    printCoeffs <span class="hljs-literal">on</span>;
-    cubeRootVolCoeffs
-    {
-        deltaCoeff <span class="hljs-number">1</span>;
-    }
-}</code></pre></div>
-<p>常用 RANS 模型怎么挑</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>模型</th><th>特点</th><th>场合</th></tr>
-<tr><td><code>kEpsilon</code></td><td>最经典，壁面靠壁函数</td><td>内流、自由剪切流</td></tr>
-<tr><td><code>realizableKE</code></td><td>对旋转/分离更好</td><td>旋流</td></tr>
-<tr><td><code>kOmegaSST</code></td><td>近壁用 <span class="math-formula" data-tex="k-\omega"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>−</mo><mi>ω</mi></mrow><annotation encoding="application/x-tex">k-\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></span>、远场用 <span class="math-formula" data-tex="k-\varepsilon"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>−</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">k-\varepsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span></span>，逆压梯度和分离预测好</td><td>外流绕流、翼型，最常用</td></tr>
-<tr><td><code>SpalartAllmaras</code></td><td>单方程，便宜</td><td>航空外流</td></tr>
-<tr><td><code>LaunderSharmaKE</code></td><td>低雷诺数版本，需要 <span class="math-formula" data-tex="y^{+}\approx 1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">+</mo></msup><mo>≈</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">y^{+}\approx 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9658em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7713em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></td><td>不用壁函数时</td></tr>
-</tbody></table></div>
-<p><code>v2512</code> 的 <code>kEpsilon</code> 新增 twoLayerTreatment 开关，可以在近壁内层用代数关系式，降低对第一层网格的要求：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">RAS
-{
-    RASModel        kEpsilon;
-    turbulence      on;
-    kEpsilonCoeffs  { twoLayerTreatment true; }
-}</code></pre></div>
-<p>层流就写 <code>simulationType</code> <code>laminar</code>;，此时 0/ 里不需要 <code>k</code>、<code>epsilon</code>、<code>nut</code> 等文件。</p>
-<h2>18.3 thermophysicalProperties（可压/传热必需）</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">thermoType
-{
-    <span class="hljs-keyword">type</span> hePsiThermo; <span class="hljs-comment">// hePsiThermo(可压理想气体) / heRhoThermo(液体)</span>
-    mixture pureMixture; <span class="hljs-comment">// 单组分</span>
-    transport sutherland; <span class="hljs-comment">// const / sutherland / polynomial</span>
-    thermo janaf; <span class="hljs-comment">// hConst / eConst / janaf</span>
-    equationOfState perfectGas; <span class="hljs-comment">// perfectGas / rhoConst / Boussinesq / PengRobinson</span>
-    specie specie;
-    energy sensibleInternalEnergy; <span class="hljs-comment">// sensibleEnthalpy / sensibleInternalEnergy</span>
-}
-mixture
-{
-    specie
-    {
-        molWeight <span class="hljs-number">28.96</span>;
-    }
-    thermodynamics
-    {
-        Cp <span class="hljs-number">1004.5</span>;
-        Hf <span class="hljs-number">0</span>;
-    }
-    transport
-    {
-        mu <span class="hljs-number">1.8e-05</span>;
-        Pr <span class="hljs-number">0.7</span>;
-    }
-}</code></pre></div>
-<p>七个字段各自的意思：<code>type</code> 决定用 <span class="math-formula" data-tex="\psi (=1/RT)"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ψ</mi><mo stretchy="false">(</mo><mo>=</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>R</mi><mi>T</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\psi (=1/RT)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">)</span></span></span></span></span> 还是 <span class="math-formula" data-tex="\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span></span> 作为基本量；<code>mixture</code> 是单组分还是多组分；<code>transport</code> 是粘性/导热系数的模型；<code>thermo</code> 是比热模型（<code>hConst</code> 常数比热，<code>janaf</code> 用 JANAF 多项式）；<code>equationOfState</code> 是状态方程；<code>energy</code> 是用焓还是内能作为求解变量。修改时七个字段必须相互兼容，不兼容时报错信息会把所有合法组合列出来——照着报错里的列表挑就行，这是 OpenFOAM 少数几个报错比文档还好用的地方。</p>
-<p><code>sensibleEnthalpy</code> 还是 <code>sensibleInternalEnergy</code>：基于压力的求解器（<code>rhoPimpleFoam</code>）一般用焓；基于密度的（<code>rhoCentralFoam</code>）用内能。照抄对应教程即可。</p>
-<h2>18.4 g（重力）</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    ... <span class="hljs-keyword">class</span> uniformDimensionedVectorField;
-    <span class="hljs-keyword">object</span> g;
-}
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">value</span> (<span class="hljs-number">0</span> <span class="hljs-number">-9.81</span> <span class="hljs-number">0</span>);</code></pre></div>
-<p>浮力、多相流求解器必需。方向要和你的网格坐标系一致——把 <code>z</code> 当竖直方向的算例写成 (0 -9.81 0) 是常见低级错误。</p>
-<h2>18.5 dynamicMeshDict（动网格）</h2>
-<p>刚体运动（最简单）</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">dynamicFvMesh   dynamicMotionSolverFvMesh;
-motionSolver    solidBody;
-solidBodyMotionFunction  rotatingMotion;
-rotatingMotionCoeffs
-{
-    origin  (0 0 0);
-    axis    (0 0 1);
-    omega   6.28;                 // rad/s
-}
-cellZone        rotor;            // 只让这个 zone 动</code></pre></div>
-<p>其他运动函数：oscillatingLinearMotion、linearMotion、SDA、tabulated6DoFMotion、multiMotion。</p>
-<p>六自由度耦合（自由运动物体）</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">motionSolver sixDoFRigidBodyMotion;
-sixDoFRigidBodyMotionCoeffs
-{
-    patches (floatingObject);
-    innerDistance <span class="hljs-number">0.05</span>;
-    outerDistance <span class="hljs-number">0.35</span>;
-    mass <span class="hljs-number">9.6</span>;
-    centreOfMass (<span class="hljs-number">0.5</span> <span class="hljs-number">0.45</span> <span class="hljs-number">0.4</span>);
-    momentOfInertia (<span class="hljs-number">0.08</span> <span class="hljs-number">0.08</span> <span class="hljs-number">0.06</span>);
-    accelerationRelaxation <span class="hljs-number">0.7</span>;
-    <span class="hljs-keyword">solver</span>
-    {
-        <span class="hljs-keyword">type</span> Newmark;
-    }
-    constraints
-    {
-        zAxis
-        {
-            sixDoFRigidBodyMotionConstraint line;
-            direction (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-        }
-    }
-}</code></pre></div>
-<p>动态加密（AMR）</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">dynamicFvMesh   dynamicRefineFvMesh;
-refineInterval  10;
-field           alpha.water;      // 按哪个场判断
-lowerRefineLevel 0.001;
-upperRefineLevel 0.999;
-maxRefinement   2;
-maxCells        2000000;
-nBufferLayers   1;</code></pre></div>
-<p>用途：VOF 里只在界面附近加密，单元数可以省一个量级。</p>
-<h2>18.6 radiationProperties</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">radiation       on;
-radiationModel  P1;              // none / P1 / fvDOM / viewFactor / opaqueSolid
-solverFreq      10;
-absorptionEmissionModel constantAbsorptionEmission;
-constantAbsorptionEmissionCoeffs { absorptivity 0.5; emissivity 0.5; E 0; }
-scatterModel    none;</code></pre></div><!-- example-reading --><p>阅读<code>18.6 radiationProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>radiationModel</code> 设为 <code>P1</code>：选择辐射传递模型。</li><li><code>solverFreq</code> 设为 <code>10</code>：规定辐射方程的求解间隔。</li><li><code>absorptionEmissionModel</code> 设为 <code>constantAbsorptionEmission</code>：选择吸收与发射物性。</li><li><code>scatterModel</code> 设为 <code>none</code>：选择散射模型。</li></ul><!-- /example-reading -->
-<h2>18.7 polyMesh/ 与 triSurface/</h2>
-<p>constant/polyMesh/ 里是网格数据，只有 <code>boundary</code> 这个文件需要偶尔手动改：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-number">6</span>
-(
-    movingWall
-    {
-        <span class="hljs-keyword">type</span> wall; <span class="hljs-comment">// ← 转换来的网格常常要在这里把 patch 改成 wall</span>
-        inGroups <span class="hljs-number">1</span>(wall);
-        nFaces <span class="hljs-number">20</span>;
-        startFace <span class="hljs-number">760</span>;
-    }
-    ...
-)</code></pre></div>
-<p>nFaces 和 startFace 由网格工具生成；边界类型与分组分别通过 <code>type</code> 和 <code>inGroups</code> 设置。</p>
-<p>constant/triSurface/ 放 <code>snappyHexMesh</code> 用的 STL/OBJ 几何文件。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -475,6 +306,6 @@ scatterModel    none;</code></pre></div><!-- example-reading --><p>阅读<code>1
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

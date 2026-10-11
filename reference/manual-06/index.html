@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,65 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>06 常见文件与字典语法</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>独立字典文件以 <code>FoamFile</code> 文件头开始；配置片段写入对应的父字典。先选择文件位置，再按算例设置几何尺寸、物性和数值参数。</p>
-<h2>6.1 目录结构与文件用途</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>路径</th><th>主要作用</th><th>使用阶段</th></tr>
-<tr><td>0/ 或起始时间目录</td><td><code>U</code>、<code>p</code>、<code>T</code>、湍流量、相分数等场的初值与边界条件</td><td>初始化和边界设置</td></tr>
-<tr><td>0.orig/</td><td>教程约定的初始场备份目录</td><td>配合 <code>restore0Dir</code> 恢复</td></tr>
-<tr><td>constant/polyMesh/</td><td><code>points</code>、<code>faces</code>、owner、neighbour、<code>boundary</code> 及可选 <code>zones</code></td><td>通常由网格工具生成</td></tr>
-<tr><td>constant/triSurface/</td><td>STL、OBJ、<code>eMesh</code> 等几何与特征线</td><td>网格前处理</td></tr>
-<tr><td>constant/</td><td>物性、湍流、重力、旋转、动网格等配置</td><td>物理模型设置</td></tr>
-<tr><td>system/</td><td><code>controlDict</code>、<code>fvSchemes</code>、<code>fvSolution</code>、网格工具字典</td><td>时间、离散、求解和工具控制</td></tr>
-<tr><td>constant/区域名 和 system/区域名</td><td>分别保存各区域的网格、物性和数值配置</td><td>共轭传热等</td></tr>
-<tr><td>system/finite-area/ 和 constant/finite-area/</td><td>有限面积配置与网格；多区域按名称分层</td><td>有限面积模型</td></tr>
-<tr><td>processor0/ 等</td><td>分散式并行网格和场；<code>collated</code> 采用对应目录结构</td><td><code>decomposePar</code> 等生成</td></tr>
-<tr><td>postProcessing/</td><td>函数对象的采样、积分与统计结果</td><td>运行时或事后处理</td></tr>
-<tr><td>时间目录/polyMesh/</td><td>移动网格点坐标及更新后的拓扑</td><td>动网格结果</td></tr>
-<tr><td><code>Allrun</code>、<code>Allclean</code></td><td>约定的算例运行与清理脚本</td><td>算例批处理</td></tr>
-</tbody></table></div>
-<h2>6.2 文件头与字典语法</h2>
-<p>字典采用“关键字 值;”的形式定义条目，以花括号组织子字典、圆括号定义列表、方括号表示量纲。单行和多行注释分别使用 // 和 /* ... */。文件名、关键字及模型名称区分大小写。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>条目</th><th>含义</th><th>设置方法</th></tr>
-<tr><td><code>version</code></td><td>OpenFOAM 文件格式版本</td><td>通常设为 2.0</td></tr>
-<tr><td><code>format</code></td><td>存储方式</td><td><code>ascii</code> 可读；<code>binary</code> 更紧凑</td></tr>
-<tr><td><code>class</code></td><td>数据类型</td><td><code>dictionary</code>、<code>volScalarField</code>、<code>volVectorField</code> 等</td></tr>
-<tr><td><code>object</code></td><td>对象名</td><td>通常与文件名一致</td></tr>
-<tr><td><code>location</code></td><td>可选存储位置说明</td><td>如 "0" 或 "<code>system</code>"，用于描述存储位置</td></tr>
-<tr><td><code>dimensions</code></td><td>七个 SI 基本量纲指数</td><td>顺序为质量、长度、时间、温度、物质的量、电流、发光强度</td></tr>
-<tr><td><code>uniform</code> 与 <code>nonuniform</code></td><td>统一赋值或按对象逐项赋值</td><td>非均匀列表数量须与网格对象数量匹配</td></tr>
-<tr><td><code>true/false</code>、<code>on/off</code>、<code>yes/no</code></td><td>常见开关表示</td><td>同一文件采用一致的开关写法</td></tr>
-</tbody></table></div>
-<p>速度 <code>U</code> 的量纲为 [0 1 -1 0 0 0 0]，温度 <code>T</code> 为 [0 0 0 1 0 0 0]，运动黏度为 [0 2 -1 0 0 0 0]。压力场需区分运动学压力 [0 2 -2 0 0 0 0] 与以 Pa 表示的压力 [1 -1 -2 0 0 0 0]，具体定义见求解器及场文件的 <code>dimensions</code>。</p>
-<h2>6.3 引用和预处理关键字</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>关键字</th><th>作用</th><th>示例</th></tr>
-<tr><td>$名称</td><td>引用当前或可见作用域中的字典条目</td><td><code>pFinal</code> { <code>$p</code>; <code>relTol</code> 0; }</td></tr>
-<tr><td>${名称}</td><td>限定变量名称范围，支持环境变量展开</td><td>#<code>include</code> "${<code>FOAM_CASE</code>}/system/commonSettings"</td></tr>
-<tr><td>$../名称</td><td>访问父字典作用域</td><td><code>a</code> $../referenceValue;</td></tr>
-<tr><td>$!名称</td><td>从顶层字典查找</td><td><code>a</code> $!referenceValue;</td></tr>
-<tr><td>#<code>include</code></td><td>读取指定文件</td><td>#<code>include</code> "commonSettings"</td></tr>
-<tr><td>#<code>includeIfPresent</code></td><td>仅在文件存在时包含</td><td>#<code>includeIfPresent</code> "localOverrides"</td></tr>
-<tr><td>#<code>includeEtc</code></td><td>从 OpenFOAM 配置搜索路径引入文件</td><td>#<code>includeEtc</code> "<code>caseDicts/meshQualityDict</code>"</td></tr>
-<tr><td>#<code>includeFunc</code></td><td>加入预配置函数对象</td><td>#<code>includeFunc</code> <code>solverInfo</code></td></tr>
-<tr><td>#<code>inputMode</code></td><td>控制重复键合并方式</td><td>#<code>inputMode</code> <code>merge</code></td></tr>
-<tr><td>#<code>remove</code></td><td>删除已有条目，支持正则表达式</td><td>#<code>remove</code> "obsolete.*"</td></tr>
-<tr><td>#<code>calc</code></td><td>由动态编译表达式生成值</td><td><code>length</code> 2; halfLength #<code>calc</code> "<code>$length/2.0</code>";</td></tr>
-<tr><td>#<code>eval</code></td><td>采用表达式求值</td><td><code>a</code> #<code>eval</code> "sqrt(2.0)";</td></tr>
-<tr><td>#<code>codeStream</code></td><td>编译执行 <code>C</code>++ 并写回字典内容</td><td>见第 9.13 节</td></tr>
-</tbody></table></div>
-<p>OpenFOAM 字典引用与 Bash 变量展开分别由各自的解析器处理。使用 shell 生成含 <code>$p</code> 的字典时，采用带引号的 here-document 定界符，如 &lt;&lt;'<code>EOF</code>'，可保留引用原文。</p>
-<p><code>foamDictionary</code> <code>system/fvSolution</code> <code>-expand</code> 可查看展开后的配置。#<code>calc</code> 和 #<code>codeStream</code> 会编译并执行代码，使用时需具备相应编译环境。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -364,6 +306,6 @@
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

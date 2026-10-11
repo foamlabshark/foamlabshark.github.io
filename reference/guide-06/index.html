@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,222 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 6 章　前处理命令（网格与初场）</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>前处理要回答三个问题：网格从哪来（生成或转换）→ 网格好不好（检查）→ 初始场怎么给（初始化）。这一章按这个顺序排。</p>
-<h2>6.1 blockMesh —— 结构化网格生成器</h2>
-<p>是什么：读 <code>system/blockMeshDict</code>，把若干个六面体块划分成网格，写进 constant/polyMesh/。</p>
-<p><code>blockMesh</code> 将顶点、块连接关系、网格数量和边界保存在文本字典中，适合学习局部编号与网格拓扑。<code>snappyHexMesh</code> 需要背景网格，该网格可以由 <code>blockMesh</code> 等工具提供。</p>
-<p>用法</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">blockMesh [-dict &lt;文件&gt;] [-<span class="hljs-keyword">case</span> &lt;目录&gt;] [-region &lt;区域&gt;] [-write-vtk] [-no-clean]</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>选项</th><th>作用</th></tr>
-<tr><td><code>-dict</code> &lt;文件&gt;</td><td>用别的字典（做参数扫描时指向不同文件）</td></tr>
-<tr><td><code>-region</code> &lt;名字&gt;</td><td>为指定区域建网格（多区域算例）</td></tr>
-<tr><td><code>-write-vtk</code></td><td>额外输出 VTK，便于在 ParaView 里直接看块结构</td></tr>
-</tbody></table></div>
-<p>示例</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">run
-<span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/icoFoam/cavity/cavity .
-<span class="hljs-built_in">cd</span> cavity
-blockMesh
-...
-Mesh Information
-  nPoints: 882   nCells: 400   nFaces: 1640
-End
-<span class="hljs-built_in">ls</span> constant/polyMesh/
-boundary  faces  neighbour  owner  points</code></pre></div>
-<p>生成的五个文件就是 OpenFOAM 的网格全部内容：<code>points</code>（点坐标）、<code>faces</code>（面由哪些点组成）、owner/neighbour（面属于哪两个单元）、<code>boundary</code>（边界分组）。理解这五个文件，就理解了 OpenFOAM 的非结构化网格数据结构：它不存”单元由哪些点组成”，而是存”面”，单元是由面隐式定义的。这正是它能处理任意多面体网格的原因。</p>
-<p>字典写法见第 15 章。</p>
-<h2>6.2 surfaceFeatureExtract 与 surface 系列</h2>
-<p>是什么：从 STL/OBJ 几何里提取特征边（两个面片夹角超过阈值的棱），输出 constant/extendedFeatureEdgeMesh/。</p>
-<p>显式特征边可帮助 <code>snappyHexMesh</code> 保持尖锐边缘。是否需要预先提取特征，还取决于显式/隐式特征捕捉设置、几何质量与局部分辨率。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">surfaceFeatureExtract          # 读 system/surfaceFeatureExtractDict</code></pre></div>
-<p>其他常用 <code>surface</code> 工具</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>作用</th><th>示例</th></tr>
-<tr><td><code>surfaceCheck</code></td><td>检查 STL 是否封闭、有无自交、法向是否一致</td><td><code>surfaceCheck</code> geom.stl</td></tr>
-<tr><td><code>surfaceTransformPoints</code></td><td>缩放/平移/旋转几何</td><td><code>surfaceTransformPoints</code> <code>-scale</code> '(0.001 0.001 0.001)' in.stl out.stl</td></tr>
-<tr><td><code>surfaceConvert</code></td><td>格式转换（stl/obj/vtk/nas…）</td><td><code>surfaceConvert</code> in.obj out.stl</td></tr>
-<tr><td><code>surfaceOrient</code></td><td>统一法向朝向</td><td><code>surfaceOrient</code> in.stl '(0 0 0)' out.stl</td></tr>
-<tr><td><code>surfaceMeshTriangulate</code></td><td>把 OpenFOAM 边界导出为 STL</td><td><code>surfaceMeshTriangulate</code> walls.stl <code>-patches</code> '(wall.*)'</td></tr>
-<tr><td><code>surfaceBooleanFeatures</code></td><td>两个曲面的交线</td><td>复杂几何拼接时用</td></tr>
-<tr><td><code>surfaceSplitByPatch</code></td><td>按 <code>solid</code> 名拆分 STL</td><td>一个 STL 里含多个部件时</td></tr>
-</tbody></table></div>
-<p>STL 文件本身不保存统一的长度单位约定。若几何按毫米导出，而算例采用米，需要进行相应缩放。应使用 <code>surfaceCheck</code> 核对包围盒尺寸，确认几何尺度与物性及边界条件的单位体系一致。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">surfaceCheck constant/triSurface/body.stl | grep -i bound
-Bounding box : (0 0 0) (1200 400 300)    ← 明显是毫米，需要 -scale 0.001</code></pre></div>
-<h2>6.3 snappyHexMesh —— 复杂几何自动网格</h2>
-<p>是什么：以 <code>blockMesh</code> 生成的背景网格为原料，按 STL 几何做三步加工：细分切割（castellate）→ 贴合（<code>snap</code>）→ 加边界层（<code>addLayers</code>）。</p>
-<p>依次查看切割细化、表面贴合和加层的结果，结合各阶段日志、网格质量和截面图，定位几何选择、特征捕捉或层厚设置的问题。</p>
-<p>用法</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">snappyHexMesh [-overwrite] [-dict &lt;文件&gt;] [-parallel]</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>选项</th><th>作用</th></tr>
-<tr><td><code>-overwrite</code></td><td>直接覆盖 <code>constant/polyMesh</code>，不生成 1/、2/、3/ 中间时间目录</td></tr>
-<tr><td><code>-dict</code></td><td>指定字典</td></tr>
-</tbody></table></div>
-<p>示例：分阶段调试（强烈推荐初学者这么做）</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 只做切割：把 snap 和 addLayers 关掉，跑完立刻用 paraFoam 看</span>
-foamDictionary system/snappyHexMeshDict -entry snap -<span class="hljs-built_in">set</span> <span class="hljs-literal">false</span>
-foamDictionary system/snappyHexMeshDict -entry addLayers -<span class="hljs-built_in">set</span> <span class="hljs-literal">false</span>
-snappyHexMesh                    <span class="hljs-comment"># 查看本次生成的网格时间目录，具体名称由时间设置决定</span>
-
-<span class="hljs-comment"># ② 确认切割正确后，打开 snap</span>
-foamDictionary system/snappyHexMeshDict -entry snap -<span class="hljs-built_in">set</span> <span class="hljs-literal">true</span>
-snappyHexMesh
-
-<span class="hljs-comment"># ③ 最后打开边界层</span>
-foamDictionary system/snappyHexMeshDict -entry addLayers -<span class="hljs-built_in">set</span> <span class="hljs-literal">true</span>
-snappyHexMesh -overwrite
-checkMesh -allGeometry -allTopology</code></pre></div>
-<p>并行加密（大网格必须并行，单核会内存爆掉）：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">decomposePar
-mpirun -np 8 snappyHexMesh -overwrite -parallel
-reconstructParMesh -constant</code></pre></div>
-<p>字典写法见第 16 章。</p>
-<h2>6.4 extrudeMesh 与 extrudeToRegionMesh</h2>
-<p>是什么：把一个面（或一个已有的 <code>patch</code>）沿法向/轴向拉伸成三维网格。</p>
-<p>挤出工具可以构造薄层、轴对称 <code>wedge</code> 或独立的薄壁区域。挤出方向、层数和前后边界类型必须与目标模型的二维或轴对称假设一致。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">extrudeMesh                       # 读 system/extrudeMeshDict
-extrudeToRegionMesh -overwrite    # 从 faceZone 生成新 region（共轭传热常用）</code></pre></div>
-<h2>6.5 checkMesh —— 网格体检（每次建完网格必跑）</h2>
-<p>是什么：检查网格拓扑与几何质量，报告非正交角、歪斜度、纵横比、负体积等。</p>
-<p>修改网格后运行 <code>checkMesh</code>，并查看边界、非正交性、扭曲、尺寸变化及目标区域的分辨率，再进行网格敏感性检查。</p>
-<p>用法</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh [-allGeometry] [-allTopology] [-meshQuality] [-writeSets vtk] [-latestTime] [-region &lt;名&gt;] [-parallel]</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>选项</th><th>作用</th></tr>
-<tr><td><code>-allGeometry</code> / <code>-allTopology</code></td><td>做全部几何/拓扑检查（默认只做基础检查）</td></tr>
-<tr><td><code>-meshQuality</code></td><td>用 <code>system/meshQualityDict</code> 的阈值判定</td></tr>
-<tr><td><code>-writeSets</code> <code>vtk</code></td><td>把有问题的单元/面导出成 VTK，可在 ParaView 里直接看到坏在哪</td></tr>
-</tbody></table></div>
-<p>示例与读法</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh -allGeometry -allTopology
-...
-Checking geometry...
-    Max cell openness = 1.6e-16 OK.
-    Max aspect ratio = 5.2 OK.
-    Mesh non-orthogonality Max: 42.7 average: 8.6      ← 关注这个
-    Max skewness = 1.8 OK.                             ← 和这个
-Mesh OK.</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>指标</th><th>安全范围</th><th>超标了怎么办</th></tr>
-<tr><td>non-orthogonality（非正交角）</td><td>&lt; 70 好；70–80 需处理；&gt; 80 危险</td><td>在 <code>fvSolution</code> 里加 <code>nNonOrthogonalCorrectors</code> 1~2，<code>fvSchemes</code> 的 <code>laplacianSchemes</code> 用 <code>limited</code> <code>corrected</code> 0.33</td></tr>
-<tr><td><code>skewness</code>（歪斜度）</td><td>&lt; 4</td><td>改网格，数值上没有好办法救</td></tr>
-<tr><td>aspect ratio（纵横比）</td><td>&lt; 100（边界层区域可放宽）</td><td>检查边界层加密是否过分</td></tr>
-<tr><td><code>negative</code> <code>volume</code>（负体积）</td><td>必须为 0</td><td>网格是坏的，必须重建</td></tr>
-</tbody></table></div>
-<p>看到 ***Number <code>of</code> severely non-orthogonal <code>faces</code>: N 这种带 *** 的行，一定要处理，它是错误不是提示。</p>
-<h2>6.6 renumberMesh —— 重排单元编号提速</h2>
-<p>是什么：用 Cuthill-McKee 等算法重新编号单元，让相邻单元的编号也相邻。</p>
-<p>重编号可改善矩阵带宽和访问局部性。用相同算例比较重编号前后的运行时间与收敛情况，评估效果。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">renumberMesh -overwrite
-mpirun -np 8 renumberMesh -overwrite -parallel     <span class="hljs-comment"># 并行网格也能做</span></code></pre></div>
-<h2>6.7 transformPoints —— 缩放 / 平移 / 旋转网格</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">transformPoints -scale '(0.001 0.001 0.001)'          # mm → m
-transformPoints -translate '(0 0 -0.5)'               # 平移
-transformPoints -rotate-angle '((0 0 1) 30)'          # 绕 z 轴转 30°
-transformPoints -rollPitchYaw '(0 10 0)'              # 按滚转/俯仰/偏航角</code></pre></div>
-<p>最常见用途：从 CAD 导来的网格单位是毫米，用第一条命令一次性换算。注意它直接改 <code>constant/polyMesh/points</code>，是不可撤销的，做之前先备份或确认命令没写错。</p>
-<h2>6.8 topoSet —— 造集合（cellSet / faceSet / pointSet / zone）</h2>
-<p>是什么：按几何条件（盒子、球、圆柱、曲面内外）或拓扑关系挑出一批单元/面/点，命名保存。</p>
-<p><code>topoSet</code> 通过几何或已有集合选择单元、面和点，为局部加密、区域源项、挡板或分区等操作准备集合。集合与 <code>zone</code> 的类型和用途不同，后续工具需要的名称必须一致。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">topoSet                       <span class="hljs-comment"># 读 system/topoSetDict</span>
-topoSet -dict system/topoSetDict.refine
-topoSet -constant             <span class="hljs-comment"># 作用在 constant 时刻的网格上</span></code></pre></div>
-<p>示例：选出一个盒子区域的单元，再转成 <code>cellZone</code></p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// system/topoSetDict</span>
-actions
-(
-    {
-        <span class="hljs-keyword">name</span> c0;
-        <span class="hljs-keyword">type</span> cellSet;
-        action new;
-        source boxToCell;
-        box (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>);
-    }
-    {
-        <span class="hljs-keyword">name</span> porousZone;
-        <span class="hljs-keyword">type</span> cellZoneSet;
-        action new;
-        source setToCellZone;
-        set c0;
-    }
-);</code></pre></div>
-<p><code>cellSet</code> 与 <code>cellZone</code> 的区别：Set 是临时的选择结果（存在 constant/polyMesh/sets/），Zone 是网格的正式组成部分（写进 <code>constant/polyMesh/cellZones</code>），求解器里的多孔介质、<code>MRF</code>、<code>fvOptions</code> 认的是 Zone。所以流程通常是”先 Set 后 Zone”。</p>
-<p>常用 <code>source</code> 类型见第 17 章。</p>
-<h2>6.9 setFields —— 分区域给初始场赋值</h2>
-<p>是什么：把某个几何区域内的场设成指定值。溃坝算例里”左下角一柱水”就是它做出来的。</p>
-<p><code>setFields</code> 按几何区域批量赋值，比直接修改按单元编号排列的数据更便于复现。操作后应检查相分数范围、所选体积和积分质量，并确认边界条件仍符合模型。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">setFields                     <span class="hljs-comment"># 读 system/setFieldsDict</span></code></pre></div>
-<p>完整示例（溃坝）</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_TUTORIALS</span>/multiphase/interFoam/laminar/damBreak/damBreak .
-<span class="hljs-built_in">cd</span> damBreak
-./Allrun.pre        <span class="hljs-comment"># 或手动：</span>
-blockMesh
-<span class="hljs-built_in">cp</span> -r 0.orig 0      <span class="hljs-comment"># ★ 先恢复干净的初始场</span>
-setFields
-interFoam</code></pre></div>
-<p>字典写法见第 17 章。</p>
-<p>兄弟命令</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>作用</th><th>示例</th></tr>
-<tr><td><code>setExprFields</code></td><td>用表达式给场赋值，比 <code>setFields</code> 灵活得多</td><td><code>setExprFields</code> <code>-field</code> <code>U</code> <code>-expression</code> "<code>vector</code>(4*<code>pos</code>().y()*(1-pos().y()),0,0)"（抛物线入口）</td></tr>
-<tr><td><code>setExprBoundaryFields</code></td><td>同上，但作用在边界上</td><td>给非均匀边界条件用</td></tr>
-<tr><td><code>setAlphaField</code></td><td>按解析形状（球、平面）精确初始化相分数，界面处给出部分填充的体积分数</td><td>配合 <code>interIsoFoam</code> 做界面收敛性研究</td></tr>
-</tbody></table></div>
-<p><code>setExprFields</code> 值得单独说一句：它让你不写代码就能给出解析初场（剪切层、涡、扰动），做验证算例时极其省事。表达式里可用 <code>pos</code>()（单元中心坐标）、vol()、<code>time</code>()、rand() 等。</p>
-<h2>6.10 网格操作类命令一览</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>作用</th><th>典型用法</th></tr>
-<tr><td><code>createPatch</code></td><td>合并/拆分/新建边界 <code>patch</code>，把 <code>cyclic</code> 配对起来</td><td><code>createPatch</code> <code>-overwrite</code>（读 <code>system/createPatchDict</code>）</td></tr>
-<tr><td><code>mergeMeshes</code></td><td>把两套网格合成一套</td><td><code>mergeMeshes</code> . ../otherCase <code>-overwrite</code></td></tr>
-<tr><td><code>stitchMesh</code></td><td>把两个 <code>patch</code> 缝合成内部面</td><td><code>stitchMesh</code> <code>-perfect</code> patchA patchB <code>-overwrite</code></td></tr>
-<tr><td><code>mirrorMesh</code></td><td>按平面镜像网格</td><td><code>mirrorMesh</code> <code>-overwrite</code>（读 <code>mirrorMeshDict</code>）</td></tr>
-<tr><td><code>subsetMesh</code></td><td>只保留某个 <code>cellSet</code> 的网格</td><td><code>subsetMesh</code> <code>c0</code> <code>-patch</code> newPatch <code>-overwrite</code></td></tr>
-<tr><td><code>splitMeshRegions</code></td><td>按 <code>cellZone</code> 拆成多个 <code>region</code></td><td><code>splitMeshRegions</code> <code>-cellZones</code> <code>-overwrite</code>（共轭传热必用）</td></tr>
-<tr><td><code>refineMesh</code></td><td>各向同性/指定方向加密</td><td><code>refineMesh</code> <code>-overwrite</code> <code>-dict</code> <code>system/refineMeshDict</code></td></tr>
-<tr><td><code>createBaffles</code></td><td>在内部面上造零厚度挡板</td><td><code>createBaffles</code> <code>-overwrite</code>（读 <code>createBafflesDict</code>）</td></tr>
-<tr><td><code>checkMesh</code></td><td>见 6.5</td><td></td></tr>
-<tr><td><code>polyDualMesh</code></td><td>生成对偶多面体网格</td><td><code>polyDualMesh</code> 60 <code>-overwrite</code></td></tr>
-<tr><td><code>collapseEdges</code></td><td>折叠过短的边，修补差网格</td><td><code>collapseEdges</code> <code>-overwrite</code></td></tr>
-<tr><td><code>moveDynamicMesh</code></td><td>只跑动网格运动，不解流场（检查运动设置）</td><td><code>moveDynamicMesh</code> <code>-checkAMI</code></td></tr>
-<tr><td><code>zeroDimensionalMesh</code></td><td>生成单单元网格（做化学反应零维验证）</td><td><code>zeroDimensionalMesh</code></td></tr>
-</tbody></table></div>
-<h2>6.11 mapFields / mapFieldsPar —— 把结果映射到另一套网格</h2>
-<p>是什么：把一个算例的场插值到另一个（网格不同的）算例上。</p>
-<p>用 <code>mapFields</code> 将已有结果插值到新网格，作为后续计算的初值。映射后检查守恒量、边界和关键区域的场分布。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># 网格边界完全一致（只是加密）时用 -consistent</span>
-mapFields ../coarseCase -consistent -sourceTime latestTime
-
-<span class="hljs-comment"># 网格区域不一致时，需要 system/mapFieldsDict 指定 patch 对应关系</span>
-mapFields ../otherCase -sourceTime 0.5
-
-<span class="hljs-comment"># 并行算例用 mapFieldsPar（能直接处理 processor* 数据）</span>
-mpirun -np 8 mapFieldsPar ../coarseCase -consistent -sourceTime latestTime -parallel</code></pre></div>
-<h2>6.12 网格转换命令（从其他软件导入）</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>命令</th><th>来源格式</th><th>示例</th></tr>
-<tr><td><code>fluentMeshToFoam</code></td><td>Fluent .msh（2D/3D）</td><td><code>fluentMeshToFoam</code> mesh.msh <code>-writeZones</code> <code>-scale</code> 0.001</td></tr>
-<tr><td><code>fluent3DMeshToFoam</code></td><td>Fluent 3D .msh</td><td><code>fluent3DMeshToFoam</code> mesh.msh</td></tr>
-<tr><td><code>gmshToFoam</code></td><td>Gmsh .msh</td><td><code>gmshToFoam</code> model.msh</td></tr>
-<tr><td><code>ideasUnvToFoam</code></td><td>I-DEAS / Salome .unv</td><td><code>ideasUnvToFoam</code> mesh.unv</td></tr>
-<tr><td><code>cfx4ToFoam</code></td><td>CFX .geo</td><td><code>cfx4ToFoam</code> mesh.geo</td></tr>
-<tr><td><code>starToFoam</code> / <code>ccm26ToFoam</code></td><td>STAR-CD / STAR-CCM+</td><td><code>ccm26ToFoam</code> mesh.ccm</td></tr>
-<tr><td><code>ansysToFoam</code></td><td>ANSYS .ans</td><td><code>ansysToFoam</code> mesh.ans <code>-scale</code> 0.001</td></tr>
-<tr><td><code>plot3dToFoam</code></td><td>Plot3D</td><td><code>plot3dToFoam</code> mesh.xyz</td></tr>
-<tr><td><code>netgenNeutralToFoam</code></td><td>Netgen</td><td><code>netgenNeutralToFoam</code> mesh.vol</td></tr>
-<tr><td><code>kivaToFoam</code></td><td>KIVA</td><td><code>kivaToFoam</code></td></tr>
-<tr><td><code>foamMeshToFluent</code></td><td>反向导出到 Fluent</td><td><code>foamMeshToFluent</code></td></tr>
-<tr><td><code>foamToStarMesh</code></td><td>反向导出到 STAR</td><td><code>foamToStarMesh</code></td></tr>
-</tbody></table></div>
-<p>转换后必做三件事：① <code>checkMesh</code> 查质量；② 看 <code>constant/polyMesh/boundary</code>，把各 <code>patch</code> 的 <code>type</code> 改对（转换器常把所有边界都设成 <code>patch</code>，壁面必须改成 <code>wall</code>，否则壁面函数不起作用）；③ 确认单位（必要时 <code>transformPoints</code> <code>-scale</code>）。</p>
-<h2>6.13 changeDictionary —— 批量改字典（适用于多区域算例）</h2>
-<p>是什么：按规则批量修改字典条目，支持正则匹配 <code>patch</code> 名。</p>
-<p>多区域算例含有多个网格和相互耦合的边界。使用脚本或字典批量更新可减少重复编辑，但仍需逐一核对区域名、<code>patch</code> 对应关系和耦合条件。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">changeDictionary -region solid          # 读 system/solid/changeDictionaryDict
-changeDictionary -literalRE             # 关键字里的正则按字面处理</code></pre></div>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -521,6 +306,6 @@ changeDictionary -literalRE             # 关键字里的正则按字面处理</
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

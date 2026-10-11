@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,154 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>omega</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>比耗散率场，常用于 <code>k</code>–<code>omega</code> 和 SST 模型，单位为 1/s。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>omega</code> 是 <code>k</code>–<code>omega</code> 及 SST 模型的比耗散率变量，用来表征湍流时间尺度。它与 <code>k</code> 共同决定湍流黏度，入口湍流尺度和壁面距离会影响其设置，适合结合所选近壁模型配置。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>0/omega</code></p><h2>配置方法</h2><p><code>omega</code> 是比耗散率，单位 s⁻¹，可理解为湍流时间尺度倒数的模型量。<code>k</code>–ω 和 SST 模型使用 <code>k</code>、<code>omega</code> 共同计算湍流黏度，并通过模型中的限制和混合关系处理不同流动区域。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">场量纲与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>分别为字段量纲与内部单元初值；<code>uniform</code> 表示统一值，<code>nonuniform</code> 列表长度需匹配网格。</td></tr><tr><td><code>boundaryField.&lt;patch&gt;.type / value</code></td><td><code>type</code> 选择该字段的边界条件。<code>value</code> 在 <code>fixedValue</code> 中为指定值，在许多派生条件中仅作初始化。</td></tr><tr><td><code>&lt;patch&gt;</code></td><td><code>movingWall</code>、<code>fixedWalls</code>、<code>upperWall</code>、<code>lowerWall</code>、<code>inlet</code>、<code>outlet</code> 等均为算例自定名称，要与 <code>constant/polyMesh/boundary</code> 对应。</td></tr></tbody></table></div><p><a href="/boundary-conditions/omega-mixing/">turbulentMixingLengthFrequencyInlet 的参数、示例与配套算例</a></p><p><a href="/boundary-conditions/omega-wall/">omegaWallFunction 的参数、示例与配套算例</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · SST 的入口与壁面</h3><p>使用 <span class="math-formula" data-tex="\omega=\sqrt{k}/(C_\mu^{1/4}\ell)"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><msqrt><mi>k</mi></msqrt><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><msubsup><mi>C</mi><mi>μ</mi><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>4</mn></mrow></msubsup><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\omega=\sqrt{k}/(C_\mu^{1/4}\ell)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.2975em;vertical-align:-0.2527em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9322em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span><span style="top:-2.8922em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1078em;"><span></span></span></span></span></span><span class="mord">/</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.5834em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1/4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2527em;"><span></span></span></span></span></span></span><span class="mord">ℓ</span><span class="mclose">)</span></span></span></span></span>，当 <span class="math-formula" data-tex="k=0.375\ \mathrm{m^2/s^2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>0.375</mn><mtext>&nbsp;</mtext><mrow><msup><mi mathvariant="normal">m</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup></mrow></mrow><annotation encoding="application/x-tex">k=0.375\ \mathrm{m^2/s^2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">0.375</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span><span class="mord mathrm">/</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>、<span class="math-formula" data-tex="\ell=0.01\ \mathrm m"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">ℓ</mi><mo>=</mo><mn>0.01</mn><mtext>&nbsp;</mtext><mi mathvariant="normal">m</mi></mrow><annotation encoding="application/x-tex">\ell=0.01\ \mathrm m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">ℓ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.01</span><span class="mspace">&nbsp;</span><span class="mord mathrm">m</span></span></span></span></span>、<span class="math-formula" data-tex="C_\mu=0.09"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>μ</mi></msub><mo>=</mo><mn>0.09</mn></mrow><annotation encoding="application/x-tex">C_\mu=0.09</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.09</span></span></span></span></span> 时，入口 <span class="math-formula" data-tex="\omega\approx112\ \mathrm{s^{-1}}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>≈</mo><mn>112</mn><mtext>&nbsp;</mtext><msup><mi mathvariant="normal">s</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\omega\approx112\ \mathrm{s^{-1}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">112</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord mathrm">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathrm mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></span>。在 <code>0/omega</code> 的 <code>boundaryField</code> 中设置：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
-{
-    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">112</span>;
-}
-wall
-{
-    <span class="hljs-keyword">type</span> omegaWallFunction;
-    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">112</span>;
-}
-</code></pre></div>
-<p>场量纲为 <code>[0 0 -1 0 0 0 0]</code>。入口采用给定值，壁面由 <code>omegaWallFunction</code> 根据近壁信息更新。配套检查 <code>0/k</code>、<code>0/nut</code>、模型选择以及 <code>fvSolution</code> 中的 <code>omega</code> 求解器设置。</p>
-<p><code>omegaWallFunction</code> 具有可配置的近壁混合方式，选择时结合 <code>y</code>⁺ 和模型要求。将入口尺度增大，会减小由上式估算的 <code>omega</code>，并影响湍流在入口下游的衰减。</p>
-<p>切换模型后出现 <code>cannot find file omega</code>，说明初始字段尚未补齐；提示找不到 <code>div(phi,omega)</code> 或相应求解器时，继续补充离散和线性求解器配置。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pisoFoam/RAS/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pisoFoam/RAS/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity"><code>incompressible/pisoFoam/RAS/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>湍流方腔使用 <code>omega</code> 描述比耗散率，壁面条件与相应 <code>k</code>–<code>omega</code> 类模型配合。</p>
-<ul>
-<li><code>dimensions [0 0 -1 0 0 0 0]</code> 表示 s⁻¹。</li>
-<li>内部初值为 <code>22.4</code>，移动与固定壁面共用 <code>omegaWallFunction</code>。</li>
-<li><code>frontAndBack/empty</code> 保持二维计算。</li>
-</ul>
-<p>增大盖板速度或更换湍流初值时，同时检查 <code>k</code>、<code>omega</code>、<code>nut</code> 和近壁网格的对应关系。</p>
-<p><a href="/assets/examples/v2512/omega/1-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/RAS/cavity/0.orig/omega"><code>incompressible/pisoFoam/RAS/cavity/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> omega;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">22.4</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">"(movingWall|fixedWalls)"</span>
-    {
-        <span class="hljs-keyword">type</span> omegaWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">22.4</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/electrostaticDeposition</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/RAS/electrostaticDeposition"><h3>算例问题：electrostaticDeposition</h3><p class="reference-case-problem">金属板按照给定的平移和转动轨迹运动，周围水气界面随板面运动而改变。算例通过表格指定六自由度运动，板面采用 <code>movingWallVelocity</code>，主要观察板附近液体附着、排液以及自由液面的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition"><code>multiphase/interFoam/RAS/electrostaticDeposition</code></a>。</p></section><!-- /reference-case-contexts --><p>electrostaticDeposition 给壁面和开放侧边分别设置 <code>omega</code> 条件。</p>
-<ul>
-<li>初值 <code>0.22</code> 的单位为 s⁻¹。</li>
-<li><code>metalSheet/omegaWallFunction</code> 对金属板应用近壁处理。</li>
-<li><code>"side-.*"/inletOutlet</code> 在流入时使用 <code>inletValue $internalField</code>，流出时采用相应外推。</li>
-<li><code>value $internalField</code> 为边界提供启动值。</li>
-</ul>
-<p>侧边回流明显时，为进入流体设置相应的湍流尺度。</p>
-<p><a href="/assets/examples/v2512/omega/2-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega"><code>multiphase/interFoam/RAS/electrostaticDeposition/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> omega;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.22</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    metalSheet
-    {
-        <span class="hljs-keyword">type</span> omegaWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    <span class="hljs-string">"side-.*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreakWithObstacle</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/damBreakWithObstacle"><h3>算例问题：damBreakWithObstacle</h3><p class="reference-case-problem">局部水柱在重力作用下坍塌并撞击下游障碍物，周围为空气。计算跟踪水气界面、回流与冲击压力，用于检查界面输运、固壁条件和时间步设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle"><code>multiphase/interFoam/laminar/damBreakWithObstacle</code></a>。</p><figure class="reference-case-figure"><img alt="damBreakWithObstacle 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/dam-obstacle.svg" width="720"><figcaption>damBreakWithObstacle 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>带障碍物溃坝目录中的 <code>omega</code> 文件提供可供相应湍流设置使用的字段模板，实际是否求解它由 <code>turbulenceProperties</code> 决定。</p>
-<ul>
-<li>初值 <code>2</code> 的单位为 s⁻¹。</li>
-<li><code>atmosphere/inletOutlet</code> 在回流时使用同一初值，流出时外推。</li>
-<li>障碍物与墙面共用 <code>omegaWallFunction</code>。</li>
-</ul>
-<p>启用 <code>k</code>–<code>omega</code> 类模型时同步准备 <code>k</code> 和 <code>nut</code>，保持所有墙面条件相容。</p>
-<p><a href="/assets/examples/v2512/omega/3-omega.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega"><code>multiphase/interFoam/laminar/damBreakWithObstacle/0.orig/omega</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> omega;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">2</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    atmosphere
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-    <span class="hljs-string">"(obstacle|walls)"</span>
-    {
-        <span class="hljs-keyword">type</span> omegaWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -453,6 +306,6 @@ wall
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

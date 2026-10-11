@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,186 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>fvDOM</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>按离散方向求解辐射强度，适合需要保留辐射方向信息的问题。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p><code>fvDOM</code> 将辐射传播方向离散为若干方向，分别求解各方向的辐射强度。对传播方向、遮挡及局部受热较敏感的问题，可以采用这种描述。</p><p><code>nPhi</code> 与 <code>nTheta</code> 控制角度离散；吸收、发射等介质模型和壁面条件决定各方向的辐射交换。增加方向数后，应比较热流与温度结果，判断角度分辨率是否足够。</p></div><!-- reference-concepts --><p>离散坐标法把辐射传播方向划分为若干射线，对每个方向求解辐射输运。忽略散射的单一灰波段可写为：</p><p><span class="math-formula math-display" data-tex="\nabla\cdot(\mathbf s I)+aI=eI_b+E/(4\pi)"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi mathvariant="bold">s</mi><mi>I</mi><mo stretchy="false">)</mo><mo>+</mo><mi>a</mi><mi>I</mi><mo>=</mo><mi>e</mi><msub><mi>I</mi><mi>b</mi></msub><mo>+</mo><mi>E</mi><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>4</mn><mi>π</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\nabla\cdot(\mathbf s I)+aI=eI_b+E/(4\pi)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">s</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal">e</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord">/</span><span class="mopen">(</span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mclose">)</span></span></span></span></span></span></p><p>s 为传播方向单位向量，<code>I</code> 为该方向的辐射强度，Ib 为黑体辐射强度；<code>a</code>、<code>e</code>、<code>E</code> 由吸收发射模型提供。<code>nTheta</code> 与 nPhi 控制角度离散，增加方向数可改善方向分辨率，但会增加所求解的辐射方程数。应分别检查空间网格和角度离散的影响。</p><!-- /reference-concepts --><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM"><h3>算例问题：hotRadiationRoomFvDOM</h3><p class="reference-case-problem">室内热源加热空气和周围壁面，浮力对流与表面、介质辐射共同传递能量。算例需要同时配置温度、流动和辐射边界，可比较房间温度、循环流动及壁面辐射热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM</code></a>。</p></section><!-- /reference-case-contexts --><p>本页重点配置：<code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/constant/radiationProperties</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>nPhi / nTheta</code></td><td>方位角和极角方向离散参数。</td></tr><tr><td><code>tolerance / maxIter</code></td><td>辐射迭代容差和迭代次数上限。</td></tr><tr><td><code>absorptionEmissionModel</code></td><td>选择介质吸收发射模型。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/radiationProperties</code></h3><p>辐射求解方法及介质辐射物性。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/constant/radiationProperties"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/constant/radiationProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> radiationProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation <span class="hljs-literal">on</span>;
-radiationModel fvDOM;
-fvDOMCoeffs
-{
-    nPhi <span class="hljs-number">3</span>;
-    nTheta <span class="hljs-number">5</span>;
-    tolerance <span class="hljs-number">1e-3</span>;
-    maxIter <span class="hljs-number">10</span>;
-}
-<span class="hljs-comment">// Number of flow iterations per radiation iteration</span>
-solverFreq <span class="hljs-number">10</span>;
-absorptionEmissionModel constantAbsorptionEmission;
-constantAbsorptionEmissionCoeffs
-{
-    absorptivity absorptivity [ m^<span class="hljs-number">-1</span> ] <span class="hljs-number">0.5</span>;
-    emissivity emissivity [ m^<span class="hljs-number">-1</span> ] <span class="hljs-number">0.5</span>;
-    E E [ kg m^<span class="hljs-number">-1</span> s^<span class="hljs-number">-3</span> ] <span class="hljs-number">0</span>;
-}
-scatterModel none;
-sootModel none;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/radiationProperties</code> 中各项设置的作用如下。</p><ul><li><code>radiationModel</code> 设为 <code>fvDOM</code>：选择辐射传递模型。</li><li><code>fvDOMCoeffs/nPhi</code> 设为 <code>3</code>：方位角和极角方向离散参数。</li><li><code>fvDOMCoeffs/nTheta</code> 设为 <code>5</code>：方位角和极角方向离散参数。</li><li><code>fvDOMCoeffs/tolerance</code> 设为 <code>1e-3</code>：规定该模型或算法的收敛阈值。</li><li><code>fvDOMCoeffs/maxIter</code> 设为 <code>10</code>：规定当前求解步骤的迭代次数上限。</li><li><code>solverFreq</code> 设为 <code>10</code>：规定辐射方程的求解间隔。</li><li><code>absorptionEmissionModel</code> 设为 <code>constantAbsorptionEmission</code>：选择介质吸收发射模型。</li><li><code>scatterModel</code> 设为 <code>none</code>：选择散射模型。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/constant/radiationProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/constant/radiationProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/G</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/IDefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0.orig/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0.orig/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>0.orig/p_rgh</code></td><td>扣除静水压部分的压力，通常为 Pa。</td></tr><tr><td><code>constant/g</code></td><td>重力向量，m/s²。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0.orig/G：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/G</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/G"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/G</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> G;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> MarshakRadiation;
-        emissivityMode lookup;
-        emissivity <span class="hljs-keyword">uniform</span> <span class="hljs-number">1.0</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/G</code> 设置 <code>G</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 0 -3 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>".*"</code> 采用 <code>MarshakRadiation</code>，根据壁温和发射率给 <code>P1</code> 入射辐射场 <code>G</code> 设置混合边界。参数为 <code>emissivityMode</code> <code>lookup</code>，<code>emissivity</code> <code>uniform 1.0</code>，<code>value</code> <code>uniform 0</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/G">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/G.txt">下载此配置文件</a></p></details><details><summary>0.orig/IDefault：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/IDefault</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/IDefault"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/IDefault</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> IDefault;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> greyDiffusiveRadiation;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/IDefault</code> 设置 <code>IDefault</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 0 -3 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>".*"</code> 采用 <code>greyDiffusiveRadiation</code>，为 fvDOM 的离散方向辐射强度设置灰体漫反射壁面。参数为 <code>value</code> <code>uniform 0</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/IDefault">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/IDefault.txt">下载此配置文件</a></p></details><details><summary>0.orig/T：温度，K。</summary><h3><code>0.orig/T</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/T"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/T</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> T;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    floor
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300.0</span>;
-    }
-    ceiling
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300.0</span>;
-    }
-    fixedWalls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    box
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">500.0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/T</code> 设置 <code>T</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform 300</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>floor</code>、<code>ceiling</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 300.0</code>。</li><li><code>fixedWalls</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>box</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 500.0</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/T">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/0.orig/T.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/system/fvSolution"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">67 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvSolution;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solvers
-{
-    p_rgh
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
-        preconditioner DIC;
-        tolerance <span class="hljs-number">1e-06</span>;
-        relTol <span class="hljs-number">0.01</span>;
-    }
-    Ii
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
-        tolerance <span class="hljs-number">1e-4</span>;
-        relTol <span class="hljs-number">0</span>;
-        smoother symGaussSeidel;
-        maxIter <span class="hljs-number">5</span>;
-        nPostSweeps <span class="hljs-number">1</span>;
-    }
-    <span class="hljs-string">"(U|h|k|epsilon)"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner DILU;
-        tolerance <span class="hljs-number">1e-05</span>;
-        relTol <span class="hljs-number">0.1</span>;
-    }
-}
-<span class="hljs-built_in">SIMPLE</span>
-{
-    nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    pRefCell <span class="hljs-number">0</span>;
-    pRefValue <span class="hljs-number">0</span>;
-    residualControl
-    {
-        p_rgh <span class="hljs-number">1e-2</span>;
-        U <span class="hljs-number">1e-3</span>;
-        h <span class="hljs-number">1e-3</span>;
-        G <span class="hljs-number">1e-3</span>;
-        <span class="hljs-comment">// possibly check turbulence fields</span>
-        <span class="hljs-string">"(k|epsilon|omega)"</span> <span class="hljs-number">1e-3</span>;
-        <span class="hljs-string">"ILambda.*"</span> <span class="hljs-number">1e-3</span>;
-    }
-}
-relaxationFactors
-{
-    fields
-    {
-        rho <span class="hljs-number">1.0</span>;
-        p_rgh <span class="hljs-number">0.7</span>;
-    }
-    equations
-    {
-        U <span class="hljs-number">0.2</span>;
-        h <span class="hljs-number">0.2</span>;
-        k <span class="hljs-number">0.5</span>;
-        epsilon <span class="hljs-number">0.5</span>;
-        <span class="hljs-string">"ILambda.*"</span> <span class="hljs-number">0.7</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p_rgh</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.01</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>Ii</code></td><td><code>solver</code> <code>GAMG</code>：线性方程采用 <code>GAMG</code> 方法；<code>tolerance</code> <code>1e-4</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断；<code>smoother</code> <code>symGaussSeidel</code>：选择光顺方法；<code>maxIter</code> <code>5</code>：限定单次线性求解的最大迭代次数。</td></tr><tr><td><code>"(U|h|k|epsilon)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>SIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>SIMPLE/pRefCell</code> = <code>0</code>：设置压力参考单元。</li><li><code>SIMPLE/pRefValue</code> = <code>0</code>：设置该单元的压力参考值。</li><li><code>SIMPLE/residualControl/p_rgh</code> = <code>1e-2</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/U</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/h</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/G</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/"(k|epsilon|omega)"</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/"ILambda.*"</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>relaxationFactors/fields/rho</code> = <code>1.0</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/fields/p_rgh</code> = <code>0.7</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/U</code> = <code>0.2</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/h</code> = <code>0.2</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/k</code> = <code>0.5</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/epsilon</code> = <code>0.5</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"ILambda.*"</code> = <code>0.7</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/system/fvSolution.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/hotRadiationRoomFvDOM-reference"</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/hotRadiationRoomFvDOM-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/Allrun"><code>heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/Allrun</code></a>（原文件）。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-restore0Dir
-
-runApplication blockMesh
-
-runApplication $(getApplication)
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><ol><li><code>cd</code> 切换当前工作目录。</li><li><code>restore0Dir</code> 将 0.orig 恢复为求解所用的 0 目录。</li><li><code>blockMesh</code> 读取 <code>blockMeshDict</code>，生成由六面体块组成的网格。</li><li>从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</li></ol><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/heatTransfer/buoyantSimpleFoam/hotRadiationRoomFvDOM/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>比较不同方向划分下的壁面热流，检查角度离散误差。</p><p><a href="/radiation-models/">返回辐射模型</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -485,6 +306,6 @@ runApplication $(getApplication)
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,123 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>extrudeToRegionMeshDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>从已有网格的面或面区挤出独立区域，用于薄壁或液膜等区域耦合。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>从已有网格表面建立独立薄层区域时，这个字典指定来源面、挤出模型和区域边界。它常用于液膜或薄壁耦合，让新区域拥有独立网格，并保持与原区域的对应关系。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/extrudeToRegionMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>region</code></td><td>目标网格区域名称；多区域场与网格路径中应保持一致。</td></tr><tr><td><code>extrudeModel</code></td><td>挤出几何模型，例如平移、旋转或法向挤出；各模型需要不同系数。</td></tr><tr><td><code>nLayers</code></td><td>挤出或边界层生成的层数；同时检查层厚与总厚度。</td></tr><tr><td><code>expansionRatio</code></td><td>相邻挤出层的厚度增长比例。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>linearNormalCoeffs.thickness</code></td><td>沿来源面法向挤出的总厚度，与 <code>nLayers</code>、<code>expansionRatio</code> 配合。</td></tr><tr><td><code>faceZones / patches</code></td><td>选择来源面区或边界；名称应在原始网格中存在。</td></tr><tr><td><code>oneD / oneDPolyPatchType</code></td><td>一维挤出区域及其特殊边界类型的设置，需要与后续区域求解方式相容。</td></tr><tr><td><code>adaptMesh / sampleMode</code></td><td>是否同步修改原网格，以及区域间映射采用的采样方式。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/fireFoam/LES/simplePMMApanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/simplePMMApanel"><h3>算例问题：simplePMMApanel</h3><p class="reference-case-problem">PMMA 固体板受热后热解，释放可燃气体并在气相中燃烧。固体温升、热解质量源、火焰辐射与气相流动相互影响，主要观察热解区、火焰和板面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel"><code>combustion/fireFoam/LES/simplePMMApanel</code></a>。</p></section><!-- /reference-case-contexts --><p>PMMA 板燃烧算例从已有 <code>panel</code> 面区向厚度方向拉伸，建立固体板区域 <code>panelRegion</code>。</p>
-<ul>
-<li><code>faceZones (panel)</code> 选定起始面区，<code>region panelRegion</code> 给新网格命名。</li>
-<li><code>extrudeModel linearNormal</code> 沿局部法向拉伸，<code>thickness 0.0234</code> 给出板厚 23.4 mm。</li>
-<li><code>nLayers 8</code>、<code>expansionRatio 1</code> 使用 8 层等厚单元，每层约 2.925 mm。</li>
-<li><code>oneD true</code> 与 <code>oneDPolyPatchType empty</code> 将板内主要传热方向设为厚度方向；<code>sampleMode nearestPatchFace</code> 用于界面映射。</li>
-<li><code>adaptMesh true</code> 同步调整原始网格的相关边界。</li>
-</ul>
-<p>改变板厚时同时更新材料热物性与层数，比较板面温度和厚度方向温度梯度。</p>
-<p><a href="/assets/examples/v2512/extrudetoregionmeshdict/1-extrudeToRegionMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/system/extrudeToRegionMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/system/extrudeToRegionMeshDict"><code>combustion/fireFoam/LES/simplePMMApanel/system/extrudeToRegionMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> extrudeToRegionMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-region panelRegion;
-faceZones (panel);
-oneD <span class="hljs-literal">true</span>;
-sampleMode nearestPatchFace;
-extrudeModel linearNormal;
-oneDPolyPatchType <span class="hljs-built_in">empty</span>;
-nLayers <span class="hljs-number">8</span>;
-expansionRatio <span class="hljs-number">1</span>;
-adaptMesh <span class="hljs-literal">true</span>;
-linearNormalCoeffs
-{
-    thickness <span class="hljs-number">0.0234</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/cylinder</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/cylinder"><h3>算例问题：cylinder</h3><p class="reference-case-problem">水滴在重力和流体阻力作用下运动，与圆柱表面的液膜交换质量。本例启用表面液膜模型，而液滴换热、相变及化学反应模型设为 <code>none</code>；主要检查液滴轨迹、碰壁处理和液膜分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder"><code>lagrangian/reactingParcelFoam/cylinder</code></a>。</p></section><!-- /reference-case-contexts --><p><code>cylinder</code> 算例从 <code>wallFilmFaces</code> 面区生成 <code>wallFilmRegion</code>，为壁面液膜计算提供附着区域。</p>
-<ul>
-<li><code>faceZones (wallFilmFaces)</code> 选定壁面集合，<code>region wallFilmRegion</code> 是后续液膜模型查找的区域名称。</li>
-<li><code>linearNormal</code> 沿壁面法向拉伸，<code>thickness 0.01</code>、<code>nLayers 1</code> 生成 0.01 m 的单层区域。</li>
-<li><code>sampleMode nearestPatchFace</code> 选择界面采样映射方式，<code>adaptMesh yes</code> 更新原有网格的连接边界。</li>
-<li><code>oneD false</code> 保留该区域的多方向拓扑处理，<code>expansionRatio 1</code> 采用均匀层厚。</li>
-</ul>
-<p>修改壁面区域名称后同步修改 <code>surfaceFilmProperties</code> 中的 <code>region</code>，使液膜模型能找到对应网格。</p>
-<p><a href="/assets/examples/v2512/extrudetoregionmeshdict/2-extrudeToRegionMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder/system/extrudeToRegionMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/cylinder/system/extrudeToRegionMeshDict"><code>lagrangian/reactingParcelFoam/cylinder/system/extrudeToRegionMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> extrudeToRegionMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-region wallFilmRegion;
-faceZones (wallFilmFaces);
-sampleMode nearestPatchFace;
-oneD <span class="hljs-literal">false</span>;
-extrudeModel linearNormal;
-nLayers <span class="hljs-number">1</span>;
-expansionRatio <span class="hljs-number">1</span>;
-adaptMesh <span class="hljs-literal">yes</span>; <span class="hljs-comment">// apply mapped to both regions</span>
-linearNormalCoeffs
-{
-    thickness <span class="hljs-number">0.01</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/rivuletPanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/rivuletPanel"><h3>算例问题：rivuletPanel</h3><p class="reference-case-problem">液体沿板面形成液膜或细流，重力、黏性与表面作用决定其铺展。算例用于连接表面液膜与周围流体，主要观察液膜厚度、流速和板面上的覆盖范围。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel"><code>lagrangian/reactingParcelFoam/rivuletPanel</code></a>。</p></section><!-- /reference-case-contexts --><p><code>rivuletPanel</code> 从板面创建壁膜区域，随后在其上计算液膜沿板面的运动。</p>
-<ul>
-<li><code>wallFilmFaces</code> 指定要拉伸的面区，输出区域名称为 <code>wallFilmRegion</code>。</li>
-<li><code>linearNormal</code>、<code>thickness 0.01</code> 沿板法向生成厚 0.01 m 的网格区域，<code>nLayers 1</code> 只保留一层。</li>
-<li><code>nearestPatchFace</code> 用最近面映射连接壁膜区域与主流区域，<code>adaptMesh yes</code> 调整主网格相关边界。</li>
-<li><code>oneD false</code>、<code>expansionRatio 1</code> 给出区域生成方式和均匀层厚。</li>
-</ul>
-<p>这里的几何拉伸厚度与液膜场中的局部液膜厚度分别配置；查看液膜结果时应读取模型计算的厚度场。</p>
-<p><a href="/assets/examples/v2512/extrudetoregionmeshdict/3-extrudeToRegionMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel/system/extrudeToRegionMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel/system/extrudeToRegionMeshDict"><code>lagrangian/reactingParcelFoam/rivuletPanel/system/extrudeToRegionMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> extrudeToRegionMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-region wallFilmRegion;
-faceZones (wallFilmFaces);
-oneD <span class="hljs-literal">false</span>;
-sampleMode nearestPatchFace;
-extrudeModel linearNormal;
-nLayers <span class="hljs-number">1</span>;
-expansionRatio <span class="hljs-number">1</span>;
-adaptMesh <span class="hljs-literal">yes</span>; <span class="hljs-comment">// apply mapped to both regions</span>
-linearNormalCoeffs
-{
-    thickness <span class="hljs-number">0.01</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/extrudetoregionmesh/">extrudeToRegionMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -422,6 +306,6 @@ linearNormalCoeffs
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

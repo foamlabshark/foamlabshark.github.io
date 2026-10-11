@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,96 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 9 章　并行计算与集群作业</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>9.1 并行的三步骤</h2>
-<p>OpenFOAM 的并行是区域分解：把网格切成 N 块，每块交给一个进程，进程之间在交界面上交换数据。所以流程固定为三步：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">decomposePar                              <span class="hljs-comment"># ① 切分：生成 processor0/ … processorN-1/</span>
-mpirun -np 8 simpleFoam -parallel         <span class="hljs-comment"># ② 并行求解（-parallel 不能漏）</span>
-reconstructPar                            <span class="hljs-comment"># ③ 合并结果回主目录</span></code></pre></div>
-<p><code>-parallel</code> 漏了会怎样：8 个进程各自把整个算例独立算一遍，互相覆盖对方的输出。日志看起来”正常”但结果是错的，而且慢 8 倍。这是初学者最隐蔽的错误之一。</p>
-<h2>9.2 decomposePar</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">decomposePar [-force] [-copyZero] [-fields] [-latestTime] [-time &lt;范围&gt;] [-cellDist] [-dry-run]</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>选项</th><th>作用</th></tr>
-<tr><td><code>-force</code></td><td>先删掉已有的 <code>processor</code>* 再分（改了网格重新分时必用）</td></tr>
-<tr><td><code>-fields</code></td><td>只分场，不分网格（网格已分好、只是换了初场时用，快很多）</td></tr>
-<tr><td><code>-copyZero</code></td><td>原样复制 0/ 而不做插值分解</td></tr>
-<tr><td><code>-latestTime</code></td><td>只分解最新时刻（续算时用）</td></tr>
-<tr><td><code>-cellDist</code></td><td>输出 <code>cellDist</code> 场，可在 ParaView 里看分区效果</td></tr>
-</tbody></table></div>
-<p>示例</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">decomposePar -force
-decomposePar -cellDist        <span class="hljs-comment"># 想检查分区是否合理时</span>
-paraFoam                      <span class="hljs-comment"># 在 ParaView 里显示 cellDist，看分块是否均匀</span></code></pre></div>
-<p>配置文件 <code>system/decomposeParDict</code> 见第 17 章。</p>
-<h2>9.3 mpirun 的常用写法</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 8 simpleFoam -parallel &gt; log.simpleFoam 2&gt;&amp;1 &amp;
-mpirun -np 16 interFoam -parallel -fileHandler collated &gt; <span class="hljs-built_in">log</span> 2&gt;&amp;1 &amp;
-mpirun --hostfile hosts -np 32 pimpleFoam -parallel &gt; <span class="hljs-built_in">log</span> 2&gt;&amp;1 &amp;   <span class="hljs-comment"># 多机</span></code></pre></div>
-<p><code>-np</code> 必须等于 <code>decomposeParDict</code> 里的 <code>numberOfSubdomains</code>，不一致会直接报错退出。</p>
-<p>核数怎么选：经验值是每个核 5 万–10 万网格。核给太多，每核网格太少，通信时间超过计算时间，反而更慢。100 万网格的算例，用 8–16 核通常就是最优区间。</p>
-<h2>9.4 reconstructPar / reconstructParMesh</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">reconstructPar                        # 合并所有时刻
-reconstructPar -latestTime            # 只合并最后一个时刻（最常用）
-reconstructPar -newTimes              # 只合并尚未合并过的时刻
-reconstructPar -fields '(U p)'        # 只合并部分场
-reconstructParMesh -constant          # 合并网格（并行 snappyHexMesh 之后必须做）</code></pre></div>
-<p>什么时候可以不合并：只是想在 ParaView 里看结果的话，直接用 Decomposed Case 模式读 <code>processor</code>*（见 8.5），省下大量时间和磁盘。需要合并的场景：要做 <code>mapFields</code>、要把结果交给别人、要用串行工具处理。</p>
-<h2>9.5 redistributePar —— 变更核数而不重新分解</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 16 redistributePar -overwrite -parallel      <span class="hljs-comment"># 8 核结果改到 16 核继续算</span>
-mpirun -np 8  redistributePar -reconstruct -parallel    <span class="hljs-comment"># 相当于并行版 reconstructPar，大算例快得多</span>
-mpirun -np 8  redistributePar -decompose -parallel      <span class="hljs-comment"># 并行版 decomposePar</span></code></pre></div>
-<p>大规模结果可评估 <code>redistributePar</code> <code>-reconstruct</code> 的并行重构流程。是否优于串行重构取决于文件处理器、并行文件系统、进程数和字段数量，应在代表性数据上比较内存与耗时。</p>
-<h2>9.6 collated 文件模式（大规模并行必备）</h2>
-<p>默认情况下 1000 核会生成 1000 个目录、每个目录里一堆小文件。文件系统（尤其是集群的并行文件系统）会被这种小文件海拖垮。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 256 simpleFoam -parallel -fileHandler collated</code></pre></div>
-<p>所有进程的数据写进 processors256/ 下的少量合并文件。也可以在 etc/controlDict 或算例 <code>controlDict</code> 的 <code>OptimisationSwitches</code> 里全局设定：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">OptimisationSwitches
-{
-    fileHandler collated;
-    maxThreadFileBufferSize 2e9;    // 用后台线程写，计算不必等 I/O
-}</code></pre></div>
-<p>转换回普通格式：<code>foamFormatConvert</code> <code>-fileHandler</code> uncollated。</p>
-<h2>9.7 并行时的常见操作</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">mpirun -np 8 checkMesh -parallel                 <span class="hljs-comment"># 并行查网格</span>
-mpirun -np 8 snappyHexMesh -overwrite -parallel  <span class="hljs-comment"># 并行生成网格</span>
-mpirun -np 8 renumberMesh -overwrite -parallel
-mpirun -np 8 postProcess -func Q -latestTime -parallel
-foamListTimes -<span class="hljs-built_in">rm</span> -processor                     <span class="hljs-comment"># 清理 processor* 里的时间目录</span></code></pre></div><!-- example-reading --><ol><li><code>checkMesh</code> 检查网格拓扑、几何形状与质量，并定位问题区域。</li><li><code>snappyHexMesh</code> 细化背景网格，贴合几何表面，并按设置生成边界层。结果覆盖当前网格。</li><li><code>renumberMesh</code> 重排单元与面编号以减小矩阵带宽，并同步重排场。结果覆盖当前网格。</li><li><code>postProcess</code> 在已有结果上执行功能对象。只读取最新结果时刻。</li><li><code>foamListTimes</code> 列出符合条件的案例时间目录；<code>rm</code> 删除指定的文件或目录。</li></ol><!-- /example-reading -->
-<h2>9.8 集群作业脚本模板</h2>
-<p>SLURM</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/bash</span>
-<span class="hljs-comment">#SBATCH --job-name=of_case</span>
-<span class="hljs-comment">#SBATCH --nodes=2</span>
-<span class="hljs-comment">#SBATCH --ntasks-per-node=32</span>
-<span class="hljs-comment">#SBATCH --time=24:00:00</span>
-<span class="hljs-comment">#SBATCH --output=slurm-%j.out</span>
-
-<span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/OpenFOAM/OpenFOAM-v2512/etc/bashrc
-
-<span class="hljs-built_in">cd</span> <span class="hljs-variable">$SLURM_SUBMIT_DIR</span>
-decomposePar -force &gt; log.decomposePar 2&gt;&amp;1
-srun --mpi=pmi2 simpleFoam -parallel -fileHandler collated &gt; log.simpleFoam 2&gt;&amp;1
-reconstructPar -latestTime &gt; log.reconstructPar 2&gt;&amp;1</code></pre></div><!-- example-reading --><ol><li><code>source</code> 在当前终端执行脚本，使脚本设置的环境变量和函数立即生效。</li><li><code>cd</code> 切换当前工作目录。</li><li><code>decomposePar</code> 把网格和场划分到多个处理器子域。</li><li><code>simpleFoam</code> 使用 <code>SIMPLE</code> 算法求解不可压缩稳态流动。</li><li><code>reconstructPar</code> 把并行结果的字段重构到完整案例。只读取最新结果时刻。</li></ol><!-- /example-reading -->
-<p>提交与查看：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">sbatch job.sh          # 提交
-squeue -u $USER        # 查看排队/运行状态
-scancel &lt;作业号&gt;       # 取消
-sacct -j &lt;作业号&gt;      # 查看资源使用</code></pre></div><!-- example-reading --><p>sbatch 提交 job.sh，并返回作业号；squeue 按当前用户查看排队和运行状态。需要取消时，把占位符替换为实际作业号再使用 scancel；sacct 用于查询该作业的资源和结束状态。</p><!-- /example-reading -->
-<p>PBS / Torque</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/bash</span>
-<span class="hljs-comment">#PBS -N of_case</span>
-<span class="hljs-comment">#PBS -l nodes=2:ppn=32</span>
-<span class="hljs-comment">#PBS -l walltime=24:00:00</span>
-<span class="hljs-comment">#PBS -j oe</span>
-
-<span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/OpenFOAM/OpenFOAM-v2512/etc/bashrc
-<span class="hljs-built_in">cd</span> <span class="hljs-variable">$PBS_O_WORKDIR</span>
-decomposePar -force &gt; log.decomposePar 2&gt;&amp;1
-mpirun -np 64 simpleFoam -parallel &gt; log.simpleFoam 2&gt;&amp;1
-qsub job.sh      $ qstat -u <span class="hljs-variable">$USER</span>      $ qdel &lt;作业号&gt;</code></pre></div>
-<p>集群运行中常见的两类环境问题：① 计算节点没 <code>source</code> 环境 —— 脚本里必须显式 <code>source</code> .../etc/bashrc（或用 <code>foamExec</code>）；② 集群的 MPI 与编译 OpenFOAM 时用的 MPI 不是同一个 —— 表现为一跑就 mpirun 报符号错误，解决办法是用集群的 <code>module</code> <code>load</code> 加载与编译时一致的 MPI。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -395,6 +306,6 @@ qsub job.sh      $ qstat -u <span class="hljs-variable">$USER</span>      $ qdel
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

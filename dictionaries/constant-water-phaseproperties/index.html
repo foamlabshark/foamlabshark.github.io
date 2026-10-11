@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,168 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>phaseProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>描述相系统、各相模型以及相间动量、热量和质量交换。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>phaseProperties</code> 定义相系统中有哪些相、各相使用什么模型，以及相间如何交换动量、热量和质量。它是多相求解配置的中心文件，应与按相命名的字段及热物性保持一致。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/water/phaseProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>phases</code></td><td>相名称列表；这些名称会影响相分数、速度、热物性等字段或字典的命名。</td></tr><tr><td><code>sigma</code></td><td>常见为表面张力系数，但在电磁模型中可表示电导率；以模型与量纲为准。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="model-configuration">模型选择与嵌套参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>massTransferModel.&lt;相对&gt;.type</code></td><td>按相对选择质量传递模型；系数只对所选模型生效。</td></tr><tr><td><code>massTransferModel.&lt;相对&gt;.C / Tactivate</code></td><td>所选热相变模型的速率系数与激活温度。</td></tr><tr><td><code>solidPhase / Cu</code></td><td>凝固或多孔阻力模型中的固相指定与阻力系数，需与其模型选择一致。</td></tr><tr><td><code>species</code></td><td>参与组分输运或相间传递的物种列表，名称应与热物性和反应机理对应。</td></tr></tbody></table></div>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam"><h3>算例问题：icoReactingMultiphaseInterFoam</h3><p class="reference-case-problem">液体或固体在边界加热、冷却作用下发生相变，固液界面随时间移动。算例通过导热与潜热收支确定界面推进速度，用温度分布和相界面位置检验相变模型。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam"><code>verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam</code></a>。</p><figure class="reference-case-figure"><img alt="icoReactingMultiphaseInterFoam 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/phase-change.svg" width="720"><figcaption><code>icoReactingMultiphaseInterFoam</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>这个 Stefan 算例使用 <code>icoReactingMultiphaseInterFoam</code> 计算液体向气体的相变，借助平面界面问题比较相变前沿的位置。</p>
-<ul>
-<li><code>type massTransferMultiphaseSystem</code> 启用相间质量交换；<code>phases (liquid gas)</code> 列出两相，均为 <code>pureMovingPhaseModel</code>。</li>
-<li><code>surfaceTension</code> 中 <code>sigma 0.0</code> 去掉表面张力作用，使本例突出导热、潜热与相变前沿运动。</li>
-<li><code>(liquid to gas)</code> 指定质量由液相转入气相；<code>Lee</code> 使用温度偏离激活温度的程度构造源项。</li>
-<li><code>C 1700</code> 的量纲为 s⁻¹，<code>Tactivate 373.25</code> 为激活温度，单位 K。对于这里的正 <code>C</code>，高于激活温度的液相产生蒸发源项。</li>
-</ul>
-<p>可以先保持 <code>Tactivate</code> 与热物性不变，减小 <code>C</code> 比较界面响应，再做时间步和网格细化。验证指标可选界面位置、温度剖面及总潜热消耗。</p>
-<p><a href="/assets/examples/v2512/phaseproperties/1-phaseProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam/constant/phaseProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam/constant/phaseProperties"><code>verificationAndValidation/multiphase/StefanProblem/setups.orig/icoReactingMultiphaseInterFoam/constant/phaseProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> phaseChangeProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">type</span> massTransferMultiphaseSystem;
-phases (liquid gas);
-liquid
-{
-    <span class="hljs-keyword">type</span> pureMovingPhaseModel;
-}
-gas
-{
-    <span class="hljs-keyword">type</span> pureMovingPhaseModel;
-}
-surfaceTension
-(
-    (gas and liquid)
-    {
-        <span class="hljs-keyword">type</span> constant;
-        sigma <span class="hljs-number">0.0</span>;
-    }
-);
-massTransferModel
-(
-    (liquid to gas)
-    {
-        <span class="hljs-keyword">type</span> Lee;
-        C <span class="hljs-number">1700</span>;
-        Tactivate <span class="hljs-number">373.25</span>;
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent"><h3>算例问题：evaporationMultiComponent</h3><p class="reference-case-problem">多组分液体与气相接触，各组分的挥发性不同，蒸发会同时改变液相和气相组成。算例耦合界面移动、组分输运及能量方程，适合检查各组分的相间传质与总质量守恒。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent"><code>multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent</code></a>。</p><figure class="reference-case-figure"><img alt="evaporationMultiComponent 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/phase-change.svg" width="720"><figcaption><code>evaporationMultiComponent</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>evaporationMultiComponent</code> 将单组分液体蒸发到多组分气体中，因此两相采用不同的成分模型。</p>
-<ul>
-<li><code>liquid</code> 采用 <code>pureMovingPhaseModel</code>；<code>gas</code> 采用 <code>multiComponentMovingPhaseModel</code>，气相可同时含蒸气与其他组分。</li>
-<li><code>species vapour.gas</code> 指定蒸发质量进入气相中的 <code>vapour</code> 组分。该名称需要与气相热物性及组分场对应。</li>
-<li><code>Lee</code> 模型的 <code>C 100</code> 控制相变响应速度，<code>Tactivate 366</code> K 给出激活温度；正系数对应高温侧的液体蒸发。</li>
-<li><code>sigma 0.07</code> N/m 为气液表面张力系数，会影响弯曲界面的压力跳跃及形态。</li>
-</ul>
-<p>修改环境气体组分时，保留蒸气接收组分与相变模型之间的对应关系。改变 <code>C</code> 可研究模型响应；改变表面张力则用于研究界面动力学。比较液体质量损失与气相蒸气增加量，可以检查相间质量交换。</p>
-<p><a href="/assets/examples/v2512/phaseproperties/2-phaseProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent/constant/phaseProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent/constant/phaseProperties"><code>multiphase/icoReactingMultiphaseInterFoam/evaporationMultiComponent/constant/phaseProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> phaseProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">type</span> massTransferMultiphaseSystem;
-phases (liquid gas);
-liquid
-{
-    <span class="hljs-keyword">type</span> pureMovingPhaseModel;
-}
-gas
-{
-    <span class="hljs-keyword">type</span> multiComponentMovingPhaseModel;
-}
-surfaceTension
-(
-    (gas and liquid)
-    {
-        <span class="hljs-keyword">type</span> constant;
-        sigma <span class="hljs-number">0.07</span>;
-    }
-);
-massTransferModel
-(
-    (liquid to gas)
-    {
-        <span class="hljs-keyword">type</span> Lee;
-        species vapour.gas;
-        C <span class="hljs-number">100</span>;
-        Tactivate <span class="hljs-number">366</span>;
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/icoReactingMultiphaseInterFoam/solidMelting2D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/icoReactingMultiphaseInterFoam/solidMelting2D"><h3>算例问题：solidMelting2D</h3><p class="reference-case-problem">受热区域内的固体逐渐熔化，输入热量一部分提高温度，一部分转化为相变潜热。计算跟踪温度和固液分布，用于说明熔化速率、热物性和潜热设置之间的关系。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/solidMelting2D"><code>multiphase/icoReactingMultiphaseInterFoam/solidMelting2D</code></a>。</p><figure class="reference-case-figure"><img alt="solidMelting2D 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/phase-change.svg" width="720"><figcaption><code>solidMelting2D</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>solidMelting2D</code> 计算固体熔化后形成液体的过程，同时用阻力项抑制尚未熔化区域中的流动。</p>
-<ul>
-<li><code>phases (solid liquid)</code> 定义两相；固相为 <code>pureStaticSolidPhaseModel</code>，液相为 <code>pureMovingPhaseModel</code>。</li>
-<li><code>(solid to liquid)</code> 的 <code>Lee</code> 模型使用 <code>Tactivate 302.78</code> K 与 <code>C 40</code> s⁻¹。温度超过激活值后，固相向液相转化。</li>
-<li><code>interfacePorous</code> 选择 <code>VollerPrakash</code>，通过 <code>solidPhase alpha.solid</code> 读取固相分数。</li>
-<li><code>Cu 1e7</code> 放大固相区域的阻力。源码中的系数与 <span class="math-formula" data-tex="C_u\alpha_s^2/[(1-\alpha_s)^3+10^{-3}]"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>u</mi></msub><msubsup><mi>α</mi><mi>s</mi><mn>2</mn></msubsup><mi mathvariant="normal">/</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>α</mi><mi>s</mi></msub><msup><mo stretchy="false">)</mo><mn>3</mn></msup><mo>+</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">C_u\alpha_s^2/[(1-\alpha_s)^3+10^{-3}]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mopen">[(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span> 成正比，固相分数越高，速度抑制越强。</li>
-</ul>
-<p>增大 <code>Cu</code> 可以进一步降低残余固区速度，同时会增强动量方程刚性。改变加热温度时，比较熔化前沿、液相对流与总焓变化；改变 <code>C</code> 时则观察相变响应速度。</p>
-<p><a href="/assets/examples/v2512/phaseproperties/3-phaseProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/solidMelting2D/constant/phaseProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/solidMelting2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/solidMelting2D/constant/phaseProperties"><code>multiphase/icoReactingMultiphaseInterFoam/solidMelting2D/constant/phaseProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> phaseProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">type</span> massTransferMultiphaseSystem;
-phases (solid liquid);
-liquid
-{
-    <span class="hljs-keyword">type</span> pureMovingPhaseModel;
-}
-solid
-{
-    <span class="hljs-keyword">type</span> pureStaticSolidPhaseModel;
-}
-interfacePorous
-(
-    (solid and liquid)
-    {
-        <span class="hljs-keyword">type</span> VollerPrakash;
-        solidPhase alpha.solid;
-        Cu <span class="hljs-number">1e7</span>;
-    }
-);
-massTransferModel
-(
-    (solid to liquid)
-    {
-        <span class="hljs-keyword">type</span> Lee;
-        C <span class="hljs-number">40</span>;
-        Tactivate <span class="hljs-number">302.78</span>;
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/reactingtwophaseeulerfoam/">reactingTwoPhaseEulerFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -467,6 +306,6 @@ massTransferModel
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

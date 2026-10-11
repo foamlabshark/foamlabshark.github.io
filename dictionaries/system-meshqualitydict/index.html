@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,101 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>meshQualityDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>设置非正交角、偏斜、体积等网格质量限制。<code>snappyHexMesh</code> 可在生成网格时用这些阈值调整局部操作。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>meshQualityDict</code> 将允许的网格非正交性、偏斜和体积等指标集中设置。它可供网格生成过程判断局部操作是否可接受，也可用于后续质量检查，让生成与检查采用一致的阈值。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/meshQualityDict</code></p><figure class="wolf-figure"><img alt="非正交角的几何定义" loading="lazy" src="/assets/wolf/wolf-mesh-nonorthogonality.png"><figcaption><strong>非正交角的几何定义</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module3.pdf，p. 16</small></figcaption></figure><h2>配置方法</h2><p>运行 <code>foamGetDict</code> <code>meshQualityDict</code> 获取模板，或通过 #<code>includeEtc</code> "<code>caseDicts/meshQualityDict</code>" 引入。下表列出常用质量指标及示例阈值，阈值应结合网格尺度和求解要求确定。</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>参数</th><th>含义</th><th>示例值</th></tr>
-<tr><td><code>maxNonOrtho</code></td><td>最大非正交角</td><td>65</td></tr>
-<tr><td><code>maxBoundarySkewness</code></td><td>边界偏斜限制</td><td>20</td></tr>
-<tr><td><code>maxInternalSkewness</code></td><td>内部偏斜限制</td><td>4</td></tr>
-<tr><td><code>maxConcave</code></td><td>最大凹角</td><td>80</td></tr>
-<tr><td><code>minVol</code></td><td>最小单元体积</td><td>示例为 1e-13，按实际网格尺度确定</td></tr>
-<tr><td><code>minTetQuality</code></td><td>最小分解四面体质量</td><td>1e-15</td></tr>
-<tr><td><code>minArea</code></td><td>最小面面积</td><td>负值可关闭相应面积检查</td></tr>
-<tr><td><code>minTwist</code>、<code>minTriangleTwist</code></td><td>面扭曲限制</td><td>以模板值为初值，按不合格面分布调整</td></tr>
-<tr><td><code>minDeterminant</code></td><td>单元几何行列式限制</td><td>0.001</td></tr>
-<tr><td><code>minFaceWeight</code></td><td>面插值权重下限</td><td>0.05</td></tr>
-<tr><td><code>minVolRatio</code></td><td>相邻单元体积比下限</td><td>0.01</td></tr>
-<tr><td><code>nSmoothScale</code>、<code>errorReduction</code></td><td>质量失败时缩放处理参数</td><td>4、0.75</td></tr>
-</tbody></table></div><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#includeEtc "caseDicts/meshQualityDict"     // 直接用官方默认阈值</span>
-maxNonOrtho <span class="hljs-number">65</span>; <span class="hljs-comment">// 再局部覆盖</span></code></pre></div>
-<p>供 <code>checkMesh</code> <code>-meshQuality</code> 与 <code>snappyHexMesh</code> 共用。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · combustion/reactingFoam/RAS/membrane</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/RAS/membrane"><h3>算例问题：membrane</h3><p class="reference-case-problem">膜两侧的气体具有不同组分，部分组分可穿过膜并与两侧流动或反应过程耦合。算例需要为组分透过和总质量通量分别设置边界，用于检查选择性传质与组分守恒。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane"><code>combustion/reactingFoam/RAS/membrane</code></a>。</p><figure class="reference-case-figure"><img alt="membrane 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/membrane.svg" width="720"><figcaption><code>membrane</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>膜分离反应流算例把网格质量阈值集中放在公共配置中。</p>
-<ul>
-<li>这里唯一的有效条目是 <code>#includeEtc "caseDicts/meshQualityDict"</code>，它从当前 OpenFOAM 安装展开质量约束。</li>
-<li>实际阈值取决于被包含文件；阅读本例时应连同该文件查看非正交、倾斜与体积等要求。</li>
-<li>本文件没有局部覆盖值，调整某项可在 <code>include</code> 后显式添加同名条目。</li>
-</ul>
-<p>网格被拒绝时先定位具体质量项和坏单元位置，再判断是改善几何、网格参数，还是调整适当阈值。</p>
-<p><a href="/assets/examples/v2512/meshqualitydict/1-meshQualityDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/meshQualityDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/membrane/system/meshQualityDict"><code>combustion/reactingFoam/RAS/membrane/system/meshQualityDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> meshQualityDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-meta">#includeEtc "caseDicts/meshQualityDict"</span>
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/rotorDisk</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/rotorDisk"><h3>算例问题：rotorDisk</h3><p class="reference-case-problem">用等效转子盘源项表示叶轮对流体的作用，不逐片解析叶片表面。来流穿过转子区域后改变动量并形成尾流，算例用于检查盘区选择、载荷设置与整体推力。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotorDisk"><code>incompressible/simpleFoam/rotorDisk</code></a>。</p></section><!-- /reference-case-contexts --><p>rotorDisk 的网格质量设置引用生成器用的公共阈值，供网格生成与质量判断使用。</p>
-<ul>
-<li><code>#includeEtc "caseDicts/mesh/generation/meshQualityDict.cfg"</code> 指向安装内的生成配置。</li>
-<li>本地文件没有再定义数值，因此完整配置由 <code>include</code> 展开取得。</li>
-<li>需要定制时可在文件后部增加明确的质量阈值，并保留与求解离散格式的对应。</li>
-</ul>
-<p>旋转盘附近的高纵横比或局部细化需要查看坏单元分布；单独放宽阈值不会改变网格本身。</p>
-<p><a href="/assets/examples/v2512/meshqualitydict/2-meshQualityDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotorDisk/system/meshQualityDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotorDisk">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotorDisk/system/meshQualityDict"><code>incompressible/simpleFoam/rotorDisk/system/meshQualityDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> meshQualityDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-meta">#includeEtc "caseDicts/mesh/generation/meshQualityDict.cfg"</span>
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>combustion/XiDyMFoam/annularCombustorTurbine</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/XiDyMFoam/annularCombustorTurbine"><h3>算例问题：annularCombustorTurbine</h3><p class="reference-case-problem">预混燃烧气体在环形燃烧与透平相关区域中流动，火焰传播与运动区域相互耦合。算例通过燃烧进度和火焰褶皱描述湍流预混火焰，需同时检查运动接口、入口混合物与点火设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine"><code>combustion/XiDyMFoam/annularCombustorTurbine</code></a>。</p></section><!-- /reference-case-contexts --><p>环形燃烧器网格沿用公共质量标准，并对非正交角作了更明确的限制。</p>
-<ul>
-<li><code>#includeEtc "caseDicts/meshQualityDict"</code> 提供基础质量约束。</li>
-<li><code>maxNonOrtho 55</code> 将允许的最大非正交角设为 55°，本地值覆盖包含文件中的同名项。</li>
-<li>角度描述单元中心连线与面法向的偏离，直接影响法向梯度离散。</li>
-</ul>
-<p>若局部超限，先在几何上定位单元并调整网格；修改阈值后仍需选择与非正交程度相适应的数值修正。</p>
-<p><a href="/assets/examples/v2512/meshqualitydict/3-meshQualityDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/system/meshQualityDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/system/meshQualityDict"><code>combustion/XiDyMFoam/annularCombustorTurbine/system/meshQualityDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> meshQualityDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Include defaults parameters from master dictionary</span>
-<span class="hljs-meta">#includeEtc "caseDicts/meshQualityDict"</span>
-maxNonOrtho <span class="hljs-number">55</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/checkmesh/">checkMesh</a> · <a href="/commands/snappyhexmesh/">snappyHexMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -400,6 +306,6 @@ maxNonOrtho <span class="hljs-number">55</span>;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

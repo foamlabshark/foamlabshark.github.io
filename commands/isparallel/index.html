@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,44 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>isParallel</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>检查参数列表是否包含 <code>-parallel</code>。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>isParallel</code> 检查运行脚本收到的参数中是否有 <code>-parallel</code>，并用退出状态表示结果。脚本可据此选择串行或并行分支，使同一个 <code>Allrun</code> 入口支持不同运行方式。</p>
-<!-- /reference-introduction -->
-<h2>开始前</h2>
-<p>先在单独一行执行 <code>source</code> "<code>$WM_PROJECT_DIR/bin/tools/RunFunctions</code>"。示例在个人算例工作区操作，<code>caseA</code>、<code>caseB</code> 均为可修改的副本。 此函数检查传入参数列表，返回状态码；它本身不启动计算。</p>
-<h2>示例 1：识别指定标记</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-keyword">if</span> isParallel -parallel; <span class="hljs-keyword">then</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"true"</span>; <span class="hljs-keyword">else</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"false"</span>; <span class="hljs-keyword">fi</span>
-</code></pre></div>
-<p>匹配到 <code>-parallel</code> 时，本例输出 <code>true</code>。</p>
-<h2>示例 2：检查多个参数</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-keyword">if</span> isParallel -<span class="hljs-keyword">case</span> caseA -parallel; <span class="hljs-keyword">then</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"selected"</span>; <span class="hljs-keyword">else</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"other"</span>; <span class="hljs-keyword">fi</span>
-</code></pre></div>
-<p>函数遍历整个参数列表，标记无需放在第一位。</p>
-<h2>示例 3：处理未提供标记的情况</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-keyword">if</span> isParallel -<span class="hljs-keyword">case</span> caseA; <span class="hljs-keyword">then</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"selected"</span>; <span class="hljs-keyword">else</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"other"</span>; <span class="hljs-keyword">fi</span>
-</code></pre></div>
-<p>本例未传 <code>-parallel</code>，返回状态 1，便于区分默认分支。</p>
-<h2>示例 4：在 Allrun 中保留原参数</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">cat</span> &gt; argument-demo.sh &lt;&lt;<span class="hljs-string">'EOF'</span>
-<span class="hljs-comment">#!/bin/sh</span>
-. <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/bin/tools/RunFunctions"</span>
-<span class="hljs-keyword">if</span> isParallel <span class="hljs-string">"<span class="hljs-variable">$@</span>"</span>; <span class="hljs-keyword">then</span>
-    <span class="hljs-built_in">echo</span> <span class="hljs-string">"selected workflow"</span>
-<span class="hljs-keyword">else</span>
-    <span class="hljs-built_in">echo</span> <span class="hljs-string">"alternative workflow"</span>
-<span class="hljs-keyword">fi</span>
-EOF
-sh argument-demo.sh -parallel
-</code></pre></div>
-<p>"$@" 按原参数边界传入，脚本输出对应流程名。</p>
-<h2>示例 5：用状态控制实际步骤</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-keyword">if</span> isParallel -parallel; <span class="hljs-keyword">then</span> runParallel checkMesh; <span class="hljs-keyword">else</span> runApplication checkMesh; <span class="hljs-keyword">fi</span>
-</code></pre></div>
-<p>在已准备的算例目录执行；并行分支需先分区。测试分支只做网格检查，普通分支可运行求解器。</p>
-<h2>参考</h2><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/RunFunctions">源码与说明</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -343,6 +306,6 @@ sh argument-demo.sh -parallel
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

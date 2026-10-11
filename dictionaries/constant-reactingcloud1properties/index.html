@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,95 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>reactingCloud1Properties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>配置名为 <code>reactingCloud1</code> 的反应颗粒云，包括注入、颗粒物性、传热、挥发或表面反应与边界碰撞。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>这个字典组织反应颗粒云的注入、物性、传热和反应等子模型。它把颗粒运动与气相的热质交换连接起来，适合描述颗粒挥发、表面反应或其他所选转化过程。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/reactingCloud1Properties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>solution</code></td><td>颗粒云的求解控制，包含稳态/瞬态、载体耦合、源项与时间积分等。</td></tr><tr><td><code>active</code></td><td>是否启用当前模型实例或操作。</td></tr><tr><td><code>constantProperties</code></td><td>单个颗粒或材料的基本属性，例如密度、温度和热容；具体键由云类型决定。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · lagrangian/reactingParcelFoam/rivuletPanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/rivuletPanel"><h3>算例问题：rivuletPanel</h3><p class="reference-case-problem">液体沿板面形成液膜或细流，重力、黏性与表面作用决定其铺展。算例用于连接表面液膜与周围流体，主要观察液膜厚度、流速和板面上的覆盖范围。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel"><code>lagrangian/reactingParcelFoam/rivuletPanel</code></a>。</p></section><!-- /reference-case-contexts --><p><code>rivuletPanel</code> 的这个文件把名为 <code>reactingCloud1</code> 的颗粒云关闭。计算重点可放在壁面液膜形成的细流上。</p>
-<ul>
-<li><code>solution/active no</code> 是本文件唯一的有效设置，求解过程中不推进该颗粒云。</li>
-<li>算例目录中即使保留注入数据，也要由启用的注入模型读取后才会形成计算粒子。这个云目前没有提供这样的完整模型配置。</li>
-<li>液膜模型与膜内初始场由 <code>surfaceFilmProperties</code> 及相应区域文件单独控制，修改云开关与修改液膜流量是两种不同操作。</li>
-</ul>
-<p>若要研究喷滴补给细流，可从完整的颗粒云教程复制 <code>solution</code>、<code>constantProperties</code> 与 <code>subModels</code>，配置注入器和膜碰撞模型后再启用。比较新增液滴质量与膜内质量增长，可以检查交换过程。</p>
-<p><a href="/assets/examples/v2512/reactingcloud1properties/1-reactingCloud1Properties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel/constant/reactingCloud1Properties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/rivuletPanel/constant/reactingCloud1Properties"><code>lagrangian/reactingParcelFoam/rivuletPanel/constant/reactingCloud1Properties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> reactingCloud1Properties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solution
-{
-    active <span class="hljs-literal">no</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>combustion/fireFoam/LES/compartmentFire</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/compartmentFire"><h3>算例问题：compartmentFire</h3><p class="reference-case-problem">封闭或带开口的房间内发生火灾，热浮力驱动烟气上升并在空间内传播。计算将燃烧、湍流、辐射与通风联系起来，重点观察温度、烟气流动及壁面热负荷。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire"><code>combustion/fireFoam/LES/compartmentFire</code></a>。</p></section><!-- /reference-case-contexts --><p><code>compartmentFire</code> 研究室内火灾流动。此文件使用 <code>solution/active false</code>，关闭额外的反应颗粒云。</p>
-<ul>
-<li><code>active false</code> 表示不推进 <code>reactingCloud1</code> 的位置、温度或质量。</li>
-<li>火灾的气相燃烧、浮力与辐射由各自模型文件承担，因此这里无需列出颗粒的阻力、注入和蒸发参数。</li>
-<li>若扩展为喷雾灭火，应同时提供水滴注入、传热、蒸发及耦合设置；云的开关是这些设置完整后的启用步骤。</li>
-</ul>
-<p>扩展时可以固定火源与通风条件，先加入少量液滴观察轨迹，再逐步增加流量。分别记录液滴蒸发量、气相降温和水汽增加量，能更清楚地分析冷却机制。</p>
-<p><a href="/assets/examples/v2512/reactingcloud1properties/2-reactingCloud1Properties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire/constant/reactingCloud1Properties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/compartmentFire/constant/reactingCloud1Properties"><code>combustion/fireFoam/LES/compartmentFire/constant/reactingCloud1Properties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> reactingCloud1Properties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solution
-{
-    active <span class="hljs-literal">false</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>lagrangian/reactingParcelFoam/counterFlowFlame2DLTS</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/counterFlowFlame2DLTS"><h3>算例问题：counterFlowFlame2DLTS</h3><p class="reference-case-problem">燃料与氧化剂从相对边界进入，在中间的混合区发生反应并形成对向流火焰。包含颗粒的版本还将液滴的运动、蒸发与气相反应耦合，主要观察火焰位置、温度和组分梯度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/counterFlowFlame2DLTS"><code>lagrangian/reactingParcelFoam/counterFlowFlame2DLTS</code></a>。</p><figure class="reference-case-figure"><img alt="counterFlowFlame2DLTS 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/counterflow-flame.svg" width="720"><figcaption><code>counterFlowFlame2DLTS</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>counterFlowFlame2DLTS</code> 当前求解气相对向流火焰，<code>reactingCloud1</code> 被关闭，便于先建立气相火焰基准。</p>
-<ul>
-<li><code>solution/active no</code> 关闭该颗粒云，当前不发生颗粒注入或跟踪。</li>
-<li><code>constantProperties/volumeUpdateMethod constantRho</code> 保留了启用后采用恒密度方式更新颗粒体积的选择；质量改变时，颗粒体积相应变化。</li>
-<li>气相反应由配套 <code>combustionModel laminar</code> 和开启的化学模型推进，颗粒开关与气相燃烧分别配置。</li>
-</ul>
-<p>要扩展为液滴对向流火焰，需要补齐注入、液体成分、相变和传热模型。先复用已得到的气相状态，再逐步增加液滴质量流量，比较火焰位置与蒸发冷却的变化。</p>
-<p><a href="/assets/examples/v2512/reactingcloud1properties/3-reactingCloud1Properties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/counterFlowFlame2DLTS/constant/reactingCloud1Properties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/counterFlowFlame2DLTS">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/counterFlowFlame2DLTS/constant/reactingCloud1Properties"><code>lagrangian/reactingParcelFoam/counterFlowFlame2DLTS/constant/reactingCloud1Properties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> reactingCloud1Properties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solution
-{
-    active <span class="hljs-literal">no</span>;
-}
-constantProperties
-{
-    volumeUpdateMethod constantRho;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/reactingparcelfoam/">reactingParcelFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -394,6 +306,6 @@ constantProperties
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

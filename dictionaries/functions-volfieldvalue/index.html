@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,243 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>volFieldValue</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在体区域内计算场的求和、平均、极值或体积积分。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>volFieldValue</code> 将全域或指定单元区的场归约成数值，例如平均温度、最大浓度或某相总体积。所选操作决定是简单求和、按单元体积加权还是积分，适合输出随时间变化的区域监测量。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/controlDict → functions → volFieldValue</code></p><h2>配置方法</h2><p><code>volFieldValue</code> 对整个网格或指定 <code>cellZone</code> 中的单元场求平均、极值或体积分。温度适合体积平均，体积分数适合体积积分，二者对应不同操作。</p><!-- reference-configuration-supplement -->
-<h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>volFieldValue</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>fieldFunctionObjects</code>)</td></tr><tr><td><code>fields</code></td><td>需要处理的场名称列表。</td><td>必填</td><td>—</td></tr><tr><td><code>regionType</code></td><td><code>all</code> 选择全域，<code>cellZone</code> 选择命名单元区。</td><td>必填</td><td>—</td></tr><tr><td><code>operation</code></td><td>对输入数据执行的运算。</td><td>必填</td><td>—</td></tr><tr><td><code>postOperation</code></td><td>主运算之后的附加运算，例如 <code>none</code>、<code>mag</code> 或 sqrt。</td><td>可选</td><td><code>none</code></td></tr><tr><td><code>weightField</code></td><td>进行加权统计时采用的权重场。</td><td>条件必填</td><td>—</td></tr><tr><td><code>weightFields</code></td><td>多个权重场的名称列表。</td><td>条件必填</td><td>—</td></tr><tr><td><code>name</code></td><td><code>cellZone</code> 的区域名称</td><td>条件必填</td><td>—</td></tr><tr><td><code>writeFields</code></td><td>是否写出所选原始场</td><td>必填</td><td><code>true</code> / <code>false</code></td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr><tr><td><code>interpolationScheme</code></td><td>把离散场插值到采样位置的方式；不同插值可能影响局部峰值。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><p><a href="/function-objects/volfieldvalue/">volFieldValue 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 计算水相体积</h3><p>在具有 <code>alpha.water</code> 的案例中加入 <code>system/controlDict/functions</code>：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">waterVolume
-{
-    <span class="hljs-keyword">type</span> volFieldValue;
-    <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-    regionType all;
-    operation volIntegrate;
-    fields (alpha.water);
-    writeFields <span class="hljs-literal">false</span>;
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-}
-</code></pre></div>
-<p><code>regionType all</code> 选择全部单元，<code>volIntegrate</code> 计算 <span class="math-formula" data-tex="\sum_i\alpha_iV_i"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>α</mi><mi>i</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sum_i\alpha_iV_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>，结果单位是 m³。<code>writeFields false</code> 只保存统计结果，减少重复字段输出。文本位于 <code>postProcessing/waterVolume/</code>。</p>
-<p>将 <code>operation</code> 改为 <code>volAverage</code>、<code>fields</code> 改为 <code>(T)</code>，可以计算 <span class="math-formula" data-tex="\sum_iT_iV_i/\sum_iV_i"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>T</mi><mi>i</mi></msub><msub><mi>V</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>V</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\sum_iT_iV_i/\sum_iV_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>。普通 <code>average</code> 按单元数平均，在大小不一的网格上与体积平均不同。</p>
-<p>局部区域使用 <code>regionType cellZone</code> 并设置 <code>name heater</code> 等实际 <code>cellZone</code> 名称。若希望计算水相中的平均温度，可采用 <code>weightedVolAverage</code>，并以 <code>alpha.water</code> 作为 <code>weightField</code>；这种平均对应相体积权重，质量或焓权重需按目标量另外构造。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/icoReactingMultiphaseInterFoam/oxideFormation</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/icoReactingMultiphaseInterFoam/oxideFormation"><h3>算例问题：oxideFormation</h3><p class="reference-case-problem">多相体系中设置组分反应与相间转化，用于描述氧化物形成时的物质交换。阅读该算例时，应将每个相的物性、反应组分及质量源项对应起来，再检查各相和各组分的总量变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/oxideFormation"><code>multiphase/icoReactingMultiphaseInterFoam/oxideFormation</code></a>。</p></section><!-- /reference-case-contexts --><p>氧化形成算例对液体转为氧化物的质量源作体积积分，得到整个域的相变速率监测。</p>
-<ul>
-<li><code>operation volIntegrate</code> 对字段乘单元体积后求和。</li>
-<li><code>fields (dmdt.liquidToOxide)</code> 指定相间质量传递率场，积分结果对应总传质速率。</li>
-<li>每 10 个求解步输出，<code>log true</code> 同时打印，<code>writeFields false</code> 避免另外写完整场。</li>
-<li>主计算采用自动步长，所以每 10 步的物理时间间隔可能变化。</li>
-</ul>
-<p>更换相名称或传质模型后核对实际生成的字段名与量纲。</p>
-<p><a href="/assets/examples/v2512/volfieldvalue/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/oxideFormation/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/oxideFormation">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/oxideFormation/system/controlDict"><code>multiphase/icoReactingMultiphaseInterFoam/oxideFormation/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">53 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">application</span> icoReactingMultiphaseInterFoam;
-startFrom latestTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">3</span>;
-deltaT <span class="hljs-number">1e-3</span>;
-writeControl adjustable;
-writeInterval <span class="hljs-number">0.1</span>;
-purgeWrite <span class="hljs-number">0</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">6</span>;
-compression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">yes</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>;
-maxDeltaT <span class="hljs-number">1e-1</span>;
-maxCo <span class="hljs-number">1</span>;
-maxAlphaCo <span class="hljs-number">1</span>;
-maxAlphaDdt <span class="hljs-number">1</span>;
-<span class="hljs-keyword">functions</span>
-{
-    mass
-    {
-        <span class="hljs-keyword">type</span> volFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        writeControl timeStep;
-        writeInterval <span class="hljs-number">10</span>;
-        writeFields <span class="hljs-literal">false</span>;
-        log <span class="hljs-literal">true</span>;
-        operation volIntegrate;
-        fields
-        (
-            dmdt.liquidToOxide
-        );
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/overInterDyMFoam/twoSquaresOutDomain</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/overInterDyMFoam/twoSquaresOutDomain"><h3>算例问题：twoSquaresOutDomain</h3><p class="reference-case-problem">方形物体相对背景流体运动，局部网格随物体移动并通过重叠区域传递场量。算例用于检查大幅运动下的网格连接、压力和速度连续性。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/twoSquaresOutDomain"><code>multiphase/overInterDyMFoam/twoSquaresOutDomain</code></a>。</p><figure class="reference-case-figure"><img alt="twoSquaresOutDomain 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/overset.svg" width="720"><figcaption>twoSquaresOutDomain 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>双方块重叠网格算例统计网格内水相体积分，并在指定位置记录压力和速度。</p>
-<ul>
-<li><code>alphaVol/type volFieldValue</code>、<code>operation volIntegrate</code> 积分 <code>alpha.water</code>，结果具有体积单位。</li>
-<li><code>regionType all</code> 对当前网格全域求和，<code>postOperation none</code> 保留积分值。</li>
-<li>每步记录，<code>writeFields false</code> 仅输出汇总数据。</li>
-<li>另一个 <code>probes</code> 位于 <code>(0.0009999 0.0015 0.003)</code>，采样 <code>p</code>、<code>U</code>。</li>
-</ul>
-<p>该项直接输出当前网格的 <span class="math-formula" data-tex="\sum_{\rm cells}\mathtt{alpha.water}\,V"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">s</mi></mrow></msub><mrow><mi mathvariant="monospace">a</mi><mi mathvariant="monospace">l</mi><mi mathvariant="monospace">p</mi><mi mathvariant="monospace">h</mi><mi mathvariant="monospace">a</mi><mi mathvariant="monospace">.</mi><mi mathvariant="monospace">w</mi><mi mathvariant="monospace">a</mi><mi mathvariant="monospace">t</mi><mi mathvariant="monospace">e</mi><mi mathvariant="monospace">r</mi></mrow><mtext> </mtext><mi>V</mi></mrow><annotation encoding="application/x-tex">\sum_{\rm cells}\mathtt{alpha.water}\,V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1864em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">cells</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathtt">alpha.water</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></span>。统计重叠网格的物理总体积时，应另行指定不重复覆盖的统计区域或合适权重，并处理孔洞单元。</p>
-<p><a href="/assets/examples/v2512/volfieldvalue/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/twoSquaresOutDomain/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/twoSquaresOutDomain">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/twoSquaresOutDomain/system/controlDict"><code>multiphase/overInterDyMFoam/twoSquaresOutDomain/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">libs</span> (overset fvMotionSolvers);
-<span class="hljs-keyword">application</span> overInterDyMFoam;
-startFrom startTime;
-startTime <span class="hljs-number">0.0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">0.08</span>;
-deltaT <span class="hljs-number">0.001</span>;
-writeControl adjustable;
-writeInterval <span class="hljs-number">0.01</span>;
-purgeWrite <span class="hljs-number">0</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">12</span>;
-writeCompression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">yes</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>;
-maxCo <span class="hljs-number">1.5</span>;
-maxAlphaCo <span class="hljs-number">2.0</span>;
-maxDeltaT <span class="hljs-number">1</span>;
-<span class="hljs-keyword">functions</span>
-{
-    probes
-    {
-        <span class="hljs-keyword">type</span> probes;
-        <span class="hljs-keyword">libs</span> (sampling);
-        <span class="hljs-keyword">name</span> probes;
-        writeControl timeStep;
-        writeInterval <span class="hljs-number">1</span>;
-        fields (p U);
-        interpolationScheme cell;
-        probeLocations
-        (
-            (<span class="hljs-number">0.0009999</span> <span class="hljs-number">0.0015</span> <span class="hljs-number">0.003</span>)
-        );
-    }
-    alphaVol
-    {
-        <span class="hljs-keyword">type</span> volFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        fields (alpha.water);
-        operation volIntegrate;
-        regionType all;
-        postOperation none;
-        writeControl timeStep;
-        writeInterval <span class="hljs-number">1</span>;
-        writeFields <span class="hljs-literal">false</span>;
-        log <span class="hljs-literal">true</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/icoReactingMultiphaseInterFoam/poolEvaporation</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/icoReactingMultiphaseInterFoam/poolEvaporation"><h3>算例问题：poolEvaporation</h3><p class="reference-case-problem">液池与上方气体接触，液面处的蒸发将液体质量转移到气相，同时消耗潜热。算例用于观察液面附近的温度、蒸气组分与相分数变化，界面传质和热量供应需要配套设置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation"><code>multiphase/icoReactingMultiphaseInterFoam/poolEvaporation</code></a>。</p><figure class="reference-case-figure"><img alt="poolEvaporation 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/phase-change.svg" width="720"><figcaption>poolEvaporation 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>poolEvaporation 同时监测总蒸发速率、底部换热系数和壁面热流。</p>
-<ul>
-<li><code>mass</code> 对 <code>dmdt.liquidToGas</code> 作 <code>volIntegrate</code>，每 10 步输出总传质速率。</li>
-<li><code>htc</code> 使用 <code>multiphaseInterHtcModel</code>，目标温度场 <code>T</code>，底部 <code>patch</code> 为 <code>bottom</code>。</li>
-<li><code>fixedReferenceTemperature</code>、<code>TRef 373</code> 用 373 K 作为换热系数参考温度。</li>
-<li><code>wallHeatFlux</code> 也作用于 <code>bottom</code>，并随主场写出。</li>
-</ul>
-<p>改变加热温度时区分壁温与参考温度，再检查热流和蒸发潜热收支。</p>
-<p><a href="/assets/examples/v2512/volfieldvalue/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/system/controlDict"><code>multiphase/icoReactingMultiphaseInterFoam/poolEvaporation/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">72 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">application</span> icoReactingMultiphaseInterFoam;
-startFrom startTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">100</span>;
-deltaT <span class="hljs-number">1e-3</span>;
-writeControl adjustable;
-writeInterval <span class="hljs-number">5</span>;
-purgeWrite <span class="hljs-number">4</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">6</span>;
-compression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">yes</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>;
-maxDeltaT <span class="hljs-number">1e-1</span>;
-maxCo <span class="hljs-number">3</span>;
-maxAlphaCo <span class="hljs-number">2</span>;
-maxAlphaDdt <span class="hljs-number">1</span>;
-<span class="hljs-keyword">functions</span>
-{
-    mass
-    {
-        <span class="hljs-keyword">type</span> volFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        writeControl timeStep;
-        writeInterval <span class="hljs-number">10</span>;
-        writeFields <span class="hljs-literal">false</span>;
-        log <span class="hljs-literal">true</span>;
-        operation volIntegrate;
-        fields
-        (
-            dmdt.liquidToGas
-        );
-    }
-    htc
-    {
-        <span class="hljs-keyword">type</span> multiphaseInterHtcModel;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        field T;
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-        htcModel fixedReferenceTemperature;
-        patches (bottom);
-        TRef <span class="hljs-number">373</span>;
-    }
-    wallHeatFlux
-    {
-        <span class="hljs-keyword">type</span> wallHeatFlux;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        patches (bottom);
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -542,6 +306,6 @@ maxAlphaDdt <span class="hljs-number">1</span>;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

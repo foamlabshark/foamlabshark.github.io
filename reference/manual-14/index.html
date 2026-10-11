@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,32 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>14 常见错误与排查方法</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><div class="table-scroll"><table>
-<tbody><tr><th>现象</th><th>常见原因</th><th>排查方法</th></tr>
-<tr><td><code>command</code> <code>not</code> <code>found</code></td><td>环境未加载，软件未安装或工具未构建</td><td><code>type</code> 命令；<code>echo</code> "<code>$WM_PROJECT_DIR</code>"；<code>command</code> <code>-v</code> 命令</td></tr>
-<tr><td><code>foam</code>、<code>tut</code> 不可用但 <code>blockMesh</code> 可用</td><td><code>PATH</code> 已设置，但别名未加载或未展开</td><td><code>source</code> 对应 bashrc；非交互脚本使用 <code>cd</code> 和路径变量</td></tr>
-<tr><td>找不到 <code>foamGet</code></td><td>命令名称与发行版本不一致</td><td>使用 <code>foamGetDict</code>；<code>type</code> <code>foamGet</code> 可查询本地定义</td></tr>
-<tr><td><code>keyword</code> <code>not</code> <code>found</code></td><td>缺少键、父字典层级错误或版本不匹配</td><td>按报错文件及行号检查字典，与同版教程比较</td></tr>
-<tr><td>unknown <code>patchField</code> <code>type</code></td><td>模型名、字段类型或动态库不匹配</td><td>检查 <code>libs</code>、拼写和 <code>foamHelp</code> <code>boundary</code> <code>-field</code> 字段</td></tr>
-<tr><td>缺少边界场条目：<code>cannot find patchField entry</code></td><td>网格边界与场边界条目不对应</td><td>查看 <code>constant/polyMesh/boundary</code> 和所有 0/ 字段</td></tr>
-<tr><td>inconsistent <code>dimensions</code></td><td>量纲不匹配</td><td>区分 Pa、运动学压力、<code>nu</code>、<code>mu</code> 等</td></tr>
-<tr><td>floating <code>point</code> exception</td><td>非物理数值、网格质量问题、过大时间步或模型失效</td><td>定位日志中首次异常及对应场量</td></tr>
-<tr><td>Courant 数持续增长</td><td>流速增大、局部小单元或时间步不合适</td><td>检查局部流场及时间步控制是否生效</td></tr>
-<tr><td>残差小但质量不守恒</td><td>边界或算法不一致，或发生假收敛</td><td>检查连续性误差、进出口通量和目标量</td></tr>
-<tr><td>并行进程数错误</td><td><code>numberOfSubdomains</code> 与 MPI 核数不一致</td><td>核对分区字典及现有 <code>processor</code> 数据</td></tr>
-<tr><td>重构失败或字段不完整</td><td>网格拓扑变化、时刻不一致或处理器寻址缺失</td><td>核对输出时刻，按需先运行 <code>reconstructParMesh</code></td></tr>
-<tr><td>ParaView 无法读取算例</td><td>缺读取器、格式不兼容或路径选择错误</td><td>采用 <code>paraFoam</code> <code>-builtin</code>，或用 <code>foamToVTK</code> 转换</td></tr>
-<tr><td>共享库加载失败：<code>error while loading shared libraries</code></td><td>库路径或 ABI 不匹配</td><td><code>echo</code> "<code>$WM_OPTIONS</code>"；<code>foamHasLibrary</code>；检查是否混用版本</td></tr>
-<tr><td><code>Allrun</code> 提示 bad interpreter 或 <span class="math-formula" data-tex="^M"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow></mrow><mi>M</mi></msup></mrow><annotation encoding="application/x-tex">^M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord"><span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">M</span></span></span></span></span></span></span></span></span></span></span></span></td><td>Windows CRLF 换行</td><td>转换为 LF，并 <code>chmod</code> <code>u</code>+<code>x</code> <code>Allrun</code></td></tr>
-</tbody></table></div>
-<p>程序接口通过 <code>-help</code> 或 <code>-help-full</code> 查询。<code>foamSolverSweeps</code> 采用交互式日志输入；<code>foamHelp</code> 按类别查询，并加载相应算例环境。</p>
-<p>以下命令列出当前安装目录中的可执行程序，并查看目录别名及版本函数。实际程序数量由平台和编译依赖决定。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">find <span class="hljs-string">"<span class="hljs-variable">$FOAM_APPBIN</span>"</span> -maxdepth 1 -<span class="hljs-built_in">type</span> f -executable -<span class="hljs-built_in">printf</span> <span class="hljs-string">'%f\n'</span> | <span class="hljs-built_in">sort</span>
-find <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</span>/bin"</span> -maxdepth 1 -<span class="hljs-built_in">type</span> f -executable -<span class="hljs-built_in">printf</span> <span class="hljs-string">'%f\n'</span> | <span class="hljs-built_in">sort</span>
-<span class="hljs-built_in">type</span> foam tut sol foamVersion
-<span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span></code></pre></div><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -331,6 +306,6 @@ find <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_DIR</spa
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

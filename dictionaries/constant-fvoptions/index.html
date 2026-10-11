@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,210 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>fvOptions</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>为方程添加源项、约束或求解后修正，例如动量源、多孔阻力和固定温度区。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>fvOptions</code> 用于给支持该接口的方程加入局部源项、约束或修正，例如热源、动量驱动和多孔阻力。每个条目同时说明模型类型和作用单元区域，让附加物理作用能够通过配置接入求解流程。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/fvOptions</code></p><h2>配置方法</h2><p><code>fvOptions</code> 让支持该接口的求解器增加体积力、热源、多孔阻力或区域约束。它既描述采用什么模型，也描述模型作用于哪些单元。文件常位于 <code>constant/fvOptions</code>，也有教程放在 <code>system/fvOptions</code>；沿用所选完整算例的位置即可。</p><h3>求解器中的调用位置</h3><p><code>simpleFoam</code>、<code>pimpleFoam</code> 等在方程组装中调用源项，并在求解前后调用约束和修正。使用基础 <code>icoFoam</code> 扩展源项时，需要在自定义程序中加入对应接口；也可以直接选用已经支持该模型的求解器。</p>
-<p>启用后检查日志中选中的单元数、区域体积和模型名称。对于热源，再计算体积积分对应的总功率；对于阻力，比较源区两侧压降。这样可以直接确认源项的位置、方向和量级。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">源项类型与作用区域</h2><p>将模型系数集中写入 &lt;类型&gt;<code>Coeffs</code>。省略该子字典时，<code>v2512</code> 从当前选项字典读取参数。<code>selectionMode</code> 为 <code>cellZone</code> 时可用 <code>cellZones</code> 列表指定多个区域。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>&lt;名称&gt;.type</code></td><td>按字段类型选用源项，例如 <code>scalarSemiImplicitSource</code> 或 <code>vectorSemiImplicitSource</code>。</td></tr><tr><td><code>&lt;类型&gt;Coeffs.selectionMode</code></td><td><code>all</code>、geometric、<code>points</code>、<code>movingPoints</code>、<code>cellSet</code>、<code>cellZone</code>、<code>cellType</code>。<code>all</code> 选全域；<code>cellSet</code> / <code>cellZone</code> 指定集合或区域；<code>points</code> 选包含给定点的单元；<code>movingPoints</code> 使用随时间变化的点；geometric 在 <code>selection</code> 内组合几何选择；<code>cellType</code> 用于相应重叠网格分类。</td></tr><tr><td><code>&lt;类型&gt;Coeffs.volumeMode</code></td><td><code>absolute</code> 表示整体源量按选择区体积分配；<code>specific</code> 表示单位体积源量。</td></tr><tr><td><code>&lt;类型&gt;Coeffs.injectionRateSuSp</code></td><td>兼容的字段到 (Su Sp) 列表；Su 是显式项，Sp 是线性隐式系数。</td></tr><tr><td><code>&lt;类型&gt;Coeffs.sources</code></td><td>逐字段设置源项，可分别填写 <code>explicit</code> 与 implicit 的 Function1 或表达式。sources 与旧式 <code>injectionRateSuSp</code> 选用一种写法。</td></tr><tr><td><code>momSource</code></td><td>源项对象的名称，可自定；同级对象使用各自独立的名称。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/fvOptions/sources/general/semiImplicitSource/SemiImplicitSource.H">v2512 参数读取实现</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 周期通道中维持平均速度</h3><p>在周期通道中，可以通过动量源驱动流动。以下是 <code>meanVelocityForce</code> 的最小配置主体，放在标准文件头之后：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">momentumSource
-{
-    <span class="hljs-keyword">type</span> meanVelocityForce;
-    active <span class="hljs-literal">yes</span>;
-    selectionMode all;
-    fields (U);
-    Ubar (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-</code></pre></div>
-<p><code>momentumSource</code> 是用户自定名称。<code>type</code> 选择模型；<code>selectionMode all</code> 作用于全部单元；<code>fields (U)</code> 指定速度场；<code>Ubar</code> 给出目标平均速度及方向，单位为 m/s。</p>
-<p>程序根据当前区域平均速度与目标值之间的差别，调整驱动力。它适合周期流动中控制整体流速，局部速度仍由流动方程和壁面条件决定。若通道有明确入口和出口，通常先按边界条件确定流量，再判断是否确实需要额外驱动力。</p>
-<p>若只选定一组单元，可替换选择部分：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">selectionMode cellZone;
-cellZone inletCellZone;
-</code></pre></div>
-<p><code>inletCellZone</code> 必须是网格中已有的单元区域，可由 <code>topoSet</code>、网格生成或导入步骤建立。它是一个体积单元集合，与边界面的 <code>patch</code> 名称不同。</p><h3 id="example-2">示例 2 · 多孔介质阻力</h3><p>以下是另一个独立对象，可加入同一文件，用于已有的 <code>porosity</code> 单元区：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">porousResistance
-{
-    <span class="hljs-keyword">type</span> explicitPorositySource;
-    explicitPorositySourceCoeffs
-    {
-        selectionMode cellZone;
-        cellZone porosity;
-        <span class="hljs-keyword">type</span> DarcyForchheimer;
-        d (<span class="hljs-number">1e7</span> <span class="hljs-number">1e7</span> <span class="hljs-number">1e7</span>);
-        f (<span class="hljs-number">100</span> <span class="hljs-number">100</span> <span class="hljs-number">100</span>);
-        coordinateSystem
-        {
-            origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e3 (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-        }
-    }
-}
-</code></pre></div>
-<p><code>d</code> 表示黏性阻力系数，单位为 <span class="math-formula" data-tex="\mathrm{m^{-2}}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal">m</mi><mrow><mo>−</mo><mn>2</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\mathrm{m^{-2}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathrm mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>；<code>f</code> 表示惯性阻力系数，单位为 <span class="math-formula" data-tex="\mathrm{m^{-1}}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal">m</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\mathrm{m^{-1}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathrm">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathrm mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></span>。三个分量对应局部坐标轴方向；此处设置相同值表示各向同性。<code>e1</code> 和 <code>e3</code> 定义局部第一、第三方向，程序据此构造正交坐标系。</p>
-<p>典型阻力项可写成 <span class="math-formula" data-tex="\mathbf S=-\left(\mu\mathbf D+\rho|\mathbf U|\mathbf F/2\right)\mathbf U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">S</mi><mo>=</mo><mo>−</mo><mrow><mo fence="true">(</mo><mi>μ</mi><mi mathvariant="bold">D</mi><mo>+</mo><mi>ρ</mi><mi mathvariant="normal">∣</mi><mi mathvariant="bold">U</mi><mi mathvariant="normal">∣</mi><mi mathvariant="bold">F</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo fence="true">)</mo></mrow><mi mathvariant="bold">U</mi></mrow><annotation encoding="application/x-tex">\mathbf S=-\left(\mu\mathbf D+\rho|\mathbf U|\mathbf F/2\right)\mathbf U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord mathnormal">μ</span><span class="mord mathbf">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ρ</span><span class="mord">∣</span><span class="mord mathbf">U</span><span class="mord">∣</span><span class="mord mathbf">F</span><span class="mord">/2</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">U</span></span></span></span></span>。增大 <code>d</code> 主要加强线性黏性阻力，增大 <code>f</code> 加强随流速增长的非线性阻力。参数应由材料渗透率或压降—流量关系确定。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/periodicHill/steadyState</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/periodicHill/steadyState"><h3>算例问题：steadyState</h3><p class="reference-case-problem">流体沿周期排列的丘陵表面流动，在背风侧发生分离并在下游重新附着。算例用于比较湍流模型对分离剪切层、回流区和壁面压力的预测。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicHill/steadyState"><code>incompressible/pimpleFoam/LES/periodicHill/steadyState</code></a>。</p></section><!-- /reference-case-contexts --><p>周期丘陵的 <code>steadyState</code> 阶段用体积动量源维持目标平均流速，避免在周期方向人为设置入口出口压差。</p>
-<ul>
-<li><code>type meanVelocityForce</code> 根据平均速度误差调节驱动力。</li>
-<li><code>selectionMode cellZone</code>、<code>cellZone inletCellZone</code> 指定统计与作用的单元区。</li>
-<li><code>fields (U)</code> 表示作用于速度方程，<code>Ubar (1 0 0)</code> 给定沿 <code>x</code> 的目标平均速度 1 m/s。</li>
-</ul>
-<p>改变目标流量时修改 <code>Ubar</code>；更改统计区域时同步检查 <code>cellZone</code> 的几何范围与场平均方式。</p>
-<p><a href="/assets/examples/v2512/fvoptions/authored-periodicHill-meanVelocityForce-fvOptions.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicHill/steadyState/system/fvOptions">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicHill/steadyState">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/periodicHill/steadyState/system/fvOptions"><code>incompressible/pimpleFoam/LES/periodicHill/steadyState/system/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-momentumSource
-{
-    <span class="hljs-keyword">type</span> meanVelocityForce;
-    selectionMode cellZone;
-    cellZone inletCellZone;
-    fields (U);
-    Ubar (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/pisoFoam/laminar/porousBlockage</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pisoFoam/laminar/porousBlockage"><h3>算例问题：porousBlockage</h3><p class="reference-case-problem">通道内设置多孔阻塞区域，来流受到阻力后重新分配。算例用于说明流场与体积阻力源项的耦合，重点检查多孔区域位置、通道压降以及阻塞附近的流线。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/laminar/porousBlockage"><code>incompressible/pisoFoam/laminar/porousBlockage</code></a>。</p><figure class="reference-case-figure"><img alt="porousBlockage 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/porous-duct.svg" width="720"><figcaption><code>porousBlockage</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>porousBlockage</code> 在选定区域添加多孔阻力，以等效连续介质代替逐个解析细孔。</p>
-<ul>
-<li><code>explicitPorositySource</code> 把阻力加入动量方程，<code>cellZone porousBlockage</code> 限定作用区域。</li>
-<li><code>DarcyForchheimer</code> 包含线性黏性阻力和二次惯性阻力。</li>
-<li><code>D 1000</code> 经 <code>$D</code> 展开为各向同性 <code>d (1000 1000 1000)</code>，Darcy 系数的单位为 m⁻²。</li>
-<li><code>f (0 0 0)</code> 关闭本例的二次阻力，<code>rotation none</code> 使系数方向与给定坐标系保持一致。</li>
-</ul>
-<p>更换多孔材料时根据压降与流速关系拟合 <code>d</code>、<code>f</code>；各向异性材料还需设置正确的主方向。</p>
-<p><a href="/assets/examples/v2512/fvoptions/authored-porousBlockage-DarcyForchheimer-fvOptions.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/laminar/porousBlockage/constant/fvOptions">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/laminar/porousBlockage">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pisoFoam/laminar/porousBlockage/constant/fvOptions"><code>incompressible/pisoFoam/laminar/porousBlockage/constant/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-porosity1
-{
-    <span class="hljs-keyword">type</span> explicitPorositySource;
-    explicitPorositySourceCoeffs
-    {
-        selectionMode cellZone;
-        cellZone porousBlockage;
-        <span class="hljs-keyword">type</span> DarcyForchheimer;
-        <span class="hljs-comment">// D 100;  // Very little blockage</span>
-        <span class="hljs-comment">// D 200;  // Some blockage but steady flow</span>
-        <span class="hljs-comment">// D 500;  // Slight waviness in the far wake</span>
-        D <span class="hljs-number">1000</span>; <span class="hljs-comment">// Fully shedding behavior</span>
-        d (<span class="hljs-variable">$D</span> <span class="hljs-variable">$D</span> <span class="hljs-variable">$D</span>);
-        f (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        coordinateSystem
-        {
-            origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            rotation none;
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses"><h3>算例问题：losses</h3><p class="reference-case-problem">在三维设计区域内优化流体通道分布，使压力损失或流量分配满足设定目标。算例交替更新流动、伴随变量和设计变量，需要结合目标函数与设计约束理解体积源项。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses"><code>incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses</code></a>。</p></section><!-- /reference-case-contexts --><p>三维拓扑优化把设计变量转化为动量阻力，用来逐步区分流体与受阻区域。</p>
-<ul>
-<li><code>type topOSource</code> 选择拓扑优化源项，<code>names (U Ua)</code> 指向原始速度与伴随速度变量。</li>
-<li><code>function BorrvallPetersson</code> 指定设计量到源项的插值关系。</li>
-<li><code>interpolationField beta</code> 使用 <code>beta</code> 设计场，<code>b 100</code> 是该插值函数的参数。</li>
-</ul>
-<p>改变惩罚程度时观察中间密度区、压降和优化目标的变化，并保证原始与伴随设置一致。</p>
-<p><a href="/assets/examples/v2512/fvoptions/1-fvOptions.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses/system/fvOptions">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses/system/fvOptions"><code>incompressible/adjointOptimisationFoam/topologyOptimisation/monoFluidAero/laminar/3DBox/losses/system/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-momSource
-{
-    <span class="hljs-keyword">type</span> topOSource;
-    names (U Ua);
-    function BorrvallPetersson;
-    b <span class="hljs-number">100</span>;
-    interpolationField beta;
-}</code></pre></div></details><details class="reference-example"><summary>案例文件 4 · combustion/reactingFoam/RAS/SandiaD_LTS</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/RAS/SandiaD_LTS"><h3>算例问题：SandiaD_LTS</h3><p class="reference-case-problem">燃料射流与周围氧化剂在湍流中混合并反应，形成非预混火焰。算例用入口组分、速度和湍流量建立燃烧条件，主要比较温度与组分剖面；LTS 设置通过局部时间步加速趋于稳态。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS"><code>combustion/reactingFoam/RAS/SandiaD_LTS</code></a>。</p><figure class="reference-case-figure"><img alt="SandiaD_LTS 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/jet-flame.svg" width="720"><figcaption>SandiaD_LTS 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>SandiaD_LTS 的能量方程通过 <code>fvOptions</code> 接入辐射源项。</p>
-<ul>
-<li><code>type radiation</code> 创建辐射选项。</li>
-<li><code>libs (radiationModels)</code> 加载实现所需的库。</li>
-<li>本字典负责把辐射作用接到方程，辐射模型和介质参数由配套 <code>radiationProperties</code> 定义。</li>
-</ul>
-<p>更改燃烧或辐射条件时同时检查这两个文件及温度、组分字段。</p>
-<p><a href="/assets/examples/v2512/fvoptions/2-fvOptions.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS/constant/fvOptions">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS/constant/fvOptions"><code>combustion/reactingFoam/RAS/SandiaD_LTS/constant/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-radiation
-{
-    <span class="hljs-keyword">type</span> radiation;
-    <span class="hljs-keyword">libs</span> (radiationModels);
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 5 · compressible/rhoPimpleFoam/RAS/TJunction</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleFoam/RAS/TJunction"><h3>算例问题：TJunction</h3><p class="reference-case-problem">流体从左侧进入 <code>T</code> 形通道，再从上、下两个出口分流。出口压力或流动阻力影响两支路的流量分配；带 Fan 的版本还通过风机或挡板设置改变支路压差。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunction"><code>compressible/rhoPimpleFoam/RAS/TJunction</code></a>。</p></section><!-- /reference-case-contexts --><p><code>T</code> 形管可压缩热流动启用黏性耗散，将黏性作用产生的能量变化加入相应能量方程。</p>
-<ul>
-<li><code>type viscousDissipation</code> 选择该源项。</li>
-<li>这个 fvOption 的开关是 <code>active</code>，省略时默认为 <code>true</code>。需要关闭时设置 <code>active false</code>；文件中的 <code>enabled true</code> 是保留条目，当前接口读取 <code>active</code>。</li>
-<li>它使用已有流场及输运性质，重要程度取决于速度梯度、黏度和热量尺度。</li>
-</ul>
-<p>比较有无耗散时保持其他设置相同，并观察温升与整体能量收支。</p>
-<p><a href="/assets/examples/v2512/fvoptions/3-fvOptions.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunction/constant/fvOptions">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunction">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/TJunction/constant/fvOptions"><code>compressible/rhoPimpleFoam/RAS/TJunction/constant/fvOptions</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvOptions;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-viscousDissipation
-{
-    <span class="hljs-keyword">type</span> viscousDissipation;
-    enabled <span class="hljs-literal">true</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a> · <a href="/commands/pimplefoam/">pimpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -509,6 +306,6 @@ viscousDissipation
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

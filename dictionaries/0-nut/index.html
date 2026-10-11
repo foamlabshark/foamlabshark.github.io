@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,138 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>nut</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>湍流运动黏度场，由湍流模型和近壁处理计算，单位为 m²/s。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>nut</code> 表示湍流对动量扩散的附加贡献，由湍流模型和近壁处理计算。它与材料的分子运动黏度共同形成有效输运作用，配置文件主要为模型准备初值和各边界上的计算方式。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>0/nut</code></p><figure class="wolf-figure"><img alt="无量纲壁面速度分布与近壁区域" loading="lazy" src="/assets/wolf/wolf-turbulence-wall-law.png"><figcaption><strong>无量纲壁面速度分布与近壁区域</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module8.pdf，p. 21</small></figcaption></figure><h2>配置方法</h2><p><code>nut</code> 是湍流运动黏度，单位 m²/s，用来表示湍流对动量输运的附加作用。它由湍流模型计算；分子运动黏度 <code>nu</code> 来自材料物性。采用涡黏性模型时，二者共同构成有效动量扩散。</p><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">场量纲与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>分别为字段量纲与内部单元初值；<code>uniform</code> 表示统一值，<code>nonuniform</code> 列表长度需匹配网格。</td></tr><tr><td><code>boundaryField.&lt;patch&gt;.type / value</code></td><td><code>type</code> 选择该字段的边界条件。<code>value</code> 在 <code>fixedValue</code> 中为指定值，在许多派生条件中仅作初始化。</td></tr><tr><td><code>&lt;patch&gt;</code></td><td><code>movingWall</code>、<code>fixedWalls</code>、<code>upperWall</code>、<code>lowerWall</code>、<code>inlet</code>、<code>outlet</code> 等均为算例自定名称，要与 <code>constant/polyMesh/boundary</code> 对应。</td></tr></tbody></table></div><p><a href="/boundary-conditions/nut-wall/">nutkWallFunction 的参数、示例与配套算例</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · k–ε 案例的 nut 边界</h3><p>在已有 <code>0/nut</code> 文件中，保留 <code>class volScalarField</code>、<code>object nut</code>，并设置：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    inlet
-    {
-        <span class="hljs-keyword">type</span> calculated;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> calculated;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> nutkWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-    }
-}
-</code></pre></div>
-<p>这个例子适用于具有相应 <code>patch</code> 的二维通道。<code>calculated</code> 表示边界值由模型计算，<code>value</code> 用于初始读取；壁面通过 <code>nutkWallFunction</code> 得到与所选近壁处理相符的湍流黏度。初始化为零后，模型会依据湍流场更新内部 <code>nut</code>。</p>
-<p>标准 <code>k</code>–ε 关系为 <span class="math-formula" data-tex="\nu_t=C_\mu k^2/\epsilon"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ν</mi><mi>t</mi></msub><mo>=</mo><msub><mi>C</mi><mi>μ</mi></msub><msup><mi>k</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">\nu_t=C_\mu k^2/\epsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0637em;">ν</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0637em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1002em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal">ϵ</span></span></span></span></span>。SST 和 <code>LES</code> 使用各自的计算与限制关系。后处理 <code>nut/nu</code> 可查看湍流扩散相对于分子扩散的大小，较大的比值常见于强湍流区域。</p>
-<p>低 <code>y</code>⁺ 解析、连续壁面律和粗糙壁面需要匹配的 <code>nut</code> 条件。修改壁面函数后，同时检查 <code>k</code>、第二个湍流变量和首层网格，才能解释阻力或壁面剪切的变化。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/pimpleFoam/LES/decayIsoTurb</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/decayIsoTurb"><h3>算例问题：decayIsoTurb</h3><p class="reference-case-problem">周期立方体内设置初始湍流速度场，随后在没有持续外部供能的条件下衰减。算例通过动能、耗散和能谱的时间变化检验湍流解析或亚格子模型，网格与初始谱应相互匹配。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb"><code>incompressible/pimpleFoam/LES/decayIsoTurb</code></a>。</p><figure class="reference-case-figure"><img alt="decayIsoTurb 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/periodic-cube.svg" width="720"><figcaption>decayIsoTurb 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>衰减各向同性湍流采用周期边界，<code>nut</code> 由 <code>LES</code> 亚格子模型随流场计算。</p>
-<ul>
-<li><code>dimensions [0 2 -1 0 0 0 0]</code> 表示运动黏度单位 m²/s。</li>
-<li><code>internalField uniform 0</code> 给定亚格子黏度初值。</li>
-<li><code>".*"/cyclic</code> 让对应周期面传递一致的场值。</li>
-</ul>
-<p>更换网格或滤波尺度后，比较能量衰减和 <code>nut</code> 分布，而初始零值只是计算起点。</p>
-<p><a href="/assets/examples/v2512/nut/1-nut.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb/0.orig/nut">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/decayIsoTurb/0.orig/nut"><code>incompressible/pimpleFoam/LES/decayIsoTurb/0.orig/nut</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> nut;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">cyclic</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/fireFoam/LES/simplePMMApanel</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/simplePMMApanel"><h3>算例问题：simplePMMApanel</h3><p class="reference-case-problem">PMMA 固体板受热后热解，释放可燃气体并在气相中燃烧。固体温升、热解质量源、火焰辐射与气相流动相互影响，主要观察热解区、火焰和板面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel"><code>combustion/fireFoam/LES/simplePMMApanel</code></a>。</p></section><!-- /reference-case-contexts --><p>PMMA 面板火灾算例以零湍流运动黏度开始，再由选定模型更新。</p>
-<ul>
-<li><code>nut</code> 的单位为 m²/s，内部初值为 <code>0</code>。</li>
-<li>匹配的边界统一采用 <code>zeroGradient</code>。</li>
-<li>模型类型、网格尺度和 <code>k</code> 等字段共同决定后续 <code>nut</code>。</li>
-</ul>
-<p>调整近壁模型时检查 <code>nut</code> 边界是否需要改为对应的壁面函数。</p>
-<p><a href="/assets/examples/v2512/nut/2-nut.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/0.orig/nut">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/simplePMMApanel/0.orig/nut"><code>combustion/fireFoam/LES/simplePMMApanel/0.orig/nut</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> nut;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area"><h3>算例问题：hotRoomWithThermalShell.multi-area</h3><p class="reference-case-problem">房间内空气受热流动，围护结构以热壳或有限面积区域描述其导热和蓄热。配置需要将流体温度与壳体温度正确连接，主要观察空气循环、壁面温度及随时间的热响应。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area"><code>heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area</code></a>。</p></section><!-- /reference-case-contexts --><p>带热壳层的热房间采用 <code>nut</code> 壁面函数处理近壁湍流黏度。</p>
-<ul>
-<li>内部初值为 <code>0</code>，量纲为 m²/s。</li>
-<li><code>".*"/nutkWallFunction</code> 对匹配壁面根据 <code>k</code> 等量计算近壁 <code>nut</code>。</li>
-<li><code>value uniform 0</code> 提供启动时的边界值。</li>
-</ul>
-<p>改变壁面分组时核对正则表达式覆盖范围，并结合目标 <code>y</code>⁺ 调整首层网格。</p>
-<p><a href="/assets/examples/v2512/nut/3-nut.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area/0/nut">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area/0/nut"><code>heatTransfer/buoyantPimpleFoam/hotRoomWithThermalShell.multi-area/0/nut</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> nut;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-string">".*"</span>
-    {
-        <span class="hljs-keyword">type</span> nutkWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -437,6 +306,6 @@
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

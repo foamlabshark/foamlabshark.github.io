@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,154 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>10 后处理函数对象与数据采样</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>10.1 函数对象的通用设置</h2>
-<p>函数对象配置于 <code>system/controlDict</code> 的 <code>functions</code> 子字典，或置于独立字典并由 <code>postProcess</code> <code>-dict</code> 指定。外层名称为实例名，<code>type</code> 指定函数对象类型。类型定义及模板见 S2 的 src/functionObjects 和 etc/caseDicts/postProcessing。</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>参数</th><th>含义</th><th>设置示例</th></tr>
-<tr><td><code>type</code></td><td>函数对象类型</td><td><code>probes</code>、<code>forces</code>、<code>fieldAverage</code> 等</td></tr>
-<tr><td><code>libs</code></td><td>加载相应库</td><td>("libsampling.so") 或 ("libfieldFunctionObjects.so")</td></tr>
-<tr><td><code>enabled</code>、<code>log</code></td><td>是否启用、是否打印日志</td><td><code>true</code></td></tr>
-<tr><td><code>region</code></td><td>作用区域</td><td>多区域时指定 <code>air</code> 等</td></tr>
-<tr><td><code>timeStart</code>、<code>timeEnd</code></td><td>作用时间范围</td><td>例如 0.2 到 1.0</td></tr>
-<tr><td><code>executeControl</code>、<code>executeInterval</code></td><td>计算触发方式与间隔</td><td><code>timeStep</code> 与 1</td></tr>
-<tr><td><code>writeControl</code>、<code>writeInterval</code></td><td>结果输出方式与间隔</td><td><code>timeStep</code>、<code>runTime</code>、<code>writeTime</code> 等</td></tr>
-<tr><td><code>fields</code> 或 <code>field</code></td><td>待处理字段</td><td>列表或单字段由具体类型决定</td></tr>
-</tbody></table></div>
-<p><code>executeControl</code> 和 <code>writeControl</code> 分别控制计算与输出。<code>fieldAverage</code> 和累积积分依赖历史数据，统计区间内需连续执行相应函数对象。</p>
-<h2>10.2 点探针采样</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 放入 functions 内</span>
-pressureProbes
-{
-    <span class="hljs-keyword">type</span> probes;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-    fields (p U);
-    probeLocations
-    (
-        (<span class="hljs-number">0.25</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
-        (<span class="hljs-number">0.75</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
-    );
-}</code></pre></div>
-<p>探针位置应位于有效流体单元内，压力结果输出至 postProcessing/pressureProbes/起始时刻/p。冲击和快速瞬态计算需按目标时间尺度设置采样频率，以记录峰值及波形变化。</p>
-<h2>10.3 沿线采样</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">lineSample
-{
-    <span class="hljs-keyword">type</span> sets;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl writeTime;
-    setFormat raw;
-    interpolationScheme cellPoint;
-    fields (U p);
-    sets
-    {
-        centreline
-        {
-            <span class="hljs-keyword">type</span> <span class="hljs-keyword">uniform</span>;
-            axis x;
-            start (<span class="hljs-number">0.01</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>);
-            end (<span class="hljs-number">0.99</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>);
-            nPoints <span class="hljs-number">100</span>;
-        }
-    }
-}</code></pre></div>
-<p><code>axis</code> 指定输出横坐标类型，<code>nPoints</code> 指定采样点数，<code>interpolationScheme</code> 指定单元或点插值方法。</p>
-<h2>10.4 面采样</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">sectionSample
-{
-    <span class="hljs-keyword">type</span> surfaces;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl writeTime;
-    surfaceFormat vtk;
-    fields (U p);
-    interpolationScheme cellPoint;
-    surfaces
-    {
-        midPlane
-        {
-            <span class="hljs-keyword">type</span> cuttingPlane;
-            planeType pointAndNormal;
-            pointAndNormalDict
-            {
-                point (<span class="hljs-number">0.5</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-                normal (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            }
-            interpolate <span class="hljs-literal">true</span>;
-        }
-    }
-}</code></pre></div>
-<p>面采样还支持 <code>patch</code>、<code>isoSurface</code> 等类型。采用 <code>isoSurface</code> 时，通过字段、等值和采样算法定义所需相界面或涡结构。</p>
-<h2>10.5 力与力系数</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">bodyForces
-{
-    <span class="hljs-keyword">type</span> forces;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libforces.so"</span>);
-    patches (walls);
-    p p;
-    U U;
-    rho rhoInf;
-    rhoInf <span class="hljs-number">1000</span>;
-    CofR (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-}</code></pre></div>
-<p>下例使用参考密度处理不可压缩压力场。可压缩计算通常指定实际 <code>rho</code> 字段及对应压力形式。<code>CofR</code> 定义力矩参考中心，压力基准应与载荷积分采用的压力定义一致。</p>
-<p>计算力系数时，将 <code>type</code> 设为 <code>forceCoeffs</code>，并指定 <code>liftDir</code>、<code>dragDir</code>、<code>pitchAxis</code>、<code>magUInf</code>、<code>lRef</code> 和 <code>Aref</code>。若阻力沿 <code>x</code> 方向、升力沿 <code>y</code> 方向，可设置 <code>dragDir</code> (1 0 0); <code>liftDir</code> (0 1 0); <code>pitchAxis</code> (0 0 1);。<code>lRef</code> 和 <code>Aref</code> 分别为归一化参考长度和面积，二维算例的参考面积需计入所取厚度。</p>
-<h2>10.6 统计量与派生场</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>类型</th><th>主要参数</th><th>配置与调用示例</th></tr>
-<tr><td><code>fieldAverage</code></td><td><code>fields</code> 下每场的 <code>mean</code>、<code>prime2Mean</code>、<code>base</code></td><td><code>U</code> { <code>mean</code> <code>on</code>; <code>prime2Mean</code> <code>on</code>; <code>base</code> <code>time</code>; }；生成 <code>UMean</code> 等</td></tr>
-<tr><td><code>fieldMinMax</code></td><td><code>fields</code>、<code>location</code>、<code>mode</code></td><td><code>fields</code> (<code>p</code> <code>U</code>); <code>location</code> <code>true</code>;，输出极值及位置</td></tr>
-<tr><td><code>volFieldValue</code></td><td><code>regionType</code>、<code>name</code>、<code>operation</code>、<code>fields</code></td><td><code>regionType</code> <code>all</code>; <code>operation</code> <code>volAverage</code>; <code>fields</code> (<code>T</code>);</td></tr>
-<tr><td><code>surfaceFieldValue</code></td><td><code>regionType</code> <code>patch</code>、<code>name</code>、<code>operation</code>、<code>fields</code></td><td><code>name</code> <code>outlet</code>; <code>operation</code> <code>sum</code>; <code>fields</code> (<code>phi</code>);，输出带法向符号的通量</td></tr>
-<tr><td><code>solverInfo</code></td><td><code>fields</code></td><td><code>fields</code> (<code>p</code> <code>U</code>);，记录各方程初始残差</td></tr>
-<tr><td><code>yPlus</code></td><td>湍流模型及壁面量</td><td><code>simpleFoam</code> <code>-postProcess</code> <code>-func</code> <code>yPlus</code> <code>-latestTime</code></td></tr>
-<tr><td><code>wallShearStress</code></td><td><code>patches</code>、<code>writeControl</code></td><td><code>simpleFoam</code> <code>-postProcess</code> <code>-func</code> <code>wallShearStress</code> <code>-latestTime</code></td></tr>
-<tr><td><code>wallHeatFlux</code></td><td>热模型和壁面</td><td>通过相应传热求解器 <code>-postProcess</code> <code>-func</code> <code>wallHeatFlux</code></td></tr>
-<tr><td><code>CourantNo</code></td><td>通量及密度条件</td><td><code>postProcess</code> <code>-func</code> <code>CourantNo</code> <code>-latestTime</code>，读取所需通量等场</td></tr>
-<tr><td><code>mag</code>、<code>grad</code>、<code>div</code></td><td>操作字段</td><td><code>postProcess</code> <code>-func</code> '<code>mag</code>(<code>U</code>)' <code>-latestTime</code></td></tr>
-<tr><td><code>vorticity</code>、<code>Q</code></td><td>速度梯度派生量</td><td><code>postProcess</code> <code>-func</code> <code>vorticity</code> <code>-latestTime</code></td></tr>
-<tr><td><code>MachNo</code></td><td>速度和热物性声速</td><td>通过可压缩求解器 <code>-postProcess</code> <code>-func</code> <code>MachNo</code></td></tr>
-<tr><td><code>streamLine</code></td><td><code>seedSampleSet</code>、<code>direction</code>、lifeTime、<code>trackLength</code> 等</td><td><code>foamGetDict</code> <code>streamlines</code> 获取模板，随后配置种子点</td></tr>
-</tbody></table></div>
-<p>表中名称包括函数对象类型和预配置函数。<code>postProcess</code> <code>-list</code> 列出可直接通过 <code>-func</code> 调用的预配置名称；其余类型按 <code>functions</code> 子字典配置。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">statistics
-{
-    <span class="hljs-keyword">type</span> fieldAverage;
-    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    timeStart <span class="hljs-number">0.2</span>;
-    executeControl timeStep;
-    executeInterval <span class="hljs-number">1</span>;
-    writeControl writeTime;
-    fields
-    (
-        U
-        {
-            mean <span class="hljs-literal">on</span>;
-            prime2Mean <span class="hljs-literal">on</span>;
-            base time;
-        }
-        p
-        {
-            mean <span class="hljs-literal">on</span>;
-            prime2Mean <span class="hljs-literal">off</span>;
-            base time;
-        }
-    );
-}</code></pre></div>
-<h2>10.7 system/noiseDict 与粒子后处理</h2>
-<p><code>noiseDict</code> 通过 <code>noiseModel</code> 选择 <code>pointNoise</code>、<code>surfaceNoise</code> 等模型，并定义输入数据、FFT 分块和窗函数。频谱分析采用等时间间隔采样，采样时长决定频率分辨率，Nyquist 频率为采样频率的一半。</p>
-<p>particleTracksDict 指定粒子云、采样频率和轨迹长度，轨迹重建使用求解阶段保存的粒子标识。steadyParticleTracksDict 用于稳态轨迹处理。字段设置采用对应粒子模型的教程结构。</p>
-<h2>10.8 常用后处理流程</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">postProcess -list
-postProcess -func <span class="hljs-string">'mag(U)'</span> -latestTime
-postProcess -func <span class="hljs-string">'grad(p)'</span> -latestTime
-simpleFoam -postProcess -func yPlus -latestTime
-foamToVTK -latestTime -fields <span class="hljs-string">'(U p)'</span>
-paraFoam -<span class="hljs-built_in">builtin</span></code></pre></div>
-<p>上述命令中的 <code>simpleFoam</code> 按算例所用求解器替换。瞬态压力载荷结果应注明压力单位、压力基准、采样频率、探针坐标及积分区间。</p><h2>v2512 的残差记录接口</h2><p>使用 <code>type</code> <code>solverInfo</code>，并加载 <code>utilityFunctionObjects</code>，在求解时记录残差。#<code>includeFunc</code> <code>solverInfo</code> 默认选择 <code>p</code> 和 <code>U</code>；记录其他字段时，复制模板并修改 <code>fields</code>。</p><p><a href="/dictionaries/functions-solverinfo/">完整配置、字段解释与三个 v2512 示例</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -453,6 +306,6 @@ paraFoam -<span class="hljs-built_in">builtin</span></code></pre></div>
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

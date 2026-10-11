@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,138 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>waveProperties</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>定义造波或吸波边界使用的波浪模型、周期、波高、水深和方向。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>waveProperties</code> 定义造波或吸波模型，把波高、周期、水深和传播方向转换为相应边界行为。它适合数值波浪水槽，需要让波浪参数与重力方向、初始水位及入口出口位置一致。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/waveProperties</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>waveModel</code></td><td>采用的波浪理论或造波模型，决定色散关系和所需波参数。</td></tr><tr><td><code>waveHeight</code></td><td>波峰到波谷的高度，一般为振幅的两倍。</td></tr><tr><td><code>waveAngle</code></td><td>波浪传播方向角，其单位与参考方向由模型定义。</td></tr><tr><td><code>rampTime</code></td><td>造波信号逐渐增长到目标幅值的时间，用于减小启动瞬态。</td></tr><tr><td><code>wavePeriod</code></td><td>波浪周期。</td></tr></tbody></table></div><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · multiphase/interFoam/laminar/waves/waveMakerSolitary</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/waves/waveMakerSolitary"><h3>算例问题：waveMakerSolitary</h3><p class="reference-case-problem">造波装置按规定运动在水槽中产生孤立波。计算跟踪波峰传播、流体速度和造波边界运动，初始水深及造波运动规律决定目标波形。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerSolitary"><code>multiphase/interFoam/laminar/waves/waveMakerSolitary</code></a>。</p><figure class="reference-case-figure"><img alt="waveMakerSolitary 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/wave-tank.svg" width="720"><figcaption>waveMakerSolitary 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>waveMakerSolitary 的 <code>waveProperties</code> 配置出口消波，使传播到出口的长波尽量平顺地离开计算域。</p>
-<ul>
-<li><code>outlet</code> 是实际出口边界名称，<code>alpha alpha.water</code> 指定用于识别水面的体积分数字段。</li>
-<li><code>waveModel shallowWaterAbsorption</code> 根据浅水波关系构造吸收处理。</li>
-<li><code>nPaddle 1</code> 使用一个横向控制分段，适合该演示中的简单波面。</li>
-</ul>
-<p>孤立波的产生还由算例其他初始或运动设置给出；调整出口后比较入射波离开时的水位时序和反射波幅。</p>
-<p><a href="/assets/examples/v2512/waveproperties/1-waveProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerSolitary/constant/waveProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerSolitary">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerSolitary/constant/waveProperties"><code>multiphase/interFoam/laminar/waves/waveMakerSolitary/constant/waveProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> wavesProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-outlet
-{
-    alpha alpha.water;
-    waveModel shallowWaterAbsorption;
-    nPaddle <span class="hljs-number">1</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interIsoFoam/waveExampleStreamFunction</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interIsoFoam/waveExampleStreamFunction"><h3>算例问题：waveExampleStreamFunction</h3><p class="reference-case-problem">在波浪水槽中生成并传播规则波，气液界面由相分数表示。入口造波与出口消波或开放条件共同影响波形，应检查波高、周期和沿程反射。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction"><code>multiphase/interIsoFoam/waveExampleStreamFunction</code></a>。</p><figure class="reference-case-figure"><img alt="waveExampleStreamFunction 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/wave-tank.svg" width="720"><figcaption>waveExampleStreamFunction 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>waveExampleStreamFunction 在入口使用流函数波浪理论生成非线性规则波，在出口吸收传播过来的波。</p>
-<ul>
-<li>入口 <code>waveHeight 0.1517</code> m、<code>wavePeriod 3.017</code> s、<code>waveLength 6.2832</code> m 分别给出波高、周期和波长。</li>
-<li><code>waveAngle 0</code> 设置传播方向，<code>uMean 2.0825</code> 提供流函数波解中的平均速度参数，应与所用理论解配套。</li>
-<li><code>Bjs</code>、<code>Ejs</code> 是该波解的级数系数，改变波高、水深或周期时应重新求解这些系数。</li>
-<li><code>rampTime 3.017</code> 使造波在一个周期内逐步建立，<code>activeAbsorption yes</code> 启用入口的主动吸收处理。</li>
-<li>出口使用 <code>shallowWaterAbsorption</code>，<code>nPaddle 1</code> 对整个边界采用单个控制分段。</li>
-</ul>
-<p>通过入口下游的水位探针检查实际周期和波高，再逐步分析反射与耗散。</p>
-<p><a href="/assets/examples/v2512/waveproperties/2-waveProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction/constant/waveProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/waveExampleStreamFunction/constant/waveProperties"><code>multiphase/interIsoFoam/waveExampleStreamFunction/constant/waveProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> waveProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-inlet
-{
-    alpha alpha.water;
-    waveModel streamFunction;
-    nPaddle <span class="hljs-number">1</span>;
-    waveHeight <span class="hljs-number">0.1517</span>;
-    waveAngle <span class="hljs-number">0.0</span>;
-    rampTime <span class="hljs-number">3.017</span>;
-    activeAbsorption <span class="hljs-literal">yes</span>;
-    wavePeriod <span class="hljs-number">3.017</span>;
-    uMean <span class="hljs-number">2.0825</span>;
-    waveLength <span class="hljs-number">6.2832</span>;
-    Bjs
-    (
-        <span class="hljs-number">8.6669014e-002</span>
-        <span class="hljs-number">2.4849799e-002</span>
-        <span class="hljs-number">7.7446850e-003</span>
-        <span class="hljs-number">2.3355420e-003</span>
-        <span class="hljs-number">6.4497731e-004</span>
-        <span class="hljs-number">1.5205114e-004</span>
-        <span class="hljs-number">2.5433769e-005</span>
-        <span class="hljs-number">-2.2045436e-007</span>
-        <span class="hljs-number">-2.8711504e-006</span>
-        <span class="hljs-number">-1.2287334e-006</span>
-    );
-    Ejs
-    (
-        <span class="hljs-number">5.6009609e-002</span>
-        <span class="hljs-number">3.1638171e-002</span>
-        <span class="hljs-number">1.5375952e-002</span>
-        <span class="hljs-number">7.1743178e-003</span>
-        <span class="hljs-number">3.3737077e-003</span>
-        <span class="hljs-number">1.6324880e-003</span>
-        <span class="hljs-number">8.2331980e-004</span>
-        <span class="hljs-number">4.4403497e-004</span>
-        <span class="hljs-number">2.7580059e-004</span>
-        <span class="hljs-number">2.2810557e-004</span>
-    );
-}
-outlet
-{
-    alpha alpha.water;
-    waveModel shallowWaterAbsorption;
-    nPaddle <span class="hljs-number">1</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/waves/waveMakerFlap</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/waves/waveMakerFlap"><h3>算例问题：waveMakerFlap</h3><p class="reference-case-problem">铰接式造波板在水槽端部摆动，板面运动推动水体并产生传播波。板的摆动规律、运动网格与水气界面需要共同设置，结果可用测点水位和波高沿程变化检查。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap"><code>multiphase/interFoam/laminar/waves/waveMakerFlap</code></a>。</p><figure class="reference-case-figure"><img alt="waveMakerFlap 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/wave-tank.svg" width="720"><figcaption>waveMakerFlap 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>waveMakerFlap 的这个文件负责右侧边界的波浪吸收，翻板自身的运动由其他运动配置提供。</p>
-<ul>
-<li><code>rightwall</code> 是吸收边界名称，应与网格和场文件中的 <code>patch</code> 一致。</li>
-<li><code>alpha alpha.water</code> 读取水相体积分数来识别自由表面。</li>
-<li><code>waveModel shallowWaterAbsorption</code> 采用浅水波吸收关系，<code>nPaddle 1</code> 使用一个边界控制分段。</li>
-</ul>
-<p>改变水深或造波频率后，可在不同位置设置水位探针，比较入射与反射波幅，判断出口吸收效果。</p>
-<p><a href="/assets/examples/v2512/waveproperties/3-waveProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap/constant/waveProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/waveMakerFlap/constant/waveProperties"><code>multiphase/interFoam/laminar/waves/waveMakerFlap/constant/waveProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> wavesProperties;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-rightwall
-{
-    alpha alpha.water;
-    waveModel shallowWaterAbsorption;
-    nPaddle <span class="hljs-number">1</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/interfoam/">interFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -437,6 +306,6 @@ rightwall
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

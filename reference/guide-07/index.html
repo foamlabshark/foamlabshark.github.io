@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,144 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 7 章　求解器与运行控制</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><figure><img alt="算例准备、网格检查、求解监测与后处理验证的关系" loading="lazy" src="/assets/diagrams/reference-workflow.svg"><figcaption>通用算例工作流示意。检查步骤围绕版本、网格、守恒和可复现性展开。</figcaption></figure><h2>7.1 跑一个算例的标准流程</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">run                                     <span class="hljs-comment"># 去工作目录</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/simpleFoam/pitzDaily .
-<span class="hljs-built_in">cd</span> pitzDaily
-blockMesh              &gt; log.blockMesh  2&gt;&amp;1    <span class="hljs-comment"># ① 建网格</span>
-checkMesh              &gt; log.checkMesh  2&gt;&amp;1    <span class="hljs-comment"># ② 查网格</span>
-simpleFoam             &gt; log.simpleFoam 2&gt;&amp;1 &amp;  <span class="hljs-comment"># ③ 后台求解，日志落盘</span>
-<span class="hljs-built_in">tail</span> -f log.simpleFoam                          <span class="hljs-comment"># ④ 实时看进度（Ctrl+C 只退出查看，不影响计算）</span>
-foamLog log.simpleFoam                          <span class="hljs-comment"># ⑤ 提取残差</span>
-paraFoam                                        <span class="hljs-comment"># ⑥ 可视化</span></code></pre></div>
-<p>重定向可保存标准输出与标准错误，便于记录运行过程和排查异常。2&gt;&amp;1 将标准错误合并到标准输出。<code>foamLog</code> 可从求解器日志提取残差数据；<code>foamMonitor</code> 可用于监视相应的数据文件。</p>
-<p>命令末尾添加 &amp;，使任务在当前 shell 后台运行。需要在 SSH 断开后继续的长任务，可使用作业调度器、<code>tmux</code> 或 <code>nohup</code>，并保存日志与退出状态。</p>
-<h2>7.2 求解器名字的构词法</h2>
-<p>求解器名称可以按构词规律理解：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>词缀</th><th>含义</th><th>例子</th></tr>
-<tr><td><code>ico</code></td><td><code>incompressible</code>，层流不可压</td><td><code>icoFoam</code></td></tr>
-<tr><td><code>simple</code></td><td>用 <code>SIMPLE</code> 算法 → 稳态</td><td><code>simpleFoam</code>、<code>rhoSimpleFoam</code></td></tr>
-<tr><td><code>piso</code> / <code>pimple</code></td><td><code>PISO</code> / <code>PIMPLE</code> 算法 → 瞬态</td><td><code>pisoFoam</code>、<code>pimpleFoam</code></td></tr>
-<tr><td><code>rho</code></td><td>可压缩（解密度）</td><td><code>rhoPimpleFoam</code>、<code>rhoCentralFoam</code></td></tr>
-<tr><td><code>buoyant</code></td><td>含浮力（自然对流）</td><td><code>buoyantSimpleFoam</code></td></tr>
-<tr><td><code>inter</code></td><td>两相 VOF（inter-face）</td><td><code>interFoam</code>、<code>interIsoFoam</code></td></tr>
-<tr><td><code>multiphase</code></td><td>多于两相</td><td><code>multiphaseInterFoam</code></td></tr>
-<tr><td><code>reacting</code></td><td>含化学反应</td><td><code>reactingFoam</code></td></tr>
-<tr><td><code>cht</code></td><td>共轭传热（流固耦合传热）</td><td><code>chtMultiRegionFoam</code></td></tr>
-<tr><td><code>over</code></td><td>重叠网格（<code>overset</code>）</td><td><code>overInterDyMFoam</code></td></tr>
-<tr><td><code>DyM</code></td><td>动网格（v1706 后大多已并入主求解器）</td><td><code>pimpleFoam</code> 直接支持动网格</td></tr>
-<tr><td><code>Foam</code></td><td>后缀，无实义</td><td>——</td></tr>
-</tbody></table></div>
-<p>由此可以推断：想算”瞬态、可压、带反应”的问题，八成是 <code>reactingFoam</code>；“稳态、不可压、湍流”就是 <code>simpleFoam</code>。这个推断能力比背表有用。</p>
-<h2>7.3 常用求解器速查</h2>
-<p>基础</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>解什么</th><th>关键字典</th></tr>
-<tr><td><code>laplacianFoam</code></td><td>纯扩散方程（导热）</td><td><code>transportProperties</code>（<code>DT</code>）</td></tr>
-<tr><td><code>scalarTransportFoam</code></td><td>给定流场下的标量输运</td><td><code>transportProperties</code></td></tr>
-<tr><td><code>potentialFoam</code></td><td>势流。常用来给复杂算例造初场</td><td>——</td></tr>
-</tbody></table></div>
-<p>不可压缩</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>适用</th></tr>
-<tr><td><code>icoFoam</code></td><td>层流、瞬态、牛顿流体。教学入门用</td></tr>
-<tr><td><code>simpleFoam</code></td><td>稳态、湍流。外流绕流、管道，最常用</td></tr>
-<tr><td><code>pimpleFoam</code></td><td>瞬态、湍流，允许大 Courant 数（LES/URANS 主力）</td></tr>
-<tr><td><code>pisoFoam</code></td><td>瞬态、湍流，要求 <span class="math-formula" data-tex="\mathrm{Co} < 1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">o</mi></mrow><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\mathrm{Co} &lt; 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord"><span class="mord mathrm">Co</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span>（做 <code>LES</code> 时精度更可控）</td></tr>
-<tr><td><code>boundaryFoam</code></td><td>一维充分发展边界层，标定壁面函数用</td></tr>
-<tr><td><code>adjointShapeOptimizationFoam</code></td><td>伴随法形状优化</td></tr>
-</tbody></table></div>
-<p>可压缩</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>适用</th></tr>
-<tr><td><code>rhoSimpleFoam</code></td><td>稳态可压</td></tr>
-<tr><td><code>rhoPimpleFoam</code></td><td>瞬态可压（亚声速到跨声速），基于压力</td></tr>
-<tr><td><code>rhoCentralFoam</code></td><td>基于密度的中心格式，激波捕捉。超声速、激波管、爆炸问题首选</td></tr>
-<tr><td><code>sonicFoam</code></td><td>瞬态跨/超声速（较老，多数场景已被上面两个取代）</td></tr>
-</tbody></table></div>
-<p>传热/浮力</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>适用</th></tr>
-<tr><td><code>buoyantSimpleFoam</code> / <code>buoyantPimpleFoam</code></td><td>稳态/瞬态自然对流</td></tr>
-<tr><td><code>chtMultiRegionFoam</code></td><td>流固共轭传热（多区域）</td></tr>
-<tr><td><code>thermoFoam</code></td><td>冻结流场，只解能量方程</td></tr>
-</tbody></table></div>
-<p>多相</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>适用</th></tr>
-<tr><td><code>interFoam</code></td><td>两相不可压 VOF（溃坝、自由液面）。多相入门必学</td></tr>
-<tr><td><code>interIsoFoam</code></td><td>用 isoAdvector 几何界面重构，界面更锐利</td></tr>
-<tr><td><code>compressibleInterFoam</code></td><td>两相且可压（空化、水下爆炸）</td></tr>
-<tr><td><code>multiphaseInterFoam</code></td><td>三相及以上 VOF</td></tr>
-<tr><td><code>interMixingFoam</code></td><td>两相 + 其中一相可混溶</td></tr>
-<tr><td><code>cavitatingFoam</code></td><td>空化</td></tr>
-<tr><td><code>driftFluxFoam</code></td><td>沉降/悬浮泥沙类</td></tr>
-<tr><td><code>multiphaseEulerFoam</code></td><td>欧拉-欧拉多相（气泡塔、流化床）</td></tr>
-<tr><td><code>potentialFreeSurfaceFoam</code></td><td>小变形自由液面（势流近似）</td></tr>
-</tbody></table></div>
-<p>颗粒 / 反应 / 其他</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>求解器</th><th>适用</th></tr>
-<tr><td><code>DPMFoam</code> / <code>MPPICFoam</code></td><td>离散颗粒（稠密颗粒用 MPPIC）</td></tr>
-<tr><td><code>icoUncoupledKinematicParcelFoam</code></td><td>单向耦合示踪颗粒</td></tr>
-<tr><td><code>reactingFoam</code></td><td>燃烧/化学反应</td></tr>
-<tr><td><code>XiFoam</code></td><td>预混燃烧</td></tr>
-<tr><td><code>fireFoam</code></td><td>火灾（含辐射、热解）</td></tr>
-<tr><td><code>sprayFoam</code></td><td>喷雾燃烧</td></tr>
-<tr><td><code>chemFoam</code></td><td>零维化学反应器（验证机理用）</td></tr>
-<tr><td><code>solidDisplacementFoam</code></td><td>线弹性固体应力</td></tr>
-<tr><td><code>electrostaticFoam</code> / <code>mhdFoam</code> / <code>magneticFoam</code></td><td>静电 / 磁流体 / 静磁</td></tr>
-<tr><td><code>overPimpleDyMFoam</code> / <code>overInterDyMFoam</code></td><td>重叠网格版本</td></tr>
-</tbody></table></div>
-<p>怎么确认本机到底有哪些：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">ls $FOAM_APPBIN | grep -i foam | sort | less
-ls $FOAM_SOLVERS/*                      # 按类别看源码目录</code></pre></div>
-<h2>7.4 求解器的运行选项</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">simpleFoam [-<span class="hljs-keyword">case</span> &lt;<span class="hljs-built_in">dir</span>&gt;] [-parallel] [-postProcess] [-dry-run] [-noFunctionObjects]
-           [-fileHandler collated] [-libs <span class="hljs-string">'("libMyBC.so")'</span>] [-region &lt;name&gt;]</code></pre></div>
-<p><code>-postProcess</code>：把求解器当后处理器用（非常重要的技巧）</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># 用求解器自己的物理模型，对已有结果做后处理（例如算 yPlus 需要湍流模型信息）</span>
-simpleFoam -postProcess -func yPlus -latestTime
-pimpleFoam -postProcess -func <span class="hljs-string">"grad(p)"</span> -<span class="hljs-keyword">time</span> <span class="hljs-string">'1:5'</span></code></pre></div>
-<p><code>yPlus</code>、壁面剪切应力等量需要湍流或输运模型。按函数对象的要求选择通用 <code>postProcess</code>，或能创建相应模型的求解器 <code>-postProcess</code> 模式。</p>
-<p><code>-dry-run</code>：开算前的语法体检</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">interFoam -dry-run</code></pre></div>
-<p>它会读完所有字典、建好场、然后退出。字典写错、边界条件名拼错、场文件缺失都会在这一步暴露——比跑 3 小时后崩掉划算得多。</p>
-<h2>7.5 续算、中止与在线改参数</h2>
-<p>续算（从上次结果接着算）</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">// system/controlDict
-startFrom       latestTime;    // 从最新时间目录接着算
-endTime         10;            // 把结束时间改大
-simpleFoam &gt;&gt; log.simpleFoam 2&gt;&amp;1 &amp;      <span class="hljs-comment"># 用 &gt;&gt; 追加，保留之前的日志</span></code></pre></div>
-<p>写出当前结果后结束计算</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// controlDict 里保证
-runTimeModifiable  true;      // 允许运行中修改 controlDict</code></pre></div>
-<p>然后在算例跑着的时候改 <code>controlDict</code>：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamDictionary system/controlDict -entry stopAt -<span class="hljs-built_in">set</span> writeNow</code></pre></div>
-<p>求解器会在当前时间步结束后写出结果再退出。这就是 <code>runTimeModifiable</code> 的价值：算到一半发现输出频率不合适、想提前停，都不用重来。</p>
-<p><code>stopAt</code> 的四个取值</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>值</th><th>行为</th></tr>
-<tr><td><code>endTime</code></td><td>算到 <code>endTime</code>（默认）</td></tr>
-<tr><td><code>writeNow</code></td><td>立即写结果并退出</td></tr>
-<tr><td><code>noWriteNow</code></td><td>立即退出，不写</td></tr>
-<tr><td><code>nextWrite</code></td><td>到下一个输出时刻后退出</td></tr>
-</tbody></table></div>
-<h2>7.6 时间步长与 Courant 数</h2>
-<p>瞬态算例几乎都会用自适应时间步：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// system/controlDict
-adjustTimeStep  yes;
-maxCo           0.9;        // 全场最大 Courant 数
-maxAlphaCo      0.9;        // VOF：界面处的 Courant 数（更严）
-maxDeltaT       1e-3;       // 时间步上限，防止流速很低时步长失控变大</code></pre></div>
-<p>Courant 数衡量单步输运相对于网格尺度的大小，一维估计为 <span class="math-formula" data-tex="\mathrm{Co}=|U|\Delta t/\Delta x"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">o</mi></mrow><mo>=</mo><mi mathvariant="normal">∣</mi><mi>U</mi><mi mathvariant="normal">∣</mi><mi mathvariant="normal">Δ</mi><mi>t</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">Δ</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">\mathrm{Co}=|U|\Delta t/\Delta x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">Co</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mord">∣Δ</span><span class="mord mathnormal">t</span><span class="mord">/Δ</span><span class="mord mathnormal">x</span></span></span></span></span>。按时间积分和空间离散方法设置时间步，再通过时间步敏感性检查评估精度。VOF 计算同时控制界面输运的时间步。</p>
-<p>日志里怎么看：</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">Courant Number mean: 0.0132 max: 0.847
-deltaT = 0.000123</code></pre></div>
-<p><code>max</code> 接近设定上限时，自适应时间步正在限制 Courant 数。若 <code>deltaT</code> 持续缩小至 1e-12，检查网格质量和场是否发散。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -443,6 +306,6 @@ deltaT = 0.000123</code></pre></div>
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

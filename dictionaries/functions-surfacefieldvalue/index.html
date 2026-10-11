@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,213 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>surfaceFieldValue</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在边界、面区域或采样面上计算场的求和、平均与面积积分。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>surfaceFieldValue</code> 在 <code>patch</code>、<code>faceZone</code> 或采样面上汇总场数据，常用于进出口流量和壁面平均值。字段是否已经包含面面积决定应选择求和还是面积积分，配置时需明确要计算的物理量。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/controlDict → functions → surfaceFieldValue</code></p><h2>配置方法</h2><p><code>surfaceFieldValue</code> 对网格 <code>patch</code>、<code>faceZone</code> 或采样表面上的场进行求和、平均和积分，适合出口流量、壁面平均温度及表面热流积分。</p><!-- reference-configuration-supplement -->
-<h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>surfaceFieldValue</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>fieldFunctionObjects</code>)</td></tr><tr><td><code>regionType</code></td><td><code>patch</code>、<code>faceZone</code>、<code>sampledSurface</code> 等表面选择方式。</td><td>必填</td><td>—</td></tr><tr><td><code>fields</code></td><td>需要处理的场名称列表。</td><td>必填</td><td>—</td></tr><tr><td><code>name</code></td><td>所选 <code>patch</code> 或 <code>faceZone</code> 的名称。</td><td>必填</td><td>—</td></tr><tr><td><code>names</code></td><td>额外选择的名称或正则表达式列表。</td><td>可选</td><td>—</td></tr><tr><td><code>operation</code></td><td>对输入数据执行的运算。</td><td>必填</td><td>—</td></tr><tr><td><code>postOperation</code></td><td>主运算之后的附加运算，例如 <code>none</code>、<code>mag</code> 或 sqrt。</td><td>可选</td><td><code>none</code></td></tr><tr><td><code>weightField</code></td><td>进行加权统计时采用的权重场。</td><td>条件必填</td><td>—</td></tr><tr><td><code>weightFields</code></td><td>多个权重场的名称列表。</td><td>条件必填</td><td>—</td></tr><tr><td><code>writeArea</code></td><td>是否同时记录所选表面的面积。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>surfaceFormat</code></td><td>表面结果的输出格式，例如 <code>vtk</code>、<code>ensight</code>、<code>raw</code>。</td><td>条件必填</td><td><code>none</code></td></tr><tr><td><code>empty-surface</code></td><td>所选表面为空时采用的处理方式。</td><td>可选</td><td><code>default</code></td></tr><tr><td><code>sampledSurfaceDict</code></td><td><code>regionType</code> 为 <code>sampledSurface</code> 时的采样表面定义。</td><td>可选</td><td>—</td></tr><tr><td><code>writeFields</code></td><td>是否保存表面采样原始值</td><td>必填</td><td><code>true</code> / <code>false</code></td></tr><tr><td><code>direction</code></td><td><code>sumDirection</code> 等操作的参考方向</td><td>条件必填</td><td>—</td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr></tbody></table></div><p><a href="/function-objects/surfacefieldvalue/">surfaceFieldValue 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 出口体积流量</h3><p>在 <code>simpleFoam</code> 等不可压缩算例的 <code>system/controlDict/functions</code> 中加入：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">outletFlow
-{
-    <span class="hljs-keyword">type</span> surfaceFieldValue;
-    <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-    regionType patch;
-    <span class="hljs-keyword">name</span> outlet;
-    operation sum;
-    fields (phi);
-    writeFields <span class="hljs-literal">false</span>;
-    writeArea <span class="hljs-literal">true</span>;
-    writeControl timeStep;
-    writeInterval <span class="hljs-number">1</span>;
-}
-</code></pre></div>
-<p><code>name</code> 是实际出口 <code>patch</code>。<code>phi</code> 已包含每个网格面的面积贡献，<code>sum</code> 将其相加得到总流量。<code>writeArea</code> 同时记录所选面积，有助于检查边界选择是否正确。正值通常表示流出域外，负值表示流入。</p>
-<p>不可压缩场的 <code>phi</code> 常以 m³/s 表示，可压缩场则常以 kg/s 表示，读取字段量纲确认。对壁面热流密度 W/m²，需要 <code>areaIntegrate</code> 才得到 W；对温度场使用 <code>areaAverage</code> 得到面积平均温度。</p>
-<p>截面平均温度若用于流体携热量，通常应按质量通量加权。此时可研究 <code>weightedAverage</code> 或相应加权面积操作，并明确权重场是否已经包含面积。发生回流时，正负通量会抵消，可以按需要分别统计流入与流出部分。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/simpleReactingParcelFoam/verticalChannel"><h3>算例问题：verticalChannel</h3><p class="reference-case-problem">颗粒随气流通过通道，在运动过程中与载气交换动量、热量或质量。通道方向决定重力相对来流的方向，主要观察颗粒速度、温度及质量变化；稳态和 LTS 版本采用不同的时间推进方式。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel"><code>lagrangian/simpleReactingParcelFoam/verticalChannel</code></a>。</p><p class="reference-case-source">同一物理问题的另一配置算例：lagrangian/reactingParcelFoam/verticalChannelLTS。</p></section><!-- /reference-case-contexts --><p>稳态垂直通道用出口通量加权平均，获得更适合表示流出流体状态的温度和水蒸气含量。</p>
-<ul>
-<li><code>regionType patch</code>、<code>name outlet</code> 选择出口。</li>
-<li><code>operation weightedAverage</code> 配合 <code>weightField phi</code> 按面通量加权。</li>
-<li><code>fields (H2O T)</code> 输出组分与温度，<code>writeFields no</code> 只保存汇总结果。</li>
-<li><code>writeControl writeTime</code> 跟随主结果写出，主场每 20 次迭代保存。</li>
-</ul>
-<p>出口存在回流时检查通量符号及加权结果的含义，必要时分别统计流入与流出部分。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict"><code>lagrangian/simpleReactingParcelFoam/verticalChannel/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">application</span> simpleReactingParcelFoam;
-startFrom latestTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">500</span>;
-deltaT <span class="hljs-number">1</span>;
-writeControl timeStep;
-writeInterval <span class="hljs-number">20</span>;
-purgeWrite <span class="hljs-number">10</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">10</span>;
-writeCompression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">yes</span>;
-<span class="hljs-keyword">functions</span>
-{
-    avgOutlets
-    {
-        <span class="hljs-keyword">type</span> surfaceFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        enabled <span class="hljs-literal">yes</span>;
-        writeControl writeTime;
-        log <span class="hljs-literal">yes</span>;
-        writeFields <span class="hljs-literal">no</span>;
-        regionType patch;
-        <span class="hljs-keyword">name</span> outlet;
-        operation weightedAverage;
-        weightField phi;
-        fields
-        (
-            H2O
-            T
-        );
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · lagrangian/reactingParcelFoam/verticalChannelLTS</summary><p>verticalChannelLTS 在局部时间步迭代中监测出口混合状态。</p>
-<ul>
-<li><code>surfaceFieldValue</code> 选择 <code>outlet</code> <code>patch</code>。</li>
-<li><code>weightedAverage</code> 与 <code>weightField phi</code> 计算通量加权的 <code>H2O</code>、<code>T</code>。</li>
-<li>主控制每 10 步写出，函数对象采用 <code>writeTime</code> 与之同步。</li>
-<li><code>writeFields no</code> 保留简洁的统计文件，日志也会显示数值。</li>
-</ul>
-<p>判断稳态收敛时同时看加权出口量和残差；局部时间步的迭代编号应按该求解过程解释。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict"><code>lagrangian/reactingParcelFoam/verticalChannelLTS/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">55 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">application</span> reactingParcelFoam;
-startFrom latestTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">300</span>;
-deltaT <span class="hljs-number">1</span>;
-writeControl timeStep;
-writeInterval <span class="hljs-number">10</span>;
-purgeWrite <span class="hljs-number">20</span>;
-writeFormat ascii;
-writePrecision <span class="hljs-number">10</span>;
-writeCompression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">yes</span>;
-profiling
-{
-    memInfo <span class="hljs-literal">true</span>;
-}
-<span class="hljs-keyword">functions</span>
-{
-    surfaceFieldValue1
-    {
-        <span class="hljs-keyword">type</span> surfaceFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        writeControl writeTime;
-        log <span class="hljs-literal">yes</span>;
-        writeFields <span class="hljs-literal">no</span>;
-        regionType patch;
-        <span class="hljs-keyword">name</span> outlet;
-        operation weightedAverage;
-        weightField phi;
-        fields
-        (
-            H2O
-            T
-        );
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionFoam/windshieldDefrost"><h3>算例问题：windshieldDefrost</h3><p class="reference-case-problem">暖空气流经挡风玻璃，玻璃通过内部导热和表面对流逐渐升温。算例把空气与玻璃作为相邻区域，主要观察玻璃温度分布及暖风覆盖情况。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost"><code>heatTransfer/chtMultiRegionFoam/windshieldDefrost</code></a>。</p><figure class="reference-case-figure"><img alt="windshieldDefrost 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>windshieldDefrost 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>挡风玻璃除霜的多区域计算每步监测 <code>cabin</code> 流体区入口通量。</p>
-<ul>
-<li><code>region cabin</code> 将函数对象绑定到客舱网格。</li>
-<li><code>regionType patch</code>、<code>name inlet</code> 选择入口。</li>
-<li><code>operation sum</code> 对已有面通量 <code>phi</code> 直接求和；<code>phi</code> 已包含面面积，求和时无需再乘面积。</li>
-<li>每步记录并打印，主场则按 1 s 的可调时间间隔保存。</li>
-</ul>
-<p>按该区域 <code>phi</code> 的量纲解释质量或体积流率，再与出口及区域质量变化比较。</p>
-<p><a href="/assets/examples/v2512/surfacefieldvalue/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict"><code>heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> controlDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">application</span> chtMultiRegionFoam;
-startFrom startTime;
-startTime <span class="hljs-number">0</span>;
-stopAt endTime;
-endTime <span class="hljs-number">400</span>;
-deltaT <span class="hljs-number">0.0001</span>;
-writeControl adjustable;
-writeInterval <span class="hljs-number">1</span>;
-purgeWrite <span class="hljs-number">0</span>;
-writeFormat binary;
-writePrecision <span class="hljs-number">10</span>;
-writeCompression <span class="hljs-literal">off</span>;
-timeFormat general;
-timePrecision <span class="hljs-number">6</span>;
-runTimeModifiable <span class="hljs-literal">true</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>;
-maxCo <span class="hljs-number">5</span>;
-maxDeltaT <span class="hljs-number">1</span>;
-<span class="hljs-keyword">functions</span>
-{
-    massFlux
-    {
-        <span class="hljs-keyword">type</span> surfaceFieldValue;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        enabled <span class="hljs-literal">yes</span>;
-        writeControl timeStep;
-        writeInterval <span class="hljs-number">1</span>;
-        log <span class="hljs-literal">yes</span>;
-        writeFields <span class="hljs-literal">no</span>;
-        regionType patch;
-        <span class="hljs-keyword">name</span> inlet;
-        operation sum;
-        fields (phi);
-        region cabin;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -512,6 +306,6 @@ maxDeltaT <span class="hljs-number">1</span>;
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

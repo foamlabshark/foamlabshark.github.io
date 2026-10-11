@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,340 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>blockMeshDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>定义网格顶点、六面体块、单元数和边界，供 <code>blockMesh</code> 生成结构网格。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>这个字典把可分块的几何写成顶点、六面体块和边界面的连接关系，再为各方向指定单元数和尺寸渐变。<code>blockMesh</code> 读取它后生成体网格，适合方腔、通道和可用多块拼接描述的形状，也常用于准备 <code>snappyHexMesh</code> 的背景网格。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>system/blockMeshDict</code></p><figure class="wolf-figure"><img alt="网格尺寸的突变与平滑过渡" loading="lazy" src="/assets/wolf/wolf-mesh-smooth-transition.png"><figcaption><strong>网格尺寸的突变与平滑过渡</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module3.pdf，p. 19</small></figcaption></figure><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>patches</code></td><td>参与该操作的边界列表，必须对应网格中的实际 <code>patch</code> 名称。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="nested-configuration">块、缩放与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>blocks</code></td><td>块列表；每个 <code>hex</code> 后面依次为八个顶点编号、可选 <code>cellZone</code> 名称、三个方向的单元数和 <code>grading</code>。块的局部方向由顶点顺序决定。</td></tr><tr><td><code>scale / convertToMeters</code></td><td>坐标缩放倍率，使用 <code>scale</code>；旧配置中的 <code>convertToMeters</code> 也受支持。</td></tr><tr><td><code>boundary.&lt;名称&gt;.faces</code></td><td>该 <code>patch</code> 的四边形面顶点编号列表。一个面只属于一个外部边界，顶点顺序应符合块外法向。<code>upperWall</code>、<code>lowerWall</code> 等名称由用户定义。</td></tr><tr><td><code>defaultPatch</code></td><td>未显式列出的外部面所用的默认 <code>patch</code>，包含 <code>name</code> 与 <code>type</code>；二维前后面常设为 <code>empty</code>，但必须满足一层单元条件。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/mesh/blockMesh/blockMesh/blockMesh.C">v2512 参数读取实现</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>blockMeshDict</code> 通过 <code>vertices</code> 定义顶点，以 <code>hex</code> 后的 8 个顶点编号确定块的局部方向和体积符号。(Nx Ny Nz) 指定三个方向的单元数，<code>scale</code> 指定坐标缩放系数，<code>simpleGrading</code> 指定各方向末端与起始单元的尺寸比。</p>
-<p>下例建立长 1 m、宽 0.1 m、厚 0.01 m 的二维通道。厚度方向设置一层单元，两侧边界设为 <code>empty</code>。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> blockMeshDict;
-}
-scale <span class="hljs-number">1</span>;
-vertices
-(
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>)
-);
-blocks
-(
-    hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) (<span class="hljs-number">100</span> <span class="hljs-number">20</span> <span class="hljs-number">1</span>)
-    simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-);
-edges ();
-boundary
-(
-    inlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>)
-        );
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces
-        (
-            (<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span>)
-        );
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span>)
-            (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>)
-        );
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>)
-            (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>)
-        );
-    }
-);
-mergePatchPairs ();</code></pre></div>
-<p>执行 <code>blockMesh</code> 生成网格，再执行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code> 检查拓扑和几何。边界面的顶点顺序按外法向排列；多块网格应统一局部坐标和顶点编号。</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>参数或结构</th><th>设置方法</th><th>使用条件</th></tr>
-<tr><td><code>scale</code></td><td>如 0.001 表示原坐标按毫米给出</td><td>采用 <code>scale</code> 统一设置坐标缩放</td></tr>
-<tr><td><code>simpleGrading</code></td><td>例如 (1 10 1)</td><td>沿块的局部方向设置；反向时取对应倒数</td></tr>
-<tr><td>多段 <code>grading</code></td><td>某方向可写 ((0.2 0.3 4) (0.6 0.4 1) (0.2 0.3 0.25))</td><td>每段分别为长度比例、单元比例、扩张比</td></tr>
-<tr><td><code>edgeGrading</code></td><td>对 12 条局部边分别指定扩张比</td><td>按块的局部边编号依次赋值</td></tr>
-<tr><td><code>edges</code></td><td><code>arc</code> 0 1 (中间点)，或 <code>spline</code>、<code>polyLine</code></td><td>弧线端点与控制点应满足非退化条件</td></tr>
-<tr><td><code>boundary/type</code></td><td><code>patch</code>、<code>wall</code>、<code>empty</code>、<code>symmetryPlane</code>、<code>wedge</code>、<code>cyclic</code> 等</td><td>定义网格边界类型；场边界另行配置</td></tr>
-<tr><td><code>defaultPatch</code></td><td>为未显式列出的面指定名称和类型</td><td>显式边界之外的面归入该边界</td></tr>
-<tr><td><code>mergePatchPairs</code></td><td>((patchA patchB))</td><td>合并指定的块接口</td></tr>
-</tbody></table></div><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavity</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavity"><h3>算例问题：cavity</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity"><code>incompressible/icoFoam/cavity/cavity</code></a>。</p><figure class="reference-case-figure"><img alt="cavity 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavity 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>方腔由一个六面体块生成，配合二维 <code>empty</code> 边界使用。</p>
-<ul>
-<li><code>scale 0.1</code> 把顶点坐标乘以 0.1，得到长高各 0.1 m、厚 0.01 m 的腔体。</li>
-<li><code>hex ... (20 20 1)</code> 在三个方向分成 20、20、1 个单元，共 400 个单元。</li>
-<li><code>simpleGrading (1 1 1)</code> 使用均匀间距。</li>
-<li><code>movingWall</code> 是顶盖，<code>fixedWalls</code> 为其余侧壁，<code>frontAndBack/type empty</code> 约束前后方向为二维。</li>
-</ul>
-<p>加密时可改为 (40 40 1) 并重建网格；保持二维模型时厚度方向仍取一层，同时检查时间步。</p>
-<p><a href="/assets/examples/v2512/blockmeshdict/1-blockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/blockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/blockMeshDict"><code>incompressible/icoFoam/cavity/cavity/system/blockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> blockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-scale <span class="hljs-number">0.1</span>;
-vertices
-(
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>)
-);
-blocks
-(
-    hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) (<span class="hljs-number">20</span> <span class="hljs-number">20</span> <span class="hljs-number">1</span>) simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-);
-edges ( );
-boundary
-(
-    movingWall
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces
-        (
-            (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>)
-        );
-    }
-    fixedWalls
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>)
-            (<span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span> <span class="hljs-number">1</span>)
-            (<span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span> <span class="hljs-number">0</span>)
-        );
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>)
-            (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>)
-        );
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDaily 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption><code>pitzDaily</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>pitzDaily</code> 的后台阶及下游通道由五个六面体块拼接，以便在台阶、剪切层和壁面附近分配不同分辨率。</p>
-<ul>
-<li><code>scale 0.001</code> 将毫米量级坐标换算为米。</li>
-<li>入口块 <code>(18 30 1)</code>、下游块 <code>(180 27 1)</code> 与 <code>(180 30 1)</code> 等分别控制不同分区的单元数。</li>
-<li><code>negY</code>、<code>posY</code>、<code>posYR</code> 被 <code>grading</code> 条目引用，使单元向需要分辨的区域渐变。</li>
-<li><code>inlet</code>、<code>outlet</code>、上下壁面与 <code>frontAndBack empty</code> 分开命名，随后由场文件设置物理边界。</li>
-</ul>
-<p>移动台阶或改变高度时保持相邻块共享面的单元数相容；比较回流长度时优先加密台阶后的剪切层。</p>
-<p><a href="/assets/examples/v2512/blockmeshdict/2-blockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/blockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/blockMeshDict"><code>incompressible/simpleFoam/pitzDaily/system/blockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">130 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> blockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-scale <span class="hljs-number">0.001</span>;
-vertices
-(
-    (<span class="hljs-number">-20.6</span> <span class="hljs-number">0</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">-20.6</span> <span class="hljs-number">25.4</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">-25.4</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">25.4</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">-25.4</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">0</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">25.4</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">-16.6</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">0</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">16.6</span> <span class="hljs-number">-0.5</span>)
-    (<span class="hljs-number">-20.6</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">-20.6</span> <span class="hljs-number">25.4</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">-25.4</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">25.4</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">-25.4</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">206</span> <span class="hljs-number">25.4</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">-16.6</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>)
-    (<span class="hljs-number">290</span> <span class="hljs-number">16.6</span> <span class="hljs-number">0.5</span>)
-);
-negY
-(
-    (<span class="hljs-number">2</span> <span class="hljs-number">4</span> <span class="hljs-number">1</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">3</span> <span class="hljs-number">0.3</span>)
-);
-posY
-(
-    (<span class="hljs-number">1</span> <span class="hljs-number">4</span> <span class="hljs-number">2</span>)
-    (<span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span>)
-    (<span class="hljs-number">2</span> <span class="hljs-number">4</span> <span class="hljs-number">0.25</span>)
-);
-posYR
-(
-    (<span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.25</span>)
-);
-blocks
-(
-    hex (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">1</span> <span class="hljs-number">11</span> <span class="hljs-number">14</span> <span class="hljs-number">15</span> <span class="hljs-number">12</span>) (<span class="hljs-number">18</span> <span class="hljs-number">30</span> <span class="hljs-number">1</span>)
-    simpleGrading (<span class="hljs-number">0.5</span> <span class="hljs-variable">$posY</span> <span class="hljs-number">1</span>)
-    hex (<span class="hljs-number">2</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">3</span> <span class="hljs-number">13</span> <span class="hljs-number">16</span> <span class="hljs-number">17</span> <span class="hljs-number">14</span>) (<span class="hljs-number">180</span> <span class="hljs-number">27</span> <span class="hljs-number">1</span>)
-    edgeGrading (<span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-variable">$negY</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-variable">$negY</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-    hex (<span class="hljs-number">3</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span> <span class="hljs-number">4</span> <span class="hljs-number">14</span> <span class="hljs-number">17</span> <span class="hljs-number">18</span> <span class="hljs-number">15</span>) (<span class="hljs-number">180</span> <span class="hljs-number">30</span> <span class="hljs-number">1</span>)
-    edgeGrading (<span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-number">4</span> <span class="hljs-variable">$posY</span> <span class="hljs-variable">$posYR</span> <span class="hljs-variable">$posYR</span> <span class="hljs-variable">$posY</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-    hex (<span class="hljs-number">5</span> <span class="hljs-number">8</span> <span class="hljs-number">9</span> <span class="hljs-number">6</span> <span class="hljs-number">16</span> <span class="hljs-number">19</span> <span class="hljs-number">20</span> <span class="hljs-number">17</span>) (<span class="hljs-number">25</span> <span class="hljs-number">27</span> <span class="hljs-number">1</span>)
-    simpleGrading (<span class="hljs-number">2.5</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-    hex (<span class="hljs-number">6</span> <span class="hljs-number">9</span> <span class="hljs-number">10</span> <span class="hljs-number">7</span> <span class="hljs-number">17</span> <span class="hljs-number">20</span> <span class="hljs-number">21</span> <span class="hljs-number">18</span>) (<span class="hljs-number">25</span> <span class="hljs-number">30</span> <span class="hljs-number">1</span>)
-    simpleGrading (<span class="hljs-number">2.5</span> <span class="hljs-variable">$posYR</span> <span class="hljs-number">1</span>)
-);
-edges ( );
-boundary
-(
-    inlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">12</span> <span class="hljs-number">11</span>)
-        );
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> patch;
-        faces
-        (
-            (<span class="hljs-number">8</span> <span class="hljs-number">9</span> <span class="hljs-number">20</span> <span class="hljs-number">19</span>)
-            (<span class="hljs-number">9</span> <span class="hljs-number">10</span> <span class="hljs-number">21</span> <span class="hljs-number">20</span>)
-        );
-    }
-    upperWall
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces
-        (
-            (<span class="hljs-number">1</span> <span class="hljs-number">4</span> <span class="hljs-number">15</span> <span class="hljs-number">12</span>)
-            (<span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">18</span> <span class="hljs-number">15</span>)
-            (<span class="hljs-number">7</span> <span class="hljs-number">10</span> <span class="hljs-number">21</span> <span class="hljs-number">18</span>)
-        );
-    }
-    lowerWall
-    {
-        <span class="hljs-keyword">type</span> wall;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">14</span> <span class="hljs-number">11</span>)
-            (<span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">13</span> <span class="hljs-number">14</span>)
-            (<span class="hljs-number">2</span> <span class="hljs-number">5</span> <span class="hljs-number">16</span> <span class="hljs-number">13</span>)
-            (<span class="hljs-number">5</span> <span class="hljs-number">8</span> <span class="hljs-number">19</span> <span class="hljs-number">16</span>)
-        );
-    }
-    frontAndBack
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-        faces
-        (
-            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">1</span>)
-            (<span class="hljs-number">2</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">3</span>)
-            (<span class="hljs-number">3</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span> <span class="hljs-number">4</span>)
-            (<span class="hljs-number">5</span> <span class="hljs-number">8</span> <span class="hljs-number">9</span> <span class="hljs-number">6</span>)
-            (<span class="hljs-number">6</span> <span class="hljs-number">9</span> <span class="hljs-number">10</span> <span class="hljs-number">7</span>)
-            (<span class="hljs-number">11</span> <span class="hljs-number">14</span> <span class="hljs-number">15</span> <span class="hljs-number">12</span>)
-            (<span class="hljs-number">13</span> <span class="hljs-number">16</span> <span class="hljs-number">17</span> <span class="hljs-number">14</span>)
-            (<span class="hljs-number">14</span> <span class="hljs-number">17</span> <span class="hljs-number">18</span> <span class="hljs-number">15</span>)
-            (<span class="hljs-number">16</span> <span class="hljs-number">19</span> <span class="hljs-number">20</span> <span class="hljs-number">17</span>)
-            (<span class="hljs-number">17</span> <span class="hljs-number">20</span> <span class="hljs-number">21</span> <span class="hljs-number">18</span>)
-        );
-    }
-);
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/acousticFoam/obliqueAirJet/main</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/acousticFoam/obliqueAirJet/main"><h3>算例问题：main</h3><p class="reference-case-problem">倾斜空气射流产生非定常流动与声学扰动，流动准备算例和声学主算例承担不同任务。precursor 提供所需背景信息，main 计算声压传播，阅读配置时应区分流动边界与声学边界。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/acousticFoam/obliqueAirJet/main"><code>compressible/acousticFoam/obliqueAirJet/main</code></a>。</p><figure class="reference-case-figure"><img alt="main 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/jet.svg" width="720"><figcaption>main 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>倾斜射流声学算例的 main 区先建立规则背景网格，后续数据与边界处理需结合配套流程。</p>
-<ul>
-<li><code>scale 1</code> 表示坐标直接按米使用，包围范围是 <code>x</code>: −0.2～2.2、<code>y</code>: −0.3～1.3、<code>z</code>: −0.2～2.2。</li>
-<li>单块 <code>(15 10 15)</code> 对应 2250 个单元，各方向间距均约 0.16 m。</li>
-<li><code>simpleGrading (1 1 1)</code> 使用均匀分布，<code>edges ()</code> 没有额外曲边。</li>
-<li><code>patches ()</code> 未在本文件细分边界，边界划分应继续对照算例的其他预处理配置。</li>
-</ul>
-<p>研究更高频的声学扰动时，需要按目标波长检查每波长网格数，并同步检查采样与时间步。</p>
-<p><a href="/assets/examples/v2512/blockmeshdict/3-blockMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/acousticFoam/obliqueAirJet/main/system/blockMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/acousticFoam/obliqueAirJet/main">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/acousticFoam/obliqueAirJet/main/system/blockMeshDict"><code>compressible/acousticFoam/obliqueAirJet/main/system/blockMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> blockMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-scale <span class="hljs-number">1</span>;
-vertices
-(
-    (<span class="hljs-number">-.2</span>  <span class="hljs-number">-.3</span>   <span class="hljs-number">-.2</span>)
-    (<span class="hljs-number">2.2</span>  <span class="hljs-number">-.3</span>  <span class="hljs-number">-.2</span>)
-    (<span class="hljs-number">2.2</span>  <span class="hljs-number">1.3</span>  <span class="hljs-number">-.2</span>)
-    (<span class="hljs-number">-.2</span>  <span class="hljs-number">1.3</span>  <span class="hljs-number">-.2</span>)
-    (<span class="hljs-number">-.2</span>  <span class="hljs-number">-.3</span>  <span class="hljs-number">2.2</span>)
-    (<span class="hljs-number">2.2</span>  <span class="hljs-number">-.3</span>  <span class="hljs-number">2.2</span>)
-    (<span class="hljs-number">2.2</span>  <span class="hljs-number">1.3</span>  <span class="hljs-number">2.2</span>)
-    (<span class="hljs-number">-.2</span>  <span class="hljs-number">1.3</span>  <span class="hljs-number">2.2</span>)
-);
-blocks
-(
-    hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) (<span class="hljs-number">15</span> <span class="hljs-number">10</span> <span class="hljs-number">15</span>) simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
-);
-edges ( );
-patches ( );
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/blockmesh/">blockMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -639,6 +306,6 @@ patches ( );
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,325 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>sixDoFRigidBodyMotion · 六自由度</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose">
-<p>利用流体作用力与力矩积分刚体运动，可增加约束及弹簧等限制。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>六自由度刚体模型由流体力和力矩计算物体的平移与转动。质量、惯量及外力决定运动响应，积分器负责推进位置和姿态。</p><p>配置时先确定受力表面、质心和惯量，再设置约束与 <code>restraints</code> 中的弹簧等作用。下面用带弹簧浮体说明各子字典的物理含义和相互关系。</p></div><!-- reference-concepts --><p>六自由度运动由合力与合力矩驱动。平动与转动的基本关系为：</p><p><span class="math-formula math-display" data-tex="m\ddot{\mathbf x}_c=\mathbf F,\qquad\frac{{\rm d}\mathbf L}{{\rm d}t}=\mathbf M"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>m</mi><msub><mover accent="true"><mi mathvariant="bold">x</mi><mo>¨</mo></mover><mi>c</mi></msub><mo>=</mo><mi mathvariant="bold">F</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mfrac><mrow><mi mathvariant="normal">d</mi><mi mathvariant="bold">L</mi></mrow><mrow><mi mathvariant="normal">d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi mathvariant="bold">M</mi></mrow><annotation encoding="application/x-tex">m\ddot{\mathbf x}_c=\mathbf F,\qquad\frac{{\rm d}\mathbf L}{{\rm d}t}=\mathbf M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8313em;vertical-align:-0.15em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6813em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathbf">x</span></span><span style="top:-3.0134em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">¨</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord mathbf">F</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">d</span></span></span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">d</span></span></span><span class="mord mathbf">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span></span></span></span></span></span></p><p>xc 是质心位置，<code>L</code> 为角动量；刚体惯量、姿态与角速度共同决定 <code>L</code>。<code>mass</code>、centreOfMass 和 momentOfInertia 必须对应同一物体；<code>constraints</code> 限制允许运动的自由度，restraints 增加弹簧、阻尼等力。流体压力、黏性力及外部载荷共同进入运动计算。</p><!-- /reference-concepts --><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/overInterDyMFoam/floatingBodyWithSpring/background"><h3>算例问题：background</h3><p class="reference-case-problem">水槽内的浮体通过弹簧与固定点相连，流体作用力和弹簧力共同决定浮体运动。水和空气采用界面捕捉方法，浮体附近的运动网格与背景网格通过重叠区域交换信息。算例用于研究浮体位移、自由液面变化及弹簧恢复力，配置时需同时考虑浮体质量、转动惯量、运动约束和网格连接。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background</code></a>。</p><figure class="reference-case-figure"><img alt="水槽中的弹簧浮体、自由液面及运动自由度" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/floating-spring.svg" width="720"><figcaption>水槽中的弹簧浮体、自由液面及运动自由度。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/constant/dynamicMeshDict</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>patches</code></td><td>用于积分流体力的物体表面。</td></tr><tr><td><code>mass / momentOfInertia</code></td><td>刚体质量与主惯性矩。</td></tr><tr><td><code>centreOfMass</code></td><td>初始质心。</td></tr><tr><td><code>constraints / restraints</code></td><td>几何约束与外加恢复力，例如运动轴限制和弹簧。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/dynamicMeshDict</code></h3><p>动网格类型与运动、细化参数。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/constant/dynamicMeshDict"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/constant/dynamicMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">84 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> dynamicMeshDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-dynamicFvMesh dynamicOversetFvMesh;
-solvers
-{
-    VF
-    {
-        motionSolverLibs (fvMotionSolvers);
-        motionSolver solidBody;
-        solidBodyMotionFunction drivenLinearMotion;
-        cellSet c0;
-        cOfGdisplacement CofG;
-    }
-    cube
-    {
-        motionSolverLibs (sixDoFRigidBodyMotion);
-        motionSolver sixDoFRigidBodyMotion;
-        cellSet c1;
-        patches (floatingObject);
-        innerDistance <span class="hljs-number">1000.0</span>;
-        outerDistance <span class="hljs-number">1001.0</span>;
-        centreOfMass (<span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.4</span>);
-        cOfGdisplacement CofG;
-        <span class="hljs-comment">// Cuboid dimensions</span>
-        Lx <span class="hljs-number">0.24</span>;
-        Ly <span class="hljs-number">0.24</span>;
-        Lz <span class="hljs-number">0.4</span>;
-        <span class="hljs-comment">// Density of the solid</span>
-        rhoSolid <span class="hljs-number">500</span>;
-        <span class="hljs-comment">// Cuboid mass</span>
-        mass <span class="hljs-meta">#eval{ $rhoSolid*$Lx*$Ly*$Lz };</span>
-        <span class="hljs-comment">// Cuboid moment of inertia about the centre of mass</span>
-        momentOfInertia <span class="hljs-meta">#codeStream</span>
-        {
-            <span class="hljs-keyword">codeInclude</span>
-            <span class="hljs-meta">#{</span>
-                <span class="hljs-meta">#include "diagTensor.H"</span>
-            #};
-            <span class="hljs-keyword">code</span>
-            <span class="hljs-meta">#{</span>
-                scalar sqrLx = sqr(<span class="hljs-variable">$Lx</span>);
-                scalar sqrLy = sqr(<span class="hljs-variable">$Ly</span>);
-                scalar sqrLz = sqr(<span class="hljs-variable">$Lz</span>);
-                os  &lt;&lt;
-                    <span class="hljs-variable">$mass</span>
-                *diagTensor(sqrLy + sqrLz, sqrLx + sqrLz, sqrLx + sqrLy)/<span class="hljs-number">12.0</span>;
-            #};
-        };
-        report <span class="hljs-literal">on</span>;
-        accelerationRelaxation <span class="hljs-number">0.6</span>;
-        accelerationDamping <span class="hljs-number">1</span>;
-        <span class="hljs-keyword">solver</span>
-        {
-            <span class="hljs-keyword">type</span> Newmark;
-        }
-        constraints
-        {
-            fixedAxis
-            {
-                sixDoFRigidBodyMotionConstraint plane;
-                normal (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-            }
-        }
-        restraints
-        {
-            linearSpring
-            {
-                sixDoFRigidBodyMotionRestraint linearSpring;
-                anchor (<span class="hljs-number">0</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.4</span>);
-                refAttachmentPt (<span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.4</span>);
-                stiffness <span class="hljs-number">300</span>;
-                damping <span class="hljs-number">0</span>;
-                restLength <span class="hljs-number">0</span>;
-            }
-        }
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p>本例由背景网格和随浮体运动的局部网格组成。<code>dynamicOversetFvMesh</code>负责网格更新与重叠关系；<code>solvers</code>内的两个子字典分别规定两组单元怎样运动。</p><p><code>VF</code>作用于<code>c0</code>，采用<code>solidBody</code>中的<code>drivenLinearMotion</code>；该运动读取名为<code>CofG</code>的位移信息确定的位移。<code>cube</code>作用于<code>c1</code>，通过<code>sixDoFRigidBodyMotion</code>计算浮体运动，并以同名<code>CofG</code>记录运动中心位移。本例的初始运动中心与质心一致，两个运动设置通过该位移信息耦合。</p><p><code>patches (floatingObject)</code>指定参与流体力与力矩积分的物体表面。<code>innerDistance</code>和<code>outerDistance</code>控制网格从随物体运动到不随物体运动的过渡距离；本例采用较大的过渡距离，使局部网格随浮体整体运动。</p><p>长方体尺寸为 0.24 m × 0.24 m × 0.4 m，体积为 0.02304 m³。密度为 500 kg/m³，因此<code>mass</code>中的表达式得到质量 11.52 kg。<code>momentOfInertia</code>按均匀长方体公式计算，三个主惯性矩依次为 0.208896、0.208896 和 0.110592 kg·m²。修改尺寸或密度时，这两段表达式会重新计算质量和惯量。</p><p><code>Newmark</code>用于积分刚体运动。<code>accelerationRelaxation 0.6</code>对加速度更新作松弛处理；<code>accelerationDamping 1</code>不再额外缩小加速度。二者影响运动更新，与弹簧的物理阻尼分别配置。</p><p>约束子字典虽然命名为<code>fixedAxis</code>，实际类型却是<code>plane</code>。法向量为<code>(0 0 1)</code>，限制的是沿 <code>z</code> 方向的平移，使平移保持在水平面内；该设置没有指定绕哪根轴转动。</p><p>弹簧固定端位于<code>(0 0.5 0.4)</code>，物体连接点初始位于<code>(0.5 0.5 0.4)</code>，两点相距 0.5 m。刚度 300 N/m、原长 0 m，对应初始拉力大小 150 N，方向指向固定端。<code>damping 0</code>表示弹簧模型不提供阻尼；流体仍可能耗散运动能量。</p><blockquote><p>熊猫说：子字典名称只用于组织配置，真正决定约束的是类型字段。这里的 fixedAxis 不能解释为“固定转轴”。另外，restLength 为零意味着初始时刻已经存在弹簧拉力。</p></blockquote><p>运行后先查看运动日志中的质心位移与姿态，再在 ParaView 中观察局部网格、浮体和水面的相对位置。还应检查重叠区域是否持续覆盖，以及两相体积和连续性误差是否出现异常变化。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/constant/dynamicMeshDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/constant/dynamicMeshDict.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0.orig/alpha.water</code></td><td>相分数，无量纲，通常在 0 到 1 之间。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0.orig/p_rgh</code></td><td>扣除静水压部分的压力，通常为 Pa。</td></tr><tr><td><code>0.orig/pointDisplacement</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/zoneID</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>constant/dynamicMeshDict</code></td><td>动网格类型与运动、细化参数。</td></tr><tr><td><code>constant/g</code></td><td>重力向量，m/s²。</td></tr><tr><td><code>constant/transportProperties</code></td><td>密度、黏度等输运物性；结构随求解器变化。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0.orig/U：速度向量，m/s。</summary><h3><code>0.orig/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/U"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/U</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volVectorField;
-    <span class="hljs-keyword">object</span> U;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-    oversetPatch
-    {
-        <span class="hljs-keyword">type</span> overset;
-    }
-    overset
-    {
-        patchType overset;
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    stationaryWalls
-    {
-        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    sidePatch
-    {
-        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    atmosphere
-    {
-        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    floatingObject
-    {
-        <span class="hljs-keyword">type</span> movingWallVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>oversetPatch</code> 采用 <code>overset</code>，通过重叠网格框架更新边界场。</li><li><code>overset</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。参数为 <code>patchType</code> <code>overset</code>。</li><li><code>stationaryWalls</code>、<code>sidePatch</code>、<code>atmosphere</code> 采用 <code>pressureInletOutletVelocity</code>，出流时外推速度，流入时依据通量确定法向速度。参数为 <code>value</code> <code>uniform (0 0 0)</code>。</li><li><code>floatingObject</code> 采用 <code>movingWallVelocity</code>，根据网格壁面运动计算流体壁面速度。参数为 <code>value</code> <code>uniform (0 0 0)</code>。</li></ul><p><code>0.orig/U</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/U.txt">下载此配置文件</a></p></details><details><summary>0.orig/alpha.water：相分数，无量纲，通常在 0 到 1 之间。</summary><h3><code>0.orig/alpha.water</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/alpha.water"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/alpha.water</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> alpha.water;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-    oversetPatch
-    {
-        <span class="hljs-keyword">type</span> overset;
-    }
-    sides
-    {
-        <span class="hljs-keyword">type</span> overset;
-    }
-    stationaryWalls
-    {
-        <span class="hljs-keyword">type</span> variableHeightFlowRate;
-        lowerBound <span class="hljs-number">0</span>;
-        upperBound <span class="hljs-number">1</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    atmosphere
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-    floatingObject
-    {
-        <span class="hljs-comment">//         type            variableHeightFlowRate;</span>
-        <span class="hljs-comment">//         lowerBound      0;</span>
-        <span class="hljs-comment">//         upperBound      1;</span>
-        <span class="hljs-comment">//         value           uniform 0;</span>
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    sidePatch
-    {
-        <span class="hljs-keyword">type</span> variableHeightFlowRate;
-        lowerBound <span class="hljs-number">0</span>;
-        upperBound <span class="hljs-number">1</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/alpha.water</code> 设置 <code>alpha.water</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>oversetPatch</code>、<code>sides</code> 采用 <code>overset</code>，通过重叠网格框架更新边界场。</li><li><code>stationaryWalls</code>、<code>sidePatch</code> 采用 <code>variableHeightFlowRate</code>，根据内部相分数和上下阈值确定开口处的相分数。参数为 <code>lowerBound</code> <code>0</code>，<code>upperBound</code> <code>1</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>atmosphere</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>floatingObject</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li></ul><p><code>0.orig/alpha.water</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/alpha.water">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/alpha.water.txt">下载此配置文件</a></p></details><details><summary>0.orig/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0.orig/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/epsilon"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField;
-    <span class="hljs-keyword">object</span> epsilon;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-<span class="hljs-keyword">boundaryField</span>
-{
-    <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-    stationaryWalls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-    }
-    <span class="hljs-string">"(atmosphere|sidePatch)"</span>
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
-        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-    }
-    floatingObject
-    {
-        <span class="hljs-keyword">type</span> epsilonWallFunction;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.1</span>;
-    }
-    overset
-    {
-        <span class="hljs-keyword">type</span> overset;
-    }
-    oversetPatch
-    {
-        <span class="hljs-keyword">type</span> overset;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 0.1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>stationaryWalls</code>、<code>"(atmosphere|sidePatch)"</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0.1</code>，<code>value</code> <code>uniform 0.1</code>。</li><li><code>floatingObject</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>uniform 0.1</code>。</li><li><code>overset</code>、<code>oversetPatch</code> 采用 <code>overset</code>，通过重叠网格框架更新边界场。</li></ul><p><code>0.orig/epsilon</code>还读取<code>"caseDicts/setConstraintTypes"</code>。以 #<code>includeEtc</code> 引入的配置来自安装环境；相对路径引用的文件需要随算例保留，修改引用内容会改变最终展开的字典。</p></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/0.orig/epsilon.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/system/fvSolution"><code>multiphase/overInterDyMFoam/floatingBodyWithSpring/background/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">78 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> fvSolution;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-solvers
-{
-    <span class="hljs-string">"cellDisplacement.*"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
-        preconditioner DIC;
-        tolerance <span class="hljs-number">1e-06</span>;
-        relTol <span class="hljs-number">0</span>;
-        maxIter <span class="hljs-number">100</span>;
-    }
-    <span class="hljs-string">"alpha.water.*"</span>
-    {
-        nAlphaCorr <span class="hljs-number">2</span>;
-        nAlphaSubCycles <span class="hljs-number">2</span>;
-        cAlpha <span class="hljs-number">1</span>;
-        icAlpha <span class="hljs-number">0</span>;
-        MULESCorr <span class="hljs-literal">yes</span>;
-        nLimiterIter <span class="hljs-number">5</span>;
-        alphaApplyPrevCorr <span class="hljs-literal">no</span>;
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
-        smoother symGaussSeidel;
-        tolerance <span class="hljs-number">1e-8</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-    <span class="hljs-string">"pcorr.*"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
-        preconditioner DIC;
-        tolerance <span class="hljs-number">1e-9</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-    p_rgh
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner DILU;
-        tolerance <span class="hljs-number">1e-9</span>;
-        relTol <span class="hljs-number">0.01</span>;
-    }
-    p_rghFinal
-    {
-        <span class="hljs-variable">$p_rgh</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-    <span class="hljs-string">"(U|k|omega|epsilon).*"</span>
-    {
-        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
-        smoother symGaussSeidel;
-        tolerance <span class="hljs-number">1e-08</span>;
-        relTol <span class="hljs-number">0</span>;
-    }
-}
-<span class="hljs-built_in">PIMPLE</span>
-{
-    momentumPredictor <span class="hljs-literal">no</span>;
-    nOuterCorrectors <span class="hljs-number">1</span>;
-    nCorrectors <span class="hljs-number">3</span>;
-    nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    oversetAdjustPhi <span class="hljs-literal">no</span>;
-}
-relaxationFactors
-{
-    fields
-    {
-    }
-    equations
-    {
-        <span class="hljs-string">".*"</span> <span class="hljs-number">1</span>;
-    }
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>"cellDisplacement.*"</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断；<code>maxIter</code> <code>100</code>：限定单次线性求解的最大迭代次数。</td></tr><tr><td><code>"alpha.water.*"</code></td><td><code>nAlphaCorr</code> <code>2</code>：相分数校正次数；<code>nAlphaSubCycles</code> <code>2</code>：一个流动时间步内的相分数子循环次数；<code>cAlpha</code> <code>1</code>：界面压缩强度；<code>MULESCorr</code> <code>yes</code>：是否采用 MULES 通量修正；<code>nLimiterIter</code> <code>5</code>：通量限制器迭代次数；<code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>symGaussSeidel</code>：选择光顺方法；<code>tolerance</code> <code>1e-8</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"pcorr.*"</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-9</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>p_rgh</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-9</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.01</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>p_rghFinal</code></td><td><code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|k|omega|epsilon).*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>symGaussSeidel</code>：选择光顺方法；<code>tolerance</code> <code>1e-08</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/momentumPredictor</code> = <code>no</code>：控制是否单独求解动量预测步骤。</li><li><code>PIMPLE/nOuterCorrectors</code> = <code>1</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>3</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>relaxationFactors/equations/".*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/background/system/fvSolution.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
-<span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/multiphase/overInterDyMFoam/floatingBodyWithSpring"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/floatingBodyWithSpring-reference"</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/floatingBodyWithSpring-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p><details><summary>Allrun.pre：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun.pre</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-<span class="hljs-comment"># Mesh floating body</span>
-(<span class="hljs-built_in">cd</span> floatingBody &amp;&amp; ./Allrun.pre)
-
-<span class="hljs-comment"># Add background mesh</span>
-(<span class="hljs-built_in">cd</span> background  &amp;&amp; ./Allrun.pre)
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><code>cd</code> 切换当前工作目录。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/Allrun.pre">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/Allrun.pre.txt">下载此配置文件</a></p></details><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
-. <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>
-<span class="hljs-comment">#------------------------------------------------------------------------------</span>
-
-./Allrun.pre
-
-(<span class="hljs-built_in">cd</span> background &amp;&amp; runApplication $(getApplication))
-
-<span class="hljs-comment">#------------------------------------------------------------------------------</span></code></pre></div><p><code>cd</code> 切换当前工作目录。从 <code>system/controlDict</code> 的 <code>application</code> 读取求解器名称，运行后将日志保存在算例目录。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/floatingBodyWithSpring/Allrun">查看官方原文件</a> · <a href="/downloads/reference-v2512/multiphase/overInterDyMFoam/floatingBodyWithSpring/Allrun.txt">下载此配置文件</a></p></details><h2>结果检查</h2><p>检查质心位移、转角、力和力矩，以及运动引起的网格质量变化。</p><p><a href="/mesh-motion/">返回动网格与刚体运动</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -624,6 +306,6 @@ relaxationFactors
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

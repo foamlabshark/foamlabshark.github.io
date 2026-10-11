@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,269 +276,7 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>分流再汇合静态混合器</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>建立液体配料中的横向混合与阻力模型，分析挡板位置与两股流量比对出口示踪剂方差、压降和混合长度的影响。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>静态混合器通过固定构件改变两股液体的空间分布，无需外部旋转机构。分流和再汇合增加组分接触面，但层流下分子扩散仍需要时间。出现弯曲流线并不等于组分已经均匀，必须检查出口浓度分布。</p>
-<p>本例将两股物性相同的液体分别赋予示踪值 1 和 0，通过中央分流块及交替侧挡板。速度场由不可压缩流动方程得到，示踪剂按给定扩散系数输运。计算比较挡板间距和进料流量比对出口浓度方差与压降的影响。</p>
-<h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p>几何由 <code>design.json</code> 中的尺寸和位置生成，采用中央分流块与两级交替侧向挡板。坐标与尺寸均使用 m，流向由边界速度向量确定。</p>
-<p><img src="/assets/engineering/split-recombine-mixer-geometry.webp" alt="分流再汇合静态混合器的结构分区与流动方向"></p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>基准值</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>计算域外包尺寸</td>
-<td>0.24 × 0.04 × 0.02 m</td>
-<td>实际计算空间由流体块体并集确定</td>
-</tr>
-<tr>
-<td>流体密度</td>
-<td>998.2 kg/m³</td>
-<td>惯性、压差换算和质量流量</td>
-</tr>
-<tr>
-<td>运动黏度</td>
-<td>1.004e-06 m²/s</td>
-<td>分子黏性输运</td>
-</tr>
-<tr>
-<td>基础网格</td>
-<td>18,560 单元</td>
-<td>默认 MESH_REFINE=2 的设计网格</td>
-</tr>
-<tr>
-<td>分子扩散系数</td>
-<td>1e-08 m²/s</td>
-<td>示踪输运的基准扩散系数</td>
-</tr>
-</tbody></table></div>
-<p>几何各部分的坐标范围如下。流体块体先合并，再从中划分导热固体或扣除障碍物；因此相邻、相交块体不会重复占据体积。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>部件</th>
-<th><code>x</code> 范围 / m</th>
-<th><code>y</code> 范围 / m</th>
-<th><code>z</code> 范围 / m</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>流体区域1</td>
-<td>0～0.24</td>
-<td>0～0.04</td>
-<td>0～0.02</td>
-</tr>
-<tr>
-<td>障碍物1</td>
-<td>0.025～0.065</td>
-<td>0.012～0.028</td>
-<td>0～0.02</td>
-</tr>
-<tr>
-<td>障碍物2</td>
-<td>0.09～0.13</td>
-<td>0～0.028</td>
-<td>0～0.02</td>
-</tr>
-<tr>
-<td>障碍物3</td>
-<td>0.155～0.195</td>
-<td>0.012～0.04</td>
-<td>0～0.02</td>
-</tr>
-</tbody></table></div>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>边界名称</th>
-<th>作用</th>
-<th>基准条件</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>feedA</code></td>
-<td>入口</td>
-<td><code>U</code> = (0.04 0 0) m/s</td>
-</tr>
-<tr>
-<td><code>feedB</code></td>
-<td>入口</td>
-<td><code>U</code> = (0.04 0 0) m/s</td>
-</tr>
-<tr>
-<td><code>outlet</code></td>
-<td>出口</td>
-<td>压力参考值 0</td>
-</tr>
-</tbody></table></div>
-<h2 id="物理模型与求解方法"><a href="#物理模型与求解方法" class="headerlink" title="物理模型与求解方法"></a>物理模型与求解方法</h2><p>不可压缩流动满足质量守恒与动量守恒：</p>
-<p><span class="math-formula math-display" data-tex="
-\nabla\cdot\mathbf U=0,\qquad
-\rho\left(\frac{\partial\mathbf U}{\partial t}+\mathbf U\cdot\nabla\mathbf U\right)
-=-\nabla p+\nabla\cdot\boldsymbol\tau+\mathbf f.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi mathvariant="bold">U</mi><mo>=</mo><mn>0</mn><mo separator="true">,</mo><mspace width="2em"></mspace><mi>ρ</mi><mrow><mo fence="true">(</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi mathvariant="bold">U</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi mathvariant="bold">U</mi><mo>⋅</mo><mi mathvariant="normal">∇</mi><mi mathvariant="bold">U</mi><mo fence="true">)</mo></mrow><mo>=</mo><mo>−</mo><mi mathvariant="normal">∇</mi><mi>p</mi><mo>+</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi mathvariant="bold-italic">τ</mi><mo>+</mo><mi mathvariant="bold">f</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\nabla\cdot\mathbf U=0,\qquad
-\rho\left(\frac{\partial\mathbf U}{\partial t}+\mathbf U\cdot\nabla\mathbf U\right)
-=-\nabla p+\nabla\cdot\boldsymbol\tau+\mathbf f.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathbf">U</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">U</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">∇</span><span class="mord mathbf">U</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">−</span><span class="mord">∇</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.1347em;">τ</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathbf" style="margin-right:0.109em;">f</span><span class="mord">.</span></span></span></span></span></span></p>
-<p>其中，<span class="math-formula" data-tex="\mathbf U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">U</mi></mrow><annotation encoding="application/x-tex">\mathbf U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">U</span></span></span></span></span> 为速度，<span class="math-formula" data-tex="p"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span></span> 为物理压力，<span class="math-formula" data-tex="\boldsymbol\tau"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold-italic">τ</mi></mrow><annotation encoding="application/x-tex">\boldsymbol\tau</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4444em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.1347em;">τ</span></span></span></span></span></span></span> 为黏性应力，<span class="math-formula" data-tex="\mathbf f"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="bold">f</mi></mrow><annotation encoding="application/x-tex">\mathbf f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathbf" style="margin-right:0.109em;">f</span></span></span></span></span> 为单位体积外力。连续性方程约束各截面的流量收支；动量方程描述压力、黏性作用和外力如何改变速度。</p>
-<p>两股流体另用被动标量 <span class="math-formula" data-tex="c"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span> 标记，其输运方程为</p>
-<p><span class="math-formula math-display" data-tex="
-\frac{\partial c}{\partial t}+\nabla\cdot(\mathbf Uc)=\nabla\cdot(D_{\mathrm{eff}}\nabla c).
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>c</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi mathvariant="bold">U</mi><mi>c</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mo stretchy="false">(</mo><msub><mi>D</mi><mrow><mi mathvariant="normal">e</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">f</mi></mrow></msub><mi mathvariant="normal">∇</mi><mi>c</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\frac{\partial c}{\partial t}+\nabla\cdot(\mathbf Uc)=\nabla\cdot(D_{\mathrm{eff}}\nabla c).
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">U</span><span class="mord mathnormal">c</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight" style="margin-right:0.0778em;">eff</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∇</span><span class="mord mathnormal">c</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></span></p>
-<p>入口示踪值由 <code>tracer</code> 字段规定，标量不反过来改变流动物性。层流使用给定扩散系数，湍流工况另计涡扩散。通过出口平均值核对进料比例，通过截面方差评价混合程度。</p>
-<p>本例使用 <code>simpleFoam</code>，通过稳态迭代求解，日志中的 <code>Time</code> 表示迭代序号。基准采用层流模型，黏性应力由分子黏度确定。</p>
-<h2 id="配置文件与网格建立"><a href="#配置文件与网格建立" class="headerlink" title="配置文件与网格建立"></a>配置文件与网格建立</h2><p><a href="/downloads/engineering/split-recombine-mixer.zip">下载完整算例与配置代码</a>。解压目录中已提供 <code>0.orig/</code>、<code>constant/</code>、<code>system/</code> 和几何数据，<code>build_case.py</code> 根据 <code>design.json</code> 重建相同输入；生成程序只使用 Python 标准库。</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
-<thead>
-<tr>
-<th>文件或目录</th>
-<th>操作与用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>design.json</code></td>
-<td>修改部件坐标、流体物性、速度或热功率；随后重新生成字典</td>
-</tr>
-<tr>
-<td><code>geometry/model.obj</code></td>
-<td>查看几何分区；曲线叶道以 <code>blockMesh</code> 圆弧为准</td>
-</tr>
-<tr>
-<td><code>system/blockMeshDict</code></td>
-<td>多块六面体网格的顶点、单元数与边界面</td>
-</tr>
-<tr>
-<td><code>0.orig/</code></td>
-<td>初始场和边界条件；建网格时复制到 <code>0/</code></td>
-</tr>
-<tr>
-<td><code>constant/</code></td>
-<td>物性、物理模型与区域设置</td>
-</tr>
-<tr>
-<td><code>system/fvSchemes</code>、<code>system/fvSolution</code></td>
-<td>离散格式、线性求解和耦合控制</td>
-</tr>
-<tr>
-<td><code>Allmesh</code>、<code>Allsolve</code></td>
-<td>分别完成网格准备与求解、结果提取</td>
-</tr>
-</tbody></table></div>
-<p>多块网格在肋片边缘、支路开口和分区界面处共享坐标平面，使边界与几何位置一致。默认加密级别为 2，薄通道与窄缝另外保留最低单元层数。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下条目取自本页下载包的同名文件，几何和边界名称与上表对应。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
-{
-    feedA
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0.04</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
-    }
-    feedB
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0.04</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    }
-}
-</code></pre></div>
-<p>固定速度入口与已知截面积共同确定流量。出口采用 <code>pressureInletOutletVelocity</code>，使速度与边界通量协调；实体表面为无滑移壁面。<code>MRF</code> 中的旋转壁面速度由旋转区处理。</p>
-<h3 id="0-orig-p"><a href="#0-orig-p" class="headerlink" title="0.orig/p"></a><code>0.orig/p</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
-{
-    feedA
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    walls
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    feedB
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
-    }
-    outlet
-    {
-        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-    }
-}
-</code></pre></div>
-<p><code>simpleFoam</code> 中该字段是运动学压力，量纲为 m²/s²。出口参考值为 0，物理压差应乘以流体密度；速度入口使用零法向梯度，让压力由流量约束形成。</p>
-<h3 id="constant-turbulenceProperties"><a href="#constant-turbulenceProperties" class="headerlink" title="constant/turbulenceProperties"></a><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">simulationType <span class="hljs-built_in">laminar</span>;
-</code></pre></div>
-<p><code>simulationType</code> 决定是否求解湍流闭合模型。<code>RAS</code> 工况使用 SST 模型及随包的 <code>k</code>、<code>omega</code>、<code>nut</code> 字段；<code>laminar</code> 工况只使用物性文件中的分子黏度。</p>
-<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">tracerTransport
-{
-    <span class="hljs-keyword">type</span> scalarTransport;
-    <span class="hljs-keyword">libs</span> (solverFunctionObjects);
-    field tracer;
-    D <span class="hljs-number">1e-08</span>;
-    nCorr <span class="hljs-number">1</span>;
-    resetOnStartUp <span class="hljs-literal">false</span>;
-    writeControl writeTime;
-}
-</code></pre></div>
-<p><code>field</code> 指定求解的示踪字段。层流中 <code>D</code> 直接给出扩散系数；湍流中 <code>alphaD</code> 与 <code>alphaDt</code> 分别乘以分子和涡黏度构造扩散系数。改变扩散系数后应比较出口方差，并检查网格引入的数值扩散。</p>
-<h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p>在 Linux 中加载 OpenCFD OpenFOAM <code>v2512</code>，然后进入解压目录：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">cd</span> split-recombine-mixer
-bash Allmesh
-bash Allsolve
-</code></pre></div>
-<p>安装位置不同，只需调整第一行环境路径。<code>Allmesh</code> 生成输入和网格，复制初始场并检查网格质量；<code>Allsolve</code> 调用 <code>simpleFoam</code>，运行后将监测记录整理到 <code>analysis/</code>。各阶段的详细信息分别写入 <code>log.blockMesh</code>、<code>log.checkMesh</code> 和 <code>log.simpleFoam</code>，遇到错误时脚本会停止并显示对应日志末尾。</p>
-<p>修改工况时，先在新解压目录中编辑 <code>design.json</code>，再执行 <code>Allmesh</code>。网格生成以后，边界调整应写入 <code>0/</code>；如果重新生成网格，程序会再次使用参数文件和 <code>0.orig/</code>。保留各工况独立目录，便于核对尺寸、物性与结果。</p>
-<p>先检查残差是否持续下降，再查看流量、压差和温度或转矩是否趋于稳定。不同方程的残差尺度不同，采用工程监测量的稳定性判断迭代是否足够。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>沿通道绘制多个截面的示踪值分布，观察两股液体接触面积如何变化。出口平均值应与两路流量比一致；平均值正确但方差较大时，说明质量守恒成立而混合仍不足。先用相同网格比较方案，再加密验证浓度界面的数值扩散影响。</p>
-<p>在 ParaView 中打开 <code>case.foam</code>，选择最后一个已写出时刻。用 <strong>Slice</strong> 建立上述截面，用 <strong>Plot Over Line</strong> 提取沿线变化；流量计算使用速度的截面法向分量，配合 <strong>Integrate Variables</strong> 积分。输出表格时使用 <strong>Save <code>Data</code></strong>，工况比较保持截面位置、色标和平均方式相同。</p>
-<p><code>analysis/monitor-history.csv</code> 保存监测对象的时间或迭代历史，<code>analysis/metrics.json</code> 整理边界流量、压力和温度等可用指标。内部通道分流、局部方差或单个壁面载荷按本节给出的选区继续提取。边界流量采用外法向为正，入口一般为负，出口一般为正。</p>
-<p>多个出口的流量均匀性可以用离散系数评价：</p>
-<p><span class="math-formula math-display" data-tex="
-\bar Q=\frac{1}{N}\sum_{i=1}^{N}Q_i,\qquad
-C_V=\frac{\sqrt{N^{-1}\sum_{i=1}^{N}(Q_i-\bar Q)^2}}{\bar Q}.
-"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mover accent="true"><mi>Q</mi><mo>ˉ</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>Q</mi><mi>i</mi></msub><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi>C</mi><mi>V</mi></msub><mo>=</mo><mfrac><msqrt><mrow><msup><mi>N</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo stretchy="false">(</mo><msub><mi>Q</mi><mi>i</mi></msub><mo>−</mo><mover accent="true"><mi>Q</mi><mo>ˉ</mo></mover><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></msqrt><mover accent="true"><mi>Q</mi><mo>ˉ</mo></mover></mfrac><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
-\bar Q=\frac{1}{N}\sum_{i=1}^{N}Q_i,\qquad
-C_V=\frac{\sqrt{N^{-1}\sum_{i=1}^{N}(Q_i-\bar Q)^2}}{\bar Q}.
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0145em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">Q</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.1345em;vertical-align:-0.9045em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.23em;"><span style="top:-2.6157em;"><span class="pstrut" style="height:3.3258em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">Q</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span><span style="top:-3.5558em;"><span class="pstrut" style="height:3.3258em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-4.23em;"><span class="pstrut" style="height:3.3258em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3258em;"><span class="svg-align" style="top:-3.8em;"><span class="pstrut" style="height:3.8em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">Q</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-3.2858em;"><span class="pstrut" style="height:3.8em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.88em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.88em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M983 90
-l0 -0
-c4,-6.7,10,-10,18,-10 H400000v40
-H1013.1s-83.4,268,-264.1,840c-180.7,572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7
-s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744
-c-10,12,-21,25,-33,39s-32,39,-32,39c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30
-c26.7,-32.7,52,-63,76,-91s52,-60,52,-60s208,722,208,722
-c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,-658.5
-c53.7,-170.3,84.5,-266.8,92.5,-289.5z
-M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5142em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9045em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord">.</span></span></span></span></span></span></p>
-<p><span class="math-formula" data-tex="C_V"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">C_V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 越小，所选各支路的流量越接近。只有面积与任务相当的支路才适合直接用相同目标流量比较；截面积或需求不同的支路，应分别采用其设计流量作为参照。</p>
-<h2 id="参数比较与网格收敛"><a href="#参数比较与网格收敛" class="headerlink" title="参数比较与网格收敛"></a>参数比较与网格收敛</h2><p>保持总流量，分别将两路流量比设为 1:1、2:1；移动第二挡板，使两级间距改变 20 mm，比较出口浓度方差。</p>
-<p>先完成基准工况，再每次改变一个设计因素。记录几何尺寸、入口总流量、出口示踪剂方差、压降和混合长度，将性能变化与流场结构对应。对选定方案再做网格比较：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">MESH_REFINE=4 bash Allmesh
-bash Allsolve
-</code></pre></div>
-<p>在新的解压目录执行上述命令，各方向相对默认级别增加一倍单元数。比较时使用相同物性、边界条件及结果提取位置，检查主要工程量随网格变化的幅度。自由液面案例还需减小 <code>maxDeltaT</code>，比较水位幅值和相位；示踪混合案例需同时检查浓度界面的数值扩散。</p>
-<blockquote>
-<p><strong>熊猫说：</strong> 流量由法向速度积分得到。比较方案时保持所要求的流量或压差一致，才能解释阻力变化。</p>
-</blockquote>
-<h2 id="配套代码与资料"><a href="#配套代码与资料" class="headerlink" title="配套代码与资料"></a>配套代码与资料</h2><ul>
-<li><a href="/downloads/engineering/split-recombine-mixer.zip">下载几何、完整配置、运行及分析代码</a>。<code>VALIDATION.json</code> 和 <code>validation/</code> 保存 <code>v2512</code> 网格检查与短程启动记录，<code>files.sha256</code> 可用于核对文件完整性。</li>
-<li><a href="https://www.openfoam.com/documentation/user-guide">OpenFOAM 用户指南</a>：算例结构、网格与求解流程。</li>
-<li><a href="https://api.openfoam.com/2512/">OpenFOAM v2512 源码文档</a>：字段、边界和模型实现。</li>
-</ul>
-<p><a href="/topics/engineering/">返回实际工程应用</a></p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -568,6 +306,6 @@ bash Allsolve
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

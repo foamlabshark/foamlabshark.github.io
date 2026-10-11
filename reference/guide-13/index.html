@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,121 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 13 章　system/fvSchemes（离散格式）</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>它管什么：每一项微分算子用什么数值格式离散。这是精度与稳定性的主要旋钮，也是初学者最容易被卡住的地方。</p>
-<h2>13.1 六个子字典</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes
-{
-}
-<span class="hljs-comment">// 时间导数 ∂/∂t</span>
-gradSchemes
-{
-}
-<span class="hljs-comment">// 梯度 ∇</span>
-divSchemes
-{
-}
-<span class="hljs-comment">// 对流项 ∇·( )   ← 最关键</span>
-laplacianSchemes
-{
-}
-<span class="hljs-comment">// 扩散项 ∇²</span>
-interpolationSchemes
-{
-}
-<span class="hljs-comment">// 单元中心 → 面 的插值</span>
-snGradSchemes
-{
-}
-<span class="hljs-comment">// 面法向梯度</span>
-wallDist
-{
-}
-<span class="hljs-comment">// 壁面距离算法（湍流模型需要）</span></code></pre></div><!-- example-reading --><p>这些空子字典展示 <code>fvSchemes</code> 的组织结构，还没有给出可运行的离散设置。<code>ddtSchemes</code> 处理时间导数，<code>gradSchemes</code> 和 <code>snGradSchemes</code> 分别处理体梯度与面法向梯度，<code>divSchemes</code> 处理散度项，<code>laplacianSchemes</code> 处理扩散项；后面的小节分别给出填入各子字典的格式。</p><!-- /example-reading -->
-<h2>13.2 ddtSchemes</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>写法</th><th>精度/性质</th><th>何时用</th></tr>
-<tr><td><code>steadyState</code></td><td>去掉时间项</td><td>稳态求解器必须用这个</td></tr>
-<tr><td><code>Euler</code></td><td>一阶隐式，无条件稳定，有数值耗散</td><td>瞬态起步、鲁棒优先</td></tr>
-<tr><td><code>backward</code></td><td>二阶隐式</td><td>LES/DNS 的主力</td></tr>
-<tr><td><code>CrankNicolson</code> 0.9</td><td>二阶，系数 0~1（0=<code>Euler</code>，1=纯 CN）</td><td>精度要求高时，一般取 0.9 保稳</td></tr>
-<tr><td><code>localEuler</code></td><td>伪时间步（局部时间步长加速收敛）</td><td>稳态加速</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes
-{
-    default <span class="hljs-built_in">backward</span>;
-}</code></pre></div>
-<p><code>LES</code> 需要控制时空离散的数值耗散。可选择 <code>backward</code> 或适当的 <code>CrankNicolson</code> 配置，并检查稳定性、网格分辨率与统计量；使用一阶 <code>Euler</code> 时，重点检查时间步对结果的影响。</p>
-<h2>13.3 gradSchemes</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>写法</th><th>说明</th></tr>
-<tr><td><code>Gauss</code> <code>linear</code></td><td>标准二阶，最常用</td></tr>
-<tr><td><code>leastSquares</code></td><td>最小二乘，网格差时更准</td></tr>
-<tr><td><code>cellLimited</code> <code>Gauss</code> <code>linear</code> 1</td><td>限制梯度不产生新极值，1 = 完全限制</td></tr>
-<tr><td><code>cellLimited</code>&lt;<code>cubic</code>&gt; 1.5 <code>Gauss</code> <code>linear</code> 1</td><td>更平滑的限制器</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">gradSchemes
-{
-    default         Gauss linear;
-    grad(U)         cellLimited Gauss linear 1;    // 网格差或有激波时加限制
-}</code></pre></div>
-<h2>13.4 divSchemes（对流项，最关键）</h2>
-<p>写法是 <code>Gauss</code> &lt;插值格式&gt;，<code>Gauss</code> 表示用高斯定理做体积分→面积分。真正起作用的是后面的插值格式：</p>
-<div class="table-scroll"><table>
-<tbody><tr><th>插值格式</th><th>阶数</th><th>有界性</th><th>评价</th></tr>
-<tr><td><code>upwind</code></td><td>一阶</td><td>绝对有界</td><td>最稳但最耗散，只用来救急或做初场</td></tr>
-<tr><td><code>linear</code></td><td>二阶中心</td><td>无界</td><td>精度最好，<code>LES</code> 用；RANS 上容易振荡</td></tr>
-<tr><td><code>linearUpwind</code> <code>grad</code>(<code>U</code>)</td><td>二阶迎风</td><td>基本有界</td><td>稳态 RANS 的常用选择</td></tr>
-<tr><td><code>limitedLinear</code> 1</td><td>二阶 + 限制器</td><td>有界</td><td>通用、稳健，1 最严格</td></tr>
-<tr><td><code>vanLeer</code></td><td>TVD</td><td>有界</td><td>相分数 <code>alpha</code> 常用</td></tr>
-<tr><td><code>interfaceCompression</code> <code>vanLeer</code> 1</td><td>VOF 界面压缩</td><td></td><td><code>interFoam</code> 的 <code>alpha</code> 方程</td></tr>
-<tr><td><code>LUST</code> <code>grad</code>(<code>U</code>)</td><td>75% 线性 + 25% 迎风</td><td></td><td><code>LES</code> 折中方案</td></tr>
-<tr><td><code>limitedLinear01</code> 1</td><td>限制在 [0,1]</td><td></td><td><code>alpha</code>、组分等有物理上下界的量</td></tr>
-</tbody></table></div>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">// 稳态 RANS 的典型配置
-divSchemes
-{
-    default         none;                          // ★ 强制每一项都显式指定
-    div(phi,U)      bounded Gauss linearUpwind grad(U);
-    div(phi,k)      bounded Gauss limitedLinear 1;
-    div(phi,omega)  bounded Gauss limitedLinear 1;
-    div((nuEff*dev2(T(grad(U))))) Gauss linear;
-}
-// LES 的典型配置
-divSchemes
-{
-    default         none;
-    div(phi,U)      Gauss LUST grad(U);
-    div(phi,k)      Gauss limitedLinear 1;
-    div((nuEff*dev2(T(grad(U))))) Gauss linear;
-}
-// interFoam（VOF）的典型配置
-divSchemes
-{
-    default         none;
-    div(rhoPhi,U)   Gauss linearUpwind grad(U);
-    div(phi,alpha)  Gauss vanLeer;
-    div(phirb,alpha) Gauss linear;              // 界面压缩项
-    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
-}</code></pre></div>
-<p>在相应格式字典中使用 <code>default</code> <code>none</code>，可要求相关项显式指定离散格式。缺失项会在运行时报告。应先确认方程项、变量及适用格式，再补充配置，避免仅根据名称机械复制。</p>
-<p><code>bounded</code> 用于稳态输运方程，通过减去 <span class="math-formula" data-tex="(\nabla \cdot \varphi )U"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi>φ</mi><mo stretchy="false">)</mo><mi>U</mi></mrow><annotation encoding="application/x-tex">(\nabla \cdot \varphi )U</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">φ</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span></span> 修正迭代过程中质量不守恒造成的源项。</p>
-<h2>13.5 laplacianSchemes 与 snGradSchemes</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">laplacianSchemes { default Gauss linear corrected; }
-snGradSchemes    { default corrected; }</code></pre></div>
-<div class="table-scroll"><table>
-<tbody><tr><th>修正方式</th><th>适用非正交角</th></tr>
-<tr><td><code>orthogonal</code></td><td>完全正交网格（如标准 <code>blockMesh</code> 方腔）</td></tr>
-<tr><td><code>corrected</code></td><td>&lt; 70°，标准选择</td></tr>
-<tr><td><code>limited</code> <code>corrected</code> 0.5</td><td>70°–80°，0.5 表示限制到一半</td></tr>
-<tr><td><code>limited</code> <code>corrected</code> 0.33</td><td>&gt; 80°，更保守</td></tr>
-<tr><td><code>uncorrected</code></td><td>不修正，最稳但有误差</td></tr>
-</tbody></table></div>
-<p>怎么选：跑一次 <code>checkMesh</code> 看最大非正交角，按上表挑。这就是 6.5 节强调 <code>checkMesh</code> 的原因之一——它的输出直接决定这里怎么填。</p>
-<h2>13.6 其余两项</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">interpolationSchemes { default linear; }
-wallDist             { method meshWave; }</code></pre></div><!-- example-reading --><p><code>fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>wallDist/method</code></td><td><code>meshWave</code></td><td>到壁面的距离算法，从壁面传播距离信息。</td></tr></tbody></table></div><!-- /example-reading -->
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -420,6 +306,6 @@ wallDist             { method meshWave; }</code></pre></div><!-- example-reading
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

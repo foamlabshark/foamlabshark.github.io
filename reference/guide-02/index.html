@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,76 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>第 2 章　安装与环境激活</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><h2>2.1 三条安装路线怎么选</h2>
-<div class="table-scroll"><table>
-<tbody><tr><th>路线</th><th>适合谁</th><th>代价</th></tr>
-<tr><td>deb 二进制包</td><td>只想用、不改源码</td><td>5 分钟装完，但装在 /usr/lib/openfoam 下，改源码需要 <code>root</code></td></tr>
-<tr><td>源码编译</td><td>要读源码、写自己的求解器（推荐给做科研的）</td><td>首次编译 1–3 小时</td></tr>
-<tr><td>Docker / WSL2</td><td>主力系统是 Windows 或 macOS</td><td>多一层容器，图形界面（ParaView）配置略麻烦</td></tr>
-</tbody></table></div>
-<h2>2.2 路线一：deb 包安装（Ubuntu）</h2>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 添加官方软件源（只需一次）</span>
-curl -s https://dl.openfoam.com/add-debian-repo.sh | <span class="hljs-built_in">sudo</span> bash
-
-<span class="hljs-comment"># ② 安装 v2512</span>
-<span class="hljs-built_in">sudo</span> apt update
-<span class="hljs-built_in">sudo</span> apt install openfoam2512-default
-
-<span class="hljs-comment"># ③ 激活环境</span>
-<span class="hljs-built_in">source</span> /usr/lib/openfoam/openfoam2512/etc/bashrc
-<span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span></code></pre></div>
-<p>激活 etc/bashrc 会设置可执行程序、共享库和教程等路径。环境未激活时，终端可能找不到 <code>blockMesh</code>，或者错误调用其他版本的程序。激活后应同时检查 <code>WM_PROJECT_VERSION</code>、<code>WM_PROJECT_DIR</code> 和 <code>command</code> <code>-v</code> <code>blockMesh</code>。</p>
-<h2>2.3 路线二：源码编译（Ubuntu 26.04，装到家目录）</h2>
-<p>安装在 ~/OpenFOAM 后，可以在个人目录中修改源码、编译求解器，并分别管理多个版本。</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ① 装编译依赖</span>
-<span class="hljs-built_in">sudo</span> apt update
-<span class="hljs-built_in">sudo</span> apt install -y build-essential autoconf autotools-dev cmake gawk gnuplot \
-  flex libfl-dev libreadline-dev zlib1g-dev openmpi-bin libopenmpi-dev \
-  mpi-default-bin mpi-default-dev libgmp-dev libmpfr-dev libmpc-dev
-
-<span class="hljs-comment"># ② 建目录并下载源码（OpenFOAM 本体 + ThirdParty 第三方库）</span>
-<span class="hljs-built_in">mkdir</span> -p ~/OpenFOAM &amp;&amp; <span class="hljs-built_in">cd</span> ~/OpenFOAM
-wget https://dl.openfoam.com/source/v2512/OpenFOAM-v2512.tgz
-wget https://dl.openfoam.com/source/v2512/ThirdParty-v2512.tgz
-tar -xzf OpenFOAM-v2512.tgz
-tar -xzf ThirdParty-v2512.tgz
-
-<span class="hljs-comment"># ③ 激活环境（编译前必须先 source，编译脚本靠环境变量找路径）</span>
-<span class="hljs-built_in">source</span> ~/OpenFOAM/OpenFOAM-v2512/etc/bashrc
-
-<span class="hljs-comment"># ④ 编译前体检：检查 gcc、mpi、flex 等是否齐全</span>
-foamSystemCheck
-
-<span class="hljs-comment"># ⑤ 编译（-j 用满所有核心；-s 静默；-l 写日志，出错时好排查）</span>
-<span class="hljs-built_in">cd</span> <span class="hljs-variable">$WM_PROJECT_DIR</span>
-./Allwmake -j -s -l
-
-<span class="hljs-comment"># ⑥ 编译后自检</span>
-foamInstallationTest</code></pre></div>
-<p>关于 ThirdParty：里面是 <code>scotch</code>（并行分区）、CGAL、FFTW 等第三方库。ESI 版在 Ubuntu 上大多能直接用系统自带的这些库，所以 ThirdParty 常常只需要解压、不需要单独编译。若 <code>foamSystemCheck</code> 提示某个库缺失，再进 ThirdParty 目录跑 ./Allwmake。</p>
-<p>8 核虚拟机编译约需 1–2 小时。中断后重新运行 ./Allwmake 可继续编译。</p>
-<h2>2.4 让 source 变得省事（同时支持多版本共存）</h2>
-<p>为不同 OpenFOAM 版本分别设置加载命令，需要时执行对应的 <code>source</code> .../etc/bashrc，保持当前终端使用同一版本的程序和库。</p>
-<p>可在 ~/.bashrc 中为不同安装定义别名，并在使用时显式激活所需版本。别名中的路径必须与实际安装位置一致：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-comment"># ~/.bashrc 末尾</span>
-<span class="hljs-built_in">alias</span> of2512=<span class="hljs-string">'source $HOME/OpenFOAM/OpenFOAM-v2512/etc/bashrc'</span>
-<span class="hljs-built_in">alias</span> of2506=<span class="hljs-string">'source $HOME/OpenFOAM/OpenFOAM-v2506/etc/bashrc'</span>
-<span class="hljs-built_in">source</span> ~/.bashrc     <span class="hljs-comment"># 让别名立即生效</span>
-of2512               <span class="hljs-comment"># 从此每开一个终端，敲一次这个</span>
-<span class="hljs-built_in">printf</span> <span class="hljs-string">'%s\n'</span> <span class="hljs-string">"<span class="hljs-variable">$WM_PROJECT_VERSION</span>"</span>  <span class="hljs-comment"># 版本变量不依赖交互式别名</span></code></pre></div>
-<h2>2.5 路线三：Docker / WSL2（Windows 用户）</h2>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext"># WSL2：先在 PowerShell 里装 Ubuntu，之后一切按 2.2 / 2.3 操作
-wsl --install -d Ubuntu
-
-# Docker：官方镜像
-docker run -it --rm -v $HOME/OpenFOAM:/data opencfd/openfoam-default:2512</code></pre></div>
-<p>WSL2 里跑 ParaView 有两种方式：装 Windows 版 ParaView，然后在 Windows 里打开 WSL 路径（\\wsl$\Ubuntu\home\你的用户名\...）；或在 WSL 里装 Linux 版 ParaView（Windows 11 的 WSLg 已内置图形支持）。推荐前者，更流畅。</p>
-<h2>2.6 ParaView 怎么装</h2>
-<p>deb 包 openfoam2512-default 会带一个 ParaView。如果想用新版（例如 6.x），去 paraview.org 下官方二进制包解压到家目录，然后把它的 <code>bin</code> 加进 <code>PATH</code>：</p>
-<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'export PATH=$HOME/ParaView-6.1.1/bin:$PATH'</span> &gt;&gt; ~/.bashrc</code></pre></div>
-<p><code>v2512</code> 的 <code>paraFoam</code> 调用 <code>PATH</code> 中的 <code>paraview</code>。<code>-vtk</code>（等同于 <code>-builtin</code>）使用 ParaView 内置 OpenFOAM 读取器；<code>-block</code> 使用匹配的 blockReader 插件。用 <code>command</code> <code>-v</code> <code>paraview</code> 查看程序位置，再选择所需读取器。</p><h2>环境函数与安装程序的区别</h2><p><code>foamVersion</code>、<code>tut</code>、<code>run</code> 可由环境脚本定义为函数或别名。用 <code>type</code> <code>foamVersion</code> 查看当前定义，<code>echo</code> <code>$WM_PROJECT_VERSION</code> 查询版本，<code>command</code> <code>-v</code> <code>blockMesh</code> 查找程序位置。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/config.sh/aliases">v2512 的函数与别名定义</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/bin/tools/foamExec">foamExec 的位置和环境激活实现</a></p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -375,6 +306,6 @@ docker run -it --rm -v $HOME/OpenFOAM:/data opencfd/openfoam-default:2512</code>
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

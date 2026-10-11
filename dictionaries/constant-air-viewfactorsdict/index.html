@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,109 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>viewFactorsDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>辐射视角因子预处理的配置，用于表面间辐射交换。</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p><code>viewFactorsDict</code> 配置表面间辐射视角因子的几何预处理。它决定采用什么计算方法及相关控制，输出数据随后交给辐射模型，用来描述各表面之间能交换多少辐射能量。</p>
-<!-- /reference-introduction -->
-<p>位置：<code>constant/air/viewFactorsDict</code></p><h2 id="examples">配置示例</h2><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation"><h3>算例问题：multiRegionHeaterRadiation</h3><p class="reference-case-problem">加热器及周围固体、流体划分为不同区域，热量通过固体导热、流体对流和表面辐射传递。计算需要连接区域间的温度边界，并为参与辐射的表面设置辐射属性；主要观察各区域温度及界面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation"><code>heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation</code></a>。</p><figure class="reference-case-figure"><img alt="multiRegionHeaterRadiation 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>multiRegionHeaterRadiation 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionFoam/externalSolarLoad"><h3>算例问题：externalSolarLoad</h3><p class="reference-case-problem">外部太阳辐射照射到多区域结构，表面吸收的辐射能量进入固体与流体的传热计算。太阳方向、遮挡、表面光学性质和各区域热物性共同决定温度分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalSolarLoad"><code>heatTransfer/chtMultiRegionFoam/externalSolarLoad</code></a>。</p></section><!-- /reference-case-contexts --><p>multiRegionHeaterRadiation 的 <code>topAir</code> 区域通过视角系数描述表面间的辐射交换，本文件控制预处理结果的输出。</p>
-<ul>
-<li><code>writeViewFactorMatrix true</code> 保存视角系数矩阵，矩阵元素表示某个表面发出的辐射到达另一表面的几何比例。</li>
-<li>实际参加交换的表面由辐射模型、边界配置及面聚合结果共同确定。</li>
-</ul>
-<p>改变遮挡关系或网格表面后应重新生成视角系数；可检查封闭系统的行和与面积互易关系判断几何计算是否合理。</p>
-<p><a href="/assets/examples/v2512/viewfactorsdict/1-viewFactorsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation/constant/topAir/viewFactorsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation/constant/topAir/viewFactorsDict"><code>heatTransfer/chtMultiRegionSimpleFoam/multiRegionHeaterRadiation/constant/topAir/viewFactorsDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> viewFactorsDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-writeViewFactorMatrix <span class="hljs-literal">true</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionFoam/externalSolarLoad</summary><p>externalSolarLoad 在 <code>air</code> 区域生成视角系数，并把辐射壁面聚合成较少的面组以降低几何求交成本。</p>
-<ul>
-<li><code>patchAgglomeration/viewFactorWall</code> 选择辐射壁面，<code>nFacesInCoarsestLevel 10</code> 指定最粗聚合层的目标面数。</li>
-<li><code>featureAngle 45</code> 限制跨越明显几何折角的聚合，有助于保留表面朝向变化。</li>
-<li><code>writeFacesAgglomeration true</code> 保存聚合分区，<code>writeViewFactorMatrix true</code> 保存视角系数矩阵。</li>
-<li><code>writePatchViewFactors false</code> 关闭 <code>patch</code> 级结果输出，<code>maxDynListLength 200000</code> 设置相关动态列表的容量上限。</li>
-</ul>
-<p>先显示聚合面组确认遮挡边缘和折角仍有足够分辨率，再比较更细聚合下的辐射热流。</p>
-<p><a href="/assets/examples/v2512/viewfactorsdict/2-viewFactorsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalSolarLoad/constant/air/viewFactorsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/externalSolarLoad">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> viewFactorsDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-writeViewFactorMatrix <span class="hljs-literal">true</span>;
-writePatchViewFactors <span class="hljs-literal">false</span>;
-<span class="hljs-comment">// Write rays as lines to .obj file</span>
-<span class="hljs-comment">//dumpRays                    true;</span>
-<span class="hljs-comment">// Switch on debug for faceAgglomerate</span>
-<span class="hljs-comment">//debug                       1;</span>
-writeFacesAgglomeration <span class="hljs-literal">true</span>;
-patchAgglomeration
-{
-    <span class="hljs-comment">// Do all of the view-factor patches</span>
-    viewFactorWall
-    {
-        nFacesInCoarsestLevel <span class="hljs-number">10</span>;
-        featureAngle <span class="hljs-number">45</span>;
-    }
-}
-maxDynListLength <span class="hljs-number">200000</span>;
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · etc/caseDicts/annotated</summary><p>这个注释模板控制辐射面的聚合及射线调试输出，示例边界为 <code>bottomAir_to_heater</code>。</p>
-<ul>
-<li><code>nFacesInCoarsestLevel 30</code> 设置该边界在最粗层的目标面数，<code>featureAngle 10</code> 对折角采用较严格的聚合条件。</li>
-<li><code>writeFacesAgglomeration true</code> 输出各面所属聚合组，便于在可视化中检查。</li>
-<li><code>debug 0</code>、<code>dumpRays false</code> 保持常规输出规模；分析遮挡或射线问题时可按工具支持的选项开启调试。</li>
-</ul>
-<p>迁移到其他加热器时替换边界名，并根据曲率、遮挡物尺寸和表面温度变化选择聚合尺度。</p>
-<p><a href="/assets/examples/v2512/viewfactorsdict/3-viewFactorsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/viewFactorsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2512                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/</span>
-<span class="hljs-keyword">FoamFile</span>
-{
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary;
-    <span class="hljs-keyword">object</span> viewFactorsDict;
-}
-<span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-<span class="hljs-comment">// Write agglomeration as a volScalarField with calculated boundary values</span>
-writeFacesAgglomeration <span class="hljs-literal">true</span>;
-<span class="hljs-comment">//Debug option</span>
-debug <span class="hljs-number">0</span>;
-<span class="hljs-comment">//Dump connectivity rays</span>
-dumpRays <span class="hljs-literal">false</span>;
-<span class="hljs-comment">// Per patch (wildcard possible) the coarsening level</span>
-bottomAir_to_heater
-{
-    nFacesInCoarsestLevel <span class="hljs-number">30</span>;
-    featureAngle <span class="hljs-number">10</span>;
-}
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/viewfactorsgen/">viewFactorsGen</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
-
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -408,6 +306,6 @@ bottomAir_to_heater
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>

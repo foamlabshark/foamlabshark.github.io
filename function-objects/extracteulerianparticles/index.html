@@ -13,22 +13,22 @@
   <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
   <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=d3390a38e3e8">
+  <link rel="stylesheet" href="/assets/site-core.css?v=ef65b9aa73f5">
   <link rel="stylesheet" href="/assets/function-objects.css?v=b83b221cf453">
   
-  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  <script src="/assets/runtime-account.js?v=2b88fb31cc0d" defer></script>
   
   <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
   <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
   <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
-  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  <script src="/assets/site.js?v=a3139aaee920" defer></script>
   
   <script src="/assets/function-objects.js?v=2d3cba1704ad" defer></script>
   
-  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
+  <script src="/assets/runtime-content.js?v=35588619e528" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
-  <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
+  <script src="/assets/runtime-ui.js?v=2e3fb396a0c8" defer></script>
   <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
   <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
@@ -276,93 +276,7 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>extractEulerianParticles</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>从欧拉相分数输运中提取颗粒事件数据</p><!-- reference-introduction -->
-<h2 id="brief-introduction">简要介绍</h2>
-<p>此对象在指定 <code>faceZone</code> 上识别相分数输运形成的颗粒事件，将欧拉界面信息整理为颗粒数据。它适合把一段界面计算的输出用于后续拉格朗日注入，阈值决定如何识别事件。</p>
-<!-- /reference-introduction -->
-<h2 id="usage">配置方法</h2><p>将下面的对象放入 <code>system/controlDict</code> 的 <code>functions</code> 字典。对象名可以自定；<code>type</code> 选择工具，<code>libs</code> 加载实现它的库。</p><p>配套教程配置：<code>multiphase/interFoam/laminar/vofToLagrangian/eulerianInjection/system/controlDict</code>。</p><p>完整的配置放置与运行方法见 <a href="/function-objects/usage/">functionObject 配置说明</a>。</p><h2 id="parameters">参数说明</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>extractEulerianParticles</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td><code>(fieldFunctionObjects)</code></td></tr><tr><td><code>faceZone</code></td><td>参与处理的面区域名称。</td><td>必填</td><td><code>—</code></td></tr><tr><td><code>alpha</code></td><td>相分数场名称。</td><td>必填</td><td><code>—</code></td></tr><tr><td><code>alphaThreshold</code></td><td>识别相区域或颗粒事件的相分数阈值。</td><td>可选</td><td><code>0.1</code></td></tr><tr><td><code>nLocations</code></td><td>生成的颗粒注入分箱数量。</td><td>可选</td><td><code>0</code></td></tr><tr><td><code>U</code></td><td>速度场名称。</td><td>可选</td><td><code>U</code></td></tr><tr><td><code>rho</code></td><td>密度场名称；使用常密度时按示例选择 <code>rhoInf</code>。</td><td>可选</td><td><code>rho</code></td></tr><tr><td><code>phi</code></td><td>面通量场名称。</td><td>可选</td><td><code>phi</code></td></tr><tr><td><code>minDiameter</code></td><td>统计或识别的最小直径。</td><td>可选</td><td><code>SMALL</code></td></tr><tr><td><code>maxDiameter</code></td><td>统计或识别的最大直径。</td><td>可选</td><td><code>GREAT</code></td></tr><tr><td><code>writeToFile</code></td><td>是否保存统计文本文件</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writePrecision</code></td><td>文本数值的有效位数</td><td>可选</td><td><code>全局写出精度</code></td></tr><tr><td><code>useUserTime</code></td><td>是否采用用户时间单位</td><td>可选</td><td><code>true</code></td></tr></tbody></table></div><!-- reference-configuration-supplement -->
-<h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
-<!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p>在指定 <code>faceZone</code> 上从相分数输运记录颗粒事件，用于把欧拉界面数据转成后续拉格朗日注入数据。本例选择 <code>collector</code>，<code>alphaThreshold</code> 定义液相事件识别阈值。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    extractEulerianParticles1
-    {
-        <span class="hljs-keyword">type</span> extractEulerianParticles;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        faceZone collector;
-        alpha alpha.water;
-        alphaThreshold <span class="hljs-number">0.1</span>;
-        nLocations <span class="hljs-number">20</span>;
-        U U;
-        rho rho;
-        phi phi;
-        writePrecision <span class="hljs-number">6</span>;
-        writeToFile <span class="hljs-literal">true</span>;
-        useUserTime <span class="hljs-literal">false</span>;
-        region region0;
-        enabled <span class="hljs-literal">true</span>;
-        log <span class="hljs-literal">true</span>;
-        timeStart <span class="hljs-number">0</span>;
-        timeEnd <span class="hljs-number">1000</span>;
-        executeControl timeStep;
-        executeInterval <span class="hljs-number">1</span>;
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-    }
-}</code></pre></div><h3 id="example-2">示例 2 · 提高相分数阈值</h3><p>以液相更集中的区域识别事件，比较阈值对提取结果的影响。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    extractEulerianParticles1
-    {
-        <span class="hljs-keyword">type</span> extractEulerianParticles;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        faceZone collector;
-        alpha alpha.water;
-        alphaThreshold <span class="hljs-number">0.5</span>;
-        nLocations <span class="hljs-number">20</span>;
-        U U;
-        rho rho;
-        phi phi;
-        writePrecision <span class="hljs-number">6</span>;
-        writeToFile <span class="hljs-literal">true</span>;
-        useUserTime <span class="hljs-literal">false</span>;
-        region region0;
-        enabled <span class="hljs-literal">true</span>;
-        log <span class="hljs-literal">true</span>;
-        timeStart <span class="hljs-number">0</span>;
-        timeEnd <span class="hljs-number">1000</span>;
-        executeControl timeStep;
-        executeInterval <span class="hljs-number">1</span>;
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-    }
-}</code></pre></div><h3 id="example-3">示例 3 · 增加注入分箱</h3><p>更细地组织收集面上的事件位置。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
-{
-    extractEulerianParticles1
-    {
-        <span class="hljs-keyword">type</span> extractEulerianParticles;
-        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
-        faceZone collector;
-        alpha alpha.water;
-        alphaThreshold <span class="hljs-number">0.1</span>;
-        nLocations <span class="hljs-number">40</span>;
-        U U;
-        rho rho;
-        phi phi;
-        writePrecision <span class="hljs-number">6</span>;
-        writeToFile <span class="hljs-literal">true</span>;
-        useUserTime <span class="hljs-literal">false</span>;
-        region region0;
-        enabled <span class="hljs-literal">true</span>;
-        log <span class="hljs-literal">true</span>;
-        timeStart <span class="hljs-number">0</span>;
-        timeEnd <span class="hljs-number">1000</span>;
-        executeControl timeStep;
-        executeInterval <span class="hljs-number">1</span>;
-        writeControl writeTime;
-        writeInterval <span class="hljs-number">1</span>;
-    }
-}</code></pre></div><h2 id="related">相关工具</h2><p><a href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8">颗粒与两相速查</a> · <a href="/function-objects/">全部 functionObject</a></p><p>延伸阅读：<a href="/read/?slug=function-objects-16">专题课程</a>。</p><p class="source-note">参考：<a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/functionObjects/field/extractEulerianParticles/extractEulerianParticles/extractEulerianParticles.H">OpenFOAM v2512 · extractEulerianParticles 接口</a>。</p>
-</div>
+    <div class="prose"></div><noscript><p>请启用 JavaScript 并登录后阅读正文。</p><a class="button" href="/account/">前往登录</a></noscript>
   </article>
   <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
 </div>
@@ -392,6 +306,6 @@
 </span>
  <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
 </div>
-<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>
