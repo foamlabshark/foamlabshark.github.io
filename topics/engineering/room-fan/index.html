@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>室内旋转风扇的送风与回流 · FoamLab</title>
-  <meta name="description" content="解析室内吊扇的叶片转动和送风，分析家具遮挡、回流与人员活动区域的风速。">
+  <meta name="description" content="解析室内吊扇叶片运动，计算家具和墙面对送风范围、回流及活动区风速的影响。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>室内旋转风扇的送风与回流</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>解析室内吊扇的叶片转动和送风，分析家具遮挡、回流与人员活动区域的风速。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>室内风扇产生的气流不仅由叶片决定，还受到天花板、墙面和家具的约束。风扇下方的高速区可能伴随周围大尺度回流，使不同位置的体感风速差异较大。把风扇简化为一个均匀速度入口，难以判断叶片附近流动和室内回流的联系。</p>
-<p>本例保留风扇、房间和桌面曲面，由实际旋转网格计算叶片运动。房门提供缓慢来流，另一开口排出空气。<code>pimpleFoam</code> 求解不可压缩瞬态流动，可用于比较转速对送风范围和局部风速的影响。</p>
+    <div class="prose"><p>解析室内吊扇叶片运动，计算家具和墙面对送风范围、回流及活动区风速的影响。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>吊扇推动空气后，射流受到地面、家具和墙面约束，形成室内循环。活动区风速既取决于转速，也取决于射流扩散和回流路径。循环气流与门窗之间的净换气具有不同来源，需要分别评价。</p>
+<p>算例保留风扇、房间和桌面几何，用旋转网格解析叶片运动。房门施加缓慢来流，另一开口排气，<code>pimpleFoam</code> 求解瞬态不可压缩流动。计算通过活动区速度分布和进出口流量，比较转速对送风和净通风的影响。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/room-fan-geometry.webp" alt="室内旋转风扇的送风与回流：配套模型与基准输入"></p>
-<p>公开模型包含房间、桌面和风扇，背景域约为 6.5 m × 5.5 m × 3 m。风扇转轴通过 <code>(−3 2 2.6)</code> m，沿 <code>z</code> 方向。转动区域 <code>rotatingZone</code> 通过 <code>AMI1</code> 和 <code>AMI2</code> 与房间网格连接。</p>
+<p>背景域约为 6.5 m × 5.5 m × 3 m。风扇轴心位于 <code>(−3 2 2.6)</code> m，转轴沿 <code>z</code> 方向。<code>rotatingZone</code> 包含运动网格，通过 <code>AMI1</code>、<code>AMI2</code> 与静止房间网格连接。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom">OpenFOAM v2512 · incompressible/pimpleFoam/RAS/rotatingFanInRoom</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -357,7 +357,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-constant-dynamicMeshDict"><a href="#1-constant-dynamicMeshDict" class="headerlink" title="1. constant/dynamicMeshDict"></a>1. <code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-风扇旋转轴"><a href="#1-风扇旋转轴" class="headerlink" title="1. 风扇旋转轴"></a>1. 风扇旋转轴</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置风扇旋转轴。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
 
 motionSolverLibs (fvMotionSolvers);
 
@@ -367,17 +368,19 @@ cellZone        rotatingZone;
 
 solidBodyMotionFunction  rotatingMotion;
 </code></pre></div>
-<p><code>origin</code> 必须穿过风扇几何的真实轴心。若只移动曲面而没有移动旋转轴，叶片会围绕错误位置转动并破坏 AMI 连接。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/constant/dynamicMeshDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-U"><a href="#2-0-orig-U" class="headerlink" title="2. 0.orig/U"></a>2. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">fan
+<p><code>origin</code>、<code>axis</code> 和角速度确定叶片转动轨迹。移动风扇时同步移动几何、旋转区域和轴心，使其空间关系保持一致。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
+<h3 id="2-叶片与房门边界"><a href="#2-叶片与房门边界" class="headerlink" title="2. 叶片与房门边界"></a>2. 叶片与房门边界</h3><p>文件：<code>0.orig/U</code>。本段设置叶片与房门边界。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">fan
 {
     <span class="hljs-keyword">type</span>            movingWallVelocity;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p>叶片用运动壁面速度，房门用固定来流速度。两者共同影响房间流量：吊扇主要组织内部循环，房门和出口则决定净换气。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-controlDict"><a href="#3-system-controlDict" class="headerlink" title="3. system/controlDict"></a>3. <code>system/controlDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">stopAt          endTime;
+<p>风扇表面使用运动壁面速度，房门使用固定来流速度。前者组织室内循环，后者与出口共同确定外界空气的净交换。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/0.orig/U">查看该配置的官方原文件</a>。</p>
+<h3 id="3-运行与统计时间"><a href="#3-运行与统计时间" class="headerlink" title="3. 运行与统计时间"></a>3. 运行与统计时间</h3><p>文件：<code>system/controlDict</code>。本段设置运行与统计时间。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">stopAt          endTime;
 
 endTime         <span class="hljs-number">1</span>;
 
@@ -389,8 +392,8 @@ writeInterval   <span class="hljs-number">0.02</span>;
 
 purgeWrite      <span class="hljs-number">0</span>;
 </code></pre></div>
-<p>原始运行终点为 1 s，适合先检查转动和流动启动。正式比较室内平均风速时应延长至回流结构建立，并覆盖多个转动周期。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/system/controlDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>1 s 的终点用于观察启动过程。计算平均风速时，延长运行至回流建立，再对完整的多个转动周期进行统计。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/rotatingFanInRoom/system/controlDict">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.pimpleFoam
 </code></pre></div>
@@ -435,12 +438,12 @@ purgeWrite      <span class="hljs-number">0</span>;
 <td><code>1</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选房间内部，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>U</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>先显示风扇附近的瞬态速度，再在人员活动高度建立水平截面，比较平均风速分布。查看桌面后方和墙角的低速区，区分风扇形成的循环流与房门到出口的净通风。</p>
-<p>分别测试半转速、基准转速和较高转速，记录活动区平均风速、最高风速及低速区面积。开始统计前检查这些量是否还在持续变化，并保证各工况使用相同统计时间长度。</p>
+<p>在人员活动高度建立水平截面，输出平均风速，并观察桌后、墙角和风扇周围的回流。以进出口净流量描述换气，以室内速度和流线描述循环，两组结果共同说明风扇作用。</p>
+<p>比较半转速、基准转速和较高转速下的活动区平均风速、最高风速及低速区面积。先延长计算至这些统计量不再持续漂移，再使用相同长度、覆盖多个旋转周期的时间窗取平均。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 有风感不等于换气充分。风扇能增强室内循环，但新风量仍由进出口净流量决定。</p>
+<p><strong>熊猫说：</strong> 吊扇主要加强室内循环。评价新风供给时，另行统计房门与出口的净流量。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/room-fan.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

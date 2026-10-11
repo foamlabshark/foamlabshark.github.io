@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>汽车风挡玻璃的结露与除雾 · FoamLab</title>
-  <meta name="description" content="耦合湿空气输运、玻璃导热和壁面相变，计算风挡从结露到暖风除雾的变化。">
+  <meta name="description" content="求解湿空气输运与风挡导热，跟踪低温玻璃结露及干燥暖风除雾的过程。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>汽车风挡玻璃的结露与除雾</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>耦合湿空气输运、玻璃导热和壁面相变，计算风挡从结露到暖风除雾的变化。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>风挡结露发生在湿空气接触低温玻璃时，水蒸气向表面迁移并凝结成液体。除雾需要同时提高玻璃温度和降低附近空气的水蒸气含量，单独提高风速或温度不一定能解释水膜消退速度。</p>
-<p>本例使用乘员舱气流与玻璃两个区域。空气中的 <code>H2O</code> 标量描述水蒸气质量分数，湿度耦合温度边界计算壁面凝结与蒸发。60 s 后启动较热且干燥的送风，形成一个可以追踪结露和除雾先后阶段的工况。</p>
+    <div class="prose"><p>求解湿空气输运与风挡导热，跟踪低温玻璃结露及干燥暖风除雾的过程。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>湿空气接触低温风挡后，邻近表面的水蒸气可能达到饱和并凝结。除雾需要改变玻璃温度和附近水蒸气含量：加热提高饱和蒸气压，干燥送风降低水蒸气分压，两者共同决定水分迁移方向。流量分布则影响这些作用能够覆盖的风挡区域。</p>
+<p>算例分别计算舱内空气与玻璃。<code>H2O</code> 场描述水蒸气质量分数，湿度耦合温度边界计算凝结、蒸发及潜热交换。前 60 s 建立结露状态，随后引入较热的干空气，观察表面水分消退和玻璃升温。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/windshield-condensation-geometry.webp" alt="汽车风挡玻璃的结露与除雾：配套模型与基准输入"></p>
-<p>风挡和舱内送风通道来自官方 windshieldCondensation，展向宽 0.7 m。玻璃体区域为 <code>windshield</code>，其导热系数为 0.9 W/(m·K)、密度 2400 kg/m³、比热 500 J/(kg·K)。外侧以换热系数边界连接到 260 K 环境。</p>
+<p>模型使用 <code>windshieldCondensation</code> 的风挡和送风通道，展向宽 0.7 m。玻璃区域为 <code>windshield</code>，密度 2400 kg/m³、比热 500 J/(kg·K)、导热系数 0.9 W/(m·K)。外侧通过对流换热边界与 260 K 环境交换热量。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation">OpenFOAM v2512 · heatTransfer/chtMultiRegionFoam/windshieldCondensation</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -362,7 +362,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-cabin-T"><a href="#1-0-orig-cabin-T" class="headerlink" title="1. 0.orig/cabin/T"></a>1. <code>0.orig/cabin/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cabin_to_windshield
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-界面的凝结与蒸发"><a href="#1-界面的凝结与蒸发" class="headerlink" title="1. 界面的凝结与蒸发"></a>1. 界面的凝结与蒸发</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置界面的凝结与蒸发。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cabin_to_windshield
 {
     <span class="hljs-keyword">type</span>            humidityTemperatureCoupledMixed;
     kappaMethod     fluidThermo;
@@ -387,9 +388,10 @@ bash Allmesh
     <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
 }
 </code></pre></div>
-<p><code>humidityTemperatureCoupledMixed</code> 连接温度、湿度与相变质量通量。<code>mode condensationAndEvaporation</code> 同时允许凝结与蒸发，<code>specie H2O</code> 指定水蒸气场。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/cabin/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-cabin-H2O"><a href="#2-0-orig-cabin-H2O" class="headerlink" title="2. 0.orig/cabin/H2O"></a>2. <code>0.orig/cabin/H2O</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<p><code>humidityTemperatureCoupledMixed</code> 联立界面温度与相变通量。<code>mode condensationAndEvaporation</code> 同时允许凝结和蒸发，<code>specie H2O</code> 将相变过程连接到水蒸气输运场。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
+<h3 id="2-干燥送风切换"><a href="#2-干燥送风切换" class="headerlink" title="2. 干燥送风切换"></a>2. 干燥送风切换</h3><p>文件：<code>0.orig/cabin/H2O</code>。本段设置干燥送风切换。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            uniformFixedValue;
     uniformValue           table
@@ -401,9 +403,10 @@ bash Allmesh
     );
 }
 </code></pre></div>
-<p>入口水蒸气质量分数在 60～61 s 由 0.01 降至 0，表示开始送入干空气。这里的 0.01 是质量分数，不是相对湿度 1%。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/cabin/H2O">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-orig-windshield-T"><a href="#3-0-orig-windshield-T" class="headerlink" title="3. 0.orig/windshield/T"></a>3. <code>0.orig/windshield/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">exterior
+<p>入口 <code>H2O</code> 在 60～61 s 从 0.01 降至 0，表示湿空气切换为干空气。0.01 是质量分数，其对应相对湿度还取决于温度与压力。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/cabin/H2O">查看该配置的官方原文件</a>。</p>
+<h3 id="3-玻璃外侧散热"><a href="#3-玻璃外侧散热" class="headerlink" title="3. 玻璃外侧散热"></a>3. 玻璃外侧散热</h3><p>文件：<code>0.orig/windshield/T</code>。本段设置玻璃外侧散热。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">exterior
 {
     <span class="hljs-keyword">type</span>            externalWallHeatFluxTemperature;
     mode            coefficient;
@@ -414,8 +417,8 @@ bash Allmesh
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">260</span>;
 }
 </code></pre></div>
-<p>外部环境用对流换热边界表示，<code>h</code> 与 <code>Ta</code> 分别指定换热系数和空气温度。它持续从玻璃外侧带走热量，因此会影响除雾后玻璃达到的温度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/windshield/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>h</code> 和 <code>Ta</code> 分别规定外部换热系数与环境温度。该边界持续与玻璃交换热量，影响结露初态和除雾后的最终温度。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldCondensation/0.orig/windshield/T">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.chtMultiRegionFoam
 </code></pre></div>
@@ -456,12 +459,12 @@ bash Allmesh
 <td><code>yes</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选<code>cabin</code> 与 <code>windshield</code>，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>分别显示风挡温度、水蒸气质量分数和壁面凝结相关输出，记录干燥送风启动前后水膜变化。比较风挡底部受直接吹拂区域与上部远端，分析流量分配对除雾速度的作用。</p>
-<p>固定送风速度，依次改变送风温度和入口水蒸气质量分数。绘制相同位置的壁温与水分通量曲线，解释除雾来自加热、稀释或两者共同作用。保留 60 s 前的过程，才能获得正确的初始凝结状态。</p>
+<p>同步记录风挡温度、邻近水蒸气质量分数和壁面水分通量，比较干燥送风启动前后的变化。在底部直接吹拂区与上部远端设置相同类型的监测点，分析送风覆盖对除雾速度的影响。</p>
+<p>保持速度不变，分别调整送风温度和水蒸气质量分数。壁温曲线反映加热作用，水分通量反映凝结与蒸发的变化。各组工况保留完整的结露阶段，使除雾比较具有对应的初始水分状态。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 相对湿度取决于温度和压力。若从湿度计读数设置工况，应先换算水蒸气质量分数，再填写 <code>H2O</code>。</p>
+<p><strong>熊猫说：</strong> 湿度计通常给出相对湿度，<code>H2O</code> 则需要质量分数。换算时同时使用空气温度和压力。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/windshield-condensation.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

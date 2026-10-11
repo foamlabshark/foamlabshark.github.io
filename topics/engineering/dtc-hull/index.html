@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>DTC 集装箱船模的自由液面阻力 · FoamLab</title>
-  <meta name="description" content="使用 Duisburg Test Case 船模计算航行产生的自由液面和阻力，完成船体曲面、液位及气动力积分设置。">
+  <meta name="description" content="采用 DTC 缩尺船体计算定常航行的兴波与阻力，建立自由液面、液位和水动力积分设置。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>DTC 集装箱船模的自由液面阻力</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>使用 Duisburg Test Case 船模计算航行产生的自由液面和阻力，完成船体曲面、液位及气动力积分设置。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>船舶阻力由黏性作用、压力分布和兴波共同构成。船首与船尾波系的相互作用随航速改变，因而不能仅用完全浸没物体的绕流代表水面船舶。缩尺试验和 CFD 比较还必须统一船体尺度、吃水和 Froude 数。</p>
-<p>DTC 是公开的集装箱船型基准。本例使用其缩尺船体曲面，保持船体固定，以水流经过船体表示航行。VOF 描述空气与水界面，船体表面积分给出压力和黏性力。基准使用局部时间步加速建立定常航行的平均自由液面。</p>
+    <div class="prose"><p>采用 DTC 缩尺船体计算定常航行的兴波与阻力，建立自由液面、液位和水动力积分设置。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>水面船舶航行时同时产生壁面黏性阻力、压力阻力和自由液面波动。船首与船尾波系随航速变化并相互作用，使阻力与速度之间的关系受到船型、吃水和重力波尺度的共同影响。缩尺船模的比较因此需要统一几何尺度、吃水和 Froude 数。</p>
+<p>算例采用公开的 Duisburg Test Case 集装箱船型，在固定船体周围施加来流。VOF 方法追踪水—空气界面，船体表面应力积分给出压力力与黏性力；局部时间步用于加速建立定常航行平均流场。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/dtc-hull-geometry.webp" alt="DTC 集装箱船模的自由液面阻力：配套模型与基准输入"></p>
-<p>模型曲面为 <code>DTC-scaled.stl.gz</code>，使用 <code>y</code> ≤ 0 的半船计算域，并在中纵面采用对称条件。背景域范围为 <code>x</code> = −26～16 m、<code>y</code> = −19～0 m、<code>z</code> = −16～4 m。水位和船体相对位置由曲面与 <code>setFieldsDict</code> 共同确定，缩尺船体应按原文件尺寸直接使用。</p>
+<p><code>DTC-scaled.stl.gz</code> 给出缩尺船体。计算使用 <code>y</code> ≤ 0 的半船域，中纵面采用对称条件。背景域为 <code>x</code> = −26～16 m、<code>y</code> = −19～0 m、<code>z</code> = −16～4 m，初始液位由 <code>setFieldsDict</code> 给定，与船体位置共同确定吃水。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull">OpenFOAM v2512 · multiphase/interFoam/RAS/DTCHull</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -421,7 +421,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-U"><a href="#1-0-orig-U" class="headerlink" title="1. 0.orig/U"></a>1. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Umean <span class="hljs-number">1.668</span>;
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-航速与流向"><a href="#1-航速与流向" class="headerlink" title="1. 航速与流向"></a>1. 航速与流向</h3><p>文件：<code>0.orig/U</code>。本段设置航速与流向。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Umean <span class="hljs-number">1.668</span>;
 mUmean <span class="hljs-number">-1.668</span>;
 
 <span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
@@ -446,9 +447,10 @@ mUmean <span class="hljs-number">-1.668</span>;
         <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
     }
 </code></pre></div>
-<p>入口给定航速，出口按水相平均速度控制流出。来流沿负 <code>x</code>，因此读取船体 <code>x</code> 向力时要先明确阻力正方向。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-system-setFieldsDict"><a href="#2-system-setFieldsDict" class="headerlink" title="2. system/setFieldsDict"></a>2. <code>system/setFieldsDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
+<p>来流沿负 <code>x</code>，速度为 1.668 m/s，出口根据水相平均速度控制流出。分析 <code>x</code> 向船体力时，以来流方向明确阻力符号。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/0.orig/U">查看该配置的官方原文件</a>。</p>
+<h3 id="2-初始水位"><a href="#2-初始水位" class="headerlink" title="2. 初始水位"></a>2. 初始水位</h3><p>文件：<code>system/setFieldsDict</code>。本段设置初始水位。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
 );
@@ -472,9 +474,10 @@ regions
     {
         box (<span class="hljs-number">-999</span> <span class="hljs-number">-999</span> <span class="hljs-number">-999</span>) (<span class="hljs-number">999</span> <span class="hljs-number">999</span> <span class="hljs-number">0.244</span>);
 </code></pre></div>
-<p><code>setFields</code> 先建立空气背景，再把指定液位以下填为水。船体吃水必须与这个液位保持一致；修改液位后需要重新初始化，而不是只改显示中的水面高度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/setFieldsDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-controlDict"><a href="#3-system-controlDict" class="headerlink" title="3. system/controlDict"></a>3. <code>system/controlDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">forces
+<p>初始化先将计算域设为空气，再将指定液位以下单元设为水。该液位与船体曲面共同决定吃水，改变液位后重新执行相分数初始化。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
+<h3 id="3-船体水动力积分"><a href="#3-船体水动力积分" class="headerlink" title="3. 船体水动力积分"></a>3. 船体水动力积分</h3><p>文件：<code>system/controlDict</code>。本段设置船体水动力积分。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">forces
 {
     <span class="hljs-keyword">type</span>            forces;
     <span class="hljs-keyword">libs</span>            (forces);
@@ -486,8 +489,8 @@ regions
     CofR            (<span class="hljs-number">2.929541</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
 }
 </code></pre></div>
-<p>力积分限定在 <code>hull</code> 上，避免把远场和对称面计入阻力。<code>CofR</code> 定义力矩参考点；改变它会改变力矩，却不会改变合力。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>hull</code> 限定船体受力表面，<code>CofR</code> 定义力矩参考点。修改参考点会改变力矩分量，合力保持相同。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.interFoam
 </code></pre></div>
@@ -524,12 +527,12 @@ regions
 <td><code>100</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选船体周围水域，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.water</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>显示 <code>alpha.water = 0.5</code> 等值面，观察船首波、舷侧波和尾波。沿船体附近选取固定纵向或横向测线输出波高，与试验测线保持相同坐标。把压力阻力和黏性阻力分别绘制，检查总阻力是否已稳定。</p>
-<p>改变航速时记录相应 Froude 数，并保持模型尺度和液位一致。空间收敛检查应同时覆盖船体边界层与自由液面区域；只加密船体表面可能仍然无法正确传播波形。</p>
+<p>提取 <code>alpha.water = 0.5</code> 水面，观察船首波、舷侧波和尾波。在与试验对应的纵向或横向测线上输出波高，并分别绘制压力阻力、黏性阻力和总阻力的迭代曲线。</p>
+<p>航速比较保持船模尺度和液位不变，同时报告 Froude 数。网格比较兼顾船体边界层与自由液面传播区域，分别检查阻力和波高的变化；半船力与整船试验按一致的对称约定换算。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 本例采用 LTS 求定常航行流场。研究船体运动或真实波浪传播时，应改用物理时间推进，并同步设置船体运动与时间步。</p>
+<p><strong>熊猫说：</strong> 局部时间步用于求取定常流场。研究船体运动或真实波浪时序时，采用物理时间推进，并按运动周期确定时间步和统计长度。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/dtc-hull.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

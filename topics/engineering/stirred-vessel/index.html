@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>搅拌釜滑移网格与自由液面 · FoamLab</title>
-  <meta name="description" content="在带搅拌桨和通气入口的三维容器中，计算水—空气界面、循环流及转动造成的液面变形。">
+  <meta name="description" content="计算通气搅拌釜内的水—空气分布、循环流和自由液面变形，评价转速与通气量的作用。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>搅拌釜滑移网格与自由液面</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在带搅拌桨和通气入口的三维容器中，计算水—空气界面、循环流及转动造成的液面变形。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>搅拌釜通过叶轮向液体输入动量，形成轴向和径向循环；通气后，气液分布又会反过来改变叶轮载荷与混合方式。自由液面的凹陷、局部气体聚集和循环死区，会影响有效液体体积以及传质条件。</p>
-<p>本例保留公开搅拌釜、转轴和叶轮曲面，采用旋转网格与 VOF 描述两相。基准物性调整为水和空气，初始水位设为 0.74 m，底部入口通气。重点是先建立正确的液位、相分布与转动方向，再比较不同转速的循环结构。</p>
+    <div class="prose"><p>计算通气搅拌釜内的水—空气分布、循环流和自由液面变形，评价转速与通气量的作用。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>叶轮转动向液体输入动量，形成轴向和径向循环。通气后，气相分布改变叶轮附近密度和载荷，自由液面也随旋转流发生变形。循环死区、液面凹陷和局部积气共同影响有效混合范围及相间接触。</p>
+<p>算例保留搅拌釜、转轴和叶轮曲面，采用旋转网格与 VOF 描述水—空气体系。初始水位为 0.74 m，底部持续通气。在固定通气量下比较转速，再固定转速比较通气量，将液面、循环结构和叶轮功率联系起来。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/stirred-vessel-geometry.webp" alt="搅拌釜滑移网格与自由液面：配套模型与基准输入"></p>
-<p>曲面来自 mixerVesselAMI，背景域为 0.6 m × 0.6 m × 1.55 m。转轴沿 <code>z</code> 方向，运动区域为 <code>rotating</code>。初始水填充至 <code>z</code> = 0.74 m，叶轮与部分轴段随内侧网格转动，另一部分圆柱轴面以旋转壁面速度表示。</p>
+<p>模型采用 <code>mixerVesselAMI</code> 曲面，背景域尺寸为 0.6 m × 0.6 m × 1.55 m。转轴沿 <code>z</code> 方向，运动区为 <code>rotating</code>，初始水位 <code>z</code> = 0.74 m。叶轮与部分轴段随网格转动，其他圆柱轴面通过旋转壁面速度施加运动。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI">OpenFOAM v2512 · multiphase/interFoam/RAS/mixerVesselAMI</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -293,7 +293,7 @@
 <tbody><tr>
 <td>水、空气密度</td>
 <td>998.2、1.2 kg/m³</td>
-<td>本站水—空气基准，<code>constant/transportProperties</code></td>
+<td>水—空气基准，<code>constant/transportProperties</code></td>
 </tr>
 <tr>
 <td>转动角速度</td>
@@ -366,7 +366,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-system-setFieldsDict"><a href="#1-system-setFieldsDict" class="headerlink" title="1. system/setFieldsDict"></a>1. <code>system/setFieldsDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-初始水位与相分布"><a href="#1-初始水位与相分布" class="headerlink" title="1. 初始水位与相分布"></a>1. 初始水位与相分布</h3><p>文件：<code>system/setFieldsDict</code>。本段设置初始水位与相分布。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
 );
@@ -383,9 +384,10 @@ regions
     }
 );
 </code></pre></div>
-<p>背景先设为空气，再把 0.74 m 以下的单元填为水。<code>alpha.water = 1</code> 对应水，0 对应空气；初始分布、材料密度和入口相分数必须使用同一约定。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/system/setFieldsDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-constant-dynamicMeshDict"><a href="#2-constant-dynamicMeshDict" class="headerlink" title="2. constant/dynamicMeshDict"></a>2. <code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
+<p>初始化以空气为背景，将 0.74 m 以下单元设置为水。<code>alpha.water</code> 的 1 与 0 分别表示水和空气，入口相分数沿用同一约定。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
+<h3 id="2-叶轮和轴面转动"><a href="#2-叶轮和轴面转动" class="headerlink" title="2. 叶轮和轴面转动"></a>2. 叶轮和轴面转动</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置叶轮和轴面转动。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
 
 motionSolverLibs (fvMotionSolvers);
 
@@ -395,16 +397,17 @@ cellZone        rotating;
 
 solidBodyMotionFunction  rotatingMotion;
 </code></pre></div>
-<p>负角速度表示按给定 <code>z</code> 轴反向旋转。轴壁面和运动区域的角速度分别写在不同文件中，本例两处均为 −5 rad/s，修改转速时应同步。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/constant/dynamicMeshDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-orig-U"><a href="#3-0-orig-U" class="headerlink" title="3. 0.orig/U"></a>3. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">gasInlet
+<p>角速度 −5 rad/s 表示相对给定 <code>z</code> 轴的负向转动。运动单元区与轴面边界分别读取转速，参数比较时同步修改两处。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
+<h3 id="3-底部通气"><a href="#3-底部通气" class="headerlink" title="3. 底部通气"></a>3. 底部通气</h3><p>文件：<code>0.orig/U</code>。本段设置底部通气。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">gasInlet
 {
     <span class="hljs-keyword">type</span>           <span class="hljs-built_in">fixedValue</span>;
     <span class="hljs-keyword">value</span>          <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>);
 }
 </code></pre></div>
-<p>气体入口的速度方向为正 <code>z</code>。该速度只描述流入动量，相别由 <code>alpha.water</code> 决定；只有两者结合，才能得到正确的通气条件。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>通气速度沿正 <code>z</code>，气相组成由入口 <code>alpha.water = 0</code> 给定。速度确定动量和流量，相分数确定流入物质，两项共同构成通气条件。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.interFoam
 </code></pre></div>
@@ -449,12 +452,12 @@ solidBodyMotionFunction  rotatingMotion;
 <td><code>1.5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选釜内流体，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.water</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>先用水相等值面检查液位和气体进入路径，再查看叶轮上下方的速度截面与循环流线。统计液相体积，确认变化来自入口、出口或界面输运，而不是初始相分数写反。</p>
-<p>延长计算至液面与循环流进入可统计状态，再比较转速变化带来的液面凹陷、低速区和叶轮转矩。通气量研究保持转速固定，通过入口面积与速度计算体积流量；输出总功率与液体有效循环强度，解释能量投入的用途。</p>
+<p>用水相等值面显示液面和气体进入路径，结合叶轮上下方的速度截面识别主循环与低速区。统计液体总体积，并与边界通量核对相质量收支。</p>
+<p>进入可统计状态后，比较不同转速下的液面凹陷、叶轮转矩和循环范围。通气研究保持转速固定，由入口面积与速度计算流量；转矩与角速度给出输入功率，可据此比较单位功率产生的循环改善。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 该包已统一水、空气物性及相分数定义。若替换另一种液体，除了密度和黏度，还应检查表面张力、液位和相关无量纲数。</p>
+<p><strong>熊猫说：</strong> 替换工作液体时，同时更新密度、黏度和表面张力，并重新计算反映惯性、重力与黏性关系的无量纲数。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/stirred-vessel.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

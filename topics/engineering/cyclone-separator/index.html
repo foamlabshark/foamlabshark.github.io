@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>旋风分离器的气固输运 · FoamLab</title>
-  <meta name="description" content="计算旋风筒中的旋转气流与颗粒运动，分析粒径、惯性和壁面碰撞对颗粒滞留与出口携带的影响。">
+  <meta name="description" content="计算旋风筒内气固两相运动，比较颗粒滞留、出口携带和设备压降。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>旋风分离器的气固输运</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算旋风筒中的旋转气流与颗粒运动，分析粒径、惯性和壁面碰撞对颗粒滞留与出口携带的影响。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>旋风分离器利用旋转流使颗粒向外壁迁移，常用于粉体回收和含尘气流预处理。较大的颗粒往往更难随气流急剧转向，而细颗粒更容易被中心上升气流带走。分离效果与入口速度、颗粒分布和旋涡结构相关，同时伴随压力损失。</p>
-<p>本例采用公开旋风筒曲面，使用 <code>MPPICFoam</code> 描述气固耦合和较高浓度颗粒相互作用。颗粒从入口分时注入，墙面发生反弹，顶部出口允许粒子离开。基准筒底封闭，因此需要分别统计筒内存量和出口携带量，评价一定时间内的颗粒滞留。</p>
+    <div class="prose"><p>计算旋风筒内气固两相运动，比较颗粒滞留、出口携带和设备压降。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>旋风分离器使含尘气流旋转，利用颗粒对转弯流动的惯性响应促使其向外壁迁移。粗颗粒与气流的跟随性较弱，细颗粒则更容易随中心上升流离开设备。入口速度、粒径分布和旋涡结构共同影响分离趋势，同时决定气流通过设备所需的压力差。</p>
+<p>算例使用公开旋风筒曲面，以 <code>MPPICFoam</code> 计算气固耦合，并通过颗粒应力描述高浓度堆积。颗粒按给定时段注入，筒壁反弹，顶部允许逃逸，筒底封闭。由注入质量、筒内存量与出口携带量建立收支，评价指定时间内的颗粒滞留。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/cyclone-separator-geometry.webp" alt="旋风分离器的气固输运：配套模型与基准输入"></p>
-<p>几何来自 <code>cyclone.stl.gz</code>，背景外包盒为 1.1 m × 1.1 m × 2.1 m。入口位于筒体侧面，气体通过顶部出口排出。网格由 <code>blockMesh</code> 与 <code>snappyHexMesh</code> 生成，筒壁和锥段形状由曲面保留。</p>
+<p><code>cyclone.stl.gz</code> 定义筒壁和锥段，背景外包盒尺寸为 1.1 m × 1.1 m × 2.1 m。气流从侧面进入、顶部离开。<code>blockMesh</code> 建立背景网格，<code>snappyHexMesh</code> 贴合筒体曲面并加密。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone">OpenFOAM v2512 · lagrangian/MPPICFoam/cyclone</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -350,7 +350,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-constant-kinematicCloudProperties"><a href="#1-constant-kinematicCloudProperties" class="headerlink" title="1. constant/kinematicCloudProperties"></a>1. <code>constant/kinematicCloudProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-颗粒注入与粒径"><a href="#1-颗粒注入与粒径" class="headerlink" title="1. 颗粒注入与粒径"></a>1. 颗粒注入与粒径</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置颗粒注入与粒径。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
 {
     <span class="hljs-keyword">type</span>            patchInjection;
     massTotal       <span class="hljs-number">40</span>;
@@ -374,9 +375,10 @@ bash Allmesh
     }
 }
 </code></pre></div>
-<p><code>patchInjection</code> 将颗粒从入口面注入，<code>massTotal</code> 指定整个注入阶段的质量。粒径分布有上下界，统计出口粒径时应使用相同分档，并保留每个粒子团的质量权重。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/kinematicCloudProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-constant-kinematicCloudProperties"><a href="#2-constant-kinematicCloudProperties" class="headerlink" title="2. constant/kinematicCloudProperties"></a>2. <code>constant/kinematicCloudProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">localInteractionCoeffs
+<p><code>patchInjection</code> 从入口面注入颗粒，<code>massTotal</code> 为完整注入时段的总质量。正态粒径分布具有上下限，出口统计使用相同粒径分档，以便比较不同颗粒的携带趋势。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="2-壁面碰撞和出口逃逸"><a href="#2-壁面碰撞和出口逃逸" class="headerlink" title="2. 壁面碰撞和出口逃逸"></a>2. 壁面碰撞和出口逃逸</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置壁面碰撞和出口逃逸。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">localInteractionCoeffs
 {
     patches
     (
@@ -393,16 +395,17 @@ bash Allmesh
     );
 }
 </code></pre></div>
-<p>墙面和入口采用反弹，顶部出口采用逃逸。这里没有底部连续排料边界，因此筒底累积是计算中的真实存量，不能自动计为已经从设备排出的产品。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/kinematicCloudProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-constant-transportProperties"><a href="#3-constant-transportProperties" class="headerlink" title="3. constant/transportProperties"></a>3. <code>constant/transportProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">continuousPhase air;
+<p>筒壁和入口采用反弹，顶部采用逃逸。封闭筒底保留颗粒存量，该存量与顶部流出量共同组成质量收支。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="3-连续相名称与场量"><a href="#3-连续相名称与场量" class="headerlink" title="3. 连续相名称与场量"></a>3. 连续相名称与场量</h3><p>文件：<code>constant/transportProperties</code>。本段设置连续相名称与场量。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">continuousPhase air;
 
 rho.air         <span class="hljs-number">1.2</span>;
 
 transportModel  Newtonian;
 </code></pre></div>
-<p>连续相名字为 <code>air</code>，因此速度场是 <code>U.air</code>，湍流场也带 <code>.air</code> 后缀。后处理时选择无后缀的 <code>U</code> 会找不到对应连续相速度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/transportProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>连续相名为 <code>air</code>，速度和湍流变量采用相应后缀。后处理中选择 <code>U.air</code> 查看气流，选择粒子云查看颗粒轨迹。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/cyclone/constant/transportProperties">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.MPPICFoam
 </code></pre></div>
@@ -439,12 +442,12 @@ transportModel  Newtonian;
 <td><code>0.1</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
-<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选气相内部与颗粒，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>U</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>在穿过筒轴的截面上显示轴向和周向速度，识别外侧下行流与中心上行流。按粒径分组统计出口质量、筒内质量和累计注入质量，核对三者之间的收支。</p>
-<p>比较不同入口速度下的出口携带比例和设备压降。提高速度通常同时改变离心分离趋势和压力损失，应把两项指标一起报告。若要评价持续运行的底部回收率，应在几何上建立排料口，并配置相应粒子逃逸边界。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
+<h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选气相内部与颗粒，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>U.air</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
+<p>在轴向截面显示 <code>U.air</code>，识别外侧下行流与中心上行流。按相同粒径区间统计累计注入、出口携带和筒内存量，使用各粒子团的质量权重核对收支。</p>
+<p>改变入口速度，联合比较出口携带比例与压降。封闭底部的结果表示筒内滞留；研究连续排料时，增加实际排料口及颗粒逃逸条件，另行统计底部回收质量。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 统计颗粒质量时使用粒子团权重。一个计算粒子不等于一个真实颗粒，直接数屏幕上的点不能得到收集率。</p>
+<p><strong>熊猫说：</strong> 一个计算粒子团代表一定数量的真实颗粒。质量统计采用粒子团权重和单粒质量。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/cyclone-separator.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

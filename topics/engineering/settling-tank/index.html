@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Dahl 沉淀池中的污泥输运 · FoamLab</title>
-  <meta name="description" content="计算沉淀池内污泥浓度、回流与出口携带，分析水力停留和颗粒相对沉降的竞争。">
+  <meta name="description" content="用漂移通量模型计算沉淀池浓度分层和出口携带，分析停留时间与相对沉降的竞争。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>Dahl 沉淀池中的污泥输运</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算沉淀池内污泥浓度、回流与出口携带，分析水力停留和颗粒相对沉降的竞争。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>沉淀池依靠颗粒相对于水的下沉实现固液分离。实际池内同时存在入口射流、底部高浓度流和回流，颗粒的运动不再等同于静水中单颗粒沉降。进水量增加会缩短停留时间，浓度升高又会影响沉降速度和混合物黏度。</p>
-<p>本例采用 Dahl 沉淀池的二维漂移通量模型，以混合物速度描述整体流动，以相对速度模型描述污泥和水之间的滑移。求解结果包括污泥体积分数、速度、压力及湍流量，可用于分析浓度分层和出口带出。</p>
+    <div class="prose"><p>用漂移通量模型计算沉淀池浓度分层和出口携带，分析停留时间与相对沉降的竞争。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>沉淀池中的污泥同时受到整体水流输运和相对沉降作用。入口射流、回流及底部高浓度流改变颗粒到达出口的路径；进水量和浓度又分别影响停留时间与沉降特性。由此，池内浓度分布需要与水力条件一起求解。</p>
+<p>算例采用 Dahl 沉淀池的二维构型。混合物速度描述整体运动，相对速度模型描述污泥与水之间的滑移，浓度相关流变描述高浓度区域阻力。计算通过纵向浓度变化、出口质量流率和池内存量解释分层与输运。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/settling-tank-geometry.webp" alt="Dahl 沉淀池中的污泥输运：配套模型与基准输入"></p>
-<p>计算池长 8.65 m、高 1 m，展向厚度为 0.2 m并采用二维边界。进口位于左侧，出口位于右下方 0.1 m 高的开口，其余右侧边界为壁面。池顶采用滑移条件，模型聚焦已充满水的池内浓度输运。</p>
+<p>池长 8.65 m、高 1 m、展向厚 0.2 m，采用二维边界。左侧进水，右下方设置高 0.1 m 的出口，右侧其余部分为壁面。顶部为滑移边界，表示充满水的计算区域。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl">OpenFOAM v2512 · multiphase/driftFluxFoam/RAS/dahl</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -342,7 +342,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-constant-transportProperties"><a href="#1-constant-transportProperties" class="headerlink" title="1. constant/transportProperties"></a>1. <code>constant/transportProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">relativeVelocityModel simple;
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-污泥相对沉降"><a href="#1-污泥相对沉降" class="headerlink" title="1. 污泥相对沉降"></a>1. 污泥相对沉降</h3><p>文件：<code>constant/transportProperties</code>。本段设置污泥相对沉降。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">relativeVelocityModel simple;
 
 <span class="hljs-string">"(simple|general)Coeffs"</span>
 {
@@ -352,9 +353,10 @@ bash Allmesh
     residualAlpha   <span class="hljs-number">0</span>;
 }
 </code></pre></div>
-<p>相对速度模型根据浓度调整污泥沉降行为。<code>V0</code> 给出基准沉降方向和速度尺度，<code>a</code> 等参数控制浓度效应；这些参数应由目标污泥的沉降试验确定。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/constant/transportProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-alpha-sludge"><a href="#2-0-alpha-sludge" class="headerlink" title="2. 0/alpha.sludge"></a>2. <code>0/alpha.sludge</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.001</span>;
+<p><code>V0</code> 给出基准沉降速度与方向，浓度参数控制沉降随固相含量的变化。目标污泥的沉降试验用于确定这组关系。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/constant/transportProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="2-入口与初始浓度"><a href="#2-入口与初始浓度" class="headerlink" title="2. 入口与初始浓度"></a>2. 入口与初始浓度</h3><p>文件：<code>0/alpha.sludge</code>。本段设置入口与初始浓度。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.001</span>;
 
 <span class="hljs-keyword">boundaryField</span>
 {
@@ -370,16 +372,17 @@ bash Allmesh
         inletValue      <span class="hljs-variable">$internalField</span>;
     }
 </code></pre></div>
-<p>初始场和入口均设为 0.001。它是体积分数，若输入数据为质量浓度，应结合污泥密度完成换算。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/0/alpha.sludge">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-U"><a href="#3-0-U" class="headerlink" title="3. 0/U"></a>3. <code>0/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">outlet
+<p>0.001 表示污泥体积分数。质量浓度数据需结合污泥密度换算，入口和初始场采用相同定义。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/0/alpha.sludge">查看该配置的官方原文件</a>。</p>
+<h3 id="3-底部出口条件"><a href="#3-底部出口条件" class="headerlink" title="3. 底部出口条件"></a>3. 底部出口条件</h3><p>文件：<code>0/U</code>。本段设置底部出口条件。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">outlet
 {
     <span class="hljs-keyword">type</span>            pressureInletOutletVelocity;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p>底部出口允许流出并处理可能的回流，池底与端壁保持无滑移。出口位置会直接影响高浓度底流是否被抽出，因此几何边界不能仅凭常见沉淀池印象重新命名。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/0/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>右下出口抽出该高度附近的流体与污泥，池底和端壁无滑移。出口位置直接影响底部浓缩区的排出，因此它是水力模型的一部分。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/0/U">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.driftFluxFoam
 </code></pre></div>
@@ -424,12 +427,12 @@ bash Allmesh
 <td><code>5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选沉淀池，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.sludge</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>绘制池内污泥体积分数和流线，查看入口射流是否冲入底层、是否形成短路流。提取不同纵向位置的垂向浓度剖面，并计算入口、出口污泥质量流率以及池内污泥存量。</p>
-<p>分别增加进水速度与入口浓度，比较出口浓度和池内高浓度区域位置。输出时间应覆盖若干水力停留时间，再判断浓度场是否趋于稳定；启动阶段的存量变化不应直接当作稳态分离率。</p>
+<p>叠加污泥体积分数和流线，观察入口射流、底部输运与短路流。在多个纵向位置提取垂向浓度剖面，统计入口和出口污泥质量流率，并与池内存量变化核对。</p>
+<p>分别调整进水速度和入口浓度，比较高浓度区位置与出口携带。运行时间覆盖相应水力停留时间后，结合存量变化判断是否达到可比较的稳定状态。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 这里求解的是污泥体积分数，不是单颗粒轨迹。沉降模型的参数决定相间滑移，改变粒径时需要相应更新沉降关系。</p>
+<p><strong>熊猫说：</strong> 漂移通量描述污泥相的平均滑移。改变颗粒性质时，通过沉降试验或相应关联式更新相对速度模型。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/settling-tank.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

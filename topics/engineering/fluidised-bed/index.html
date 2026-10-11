@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Goldschmidt 流化床的颗粒膨胀 · FoamLab</title>
-  <meta name="description" content="重建 Goldschmidt 颗粒床的通气膨胀过程，分析气固曳力、床层高度和压力降。">
+  <meta name="description" content="模拟 Goldschmidt 准二维颗粒床的通气膨胀，计算床层高度、压降和颗粒混合。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>Goldschmidt 流化床的颗粒膨胀</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>重建 Goldschmidt 颗粒床的通气膨胀过程，分析气固曳力、床层高度和压力降。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>流化床用向上的气流托起固体颗粒，使床层能够在较大范围内混合和交换热量，广泛用于反应、干燥和颗粒处理。气速过低时床层接近静止堆积，气速提高后出现膨胀与气泡运动；这些状态决定设备的传质与停留时间分布。</p>
-<p>本例使用 Goldschmidt 准二维床层几何与离散初始粒子位置。<code>MPPICFoam</code> 求解气体流动并跟踪颗粒团，颗粒应力模型限制过度堆积。配置重点包括入口表观速度、颗粒直径、初始装料和颗粒壁面相互作用。</p>
+    <div class="prose"><p>模拟 Goldschmidt 准二维颗粒床的通气膨胀，计算床层高度、压降和颗粒混合。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>向上的气流通过颗粒床时，曳力逐渐抵消颗粒有效重量。达到流化条件后，床层膨胀并出现随时间变化的稀疏区和致密区，改变颗粒混合、停留时间及相间交换。床高与压降因此是理解流态化过程的两个基本量。</p>
+<p>算例按给定位置装填玻璃颗粒，以 <code>MPPICFoam</code> 求解气流和颗粒团运动，颗粒应力模型限制高浓度区域的过度堆积。在相同装料条件下改变入口表观气速，比较床层膨胀、波动与压力支撑。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/fluidised-bed-geometry.webp" alt="Goldschmidt 流化床的颗粒膨胀：配套模型与基准输入"></p>
-<p>床体宽 150 mm、高 450 mm、厚 15 mm，厚度方向保留一个单元层并使用对称边界。玻璃颗粒直径为 2.5 mm，密度为 2526 kg/m³。初始位置文件 <code>kinematicCloudPositions</code> 随包提供，由手动注入模型在 <code>t</code> = 0 读入。</p>
+<p>床体宽 150 mm、高 450 mm、厚 15 mm，厚度方向为单层单元和对称边界。颗粒直径 2.5 mm、密度 2526 kg/m³。<code>kinematicCloudPositions</code> 给出初始装料位置，手动注入模型在 <code>t</code> = 0 读取该文件。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt">OpenFOAM v2512 · lagrangian/MPPICFoam/Goldschmidt</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -337,7 +337,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-U-air"><a href="#1-0-U-air" class="headerlink" title="1. 0/U.air"></a>1. <code>0/U.air</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">bottom
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-表观气速边界"><a href="#1-表观气速边界" class="headerlink" title="1. 表观气速边界"></a>1. 表观气速边界</h3><p>文件：<code>0/U.air</code>。本段设置表观气速边界。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">bottom
 {
     <span class="hljs-keyword">type</span>            interstitialInletVelocity;
     inletVelocity   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
@@ -346,9 +347,10 @@ bash Allmesh
     alpha           alpha.air;
 }
 </code></pre></div>
-<p><code>interstitialInletVelocity</code> 使用气相体积分数把输入表观速度换算为孔隙内速度。把同一个 1.875 m/s 改填普通速度边界，会改变进入床层的气体通量。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/0/U.air">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-constant-kinematicCloudProperties"><a href="#2-constant-kinematicCloudProperties" class="headerlink" title="2. constant/kinematicCloudProperties"></a>2. <code>constant/kinematicCloudProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
+<p><code>interstitialInletVelocity</code> 将 1.875 m/s 的表观速度除以局部气相体积分数，得到孔隙内速度，从而维持所需气体流量。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/0/U.air">查看该配置的官方原文件</a>。</p>
+<h3 id="2-初始颗粒装填"><a href="#2-初始颗粒装填" class="headerlink" title="2. 初始颗粒装填"></a>2. 初始颗粒装填</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置初始颗粒装填。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
 {
     <span class="hljs-keyword">type</span>            manualInjection;
     massTotal       <span class="hljs-number">0</span>;
@@ -367,9 +369,10 @@ bash Allmesh
     }
 }
 </code></pre></div>
-<p>初始粒子由文件给出，<code>parcelBasisType fixed</code> 与 <code>nParticle 1</code> 指定单个粒子团的权重。这里 <code>massTotal 0</code> 不是没有颗粒，而是由位置数量、粒径和材料密度确定装料。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-constant-kinematicCloudProperties"><a href="#3-constant-kinematicCloudProperties" class="headerlink" title="3. constant/kinematicCloudProperties"></a>3. <code>constant/kinematicCloudProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">packingModel explicit;
+<p>初始粒子位置、粒径、材料密度与 <code>nParticle 1</code> 共同确定装料质量。<code>parcelBasisType fixed</code> 固定粒子团权重，此时 <code>massTotal 0</code> 不承担装料量定义。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="3-高浓度颗粒应力"><a href="#3-高浓度颗粒应力" class="headerlink" title="3. 高浓度颗粒应力"></a>3. 高浓度颗粒应力</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置高浓度颗粒应力。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">packingModel explicit;
 
 explicitCoeffs
 {
@@ -390,8 +393,8 @@ explicitCoeffs
 
 implicitCoeffs
 </code></pre></div>
-<p>颗粒应力模型在高固相体积分数区域增大抵抗压缩的作用。<code>alphaPacked</code> 表示堆积相关参数，修改它会影响床层局部致密程度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>颗粒应力随固相浓度上升而加强，抵抗局部过度压缩。<code>alphaPacked</code> 规定堆积相关尺度，会影响致密区和床层膨胀。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.MPPICFoam
 </code></pre></div>
@@ -428,12 +431,12 @@ implicitCoeffs
 <td><code>0.01</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选气相内部与颗粒，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.air</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>绘制固相体积分数或粒子位置动画，观察床面高度及气泡状稀疏区的演化。以固定阈值识别床面，给出平均高度和波动幅度；同时提取床层底部与上方的压差。</p>
-<p>在相同装料下逐步改变入口气速，比较床层膨胀、压降和颗粒混合。先确认模拟时间足以覆盖多个床层波动周期，再讨论平均行为。空间网格、粒子数量与颗粒应力参数分别变化，以区分不同误差来源。</p>
+<p>由气相体积分数得到固相分布，结合粒子位置观察床面和内部稀疏区的演化。以统一阈值识别床面，统计平均床高及波动幅度，并输出床底与床上方压差。</p>
+<p>在相同装料下逐级调整入口气速，覆盖多个床层波动周期后比较平均结果。网格、计算粒子数量和颗粒应力参数分别变化，用于分析空间分辨率、统计分辨率和闭合模型的影响。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 该算例的入口值是表观气速。与实验数据比较时，核对文献采用的是空塔速度还是孔隙内速度。</p>
+<p><strong>熊猫说：</strong> 入口设置为表观气速，即体积流量除以空床截面积。与实验比较时采用同一速度定义。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/fluidised-bed.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

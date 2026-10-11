@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>旋转螺旋桨的推力与空化 · FoamLab</title>
-  <meta name="description" content="结合旋转网格与液汽相变模型，计算螺旋桨叶片附近的空化及其随转速变化的响应。">
+  <meta name="description" content="耦合螺旋桨转动与液汽相变，分析吸力面低压、空化体积和叶片载荷的变化。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>旋转螺旋桨的推力与空化</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>结合旋转网格与液汽相变模型，计算螺旋桨叶片附近的空化及其随转速变化的响应。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>螺旋桨通过旋转叶片向水流传递动量，叶片吸力面的局部压力可能低于饱和蒸气压，形成片状或涡状空化。空化会改变叶片载荷及推力脉动，也使仅计算单相水流的结果难以解释部分工况。</p>
-<p>本例在圆柱形流道中放置公开螺旋桨曲面，采用 AMI 连接内侧转动网格与外侧静止网格。入口速度和角速度按时间逐步变化，液汽相变由 Schnerr–Sauer 模型处理。应联合分析叶片压力、汽相体积与载荷，而不是只观察空泡外形。</p>
+    <div class="prose"><p>耦合螺旋桨转动与液汽相变，分析吸力面低压、空化体积和叶片载荷的变化。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>螺旋桨旋转向水流输入动量，并在叶片两侧形成压差。吸力面压力降低至饱和蒸气压附近时产生空化，汽相分布又会影响压力和推力。转速、来流速度及环境压力因而需要共同用于解释空化状态与载荷。</p>
+<p>算例在圆柱流道中设置公开螺旋桨曲面，内侧网格随桨转动，外侧网格保持静止，两者通过 AMI 连接。入口速度和角速度按时间变化，Schnerr–Sauer 模型计算液汽质量交换。由启动、稳定转动和降速阶段的对应结果分析转速影响。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/propeller-cavitation-geometry.webp" alt="旋转螺旋桨的推力与空化：配套模型与基准输入"></p>
-<p>曲面和内外圆柱边界来自官方 <code>propeller</code> 资源。背景外包范围为 <code>x</code>、<code>z</code> = −0.3～0.3 m，<code>y</code> = −0.81～0.21 m；螺旋桨绕 <code>y</code> 轴转动，旋转单元区为 <code>innerCylinderSmall</code>。实际桨叶轮廓由随包曲面给定。</p>
+<p>模型使用官方 <code>propeller</code> 资源中的桨叶与圆柱边界，外包范围为 <code>x</code>、<code>z</code> = −0.3～0.3 m、<code>y</code> = −0.81～0.21 m。转轴沿 <code>y</code> 方向，旋转单元区为 <code>innerCylinderSmall</code>，桨叶轮廓由配套曲面确定。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller">OpenFOAM v2512 · multiphase/interPhaseChangeDyMFoam/propeller</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -366,7 +366,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-constant-dynamicMeshDict"><a href="#1-constant-dynamicMeshDict" class="headerlink" title="1. constant/dynamicMeshDict"></a>1. <code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">omega       table
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-转速随时间变化"><a href="#1-转速随时间变化" class="headerlink" title="1. 转速随时间变化"></a>1. 转速随时间变化</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置转速随时间变化。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">omega       table
 (
     (<span class="hljs-number">0</span>    <span class="hljs-number">0</span>)
     (<span class="hljs-number">0.01</span>  <span class="hljs-number">628</span>)
@@ -375,9 +376,10 @@ bash Allmesh
     (<span class="hljs-number">100</span>   <span class="hljs-number">419</span>)
 );
 </code></pre></div>
-<p>角速度表描述启动和降速过程，时间单位为秒、角速度为 rad/s。它会改变进速系数，因此比较降速前后的空化状态时，需要同时报告转速和入口速度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/dynamicMeshDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-constant-transportProperties"><a href="#2-constant-transportProperties" class="headerlink" title="2. constant/transportProperties"></a>2. <code>constant/transportProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">phaseChangeTwoPhaseMixture SchnerrSauer;
+<p>角速度表按秒给定启动和降速过程，数值单位为 rad/s。转速变化同时改变进速系数，比较空化状态时需列出对应来流速度与转速。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
+<h3 id="2-液汽相变"><a href="#2-液汽相变" class="headerlink" title="2. 液汽相变"></a>2. 液汽相变</h3><p>文件：<code>constant/transportProperties</code>。本段设置液汽相变。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">phaseChangeTwoPhaseMixture SchnerrSauer;
 
 pSat            <span class="hljs-number">2300</span>;   <span class="hljs-comment">// Saturation pressure</span>
 
@@ -397,9 +399,10 @@ vapour
     rho             <span class="hljs-number">0.02308</span>;
 }
 </code></pre></div>
-<p><code>pSat</code> 决定液汽相变的压力基准，水和蒸气分别给定密度与黏度。后续 <code>SchnerrSauerCoeffs</code> 指定气核参数，它们会影响空化起始和增长。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/transportProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-orig-U"><a href="#3-0-orig-U" class="headerlink" title="3. 0.orig/U"></a>3. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<p><code>pSat</code> 给出汽化压力基准，各相密度和黏度规定混合物性质。<code>SchnerrSauerCoeffs</code> 中的气核参数参与汽化与凝结速率计算，影响空化起始和增长。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/transportProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="3-来流加载与桨叶速度"><a href="#3-来流加载与桨叶速度" class="headerlink" title="3. 来流加载与桨叶速度"></a>3. 来流加载与桨叶速度</h3><p>文件：<code>0.orig/U</code>。本段设置来流加载与桨叶速度。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            uniformFixedValue;
     <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
@@ -411,8 +414,8 @@ vapour
     );
 }
 </code></pre></div>
-<p>入口速度逐步增加，减少瞬间加载造成的强烈初始扰动。桨叶表面使用 <code>movingWallVelocity</code>，使壁面速度与网格运动一致。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>入口速度逐步加载，桨叶采用 <code>movingWallVelocity</code>，使固壁速度与运动网格一致。两项设置分别确定来流建立过程和旋转叶片对流体的作用。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.interPhaseChangeDyMFoam
 </code></pre></div>
@@ -457,12 +460,12 @@ vapour
 <td><code>2</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选螺旋桨与水域，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.water</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>绘制汽相体积分数等值面，并在同一时刻显示桨叶压力。比较吸力面最低压力位置与汽相出现位置，再随时间积分汽相总体积。增加桨叶表面力与转矩监测后，将载荷按转数绘图，识别启动、稳定转动与降速阶段。</p>
-<p>改变入口压力时保持转速和来流不变，得到不同空化数下的载荷变化；改变转速时则同时报告进速系数。叶尖、吸力面和 AMI 附近需要分别检查网格与时间分辨率。</p>
+<p>同时显示叶片压力和汽相体积分数，比较低压区与空化起始位置。积分汽相总体积，结合桨叶表面力及转矩的时间序列，按转数标注启动、稳定转动和降速阶段。</p>
+<p>入口压力比较保持转速和来流一致，分析空化程度与载荷变化；转速比较同时报告进速系数。分别检查叶尖、吸力面和 AMI 邻域的网格分辨率，并通过减小时间步检查载荷波动与汽相体积。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 角速度表使用 rad/s，性能曲线中的转速 <code>n</code> 使用 r/s，二者满足 <code>n</code> = ω/(2π)。归一化之前先完成换算。</p>
+<p><strong>熊猫说：</strong> 运动字典采用 rad/s，性能系数中的转速采用 r/s，换算关系为 <code>n</code> = ω/(2π)。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/propeller-cavitation.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

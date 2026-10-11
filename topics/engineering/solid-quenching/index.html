@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>金属工件水淬的沸腾换热 · FoamLab</title>
-  <meta name="description" content="耦合高温金属导热与水—蒸气两流体模型，分析水淬过程中的降温、壁面沸腾和相间换热。">
+  <meta name="description" content="耦合金属导热与水—蒸气两流体流动，计算水淬冷却曲线及壁面沸腾换热。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>金属工件水淬的沸腾换热</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>耦合高温金属导热与水—蒸气两流体模型，分析水淬过程中的降温、壁面沸腾和相间换热。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>热处理工件进入冷却液后，表面可能先被蒸气覆盖，随后进入强烈沸腾和对流冷却阶段。表面换热能力随温度和气液分布变化，导致表面与内部降温速率不同。工件温度不均匀会影响后续组织与应力分析，因此冷却边界不宜始终用一个常数换热系数表示。</p>
-<p>本例将金属工件与两相流体分区，固体内部求导热，流体区域分别求水和蒸气的速度、温度及体积分数。壁面沸腾模型提供相变热量与汽相来源，区域热耦合把工件放出的热量传入冷却液。</p>
+    <div class="prose"><p>耦合金属导热与水—蒸气两流体流动，计算水淬冷却曲线及壁面沸腾换热。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>高温工件进入水中后，表面气液分布和沸腾状态随温度变化，局部换热能力随之改变。表面降温与内部导热具有不同时间尺度，形成随时间发展的温差。完整的温度历程是后续材料组织和热应力分析的重要输入。</p>
+<p>算例将金属与冷却液分区，固体求解导热，流体分别求解水和蒸气的速度、温度及体积分数。壁面沸腾提供相变质量和能量交换，区域耦合将工件内能传入冷却液。通过中心与表面温度、界面热流和汽相分布解释冷却阶段。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/solid-quenching-geometry.webp" alt="金属工件水淬的沸腾换热：配套模型与基准输入"></p>
-<p>二维计算域宽 70 mm、高 140 mm、展向厚 2 mm。固体由 <code>x</code> = 0～4.77 mm、<code>y</code> = 29～70 mm 的选区建立，<code>x</code> = 0 为对称面；剩余单元为流体区域。原始结构网格为 140 × 170 × 1，区域分割按单元中心选取，因此离散边界位置应在网格中核对。</p>
+<p>二维域宽 70 mm、高 140 mm、展向厚 2 mm。固体选区为 <code>x</code> = 0～4.77 mm、<code>y</code> = 29～70 mm，<code>x</code> = 0 为对称面，其余单元为流体。背景网格为 140 × 170 × 1，固体边界按单元中心选区离散。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D">OpenFOAM v2512 · heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -358,7 +358,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-solid-T"><a href="#1-0-orig-solid-T" class="headerlink" title="1. 0.orig/solid/T"></a>1. <code>0.orig/solid/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solid_to_water
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-固体—两相流体热耦合"><a href="#1-固体—两相流体热耦合" class="headerlink" title="1. 固体—两相流体热耦合"></a>1. 固体—两相流体热耦合</h3><p>文件：<code>0.orig/solid/T</code>。本段设置固体—两相流体热耦合。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solid_to_water
 {
     <span class="hljs-keyword">type</span>            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1123</span>;
@@ -371,9 +372,10 @@ bash Allmesh
     qr              none;
 }
 </code></pre></div>
-<p>固体侧边界连接流体的 <code>T.liquid</code> 并识别另一相 <code>gas</code>，使液体和蒸气共同参与界面热交换。界面名称由 <code>splitMeshRegions</code> 生成。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/0.orig/solid/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-water-alphat-liquid"><a href="#2-0-orig-water-alphat-liquid" class="headerlink" title="2. 0.orig/water/alphat.liquid"></a>2. <code>0.orig/water/alphat.liquid</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">59 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">water_to_solid
+<p>固体侧连接 <code>T.liquid</code> 并识别气相 <code>gas</code>，使气液状态共同参与界面换热。<code>splitMeshRegions</code> 生成配对边界名称。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/0.orig/solid/T">查看该配置的官方原文件</a>。</p>
+<h3 id="2-壁面沸腾"><a href="#2-壁面沸腾" class="headerlink" title="2. 壁面沸腾"></a>2. 壁面沸腾</h3><p>文件：<code>0.orig/water/alphat.liquid</code>。本段设置壁面沸腾。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">59 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">water_to_solid
 {
     <span class="hljs-keyword">type</span>            compressible::alphatWallBoilingWallFunction;
     otherPhase      gas;
@@ -433,9 +435,10 @@ bash Allmesh
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e-8</span>;
 }
 </code></pre></div>
-<p>水侧湍流热扩散边界包含壁面沸腾关联式，负责对流、汽泡作用和蒸发相关的热通量分配。关联式输入与壁温、流体状态共同决定局部换热。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/0.orig/water/alphat.liquid">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-constant-water-phaseProperties"><a href="#3-constant-water-phaseProperties" class="headerlink" title="3. constant/water/phaseProperties"></a>3. <code>constant/water/phaseProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">type</span>    thermalPhaseChangeTwoPhaseSystem;
+<p>水侧边界按壁面沸腾关联式分配对流、汽泡作用和蒸发热流。壁温及局部相态通过这些关系决定工件放热。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/0.orig/water/alphat.liquid">查看该配置的官方原文件</a>。</p>
+<h3 id="3-两流体相变设置"><a href="#3-两流体相变设置" class="headerlink" title="3. 两流体相变设置"></a>3. 两流体相变设置</h3><p>文件：<code>constant/water/phaseProperties</code>。本段设置两流体相变设置。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">type</span>    thermalPhaseChangeTwoPhaseSystem;
 
 phases (gas liquid);
 
@@ -452,8 +455,8 @@ gas
     isothermalCoeffs
     {
 </code></pre></div>
-<p>流体区域由 <code>gas</code> 与 <code>liquid</code> 两相构成。体相相变开关与壁面沸腾是不同作用路径；当前配置保留官方壁面模型，通过边界相变来源描述工件表面冷却。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/constant/water/phaseProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>gas</code> 与 <code>liquid</code> 构成流体区域。体相相变与壁面沸腾分别设置，当前壁面模型通过边界质量和热量来源描述工件表面的相变冷却。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionTwoPhaseEulerFoam/solidQuenching2D/constant/water/phaseProperties">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.chtMultiRegionTwoPhaseEulerFoam
 </code></pre></div>
@@ -498,12 +501,12 @@ gas
 <td><code>0.5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选<code>solid</code> 与 <code>water</code>，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>在固体中心与表面布置温度探针，绘制降温曲线及冷却速率。同步显示水侧蒸气体积分数，分析温降缓慢或加快时界面气液分布如何变化。输出界面平均热流与换热系数，并核对固体内能下降和流体吸热之间的关系。</p>
-<p>比较不同初始水温或材料导热系数时，分别观察表面冷却和内部导热的变化。薄工件的几何离散和界面附近网格会影响温差，需在加密后重新确定固体选区，保持尺寸一致。</p>
+<p>在固体中心和表面设置温度探针，绘制温度与冷却速率，同时显示邻近汽相体积分数。将温降阶段与蒸气覆盖变化对应，输出界面平均热流，并用固体内能下降核对流体吸热。</p>
+<p>分别改变初始水温和固体导热系数，区分界面换热与内部导热对温差的影响。加密网格时同步重建固体选区，使离散后的工件尺寸保持一致。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 本例给出热流动与降温过程。将结果传递给材料组织或热应力分析时，应输出位置对应的完整温度历程。</p>
+<p><strong>熊猫说：</strong> 向材料或热应力模型传递结果时，导出同一空间位置的完整温度时序，保留表面与内部的差异。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/solid-quenching.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

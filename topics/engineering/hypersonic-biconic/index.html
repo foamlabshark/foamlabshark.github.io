@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>25°–55° 双锥的高超声速激波干扰 · FoamLab</title>
-  <meta name="description" content="使用 25°–55° 双锥试验网格计算高超声速激波干扰，分析分离、再附着及壁面热负荷。">
+  <meta name="description" content="计算 25°–55° 双锥上的高超声速激波干扰，分析分离、再附着及壁面热流。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>25°–55° 双锥的高超声速激波干扰</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>使用 25°–55° 双锥试验网格计算高超声速激波干扰，分析分离、再附着及壁面热负荷。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>高超声速气流经过折角时会形成压缩波和激波，激波与壁面边界层相互作用后可能引起分离和再附着。再附着附近常出现较高压力和热流，是飞行器热防护设计需要关注的位置。双锥模型通过明确的几何折角形成可比较的激波干扰问题。</p>
-<p>本例采用官方 Run 35 双锥网格和氮气物性，以 <code>rhoCentralFoam</code> 捕捉可压缩流动中的激波。壁面保留速度滑移和温度跳跃边界，用于对应这组低压来流条件。分析时应同时查看激波结构、壁面压力和热流，而不是只比较马赫数云图。</p>
+    <div class="prose"><p>计算 25°–55° 双锥上的高超声速激波干扰，分析分离、再附着及壁面热流。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>高超声速气流经过压缩折角时，激波与边界层相互作用可引起分离，并在下游再附着。再附着区的压力与热流集中，是热防护分析的重要载荷。双锥将这一过程限定在明确的轴对称几何中，便于比较激波结构与壁面测量。</p>
+<p>算例使用 Run 35 双锥网格和氮气物性，由 <code>rhoCentralFoam</code> 求解可压缩流动。低压工况采用速度滑移和温度跳跃边界，分析依次联系激波位置、分离长度及壁面压力与热流峰值。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/hypersonic-biconic-geometry.webp" alt="25°–55° 双锥的高超声速激波干扰：配套模型与基准输入"></p>
-<p>双锥前后半锥角分别为 25° 和 55°。真实曲线网格由随包提供的 <code>grid256.dat</code> 导入，<code>blockMesh</code> 只用于建立初始拓扑与边界名；最终坐标以导入后的网格为准。公开初始场已经包含发展后的流动，因此默认流程从该场继续计算。</p>
+<p>前后锥半角为 25° 和 55°。<code>blockMesh</code> 建立初始拓扑，随后导入 <code>grid256.dat</code> 中的最终曲线坐标。配套非均匀初始场与该网格对应，默认从已发展的流场继续计算。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35">OpenFOAM v2512 · compressible/rhoCentralFoam/biconic25-55Run35</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -369,15 +369,17 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-U-gz"><a href="#1-0-orig-U-gz" class="headerlink" title="1. 0.orig/U.gz"></a>1. <code>0.orig/U.gz</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">freestream
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-低压高速来流"><a href="#1-低压高速来流" class="headerlink" title="1. 低压高速来流"></a>1. 低压高速来流</h3><p>文件：<code>0.orig/U.gz</code>。本段设置低压高速来流。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">freestream
 {
     <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">2713</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p>来流给定轴向速度，配合压力与温度确定密度和马赫数。此处压力远低于大气压，不能把温压替换成常温常压后仍沿用同一试验工况名称。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/U.gz">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-T-gz"><a href="#2-0-orig-T-gz" class="headerlink" title="2. 0.orig/T.gz"></a>2. <code>0.orig/T.gz</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    cone
+<p>速度、静压和静温共同确定来流密度与马赫数。Run 35 的低压条件通过这三项输入进入计算。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/U.gz">查看该配置的官方原文件</a>。</p>
+<h3 id="2-壁面温度跳跃"><a href="#2-壁面温度跳跃" class="headerlink" title="2. 壁面温度跳跃"></a>2. 壁面温度跳跃</h3><p>文件：<code>0.orig/T.gz</code>。本段设置壁面温度跳跃。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    cone
     {
         <span class="hljs-keyword">type</span>            smoluchowskiJumpT;
         accommodationCoeff <span class="hljs-number">0.85</span>;
@@ -386,9 +388,10 @@ bash Allmesh
         <span class="hljs-keyword">value</span>           <span class="hljs-keyword">nonuniform</span> List&lt;scalar&gt;
 <span class="hljs-number">255</span>
 </code></pre></div>
-<p><code>smoluchowskiJumpT</code> 允许气体壁面温度与固体壁温之间存在跳跃。<code>Twall</code> 是给定固体温度，字段中的 <code>value</code> 则包含与当前网格对应的气体温度初始数据。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/T.gz">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-constant-thermophysicalProperties"><a href="#3-constant-thermophysicalProperties" class="headerlink" title="3. constant/thermophysicalProperties"></a>3. <code>constant/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">thermoType
+<p><code>smoluchowskiJumpT</code> 描述气体壁温相对固体壁温的跳跃，<code>Twall</code> 给定固体温度，<code>value</code> 保存与当前网格对应的气体初值。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/T.gz">查看该配置的官方原文件</a>。</p>
+<h3 id="3-氮气热物性"><a href="#3-氮气热物性" class="headerlink" title="3. 氮气热物性"></a>3. 氮气热物性</h3><p>文件：<code>constant/thermophysicalProperties</code>。本段设置氮气热物性。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">thermoType
 {
     <span class="hljs-keyword">type</span>            hePsiThermo;
     mixture         pureMixture;
@@ -399,8 +402,8 @@ bash Allmesh
     energy          sensibleInternalEnergy;
 }
 </code></pre></div>
-<p>气体采用氮气分子量、JANAF 热力学数据和 Sutherland 输运关系。能量变量为显内能，物性与激波温升共同参与求解。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/constant/thermophysicalProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>氮气采用 JANAF 热力学数据与 Sutherland 输运关系，以显内能为能量变量。激波温升通过这些物性关系反馈到压力、密度和输运过程。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/constant/thermophysicalProperties">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.rhoCentralFoam
 </code></pre></div>
@@ -445,12 +448,12 @@ bash Allmesh
 <td><code>0.5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选双锥附近流场，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>p</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>显示密度梯度或压力梯度，识别前锥激波、折角压缩与再附着结构。沿锥面提取压力和热流，将位置统一换算到模型轴向坐标，再与同工况测量比较。</p>
-<p>检查近壁网格与折角附近分辨率，比较分离区长度和热流峰值的变化。若重新生成网格，公开非均匀初始场的单元数量将不再对应，需要重新初始化或映射场量，再进行收敛计算。</p>
+<p>以密度或压力梯度识别前锥激波、折角压缩及再附着结构。沿锥面提取压力和热流，用统一轴向坐标与同工况试验比较，关注峰值及其位置。</p>
+<p>加密近壁和折角区域，检查分离长度和热流峰值变化。重建网格后，将初始场映射到新网格或重新初始化，再比较收敛结果。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> <code>grid256.dat</code> 决定最终几何。只查看前置 <code>blockMeshDict</code> 中的方块坐标，会把这个算例误认为普通矩形计算域。</p>
+<p><strong>熊猫说：</strong> 最终模型坐标由 <code>grid256.dat</code> 给出。检查双锥尺寸和近壁分辨率时，以导入后的网格为准。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/hypersonic-biconic.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

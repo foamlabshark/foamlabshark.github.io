@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>供暖房间的温度分层与热舒适 · FoamLab</title>
-  <meta name="description" content="计算通风房间的温度和速度分布，并结合着衣量、活动强度与湿度输出热舒适指标。">
+  <meta name="description" content="由室内流动和温度场计算热舒适与空气龄，分析送风条件对人员活动区的影响。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>供暖房间的温度分层与热舒适</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算通风房间的温度和速度分布，并结合着衣量、活动强度与湿度输出热舒适指标。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>室内平均温度达到设定值，并不意味着人员在各处都感到舒适。送风口附近可能出现吹风感，暖壁附近温度较高，房间回流又可能造成空气更新缓慢。评价空调方案需要把温度、风速和人员条件放在一起。</p>
-<p>本例使用浮力驱动的室内流动模型，设置较冷送风和较暖墙面。除了求解流动与温度，还计算 PMV、PPD、吹风感指标及空气龄。读者可以由此把流场结果转化为人员活动区的评价量。</p>
+    <div class="prose"><p>由室内流动和温度场计算热舒适与空气龄，分析送风条件对人员活动区的影响。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>室内平均温度相同，送风口附近和回流区的局部感受仍可能不同。较高风速增强人体散热，墙面温度与空气温度影响热平衡，衣着和活动强度则改变人体需求。空气更新速度还需由通风输运单独评价。</p>
+<p>算例在暖壁房间内引入冷空气，求解带浮力的流动与温度，并输出 PMV、PPD、吹风感和空气龄。分析分别联系局部冷热感、射流吹拂与空气更新，说明提高送风量可能带来的多方面变化。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/thermal-comfort-geometry.webp" alt="供暖房间的温度分层与热舒适：配套模型与基准输入"></p>
-<p>计算空间为 4 m × 3 m × 1.6 m，进出口由 <code>topoSet</code> 与 <code>createPatch</code> 从边界上选出。墙面温度为 302 K，入口温度为 290 K。几何和进出口选区均随完整算例提供。</p>
+<p>空间尺寸为 4 m × 3 m × 1.6 m。<code>topoSet</code> 与 <code>createPatch</code> 从边界选出送、排风口，墙温为 302 K，入口温度为 290 K。进出口位置与网格定义随算例提供。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom">OpenFOAM v2512 · heatTransfer/buoyantSimpleFoam/comfortHotRoom</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -354,7 +354,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-system-FOcomfort"><a href="#1-system-FOcomfort" class="headerlink" title="1. system/FOcomfort"></a>1. <code>system/FOcomfort</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">comfort
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-人员与湿度参数"><a href="#1-人员与湿度参数" class="headerlink" title="1. 人员与湿度参数"></a>1. 人员与湿度参数</h3><p>文件：<code>system/FOcomfort</code>。本段设置人员与湿度参数。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">comfort
 {
     <span class="hljs-comment">// Mandatory entries</span>
     <span class="hljs-keyword">type</span>            comfort;
@@ -383,9 +384,10 @@ bash Allmesh
     writeInterval   <span class="hljs-number">-1</span>;
 }
 </code></pre></div>
-<p>着衣量和代谢率描述人员状态，相对湿度参与人体散热计算。同一个室内温度场，在不同衣着和活动条件下可以对应不同 PMV，因此比较工况时应明确这些输入。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/FOcomfort">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-T"><a href="#2-0-orig-T" class="headerlink" title="2. 0.orig/T"></a>2. <code>0.orig/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
+<p>着衣量、代谢率和相对湿度描述人员及环境条件，参与热舒适计算。比较送风方案时保持这些输入一致，才能将 PMV 变化归因于流动与温度变化。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/FOcomfort">查看该配置的官方原文件</a>。</p>
+<h3 id="2-送风和墙面温度"><a href="#2-送风和墙面温度" class="headerlink" title="2. 送风和墙面温度"></a>2. 送风和墙面温度</h3><p>文件：<code>0.orig/T</code>。本段设置送风和墙面温度。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
 {
     walls
     {
@@ -405,9 +407,10 @@ bash Allmesh
     }
 }
 </code></pre></div>
-<p>冷空气由入口进入，墙面维持较高温度，两者共同形成温度梯度。出口采用温度零梯度，使离开的空气携带域内求得的温度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/0.orig/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-FOage"><a href="#3-system-FOage" class="headerlink" title="3. system/FOage"></a>3. <code>system/FOage</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">ageOfAir
+<p>290 K 的入口空气与 302 K 的墙面形成温差，浮力和送风共同组织室内流动。出口温度零梯度条件使空气携带内部求得的温度流出。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/0.orig/T">查看该配置的官方原文件</a>。</p>
+<h3 id="3-空气龄计算"><a href="#3-空气龄计算" class="headerlink" title="3. 空气龄计算"></a>3. 空气龄计算</h3><p>文件：<code>system/FOage</code>。本段设置空气龄计算。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">ageOfAir
 {
     <span class="hljs-comment">// Mandatory entries</span>
     <span class="hljs-keyword">type</span>            age;
@@ -433,8 +436,8 @@ bash Allmesh
     writeInterval   <span class="hljs-number">-1</span>;
 }
 </code></pre></div>
-<p>空气龄函数对象根据已有流场计算输运结果。空气龄较高的位置通常意味着空气更新较慢，应与流线和局部回流结构一起解释。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/FOage">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>空气龄函数对象利用已求得的流场计算空气停留时间。局部值较高时，结合流线判断是否存在回流或较弱的空气交换。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/comfortHotRoom/system/FOage">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.buoyantSimpleFoam
 </code></pre></div>
@@ -471,12 +474,12 @@ bash Allmesh
 <td><code>100</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选房间内部，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>在坐姿和站姿相关高度提取温度、速度、PMV 和 PPD 截面，并统一色标。将高吹风感区与高风速入口射流对应，将较高空气龄区域与回流死区对应。</p>
-<p>比较不同送风速度时，同时记录总风量和活动区舒适分布；提高风量可能减少空气龄，也可能扩大局部吹风感。再单独改变着衣量，观察人体输入对舒适结论的影响，避免把人员参数变化归因于 CFD 流场变化。</p>
+<p>在模型范围内选取人员活动高度截面，统一色标比较温度、速度、PMV 和 PPD。高吹风感区域与入口射流对照，高空气龄区域与回流对照，从空间分布解释各指标来源。</p>
+<p>改变送风速度时，同时记录风量、空气龄和活动区舒适分布。再保持流场不变，改变着衣量，区分通风方案与人体参数对舒适评价的影响。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> PPD 描述给定人体热平衡模型下的不满意比例，不能直接当作房间污染物浓度或新风合格率。</p>
+<p><strong>熊猫说：</strong> PPD 表示热平衡模型预测的不满意比例。空气更新程度通过空气龄和新风量评价。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/thermal-comfort.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>摩托车与骑手的外部空气动力学 · FoamLab</title>
-  <meta name="description" content="利用公开的摩托车与骑手三维模型，完成外流网格、湍流边界和气动力监测配置。">
+  <meta name="description" content="建立摩托车与骑手的外流模型，计算行驶状态下的阻力、表面压力及尾流。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>摩托车与骑手的外部空气动力学</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>利用公开的摩托车与骑手三维模型，完成外流网格、湍流边界和气动力监测配置。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>摩托车的空气阻力来自车身与骑手共同形成的绕流。骑手姿态、风挡和车尾会改变分离位置及尾流宽度，迎风面积相近的两种构型也可能产生不同阻力。外流计算因此需要同时保留车体、骑手与地面关系。</p>
-<p>本例使用完整公开曲面，以车体固定、空气和地面相对运动的方式建立行驶工况。<code>simpleFoam</code> 求解稳态不可压缩湍流，配合 SST 模型及贴体层网格，输出阻力系数、压力分布和尾流结构。</p>
+    <div class="prose"><p>建立摩托车与骑手的外流模型，计算行驶状态下的阻力、表面压力及尾流。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>摩托车绕流由车体、骑手和地面共同决定。风挡改变骑手迎风区域的压力，车尾和人体轮廓影响流动分离，地面运动则影响近地气流。阻力分析需要同时保留这些结构及其相对位置，才能解释姿态或外罩变化产生的效果。</p>
+<p>算例采用公开三维曲面，在车体坐标系内设置来流与运动地面。<code>simpleFoam</code> 配合 SST 湍流模型求解稳态平均流动，通过车体和骑手表面的压力及黏性应力积分获得气动力。计算重点是阻力收敛、分离位置和尾流恢复。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/motorcycle-aero-geometry.webp" alt="摩托车与骑手的外部空气动力学：配套模型与基准输入"></p>
-<p>几何文件为 <code>motorBike.obj.gz</code>，包括车轮、车架、风挡、骑手和外罩等表面。官方参考轴距为 1.42 m，系数归一化面积设为 0.75 m²。计算域为 <code>x</code> = −5～15 m、<code>y</code> = −4～4 m、<code>z</code> = 0～8 m，地面为 <code>z</code> = 0。</p>
+<p><code>motorBike.obj.gz</code> 包含车轮、车架、风挡、骑手和外罩。参考轴距为 1.42 m，参考面积为 0.75 m²。外流域沿 <code>x</code>、<code>y</code>、<code>z</code> 的范围分别为 −5～15 m、−4～4 m、0～8 m，<code>z</code> = 0 对应地面。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike">OpenFOAM v2512 · incompressible/simpleFoam/motorBike</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -357,22 +357,25 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-include-initialConditions"><a href="#1-0-orig-include-initialConditions" class="headerlink" title="1. 0.orig/include/initialConditions"></a>1. <code>0.orig/include/initialConditions</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">flowVelocity         (<span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-来流与湍流条件"><a href="#1-来流与湍流条件" class="headerlink" title="1. 来流与湍流条件"></a>1. 来流与湍流条件</h3><p>文件：<code>0.orig/include/initialConditions</code>。本段设置来流与湍流条件。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">flowVelocity         (<span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 pressure             <span class="hljs-number">0</span>;
 turbulentKE          <span class="hljs-number">0.24</span>;
 turbulentOmega       <span class="hljs-number">1.78</span>;
 </code></pre></div>
-<p>入口速度、湍动能和比耗散率集中在此处。改变来流速度后，应按入口湍流强度和长度尺度重新检查 <code>k</code>、<code>omega</code>，并同步更新气动力系数中的 <code>magUInf</code>。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/0.orig/include/initialConditions">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-U"><a href="#2-0-orig-U" class="headerlink" title="2. 0.orig/U"></a>2. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">lowerWall
+<p>来流速度、湍动能和比耗散率集中在入口参数文件中。改变速度后，根据湍流强度与长度尺度更新 <code>k</code>、<code>omega</code>，并将气动力系数的 <code>magUInf</code> 改为同一来流速度。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/0.orig/include/initialConditions">查看该配置的官方原文件</a>。</p>
+<h3 id="2-运动地面"><a href="#2-运动地面" class="headerlink" title="2. 运动地面"></a>2. 运动地面</h3><p>文件：<code>0.orig/U</code>。本段设置运动地面。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">lowerWall
 {
     <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
     <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
 }
 </code></pre></div>
-<p>地面速度与来流相同，模拟车体坐标系中路面相对运动。车体与骑手表面采用无滑移边界，这与把路面设为静止风洞地板的工况不同。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-forceCoeffs"><a href="#3-system-forceCoeffs" class="headerlink" title="3. system/forceCoeffs"></a>3. <code>system/forceCoeffs</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    patches         (motorBikeGroup);
+<p>运动地面在车体坐标系中与来流同向、同速，车体和骑手保持无滑移。该设置表示行驶路面相对车辆运动，决定近地边界层与车底流动。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/0.orig/U">查看该配置的官方原文件</a>。</p>
+<h3 id="3-气动力监测"><a href="#3-气动力监测" class="headerlink" title="3. 气动力监测"></a>3. 气动力监测</h3><p>文件：<code>system/forceCoeffs</code>。本段设置气动力监测。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    patches         (motorBikeGroup);
     rho             rhoInf;      <span class="hljs-comment">// Indicates incompressible</span>
     rhoInf          <span class="hljs-number">1</span>;           <span class="hljs-comment">// Required when rho = rhoInf</span>
     liftDir         (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
@@ -384,8 +387,8 @@ turbulentOmega       <span class="hljs-number">1.78</span>;
     Aref            <span class="hljs-number">0.75</span>;        <span class="hljs-comment">// Estimated</span>
 }
 </code></pre></div>
-<p>气动力积分覆盖 <code>motorBikeGroup</code>，包括车体与骑手全部对应表面。<code>dragDir</code>、<code>liftDir</code> 和 <code>pitchAxis</code> 确定输出分量，<code>Aref</code> 只影响系数归一化，不改变流场。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/forceCoeffs">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>motorBikeGroup</code> 汇集气动力积分所需的车体和骑手表面。<code>dragDir</code>、<code>liftDir</code>、<code>pitchAxis</code> 定义力及力矩方向，<code>Aref</code> 定义系数采用的面积。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/forceCoeffs">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.simpleFoam
 </code></pre></div>
@@ -422,12 +425,12 @@ turbulentOmega       <span class="hljs-number">1.78</span>;
 <td><code>100</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选车辆表面与空气内部，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>p</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>先绘制阻力系数随迭代变化的曲线，再查看迎风面压力、风挡后分离和车尾低速区。将尾流不同位置的速度截面放在同一色标下，比较低速区宽度及速度恢复。</p>
-<p>评估网格影响时，分别加密表面曲率、骑手附近剪切层和车尾区域，并检查首层网格对应的 <code>y</code>⁺。若力系数持续波动，稳态平均解可能不足以描述该构型，需要转入瞬态统计；不能只依据线性方程残差下降就判定气动力已稳定。</p>
+<p>绘制阻力系数随迭代的变化，结合迎风面压力、风挡后分离和车尾低速区解释阻力来源。在车尾不同位置提取速度截面，以相同色标比较尾流宽度和恢复程度。</p>
+<p>网格比较分别覆盖表面曲率、近壁层和尾流剪切层，并检查 <code>y</code>⁺。若力系数在持续迭代后仍表现出有规律的波动，可转入瞬态计算，统计平均阻力和波动幅度；残差与气动力共同用于判断收敛。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 改变 <code>Aref</code> 会改变阻力系数数值，却不会改变计算得到的阻力。比较不同模型时，应先统一参考面积与参考速度。</p>
+<p><strong>熊猫说：</strong> 参考面积只用于系数归一化。比较不同构型时，统一 <code>Aref</code>、<code>magUInf</code> 和密度，同时保留实际阻力值。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/motorcycle-aero.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

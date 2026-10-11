@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>红树林植被与波浪相互作用 · FoamLab</title>
-  <meta name="description" content="以波浪水槽和植被阻力模型研究红树林区域的消波作用，区分波幅衰减、反射与局部流动耗散。">
+  <meta name="description" content="计算波浪穿过等效植被区的传播与衰减，评价植被密度和阻力对透射波的影响。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>红树林植被与波浪相互作用</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>以波浪水槽和植被阻力模型研究红树林区域的消波作用，区分波幅衰减、反射与局部流动耗散。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>滨海植被能通过根系和枝干阻力消耗波浪能量，影响岸线附近的波高与水流。消波效果取决于植被密度、淹没深度、入射波条件及阻力系数。仅在植被后方看到较低波高，还不能区分能量耗散与边界反射造成的干涉。</p>
-<p>本例在三维水槽内设置植被区域，以动量源和湍流源描述群体作用。入射边界生成孤立波形式的扰动，下游采用吸收边界。计算沿槽布置多个水位采样位置，分析波浪通过植被区前后的变化。</p>
+    <div class="prose"><p>计算波浪穿过等效植被区的传播与衰减，评价植被密度和阻力对透射波的影响。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>滨海植被通过枝干和根系阻力改变水流，消耗部分波浪能量。植被密度、淹没深度和入射波条件共同影响消波能力，水槽边界反射与数值耗散也会改变测得波高。比较植被前后的完整水位过程，可以区分这些作用。</p>
+<p>算例在三维水槽中设置等效植被区域，以动量和湍流源表示群体作用。上游生成孤立波，下游吸收传播波；沿槽布置水位探针，将有、无植被条件下的波高、到达时间与速度衰减进行对应比较。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/mangrove-waves-geometry.webp" alt="红树林植被与波浪相互作用：配套模型与基准输入"></p>
-<p>水槽长 7 m、宽 0.55 m、高 0.5 m，初始水深 0.15 m。植被分布由 <code>seaweed.stl.gz</code> 选区后写入 <code>MangrovesIndex</code>，再转换为 <code>c0</code> 单元区；曲面用于确定阻力分布，不作为逐根解析的实体壁面。</p>
+<p>水槽长 7 m、宽 0.55 m、高 0.5 m，初始水深 0.15 m。<code>seaweed.stl.gz</code> 用于定义植被分布，将其写入 <code>MangrovesIndex</code> 后生成 <code>c0</code> 单元区，阻力源在该区域内作用。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction">OpenFOAM v2512 · multiphase/interFoam/laminar/waves/mangroveInteraction</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -354,7 +354,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-constant-waveProperties"><a href="#1-constant-waveProperties" class="headerlink" title="1. constant/waveProperties"></a>1. <code>constant/waveProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">left
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-造波与吸收"><a href="#1-造波与吸收" class="headerlink" title="1. 造波与吸收"></a>1. 造波与吸收</h3><p>文件：<code>constant/waveProperties</code>。本段设置造波与吸收。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">left
 {
     alpha           alpha.water;
 
@@ -369,9 +370,10 @@ bash Allmesh
     activeAbsorption <span class="hljs-literal">yes</span>;
 }
 </code></pre></div>
-<p>左边界使用 Boussinesq 波模型并开启主动吸收，右边界采用浅水吸收。入射条件、吸收设置和初始水深共同决定水槽中的波传播。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/constant/waveProperties">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-system-fvOptions"><a href="#2-system-fvOptions" class="headerlink" title="2. system/fvOptions"></a>2. <code>system/fvOptions</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Mangroves
+<p>左边界采用 Boussinesq 波模型和主动吸收，右边界采用浅水吸收。波高、初始水深与吸收条件共同组成水槽波浪设置。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/constant/waveProperties">查看该配置的官方原文件</a>。</p>
+<h3 id="2-植被等效作用"><a href="#2-植被等效作用" class="headerlink" title="2. 植被等效作用"></a>2. 植被等效作用</h3><p>文件：<code>system/fvOptions</code>。本段设置植被等效作用。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Mangroves
 {
     <span class="hljs-keyword">type</span>            multiphaseMangrovesSource;
     active          <span class="hljs-literal">yes</span>;
@@ -392,9 +394,10 @@ bash Allmesh
     }
 }
 </code></pre></div>
-<p><code>cellZone c0</code> 限定植被作用位置，<code>Cd</code> 控制阻力强度，<code>Cm</code> 控制惯性相关作用。参数与植被密度共同进入源项，不能把 <code>Cd</code> 当作整个植被区唯一的输入。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/system/fvOptions">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-setFieldsDict"><a href="#3-system-setFieldsDict" class="headerlink" title="3. system/setFieldsDict"></a>3. <code>system/setFieldsDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">surfaceToCell
+<p><code>cellZone c0</code> 指定源项区域，<code>Cd</code> 表示阻力作用，<code>Cm</code> 表示惯性相关作用，植被尺寸和密度进一步确定源项强度。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/system/fvOptions">查看该配置的官方原文件</a>。</p>
+<h3 id="3-植被范围选取"><a href="#3-植被范围选取" class="headerlink" title="3. 植被范围选取"></a>3. 植被范围选取</h3><p>文件：<code>system/setFieldsDict</code>。本段设置植被范围选取。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">surfaceToCell
 {
     file            <span class="hljs-string">"constant/triSurface/seaweed.stl.gz"</span>;
     outsidePoints   ((<span class="hljs-number">2</span> <span class="hljs-number">0.25</span> <span class="hljs-number">0.15</span>));
@@ -411,8 +414,8 @@ bash Allmesh
     );
 }
 </code></pre></div>
-<p>曲面选区把植被范围标记为 <code>MangrovesIndex = 1</code>，之后建立相应单元区。更换植被布局时应重建该索引与选区，否则网格图中移动了曲面，阻力仍可能作用在旧位置。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/system/setFieldsDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>曲面选区先设置 <code>MangrovesIndex</code>，再生成单元区。修改布局后重新执行这两步，使实际阻力位置随几何更新。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.interFoam
 </code></pre></div>
@@ -457,12 +460,12 @@ bash Allmesh
 <td><code>0.4</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选水槽与植被区域，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.water</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>在植被前后设置固定水位探针，提取水面随时间的变化，并按波到达顺序比较峰值和持续时间。保留植被前至少两个测点，以识别回传波和入射波的叠加。</p>
-<p>先做无植被对照，再改变植被密度或阻力参数。比较透射波高、传播时延和区域内速度衰减，明确效果来自植被源项而不是水槽本身的数值耗散。网格和时间步检查应使用相同探针曲线。</p>
+<p>在植被前后固定位置输出水位时序，按波到达顺序比较峰值和持续时间。植被前保留至少两个测点，用于观察入射波与回传波叠加。</p>
+<p>以无植被计算作为对照，分别改变植被密度和阻力参数，比较透射波高、传播时延与区域内速度。网格和时间步比较使用同一组探针曲线，使植被作用与数值耗散能够分别判断。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 只保留计算终点的一条采样线无法得到波高时序。研究透射过程时，应把探针或采样的写出控制改为固定时间间隔。</p>
+<p><strong>熊猫说：</strong> 波高分析需要连续时序。探针按固定时间间隔写出，以覆盖波进入、通过和离开植被区的全过程。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/mangrove-waves.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>汽车风挡玻璃的送风除霜 · FoamLab</title>
-  <meta name="description" content="计算热风加热汽车风挡和冰层的过程，分析送风温度、流量及潜热对融霜时间的影响。">
+  <meta name="description" content="计算汽车风挡和冰层在暖风作用下的升温与融化，评价送风条件对除霜速度的影响。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>汽车风挡玻璃的送风除霜</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算热风加热汽车风挡和冰层的过程，分析送风温度、流量及潜热对融霜时间的影响。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>冬季车辆启动后，暖风需要先加热风挡及其附着冰层，再提供融化所需潜热。即使玻璃附近空气已经升温，冰层也可能因潜热消耗而长时间停留在融点附近。仅计算玻璃表面温度，无法给出完整的除霜过程。</p>
-<p>本例将乘员舱、冰层与外部空气分为三个区域，通过耦合温度边界传递热量。冰层采用固化熔化源项处理相变，送风温度按启动过程逐步上升。输出应同时包括温度、融化比例和送风质量流量。</p>
+    <div class="prose"><p>计算汽车风挡和冰层在暖风作用下的升温与融化，评价送风条件对除霜速度的影响。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>车辆冷启动时，暖风输入的热量先用于提高风挡与冰层温度，达到融点后继续用于相变。冰层因吸收潜热可在融点附近维持较长时间，因此除霜分析需要同时计算温度和融化程度。送风覆盖不均还会使风挡不同位置具有明显不同的融化时间。</p>
+<p>算例将乘员舱、冰层和外部空气划分为三个区域，以界面热耦合传递能量，并用等效热阻表示玻璃导热。送风温度随启动过程上升，冰层通过固化熔化源项更新相变状态。由融化分布、热流和累计送风能量评价除霜效果。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/windshield-defrost-geometry.webp" alt="汽车风挡玻璃的送风除霜：配套模型与基准输入"></p>
-<p>使用官方 windshieldDefrost 的曲面风挡和送风通道，展向宽度为 0.7 m。冰层通过相邻曲面的 0.5 mm <code>x</code> 向偏移构造，风挡玻璃另外以 3 mm 等效导热层计入界面热阻。区域名称为 <code>cabin</code>、<code>ice</code> 和 <code>exterior</code>。</p>
+<p>风挡与送风通道采用 <code>windshieldDefrost</code> 曲面，展向宽 0.7 m。冰层由相邻曲面沿 <code>x</code> 方向偏移 0.5 mm 构造，玻璃则以厚度 3 mm 的导热层计入界面。三个区域名为 <code>cabin</code>、<code>ice</code>、<code>exterior</code>。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost">OpenFOAM v2512 · heatTransfer/chtMultiRegionFoam/windshieldDefrost</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -358,7 +358,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-cabin-T"><a href="#1-0-orig-cabin-T" class="headerlink" title="1. 0.orig/cabin/T"></a>1. <code>0.orig/cabin/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-暖风启动曲线"><a href="#1-暖风启动曲线" class="headerlink" title="1. 暖风启动曲线"></a>1. 暖风启动曲线</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置暖风启动曲线。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            uniformFixedValue;
     uniformValue    table
@@ -369,9 +370,10 @@ bash Allmesh
     );
 }
 </code></pre></div>
-<p>温度表描述暖风启动过程，时间单位为秒。它决定输入热量随时间的增长，不能用最终 293 K 直接替代整个启动阶段。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-system-ice-fvOptions"><a href="#2-system-ice-fvOptions" class="headerlink" title="2. system/ice/fvOptions"></a>2. <code>system/ice/fvOptions</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">iceZone
+<p>入口温度表规定 0～10 s 的升温过程，以秒为时间单位。该曲线决定初期热量输入，最终 293 K 对应升温结束后的送风状态。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
+<h3 id="2-冰层潜热"><a href="#2-冰层潜热" class="headerlink" title="2. 冰层潜热"></a>2. 冰层潜热</h3><p>文件：<code>system/ice/fvOptions</code>。本段设置冰层潜热。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">iceZone
 {
     <span class="hljs-keyword">type</span>            solidificationMeltingSource;
     active          <span class="hljs-literal">on</span>;
@@ -389,9 +391,10 @@ bash Allmesh
     }
 }
 </code></pre></div>
-<p><code>solidificationMeltingSource</code> 根据温度与潜热更新融化状态，<code>selectionMode all</code> 作用于整个冰区域。<code>Tmelt</code> 与 <code>L</code> 分别决定相变温度和单位质量所需能量。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/ice/fvOptions">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-orig-cabin-T"><a href="#3-0-orig-cabin-T" class="headerlink" title="3. 0.orig/cabin/T"></a>3. <code>0.orig/cabin/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cabin_to_ice
+<p><code>solidificationMeltingSource</code> 在整个 <code>ice</code> 区域计算相变。<code>Tmelt</code> 规定融化温度，<code>L</code> 规定单位质量相变潜热，二者共同决定升温转入融化的时刻及所需能量。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/ice/fvOptions">查看该配置的官方原文件</a>。</p>
+<h3 id="3-玻璃导热热阻"><a href="#3-玻璃导热热阻" class="headerlink" title="3. 玻璃导热热阻"></a>3. 玻璃导热热阻</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置玻璃导热热阻。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cabin_to_ice
 {
     <span class="hljs-keyword">type</span>            compressible::turbulentTemperatureRadCoupledMixed;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">260</span>;
@@ -404,8 +407,8 @@ bash Allmesh
     kappaLayers     (<span class="hljs-number">0.9</span>);
 }
 </code></pre></div>
-<p>玻璃层没有单独建立体网格，而是通过界面附加层给出热阻。这样仍能计算玻璃导热造成的温降，改变厚度时应修改这里，而不是冰层网格厚度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p>耦合温度边界中的附加层表示玻璃导热热阻。<code>thicknessLayers</code> 与 <code>kappaLayers</code> 分别给出厚度和导热系数，玻璃两侧温降由热流与该热阻共同确定。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.chtMultiRegionFoam
 </code></pre></div>
@@ -450,12 +453,12 @@ bash Allmesh
 <td><code>5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选<code>cabin</code>、ice 与 exterior，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>T</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>选取冰层区域显示液相比例，统计达到设定融化比例的面积或体积随时间变化。同步绘制冰层平均温度，识别初始升温、融化平台和融化后升温三个阶段。</p>
-<p>将送风温度与速度分开改变，比较融化时间及入口累计热量。重点观察送风直接冲击区和风挡远端的差异；如果热风只经过局部区域，提高总流量未必能均匀加快整个风挡的融化。</p>
+<p>显示冰层液相比例，统计达到指定融化比例的面积或体积，并与平均温度曲线对照。升温、相变平台和融化后升温对应不同的能量分配阶段，曲线与空间分布共同说明除霜进程。</p>
+<p>分别改变送风温度和速度，比较融化时间及累计输入热量。重点比较直接冲击区与风挡远端：若热风集中通过局部区域，流量增加对远端融化的改善可能有限。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> <code>ice</code> 区域承担相变，玻璃热阻在耦合温度边界中设置。修改冰厚和玻璃厚度对应两处不同输入。</p>
+<p><strong>熊猫说：</strong> 冰厚通过几何设置，玻璃厚度通过界面热阻设置。改变其中一项时，保持另一项不变才能区分两种传热影响。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/windshield-defrost.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

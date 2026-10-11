@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ladenburg 喷口的欠膨胀射流 · FoamLab</title>
-  <meta name="description" content="计算高压气体喷出后形成的欠膨胀射流，分析膨胀扇、激波胞与压力恢复。">
+  <meta name="description" content="模拟欠膨胀气体射流，计算喷口外膨胀、激波胞与中心线压力变化。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>Ladenburg 喷口的欠膨胀射流</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>计算高压气体喷出后形成的欠膨胀射流，分析膨胀扇、激波胞与压力恢复。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>喷管出口压力高于环境压力时，气体离开喷口后仍会继续膨胀。膨胀波与压缩波交替作用，形成具有重复结构的射流区域；在一定压比下还可能出现较强的中心激波。推进、泄放和高速喷吹设备都需要关注这种外部膨胀过程。</p>
-<p>本例采用 Ladenburg 喷流的公开基准，直接在喷口出口给定静压、静温和速度，由 <code>rhoCentralFoam</code> 求解下游可压缩射流。随包初始场为公开的发展场，适合先检查边界与结果结构，再进行网格或压比研究。</p>
+    <div class="prose"><p>模拟欠膨胀气体射流，计算喷口外膨胀、激波胞与中心线压力变化。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>气体离开喷口时若静压仍高于环境压力，将继续向外膨胀。膨胀与压缩过程交替形成激波胞，使速度、温度和压力沿轴向振荡。该结构关系到高速喷吹、推进和泄放设备的流动载荷及下游作用范围。</p>
+<p>算例采用 Ladenburg 喷流的公开条件，在喷口出口截面给定静压、静温和速度，由 <code>rhoCentralFoam</code> 计算外部射流。配套初始场已包含发展后的流动，可据此检查边界、激波位置和压力恢复，再研究压比与网格影响。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/ladenburg-jet-geometry.webp" alt="Ladenburg 喷口的欠膨胀射流：配套模型与基准输入"></p>
-<p>采用轴对称楔形区域，计算长度 30 mm、外半径 10 mm，喷口半径 5 mm。喷口边界为 <code>inlet</code>，外围环境与下游出口分别设置。网格包含 60 个轴向单元和共 20 个径向单元，完整坐标由毫米尺度字典转换到米。</p>
+<p>轴对称楔形域长 30 mm、外半径 10 mm，喷口半径为 5 mm。轴向 60 个单元，径向共 20 个单元。字典中的毫米坐标统一转换为米，喷口、外围环境和下游出口分别设置边界。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi">OpenFOAM v2512 · compressible/rhoCentralFoam/LadenburgJet60psi</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -357,23 +357,26 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-p-gz"><a href="#1-0-orig-p-gz" class="headerlink" title="1. 0.orig/p.gz"></a>1. <code>0.orig/p.gz</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-喷口静压"><a href="#1-喷口静压" class="headerlink" title="1. 喷口静压"></a>1. 喷口静压</h3><p>文件：<code>0.orig/p.gz</code>。本段设置喷口静压。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">271724</span>;
 }
 </code></pre></div>
-<p>入口代表喷口出口截面，因此这里填的是该截面的静压。不能把上游气罐总压直接写入同一固定静压边界，并仍保留原来的速度和温度。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/p.gz">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-T-gz"><a href="#2-0-orig-T-gz" class="headerlink" title="2. 0.orig/T.gz"></a>2. <code>0.orig/T.gz</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<p>该入口位于喷口出口截面，固定值为截面静压。上游气罐总压需通过喷管膨胀关系转换后，才能与此处速度和温度配套。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/p.gz">查看该配置的官方原文件</a>。</p>
+<h3 id="2-喷口温度与总焓"><a href="#2-喷口温度与总焓" class="headerlink" title="2. 喷口温度与总焓"></a>2. 喷口温度与总焓</h3><p>文件：<code>0.orig/T.gz</code>。本段设置喷口温度与总焓。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">247.1</span>;
 }
 </code></pre></div>
-<p>247.1 K 是喷口静温，低于环境温度，反映上游加速膨胀。与速度共同计算总焓，可检查这组入口是否对应一致的气体状态。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/T.gz">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-0-orig-p-gz"><a href="#3-0-orig-p-gz" class="headerlink" title="3. 0.orig/p.gz"></a>3. <code>0.orig/p.gz</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    outlet
+<p>247.1 K 为喷口静温，与速度共同确定总焓。其低于环境温度反映气体在上游加速时的膨胀降温。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/T.gz">查看该配置的官方原文件</a>。</p>
+<h3 id="3-下游透射边界"><a href="#3-下游透射边界" class="headerlink" title="3. 下游透射边界"></a>3. 下游透射边界</h3><p>文件：<code>0.orig/p.gz</code>。本段设置下游透射边界。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    outlet
     {
         <span class="hljs-keyword">type</span>            waveTransmissive;
         field           p;
@@ -408,8 +411,8 @@ bash Allmesh
 ;
     }
 </code></pre></div>
-<p><code>waveTransmissive</code> 用于减少压力波在下游边界的反射。<code>fieldInf</code> 指向远场压力，<code>lInf</code> 控制其恢复尺度；出口位置仍需足够远，避免截断主要激波结构。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/p.gz">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>waveTransmissive</code> 减小下游压力波反射，<code>fieldInf</code> 给出远场压力，<code>lInf</code> 给出恢复长度尺度。结合出口附近梯度判断主要射流结构是否完整包含在域内。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/LadenburgJet60psi/0.orig/p.gz">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.rhoCentralFoam
 </code></pre></div>
@@ -454,12 +457,12 @@ bash Allmesh
 <td><code>0.5</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选喷口与外部空间，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>p</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>沿中心线绘制压力、密度、温度和马赫数，将压力振荡与激波胞位置对应。用密度梯度显示压缩与膨胀结构，检查外围边界是否出现明显的反射波。</p>
-<p>开展入口压比研究时，从一致的总温、总压或出口状态重新确定三项入口量。增加轴向与径向网格分辨率，比较主要压力峰位置，而不是只比较渲染图的清晰程度。</p>
+<p>沿中心线输出压力、密度、温度与马赫数，将压力峰谷与激波胞位置对应。密度梯度用于显示膨胀和压缩结构，并检查外围和出口附近的反射。</p>
+<p>压比研究从一致的总态或喷口出口状态确定速度、静压、静温。轴向和径向加密后比较主要压力峰的位置与幅值，评价对激波结构的空间分辨率。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 案例名称中的 60 <code>psi</code> 是原始工况标识，求解器边界采用的是已经换算的 SI 静态量。配置时以文件中的 Pa、K 和 m/s 为准。</p>
+<p><strong>熊猫说：</strong> 工况名称中的 60 <code>psi</code> 为原始标识。边界文件采用换算后的静态量，单位分别为 Pa、K 和 m/s。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/ladenburg-jet.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>溢流堰的水面与过流能力 · FoamLab</title>
-  <meta name="description" content="以给定流量驱动过堰流动，计算上游水位、堰顶加速和下游自由液面。">
+  <meta name="description" content="计算给定流量下的过堰水位和流速，分析堰顶加速及下游自由液面。">
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -276,11 +276,11 @@
     <div class="eyebrow">OPENFOAM · v2512</div>
     <h1>溢流堰的水面与过流能力</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>以给定流量驱动过堰流动，计算上游水位、堰顶加速和下游自由液面。</p>
-<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>溢流堰通过抬高上游水位形成水头，将来水越过堰顶排向下游。堰顶流动加速、下游水舌和可能出现的水跃共同决定过流能力与局部压力。设计分析不仅关心总流量，还要确认上游水位及下游是否出现较强冲刷流动。</p>
-<p>本例使用二维堰体断面和 VOF 自由液面，入口指定体积流量，液位由流动过程形成。不同于固定入口水深和速度的写法，流量边界根据入口实际水相分布调整速度，适合观察水位随来水量变化的过程。</p>
+    <div class="prose"><p>计算给定流量下的过堰水位和流速，分析堰顶加速及下游自由液面。</p>
+<h2 id="工程场景与计算目标"><a href="#工程场景与计算目标" class="headerlink" title="工程场景与计算目标"></a>工程场景与计算目标</h2><p>溢流堰依靠上游水头输送来水，流体越过堰顶后加速并在下游重新分配动能。上游壅水、堰顶压力和下游高速区分别关系到防洪水位、结构受力与冲刷。评价过流能力需要将流量与这些局部过程联系起来。</p>
+<p>算例用结构网格描述堰体纵断面，以 VOF 追踪自由液面。入口直接规定体积流量，速度随入口水相覆盖面积调整，水位由来水量、堰体及下游条件共同形成。通过工况比较建立水头—流量关系。</p>
 <h2 id="几何、尺寸与基准工况"><a href="#几何、尺寸与基准工况" class="headerlink" title="几何、尺寸与基准工况"></a>几何、尺寸与基准工况</h2><p><img src="/assets/engineering/weir-overflow-geometry.webp" alt="溢流堰的水面与过流能力：配套模型与基准输入"></p>
-<p>计算域长 108 m，从 <code>x</code> = −18 m 延伸至 90 m，高 54 m，展向宽 1 m。堰顶高度为 30 m，堰顶从 <code>x</code> = 0 m 延伸到 15 m，下游斜坡连接至 <code>x</code> = 30 m 的底部。几何由分块结构网格直接描述。</p>
+<p>计算域沿 <code>x</code> 从 −18 m 延伸至 90 m，高 54 m、展向宽 1 m。堰顶高 30 m，水平段位于 <code>x</code> = 0～15 m，下游斜坡在 <code>x</code> = 30 m 接到底部。几何直接写入分块网格。</p>
 <p>模型与配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow">OpenFOAM v2512 · multiphase/interFoam/RAS/weirOverflow</a>。</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>
@@ -367,7 +367,8 @@ bash Allmesh
 </tr>
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
-<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-0-orig-U"><a href="#1-0-orig-U" class="headerlink" title="1. 0.orig/U"></a>1. <code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-给定流量入口"><a href="#1-给定流量入口" class="headerlink" title="1. 给定流量入口"></a>1. 给定流量入口</h3><p>文件：<code>0.orig/U</code>。本段设置给定流量入口。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            variableHeightFlowRateInletVelocity;
     flowRate        <span class="hljs-variable">$inletFlowRate</span>;
@@ -375,9 +376,10 @@ bash Allmesh
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
-<p><code>variableHeightFlowRateInletVelocity</code> 根据入口水相覆盖面积分配速度，使体积流量保持给定值。<code>alpha</code> 指向 <code>alpha.water</code>，因此水相边界和速度边界必须一起配置。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/0.orig/U">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="2-0-orig-alpha-water"><a href="#2-0-orig-alpha-water" class="headerlink" title="2. 0.orig/alpha.water"></a>2. <code>0.orig/alpha.water</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<p><code>variableHeightFlowRateInletVelocity</code> 读取 <code>alpha.water</code>，按实际水相覆盖面积分配速度，使水流量满足设定值。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/0.orig/U">查看该配置的官方原文件</a>。</p>
+<h3 id="2-入口水相与大气开口"><a href="#2-入口水相与大气开口" class="headerlink" title="2. 入口水相与大气开口"></a>2. 入口水相与大气开口</h3><p>文件：<code>0.orig/alpha.water</code>。本段设置入口水相与大气开口。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
 {
     <span class="hljs-keyword">type</span>            variableHeightFlowRate;
     lowerBound      <span class="hljs-number">0</span>;
@@ -385,9 +387,10 @@ bash Allmesh
     <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 }
 </code></pre></div>
-<p>相分数入口根据局部液位状态工作，<code>lowerBound</code> 和 <code>upperBound</code> 将水相比例限制在 0～1。上部大气开口允许空气交换，不应设成不透流固壁。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/0.orig/alpha.water">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
-<h3 id="3-system-setFieldsDict"><a href="#3-system-setFieldsDict" class="headerlink" title="3. system/setFieldsDict"></a>3. <code>system/setFieldsDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
+<p>入口相分数随液位状态确定，取值限制在 0～1。顶部大气开口允许空气进出，使水面能够升降。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/0.orig/alpha.water">查看该配置的官方原文件</a>。</p>
+<h3 id="3-起始水体分布"><a href="#3-起始水体分布" class="headerlink" title="3. 起始水体分布"></a>3. 起始水体分布</h3><p>文件：<code>system/setFieldsDict</code>。本段设置起始水体分布。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
 );
@@ -405,8 +408,8 @@ regions
     }
 );
 </code></pre></div>
-<p>初始化文件给出上游和下游起始水体。它影响启动过程；计算达到稳定后，水位由流量、堰体和下游条件共同决定。</p>
-<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/system/setFieldsDict">查看该配置的官方原文件</a>；本算例采用的完整文件保存在下载包的同一路径。</p>
+<p><code>setFields</code> 定义上、下游起始水体，控制启动过程。达到稳定后，水位由持续流量和边界条件决定。</p>
+<p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/weirOverflow/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
 <h2 id="求解运行与检查"><a href="#求解运行与检查" class="headerlink" title="求解运行与检查"></a>求解运行与检查</h2><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">bash Allsolve
 <span class="hljs-built_in">tail</span> -n 40 log.interFoam
 </code></pre></div>
@@ -451,12 +454,12 @@ regions
 <td><code>0.2</code></td>
 </tr>
 </tbody></table></div>
-<p>先确认网格检查通过、入口出口或封闭域的质量收支合理，再观察关键工程量是否稳定。稳态问题同时比较残差与出口量；周期或波动问题保留一段连续结果，用多个周期的统计量比较工况。</p>
+<p>计算检查包括网格质量、质量守恒与工程量收敛。稳态计算结合残差、流量和载荷判断迭代进程；周期或波动流动采用连续时序统计，比较相同时间窗内的均值与波动。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>在 ParaView 中打开 <code>case.foam</code>，勾选堰前和堰后水域，点击 <strong>Apply</strong>。先选择最后一个已写出的时刻，以 <code>alpha.water</code> 着色；用 <strong>Rescale <code>to</code> <code>Data</code> Range</strong> 更新色标。使用 <strong>Slice</strong> 查看内部截面，使用 <strong>Plot Over Line</strong> 沿关注方向提取曲线，最后通过 <strong>Save <code>Data</code></strong> 导出表格。对比不同工况时固定截面位置和色标范围。</p>
-<p>用 <code>alpha.water = 0.5</code> 提取水面，沿中心纵断面绘制水位和流速。记录远离堰顶加速区的上游水头，结合入口流量形成水头—流量曲线。检查堰顶附近 Froude 数及下游水舌落点。</p>
-<p>分别计算基准流量的 0.8、1 和 1.2 倍，比较上游壅水与下游速度。二维模型中的流量与展向宽度绑定，扩展到实际宽度时先换算单宽流量。若下游水位改变，应重新分析自由出流或淹没出流状态。</p>
+<p>提取 <code>alpha.water = 0.5</code> 水面，在纵断面输出水位、速度和 Froude 数。上游水头在远离堰顶加速区的位置测量，与流量配对形成过流曲线；下游重点记录水舌落点及高速区。</p>
+<p>比较 0.8、1 和 1.2 倍基准流量下的壅水与下游速度。改变下游水位时重新区分自由出流和淹没出流，模型宽度变化则按相同单宽流量换算总流量。</p>
 <blockquote>
-<p><strong>熊猫说：</strong> 本例宽度是 1 m，因此数值上 75 m³/s 对应单宽流量 75 m²/s。复制到其他宽度的模型时，需要同步调整总流量。</p>
+<p><strong>熊猫说：</strong> 1 m 宽模型中的 75 m³/s 对应单宽流量 75 m²/s。保持断面水力条件时，总流量与模型宽度同比变化。</p>
 </blockquote>
 <h2 id="文件与来源"><a href="#文件与来源" class="headerlink" title="文件与来源"></a>文件与来源</h2><ul>
 <li><a href="/downloads/engineering/weir-overflow.zip">完整算例包</a>：包含本页使用的全部配置和模型资源。</li>
