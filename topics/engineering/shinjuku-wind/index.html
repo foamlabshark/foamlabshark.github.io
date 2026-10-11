@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>新宿街区风环境：真实建筑群与测点对比 · FoamLab</title>
+  <meta name="description" content="转换 AIJ 原始 STL，设置大气来流，分析街谷、下洗和实测风速。">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
+  
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://nmkforbzmbstasnjxlid.supabase.co" crossorigin>
+  <link rel="preload" href="/assets/auth-config.json" as="fetch" crossorigin>
+  <script>document.documentElement.classList.add('has-js');</script>
+  <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
+  <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
+  <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
+  <link rel="stylesheet" href="/assets/site-core.css?v=1f3780b0fe93">
+  
+  
+  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
+  <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
+  <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
+  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  
+  
+  
+  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
+  <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
+  <script src="/assets/runtime-ui.js?v=92791928bd78" defer></script>
+  <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
+  <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
+  <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
+  <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
+  <script src="/assets/runtime-panda-pet.js?v=5104a52e33e1" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
+  <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=4f64e1fd1b4d">
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body data-section="topics" data-lesson="">
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar" id="sidebar">
+  <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
+  <a class="brand" href="/"><span class="brand-mark"><svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char"><g class="pa-head">
+  <circle class="pk" cx="44" cy="40" r="15"/><circle class="pk" cx="116" cy="40" r="15"/><circle class="pa-ear-in" cx="45" cy="41" r="7"/><circle class="pa-ear-in" cx="115" cy="41" r="7"/>
+  <g class="pa-o pa-o-headphones pa-hp-band"><path class="pa-hp" d="M38 64c0-34 84-34 84 0" fill="none"/></g>
+  <path class="pw pa-line" d="M80 30c-30 0-48 18-48 42 0 22 20 36 48 36s48-14 48-36c0-24-18-42-48-42z"/>
+  <path class="ps" d="M118 82c-4 14-18 22-38 22 24 4 44-6 46-22 0-4-2-6-8 0z"/>
+  <path class="pk" d="M50 64c4-10 16-12 20-4 4 7 2 18-6 22-8 3-18-6-14-18z"/><path class="pk" d="M110 64c-4-10-16-12-20-4-4 7-2 18 6 22 8 3 18-6 14-18z"/>
+  <g class="pa-eyes pa-eyes-open"><g class="pa-pupils"><circle class="pa-eye-white" cx="62" cy="70" r="6.4"/><circle class="pa-pupil" cx="62.6" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="64.4" cy="68.4" r="1.8"/><circle class="pa-eye-white" cx="98" cy="70" r="6.4"/><circle class="pa-pupil" cx="97.4" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="99.2" cy="68.4" r="1.8"/></g></g>
+  <g class="pa-eyes pa-eyes-happy"><path class="pa-eye-arc" d="M55 72q7-8 14 0M91 72q7-8 14 0"/></g>
+  <g class="pa-eyes pa-eyes-closed"><path class="pa-eye-arc" d="M55 70q7 6 14 0M91 70q7 6 14 0"/></g>
+  <ellipse class="pa-cheek" cx="50" cy="88" rx="7" ry="4.2"/><ellipse class="pa-cheek" cx="110" cy="88" rx="7" ry="4.2"/>
+  <path class="pk" d="M74.5 81.5c0-2 2-3 5.5-3s5.5 1 5.5 3c0 2.5-3 4.6-5.5 4.6s-5.5-2.1-5.5-4.6z"/>
+  <g class="pa-mouth pa-mouth-smile"><path class="pa-mouth-line" d="M80 86v2.6M73.5 88c2 3 5 3 6.5.6 1.5 2.4 4.5 2.4 6.5-.6"/></g>
+  <g class="pa-mouth pa-mouth-open"><path class="pa-mouth-fill" d="M74 89c0 6 3 9 6 9s6-3 6-9c-3 1.6-9 1.6-12 0z"/><path class="pa-tongue" d="M76.6 95c1.6-1.6 5.2-1.6 6.8 0-1 1.6-2.2 2.2-3.4 2.2s-2.4-.6-3.4-2.2z"/></g>
+  <g class="pa-f pa-f-master"><path class="pa-tuft" d="M72 34c0-9 10-13 16-8-6 1-8 4-6 9-4-4-7-3-10-1z"/><g class="pa-glasses"><circle cx="62" cy="71" r="11"/><circle cx="98" cy="71" r="11"/><path d="M73 70q7-4 14 0M51 68l-12-4M109 68l12-4"/></g></g>
+  <g class="pa-o pa-o-goggles"><path class="pa-goggle-band" d="M33 50c30-10 64-10 94 0"/><circle class="pa-goggle pa-line" cx="66" cy="44" r="10"/><circle class="pa-goggle pa-line" cx="94" cy="44" r="10"/><path class="pa-goggle-glint" d="M61 40q3-3 7-2M89 40q3-3 7-2"/></g>
+  <g class="pa-o pa-o-headphones"><rect class="pa-hp-cup" x="26" y="58" width="14" height="24" rx="7"/><rect class="pa-hp-cup" x="120" y="58" width="14" height="24" rx="7"/></g>
+  <g class="pa-o pa-o-flower"><g transform="translate(112 30)"><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(0)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(72)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(144)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(216)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(288)"/><circle class="pa-gold" r="3.4"/></g></g>
+  <g class="pa-hat pa-f pa-f-engineer pa-hat-hard"><path class="pa-hardhat pa-line" d="M46 40c0-20 16-30 34-30s34 10 34 30z"/><rect class="pa-hardhat pa-line" x="40" y="37" width="80" height="7" rx="3.5"/><path class="pa-hardhat-ridge" d="M80 12v24"/></g>
+  <g class="pa-hat pa-o pa-o-cap"><path class="pa-capbase pa-line" d="M56 34c0-8 48-8 48 0v8c-14-4-34-4-48 0z"/><path class="pa-capboard pa-line" d="M80 14l40 12-40 12-40-12z"/><path class="pa-tassel" d="M114 27v18"/><circle class="pa-gold" cx="114" cy="47" r="3"/></g>
+  <g class="pa-hat pa-o pa-o-strawhat"><ellipse class="pa-straw pa-line" cx="80" cy="36" rx="50" ry="10"/><path class="pa-straw pa-line" d="M58 34c0-16 10-24 22-24s22 8 22 24c-14 3-30 3-44 0z"/><path class="pa-straw-band" d="M58 30c14 3 30 3 44 0"/></g>
+  <g class="pa-hat pa-o pa-o-raincoat"><path class="pa-rain pa-line" d="M40 38c4-16 20-26 40-26s36 10 40 26c-24-6-56-6-80 0z"/><path class="pa-rain pa-line" d="M34 40c28-8 64-8 92 0l-4 6c-26-6-58-6-84 0z"/></g>
+  <g class="pa-hat pa-o pa-o-wizard"><path class="pa-wizard pa-line" d="M54 36c8-12 16-28 34-34-4 10-2 20 18 34z"/><ellipse class="pa-wizard pa-line" cx="80" cy="37" rx="34" ry="6"/><path class="pa-gold" d="M84 16l2 4.4 4.8.6-3.5 3.3.9 4.8-4.2-2.3-4.2 2.3.9-4.8-3.5-3.3 4.8-.6z"/></g>
+  </g></g></svg></span><span>FoamLab<small>熊猫带你学 OpenFOAM</small></span></a>
+  <div class="version"><span class="status-dot"></span> OpenFOAM <strong>v2512</strong></div>
+  <nav aria-label="主要导航">
+    <a class="town-entry town-nav-entry" href="/town/"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>熊猫小镇</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>
+    <div class="nav-label">学习空间</div>
+    
+<div class="nav-group" data-nav-section="home">
+ <div class="nav-parent"><a href="/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>学习概览</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="start">
+ <div class="nav-parent"><a href="/start/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span>快速开始</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-start" aria-label="快速开始子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-start" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=cfd-and-openfoam"><span>认识 CFD 与 OpenFOAM</span></a><a class="nav-item nav-subitem" href="/read/?slug=start-openfoam-v2512"><span>安装与环境配置</span></a><a class="nav-item nav-subitem" href="/read/?slug=first-cavity-result"><span>运行第一个算例</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="courses">
+ <div class="nav-parent"><a href="/courses/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>系统学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-courses" aria-label="系统学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-courses" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/courses/?track=%E8%B5%B7%E6%AD%A5%E4%B8%8E%E7%AE%97%E4%BE%8B"><span>起步与算例</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E5%87%A0%E4%BD%95%E4%B8%8E%E7%BD%91%E6%A0%BC"><span>几何与网格</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>离散与求解</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span>计算与数据分析</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E9%AA%8C%E8%AF%81%E4%B8%8E%E7%A0%94%E7%A9%B6%E6%96%B9%E6%B3%95"><span>验证与研究方法</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="topics">
+ <div class="nav-parent"><a href="/topics/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>专题学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-topics" aria-label="专题学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-topics" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/topics/finite-volume/"><span>有限体积法</span></a><a class="nav-item nav-subitem" href="/topics/turbulence/"><span>湍流</span></a><a class="nav-item nav-subitem" href="/topics/multiphase/"><span>多相流</span></a><a class="nav-item nav-subitem" href="/topics/heat-transfer/"><span>传热</span></a><a class="nav-item nav-subitem" href="/topics/electrochemistry/"><span>电化学</span></a><a class="nav-item nav-subitem" href="/topics/porous-media/"><span>渗流与多孔介质</span></a><a class="nav-item nav-subitem" href="/topics/meshing/"><span>网格划分</span></a><a class="nav-item nav-subitem" href="/topics/dynamic-mesh/"><span>动网格</span></a><a class="nav-item nav-subitem" href="/topics/function-objects/"><span>functionObject</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="quick-reference">
+ <div class="nav-parent"><a href="/quick-reference/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>速查手册</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-quick-reference" aria-label="速查手册子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-quick-reference" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="reference-general">
+ <div class="nav-parent"><a href="/quick-reference/#general" class="nav-item nav-subitem " ><span>通用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-general" aria-label="通用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-general" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="commands">
+ <div class="nav-parent"><a href="/commands/" class="nav-item nav-subitem " ><span>命令速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-commands" aria-label="命令速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-commands" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/commands/?category=%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7"><span>系统工具</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%89%8D%E5%A4%84%E7%90%86"><span>前处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E6%B1%82%E8%A7%A3%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span>求解与并行</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E7%8E%AF%E5%A2%83%E4%B8%8E%E7%BC%96%E8%AF%91"><span>环境与编译</span></a><a class="nav-item nav-subitem" href="/commands/?category=Linux"><span>Linux</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="dictionaries">
+ <div class="nav-parent"><a href="/dictionaries/" class="nav-item nav-subitem " ><span>配置与字典速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-dictionaries" aria-label="配置与字典速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-dictionaries" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BD%91%E6%A0%BC"><span>网格</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%8C%96"><span>初始化</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%9C%BA"><span>初始场</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E8%AE%A1%E7%AE%97%E6%8E%A7%E5%88%B6"><span>计算控制</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>数值方法</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97"><span>并行计算</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span>函数对象</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BC%96%E8%AF%91"><span>编译</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="function-objects">
+ <div class="nav-parent"><a href="/function-objects/" class="nav-item nav-subitem " ><span>函数对象速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-function-objects" aria-label="函数对象速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-function-objects" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%9C%BA%E8%BF%90%E7%AE%97"><span>场运算</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%87%87%E6%A0%B7%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span>采样与统计</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6"><span>湍流与声学</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%8A%9B%E4%B8%8E%E7%89%A9%E7%90%86%E9%87%8F"><span>力与物理量</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8"><span>颗粒与两相</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%96%87%E4%BB%B6%E4%B8%8E%E6%8E%A7%E5%88%B6"><span>文件与控制</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="boundary-conditions">
+ <div class="nav-parent"><a href="/boundary-conditions/" class="nav-item nav-subitem " ><span>边界条件速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-boundary-conditions" aria-label="边界条件速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-boundary-conditions" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/boundary-conditions/?field=velocity"><span>速度 U</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=pressure"><span>压力 p / p_rgh</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=temperature"><span>温度 T</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=turbulence"><span>湍流字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=phase"><span>相分数 α</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=geometry"><span>几何与耦合</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=generic"><span>通用条件</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=species"><span>组分与标量</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=radiation"><span>辐射字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=atmosphere"><span>大气边界层</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="solvers">
+ <div class="nav-parent"><a href="/solvers/" class="nav-item nav-subitem " ><span>求解器速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="numerical-methods">
+ <div class="nav-parent"><a href="/numerical-methods/" class="nav-item nav-subitem " ><span>离散格式与算法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="linear-solvers">
+ <div class="nav-parent"><a href="/linear-solvers/" class="nav-item nav-subitem " ><span>线性与 ODE 求解方法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="reference">
+ <div class="nav-parent"><a href="/reference/" class="nav-item nav-subitem " ><span>参考手册</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="reference-specialized">
+ <div class="nav-parent"><a href="/quick-reference/#specialized" class="nav-item nav-subitem " ><span>专用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-specialized" aria-label="专用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-specialized" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="turbulence-models">
+ <div class="nav-parent"><a href="/turbulence-models/" class="nav-item nav-subitem " ><span>湍流模型速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="thermophysical-models">
+ <div class="nav-parent"><a href="/thermophysical-models/" class="nav-item nav-subitem " ><span>热物性与状态方程</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="transport-models">
+ <div class="nav-parent"><a href="/transport-models/" class="nav-item nav-subitem " ><span>黏度与流变模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="radiation-models">
+ <div class="nav-parent"><a href="/radiation-models/" class="nav-item nav-subitem " ><span>辐射模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="combustion-models">
+ <div class="nav-parent"><a href="/combustion-models/" class="nav-item nav-subitem " ><span>燃烧与化学反应</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="particle-models">
+ <div class="nav-parent"><a href="/particle-models/" class="nav-item nav-subitem " ><span>颗粒、喷雾与液膜</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="multiphase-models">
+ <div class="nav-parent"><a href="/multiphase-models/" class="nav-item nav-subitem " ><span>多相流与相间作用</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="mesh-motion">
+ <div class="nav-parent"><a href="/mesh-motion/" class="nav-item nav-subitem " ><span>动网格与刚体运动</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="fv-options">
+ <div class="nav-parent"><a href="/fv-options/" class="nav-item nav-subitem " ><span>源项、约束与修正</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="programming">
+ <div class="nav-parent"><a href="/programming/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/basics/"><span>OpenFOAM 编程基础</span></a><a class="nav-item nav-subitem" href="/programming/coded-fields/"><span>用代码设置初始与边界条件</span></a><a class="nav-item nav-subitem" href="/programming/solvers/"><span>求解器开发</span></a><a class="nav-item nav-subitem" href="/programming/boundaries/"><span>边界条件开发</span></a><a class="nav-item nav-subitem" href="/programming/utilities/"><span>后处理工具开发</span></a><a class="nav-item nav-subitem" href="/programming/extensions/"><span>网格、格式与模型扩展</span></a><a class="nav-item nav-subitem" href="/programming/vibe-coding/"><span>Vibe Coding 实训</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="tools">
+ <div class="nav-parent"><a href="/tools/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工具生态</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-tools" aria-label="工具生态子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-tools" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/tools/paraview/"><span>ParaView 可视化</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-gmsh"><span>Gmsh 网格生成</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-salome"><span>SALOME 几何与网格</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyvista"><span>PyVista 数据分析</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyfoam"><span>PyFoam 运行管理</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-freecad-geometry"><span>FreeCAD 几何建模</span></a></div>
+</div>
+
+
+    <div class="nav-label">资源与社区</div>
+    
+<div class="nav-group" data-nav-section="resources">
+ <div class="nav-parent"><a href="/resources/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M3 16v6h18v-6"/></svg><span>资料中心</span></a><button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-resources" aria-label="资料中心子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-resources" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/resources/?kind=resource"><span>算例与源码</span></a><a class="nav-item nav-subitem" href="/resources/?kind=recommendation"><span>资源推荐</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="sharing">
+ <div class="nav-parent"><a href="/sharing/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>实践与分享</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="community">
+ <div class="nav-parent"><a href="/community/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z"/><path d="M7 9h9m-9 5h6"/></svg><span>讨论中心</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="assignments">
+ <div class="nav-parent"><a href="/assignments/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2m-7 8 2 2 5-5M9 18h7"/></svg><span>作业与实践</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="announcements">
+ <div class="nav-parent"><a href="/announcements/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M9 21h6"/></svg><span>网站公告</span></a></div>
+</div>
+
+
+  </nav>
+  <script src="/assets/navigation.js?v=3f7c823fe009"></script>
+  <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/topics/">专题学习</a> <span>/</span> <strong>新宿街区风环境：真实建筑群与测点对比</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
+ <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
+ <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
+ <div id="account-panel-member" hidden>
+  <a class="account-panel-growth" href="/account/#my-panda"><div><span>我的熊猫</span><strong id="account-panel-level">等级读取中…</strong></div><div class="account-panel-xp"><span id="account-panel-xp-bar"></span></div><p id="account-panel-xp">正在读取成长记录</p></a>
+  <nav class="account-panel-links" aria-label="账号常用入口"><a href="/account/#notifications">消息提醒 <span class="reply-count" data-reply-count hidden></span></a><a href="/account/#profile-form">个人资料 <span>→</span></a><a href="/account/#my-panda">我的熊猫 <span>→</span></a><a href="/account/#account-progress-state">学习进度 <span>→</span></a><a href="/studio/">作者工作台 <span>→</span></a><a href="/admin/" data-management-link hidden>管理平台 <span>→</span></a></nav>
+  <div class="account-panel-footer"><a href="/account/">打开个人中心 →</a><button type="button" class="account-sign-out" data-account-sign-out>退出登录</button></div>
+ </div>
+ <div id="account-panel-guest" hidden><p>登录后保存学习进度，查看熊猫等级并参与讨论。</p><button type="button" class="button" id="account-panel-sign-in"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg> 使用 GitHub 登录</button></div>
+ <p id="account-panel-message" role="status" hidden></p>
+</section>
+
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/topics/">← 返回专题学习</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="engineering-shinjuku-wind" data-cms-state="loading">
+    <div class="eyebrow">OPENFOAM · v2512</div>
+    <h1>新宿街区风环境：真实建筑群与测点对比</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>以 AIJ 新宿街区的真实建筑群和风速测量为依据，计算建筑绕流、街谷加速与行人高度的风速分布。</p>
+<h2 id="工程场景：高层建筑如何改变街道上的风"><a href="#工程场景：高层建筑如何改变街道上的风" class="headerlink" title="工程场景：高层建筑如何改变街道上的风"></a>工程场景：高层建筑如何改变街道上的风</h2><p>高层建筑迎风面的气流受阻后，一部分向两侧绕行，一部分沿立面向下运动。下洗气流进入近地面区域，与道路、低层建筑和裙房共同形成局部加速区。建筑背风侧则可能形成回流和低速区。两座建筑之间的通道宽度、相对位置及来流方向发生变化，都可能改变行人活动区域的风环境。</p>
+<p>这类计算服务于建筑布局、入口和广场设计，也用于分析自然通风与污染物输运。工程判断需要定位强风区出现在哪里、对哪一类来流最敏感，以及方案调整能否降低目标区域的风速。单独计算一座规则方柱，无法覆盖真实街区中高低建筑相互遮挡、街道转折和地形高差的影响。</p>
+<p>本案例采用日本建筑学会 AIJ Case <code>F</code>。公开 STL 表示新宿副中心在 1978 年 11 月的建筑构型，配套数据包括风洞来流剖面、风洞测点和对应时期的现场观测。保留这一历史构型，才能将计算值与同一组测量比较；补入今天的新建筑后，研究对象已经改变。</p>
+<p>首先完成北风工况，在已知测点比较无量纲风速；再改变风向，辨认建筑转角、街谷和背风区的响应。完成基准对比后，可以在副本中调整某一处建筑或挡风设施，比较修改前后的局部风速。</p>
+<p><img src="/assets/engineering/shinjuku-geometry.webp" alt="按 AIJ 原始 STL 绘制的新宿建筑群与尺度"></p>
+<p>几何及测量数据由 Tominaga、Kikumoto 和 Okaze 整理发布，采用 CC BY 4.0 许可。<a href="https://zenodo.org/records/15589622">原始数据集与各文件下载</a>。图中建筑形状来自该数据集，本站仅转换尺度并重新绘图。</p>
+<h2 id="先把模型尺度和测点位置统一"><a href="#先把模型尺度和测点位置统一" class="headerlink" title="先把模型尺度和测点位置统一"></a>先把模型尺度和测点位置统一</h2><p>新发布的 <code>BD_caseF.stl</code> 使用风洞尺度，缩尺比为 1∶800，单位已经是米。本节转换为实体尺度：所有几何坐标和风洞测点坐标乘以 800。入口采用同数据集 <code>LF_CaseF.xls</code> 的 <code>Inflow</code> 表所列无量纲剖面，并选择实体高度 500 m 处的参考风速为 10 m/s。</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>包含内容</th>
+<th>本节处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BD_caseF.stl</code></td>
+<td>建筑与地形，风洞尺度</td>
+<td>坐标乘 800；原文件保留</td>
+</tr>
+<tr>
+<td><code>AF_caseF.csv</code></td>
+<td>来流高度、平均风速、流向速度脉动均方根</td>
+<td>保留原始测量用于复核</td>
+</tr>
+<tr>
+<td><code>LF_CaseF.xls</code> 的 <code>Inflow</code> 表</td>
+<td>完整归一化入口剖面</td>
+<td>使用实体高度；速度比乘 10，湍动能比乘 100</td>
+</tr>
+<tr>
+<td><code>RS-WT_caseF.csv</code></td>
+<td>风洞测点、风向和无量纲风速</td>
+<td>三个坐标分量乘 800</td>
+</tr>
+<tr>
+<td><code>RS-FO_caseF.csv</code></td>
+<td>实体尺度现场观测</td>
+<td>保持原坐标，单独比较</td>
+</tr>
+</tbody></table></div>
+<p>原 STL 包围盒约为 <code>x</code>、<code>y</code> 方向各 1.8125 m，高度 0.28125 m。转换后模型范围约 1450 m×1450 m，最大高度 225 m。这里是原文件的几何范围，外部流体域还需向上游、下游和侧面扩展。</p>
+<p>资料包提供 <code>prepare_city.py</code>。它检查原始文件校验值，转换 STL 和测点，并输出北风工况测点表、入口剖面以及几何检查信息：</p>
+<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">python3 prepare_city.py
+surfaceCheck geometry/shinjuku-metres.stl
+</code></pre></div>
+<p>第一条命令完成尺度转换，第二条检查三角表面。原始城市 STL 含有开放边缘和地形连接，不能仅凭文件能够显示就直接认为流体域已封闭。应在网格软件中检查建筑底面与地形的连接，修复重叠面和局部缝隙，再导出用于网格划分的表面。</p>
+<p>原模型为表示地下空间而整体抬高了相当于实体 10 m 的高度。风洞测点 <code>z</code>=0.02375 m，转换后为 19 m，对应离原地面约 9 m。不能把它直接放在实体 <code>z</code>=9 m 的位置，否则采样高度会差 10 m。保留原 STL 时，全域坐标以风洞底板为零点；入口剖面也沿用底板高度，不将测点换算地面相对高度时所减的 10 m 再扣到入口上。若平移几何，必须同步平移测点和入口表的高度坐标。</p>
+<h2 id="流动模型与入口风剖面"><a href="#流动模型与入口风剖面" class="headerlink" title="流动模型与入口风剖面"></a>流动模型与入口风剖面</h2><p>采用中性、等温、不可压缩 RANS 模型，先用 <code>simpleFoam</code> 和标准 <code>kEpsilon</code> 获得平均风场。平均动量方程为</p>
+<p><span class="math-formula math-display" data-tex="
+\overline{\mathbf U}\cdot\nabla\overline{\mathbf U}
+=-\nabla p_k+\nabla\cdot\left[\nu\nabla\overline{\mathbf U}
+-\overline{\mathbf u'\mathbf u'}\right],
+\qquad \nabla\cdot\overline{\mathbf U}=0.
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mover accent="true"><mi mathvariant="bold">U</mi><mo stretchy="true">‾</mo></mover><mo>⋅</mo><mi mathvariant="normal">∇</mi><mover accent="true"><mi mathvariant="bold">U</mi><mo stretchy="true">‾</mo></mover><mo>=</mo><mo>−</mo><mi mathvariant="normal">∇</mi><msub><mi>p</mi><mi>k</mi></msub><mo>+</mo><mi mathvariant="normal">∇</mi><mo>⋅</mo><mrow><mo fence="true">[</mo><mi>ν</mi><mi mathvariant="normal">∇</mi><mover accent="true"><mi mathvariant="bold">U</mi><mo stretchy="true">‾</mo></mover><mo>−</mo><mover accent="true"><mrow><msup><mi mathvariant="bold">u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mi mathvariant="bold">u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><mo stretchy="true">‾</mo></mover><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="2em"></mspace><mi mathvariant="normal">∇</mi><mo>⋅</mo><mover accent="true"><mi mathvariant="bold">U</mi><mo stretchy="true">‾</mo></mover><mo>=</mo><mn>0.</mn></mrow><annotation encoding="application/x-tex">
+\overline{\mathbf U}\cdot\nabla\overline{\mathbf U}
+=-\nabla p_k+\nabla\cdot\left[\nu\nabla\overline{\mathbf U}
+-\overline{\mathbf u'\mathbf u'}\right],
+\qquad \nabla\cdot\overline{\mathbf U}=0.
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8861em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8861em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">U</span></span></span><span style="top:-3.8061em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8861em;"></span><span class="mord">∇</span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8861em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">U</span></span></span><span style="top:-3.8061em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">−</span><span class="mord">∇</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.2361em;vertical-align:-0.35em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">[</span></span><span class="mord mathnormal" style="margin-right:0.0637em;">ν</span><span class="mord">∇</span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8861em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">U</span></span></span><span style="top:-3.8061em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8779em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.7979em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">]</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8861em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8861em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">U</span></span></span><span style="top:-3.8061em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.</span></span></span></span></span></span></p>
+<p><span class="math-formula" data-tex="p_k=p/\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>k</mi></msub><mo>=</mo><mi>p</mi><mi mathvariant="normal">/</mi><mi>ρ</mi></mrow><annotation encoding="application/x-tex">p_k=p/\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal">ρ</span></span></span></span></span> 为运动学压力，<span class="math-formula" data-tex="-\overline{\mathbf u'\mathbf u'}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mover accent="true"><mrow><msup><mi mathvariant="bold">u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mi mathvariant="bold">u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><mo stretchy="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">-\overline{\mathbf u'\mathbf u'}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9612em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8779em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.7979em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></span> 表示速度脉动对平均动量输运的影响。湍流模型将这个未知应力与平均速度梯度联系起来。建筑背风回流、屋顶剪切层和窄通道中的预测偏差，应结合模型对分离和湍流混合的描述来分析。</p>
+<p>入口速度随高度增大。本节按 <code>Inflow</code> 表插值建立剖面。例如，在选定的参考风速下，实体高度 20 m 对应 4.2 m/s，80 m 对应 6.2 m/s，400 m 对应 9.4 m/s。不能把所有入口单元都设成 10 m/s，否则近地面的来流动量会明显偏大。</p>
+<p><code>Inflow</code> 表同时给出归一化湍动能，本节直接读取。若改用只提供流向速度脉动 <span class="math-formula" data-tex="u_{\rm rms}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">s</mi></mrow></msub></mrow><annotation encoding="application/x-tex">u_{\rm rms}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rms</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 的测量文件，需要先说明湍动能的估算方式。常用的各向同性近似及耗散率关系为：</p>
+<p><span class="math-formula math-display" data-tex="
+k(z)=\frac32u_{\rm rms}(z)^2,
+\qquad
+\varepsilon(z)=\frac{C_\mu^{3/4}k(z)^{3/2}}{L(z)},\quad C_\mu=0.09.
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>k</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><msub><mi>u</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">s</mi></mrow></msub><mo stretchy="false">(</mo><mi>z</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo separator="true">,</mo><mspace width="2em"></mspace><mi>ε</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msubsup><mi>C</mi><mi>μ</mi><mrow><mn>3</mn><mi mathvariant="normal">/</mi><mn>4</mn></mrow></msubsup><mi>k</mi><mo stretchy="false">(</mo><mi>z</mi><msup><mo stretchy="false">)</mo><mrow><mn>3</mn><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup></mrow><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mfrac><mo separator="true">,</mo><mspace width="1em"></mspace><msub><mi>C</mi><mi>μ</mi></msub><mo>=</mo><mn>0.09.</mn></mrow><annotation encoding="application/x-tex">
+k(z)=\frac32u_{\rm rms}(z)^2,
+\qquad
+\varepsilon(z)=\frac{C_\mu^{3/4}k(z)^{3/2}}{L(z)},\quad C_\mu=0.09.
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rms</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">ε</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.6578em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7218em;"><span style="top:-2.3588em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose">)</span></span></span><span style="top:-3.2748em;"><span class="pstrut" style="height:3.0448em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7218em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.5834em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3/4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2527em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3/2</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.09.</span></span></span></span></span></span></p>
+<p>这里的 <code>k</code> 和 ε 分别是湍动能与耗散率。<code>L</code>(<code>z</code>) 是建模输入，决定湍流衰减的尺度；资料包以入口底板为高度零点，取 <code>L</code>=0.41 <code>max</code>(<code>z</code>,0.5) m，并把这一假设与原始测量分开保存。先在去除建筑的空域中计算相同来流，检查剖面沿流向是否保持，再加入建筑。</p>
+<h3 id="北风工况的方向"><a href="#北风工况的方向" class="headerlink" title="北风工况的方向"></a>北风工况的方向</h3><p>原始平面图中 <code>x</code> 向东、<code>y</code> 向北、<code>z</code> 向上。气象学的“北风”表示风从北方吹来，因此北侧为入口，速度方向为负 <code>y</code>。为减少方向错误，首个算例保持建筑和测点原坐标，仅按该方向建立外部边界。</p>
+<h2 id="OpenFOAM-配置流程"><a href="#OpenFOAM-配置流程" class="headerlink" title="OpenFOAM 配置流程"></a>OpenFOAM 配置流程</h2><h3 id="1-建立足够大的外部流体域"><a href="#1-建立足够大的外部流体域" class="headerlink" title="1. 建立足够大的外部流体域"></a>1. 建立足够大的外部流体域</h3><p>以最高建筑高度 <code>H</code>=225 m 作为尺度，入口和侧边界先距建筑群边缘至少 5H，出口距下游边缘至少 15H，顶部距最高建筑至少 5H。对北风，入口在 <code>y</code> 最大的一侧，出口在 <code>y</code> 最小的一侧。随后通过扩大域和比较测点风速，判断边界对结果的影响。</p>
+<p>在 <code>snappyHexMeshDict</code> 中将建筑表面、地形表面、测点周围街区和高层建筑尾流设为不同细化区。第一层网格与壁面函数相配，狭窄道路至少需要多层单元跨越通道，避免两侧边界层和中部气流全部落入同一个单元。</p>
+<h3 id="2-让入口字段使用同一套高度数据"><a href="#2-让入口字段使用同一套高度数据" class="headerlink" title="2. 让入口字段使用同一套高度数据"></a>2. 让入口字段使用同一套高度数据</h3><p>准备程序输出 <code>inletProfiles.csv</code>，列出 <code>z</code>、<code>U</code>、<code>k</code>、ε，供映射边界或 <code>codedFixedValue</code> 使用。下面给出 <code>0/U</code> 中的核心写法，完整高度表在资料包中：</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">north
+{
+    <span class="hljs-keyword">type</span>            codedFixedValue;
+    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">-6.2</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">name</span>            measuredNorthWind;
+    <span class="hljs-keyword">code</span>
+    <span class="hljs-meta">#{</span>
+        const scalar zTab[] = {<span class="hljs-number">10</span>,<span class="hljs-number">20</span>,<span class="hljs-number">35</span>,<span class="hljs-number">40</span>,<span class="hljs-number">50</span>,<span class="hljs-number">60</span>,<span class="hljs-number">65</span>,<span class="hljs-number">80</span>,<span class="hljs-number">100</span>,<span class="hljs-number">120</span>,<span class="hljs-number">140</span>,<span class="hljs-number">160</span>,<span class="hljs-number">200</span>,<span class="hljs-number">240</span>,<span class="hljs-number">280</span>,<span class="hljs-number">320</span>,<span class="hljs-number">360</span>,<span class="hljs-number">400</span>,<span class="hljs-number">470</span>,<span class="hljs-number">500</span>};
+        const scalar uTab[] = {<span class="hljs-number">3.2</span>,<span class="hljs-number">4.2</span>,<span class="hljs-number">4.6</span>,<span class="hljs-number">5.0</span>,<span class="hljs-number">5.5</span>,<span class="hljs-number">5.8</span>,<span class="hljs-number">6.0</span>,<span class="hljs-number">6.2</span>,<span class="hljs-number">6.3</span>,<span class="hljs-number">6.5</span>,<span class="hljs-number">6.8</span>,<span class="hljs-number">7.3</span>,<span class="hljs-number">7.7</span>,<span class="hljs-number">8.1</span>,<span class="hljs-number">8.4</span>,<span class="hljs-number">8.9</span>,<span class="hljs-number">9.2</span>,<span class="hljs-number">9.4</span>,<span class="hljs-number">9.6</span>,<span class="hljs-number">10</span>};
+        vectorField values(patch().size(), vector::zero);
+        forAll(values, facei)
+        {
+            const scalar z = max(patch().Cf()[facei].z(), scalar(<span class="hljs-number">0</span>));
+            scalar u = z &lt; <span class="hljs-number">10</span> ? <span class="hljs-number">3.2</span>*z/<span class="hljs-number">10</span> : <span class="hljs-number">10</span>;
+            for (label j=<span class="hljs-number">0</span>; j&lt;<span class="hljs-number">19</span>; ++j)
+                if (z&gt;=zTab[j] &amp;&amp; z&lt;zTab[j+<span class="hljs-number">1</span>])
+                    u=uTab[j]+(uTab[j+<span class="hljs-number">1</span>]-uTab[j])*(z-zTab[j])/(zTab[j+<span class="hljs-number">1</span>]-zTab[j]);
+            values[facei]=vector(<span class="hljs-number">0</span>,-u,<span class="hljs-number">0</span>);
+        }
+        operator==(values);
+    #};
+}
+</code></pre></div>
+<p>表中高度之间按相邻节点线性插值；最低节点以下连接到地面零速度，500 m 以上保持参考风速。最低节点以下的近地面处理应与壁面粗糙度共同检查，避免剖面一进入流体域就发生明显调整。</p>
+<p><code>0/k</code> 和 <code>0/epsilon</code> 应由同一份高度表生成，不能分别套用无关的常数入口。若改用对数律大气边界层入口，则 <code>U</code>、<code>k</code>、ε 和地面粗糙度必须成套更换，并重复空域检查。</p>
+<h3 id="3-设置其余边界与求解控制"><a href="#3-设置其余边界与求解控制" class="headerlink" title="3. 设置其余边界与求解控制"></a>3. 设置其余边界与求解控制</h3><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
+<thead>
+<tr>
+<th>位置</th>
+<th>速度</th>
+<th>压力</th>
+<th>湍流量与壁面</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>南侧出口</td>
+<td><code>inletOutlet</code></td>
+<td><code>fixedValue 0</code></td>
+<td>流出零梯度；回流给与入口一致的物理量</td>
+</tr>
+<tr>
+<td>两侧与顶部</td>
+<td><code>symmetryPlane</code></td>
+<td><code>symmetryPlane</code></td>
+<td>几何 <code>patch</code> 同步设置</td>
+</tr>
+<tr>
+<td>建筑壁面</td>
+<td><code>noSlip</code></td>
+<td><code>zeroGradient</code></td>
+<td><code>k</code>、ε、<code>nut</code> 使用配套壁面函数</td>
+</tr>
+<tr>
+<td>地面</td>
+<td><code>noSlip</code></td>
+<td><code>zeroGradient</code></td>
+<td>使用与入口一致的粗糙壁面处理</td>
+</tr>
+</tbody></table></div>
+<p>地面粗糙度代表未被显式建模的小尺度粗糙元。已作为实体建模的建筑不能再全部折算成同样大的粗糙度重复计入。若用砂粒粗糙壁面函数，还应检查第一层单元高度与粗糙高度的相容性。</p>
+<p>先用有界的一阶对流格式获得稳定初场，再转为二阶格式完成结果统计。每次改变格式后继续监控测点速度，避免只比较残差曲线。</p>
+<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">blockMesh
+surfaceFeatureExtract
+snappyHexMesh -overwrite
+checkMesh -allTopology -allGeometry
+decomposePar
+mpirun -np 8 simpleFoam -parallel
+</code></pre></div>
+<p>这组命令从外部背景域生成街区网格并启动并行求解。<code>surfaceFeatureExtract</code> 根据已修复的表面提取建筑转角；原始 STL 转角密集，特征角阈值应结合网格预览选择。流体域内部的 <code>locationInMesh</code> 要位于建筑外，不能落入建筑实体或地下封闭空间。</p>
+<h3 id="4-在实测位置采样"><a href="#4-在实测位置采样" class="headerlink" title="4. 在实测位置采样"></a>4. 在实测位置采样</h3><p>下面是北风测点 1 的速度探针，写入 <code>controlDict</code> 的 <code>functions</code> 中。坐标由原始数据逐项乘以 800 得到。</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">windProbes
+{
+    <span class="hljs-keyword">type</span>                probes;
+    <span class="hljs-keyword">libs</span>                (sampling);
+    fields              (U);
+    writeControl        timeStep;
+    writeInterval       <span class="hljs-number">20</span>;
+    probeLocations      ((<span class="hljs-number">268.6</span> <span class="hljs-number">364.1</span> <span class="hljs-number">19</span>));
+}
+</code></pre></div>
+<p><code>268.6 364.1 19</code> 是计算域中的位置，不是“建筑编号 1”。资料包输出所有北风测点坐标；同一平面位置的不同高度应分别保留，不能只按测点编号去重。</p>
+<h2 id="结果分析：先比较测点，再解释空间分布"><a href="#结果分析：先比较测点，再解释空间分布" class="headerlink" title="结果分析：先比较测点，再解释空间分布"></a>结果分析：先比较测点，再解释空间分布</h2><p>数据集的风速比定义为</p>
+<p><span class="math-formula math-display" data-tex="
+K_i=\frac{|\overline{\mathbf U}_i|}{U_{500}},
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>K</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><msub><mover accent="true"><mi mathvariant="bold">U</mi><mo stretchy="true">‾</mo></mover><mi>i</mi></msub><mi mathvariant="normal">∣</mi></mrow><msub><mi>U</mi><mn>500</mn></msub></mfrac><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">
+K_i=\frac{|\overline{\mathbf U}_i|}{U_{500}},
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3991em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5631em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">500</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord"><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8861em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">U</span></span></span><span style="top:-3.8061em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span></span></span></span></span></span></p>
+<p>分母为相当于实体高度 500 m 的来流参考速度，本节设为 10 m/s。结果对比采用新版 <code>RS-WT_caseF.csv</code>；旧版表格的结果页采用过不同屋顶参考点，不能直接混用旧、新结果页的归一化数值。本文只从旧版 <code>Inflow</code> 页读取以 500 m 为参考高度的入口剖面。</p>
+<p>按 <code>(测点编号, x, y, z, 风向)</code> 逐行对齐数据，计算风速比差值与均方根误差。对误差较大的测点，回到三维模型检查测点是否靠近墙面、位于分离区或处在狭窄通道。对比顺序为风洞测量、不同网格计算、现场观测。现场的来流变化和统计方式与稳态计算不同，单独绘图有助于辨认差异来源。</p>
+<p>空间分析至少包含三个视图：近地面风速比、沿主街道的竖直截面、高层建筑背风侧的速度矢量。借助截面区分下洗、绕流加速和回流，解释某个测点为何偏高或偏低。</p>
+<p>进一步评估全年风舒适性时，还需要当地各风向的风速频率分布，并按指定评价标准累积超越概率。单一北风工况提供的是速度传递关系，年度出现频率需要另行输入。</p>
+<blockquote>
+<p><strong>熊猫说：</strong></p>
+<p>城市模型最容易出错的是坐标和高度。本数据集的 STL 是 1∶800 的米制模型，测点还包含相当于实体 10 m 的抬高量。先核对一处建筑高度和一个测点，再批量导入全部几何。</p>
+</blockquote>
+<h2 id="数据与配置资料"><a href="#数据与配置资料" class="headerlink" title="数据与配置资料"></a>数据与配置资料</h2><ul>
+<li><a href="/downloads/engineering/shinjuku-wind.zip">下载几何处理、入口剖面和测点配置资料包</a>。包含原始 CSV、单位转换程序、文件校验值和配置示例。</li>
+<li><a href="https://zenodo.org/records/15589622">AIJ Case F 原始 STL、CSV 与说明</a>，Tominaga、Kikumoto、Okaze，CC BY 4.0。</li>
+<li><a href="https://doi.org/10.1016/j.jweia.2008.02.058">AIJ 城市风环境 CFD 指南</a>。</li>
+<li><a href="https://doc.openfoam.com/2306/tools/processing/boundary-conditions/rtm/derived/general/codedFixedValue/">codedFixedValue 官方说明</a>：动态编译边界的写法与参数。</li>
+</ul>
+<p><a href="/topics/engineering/">返回实际工程应用</a></p>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
+</main>
+  <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
+  <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>
+  <div class="footer-contact-panel" id="footer-contact-panel" role="region" aria-label="QQ 群与小红书" hidden>
+    <div class="footer-contact-cards">
+      <div class="footer-contact-card">
+        <strong>QQ 学习交流群</strong>
+        <a class="footer-contact-code footer-contact-qq" href="/assets/contact/qq-group.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看 QQ 群二维码原图">
+          <img src="/assets/contact/qq-group.jpg" alt="FoamLab QQ 群二维码，群号 537804875" width="1284" height="2283" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">群号：<b>537804875</b></span>
+      </div>
+      <div class="footer-contact-card">
+        <strong>小红书 · 夕阳下的奔跑</strong>
+        <a class="footer-contact-code footer-contact-xhs" href="/assets/contact/xiaohongshu.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看小红书二维码原图">
+          <img src="/assets/contact/xiaohongshu.jpg" alt="夕阳下的奔跑的小红书二维码，小红书号 8436161477" width="987" height="1347" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">小红书号：<b>8436161477</b></span>
+      </div>
+    </div>
+    <small>点击二维码查看原图</small>
+  </div>
+</span>
+ <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
+</div>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<div class="toast" role="status" hidden></div>
+</body></html>

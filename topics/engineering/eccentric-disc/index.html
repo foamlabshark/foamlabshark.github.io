@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>偏心圆盘旋转：水轮机背腔与周期载荷 · FoamLab</title>
+  <meta name="description" content="按公开转子试验尺寸，设置偏心轴旋转、重叠网格、窄间隙和力矩后处理。">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
+  
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://nmkforbzmbstasnjxlid.supabase.co" crossorigin>
+  <link rel="preload" href="/assets/auth-config.json" as="fetch" crossorigin>
+  <script>document.documentElement.classList.add('has-js');</script>
+  <script src="/assets/appearance.js?v=c4e3f252c0c0"></script>
+  <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
+  <script src="/assets/sidebar-resize.js?v=12564e28268c"></script>
+  <link rel="stylesheet" href="/assets/site-core.css?v=1f3780b0fe93">
+  
+  
+  <script src="/assets/runtime-account.js?v=879c68c8afed" defer></script>
+  
+  <link rel="stylesheet" href="/assets/search-matches.css?v=51262790ad1d">
+  <script src="/assets/search-matches.js?v=9af0fd791e9a" defer></script>
+  <script src="/assets/search-scope.js?v=bbf806602a50" defer></script>
+  <script src="/assets/site.js?v=b3519db6b75c" defer></script>
+  
+  
+  
+  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
+  <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
+  <script src="/assets/runtime-ui.js?v=92791928bd78" defer></script>
+  <link rel="preload" href="/assets/navigation.js?v=3f7c823fe009" as="script">
+  <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer></script>
+  <link rel="stylesheet" href="/assets/town/panda-expansion.css?v=9f54198962b8">
+  <script src="/assets/town/town-entry.js?v=fa943228c06b" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-entry.css?v=520fde25070c">
+  <script src="/assets/runtime-panda-pet.js?v=5104a52e33e1" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
+  <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer></script>
+  <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=4f64e1fd1b4d">
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body data-section="topics" data-lesson="">
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar" id="sidebar">
+  <button class="icon-button sidebar-close" type="button" data-close-nav aria-label="关闭导航">×</button>
+  <a class="brand" href="/"><span class="brand-mark"><svg class="panda-art panda-face" viewBox="26 22 108 92" aria-hidden="true" focusable="false"><g class="pa-char"><g class="pa-head">
+  <circle class="pk" cx="44" cy="40" r="15"/><circle class="pk" cx="116" cy="40" r="15"/><circle class="pa-ear-in" cx="45" cy="41" r="7"/><circle class="pa-ear-in" cx="115" cy="41" r="7"/>
+  <g class="pa-o pa-o-headphones pa-hp-band"><path class="pa-hp" d="M38 64c0-34 84-34 84 0" fill="none"/></g>
+  <path class="pw pa-line" d="M80 30c-30 0-48 18-48 42 0 22 20 36 48 36s48-14 48-36c0-24-18-42-48-42z"/>
+  <path class="ps" d="M118 82c-4 14-18 22-38 22 24 4 44-6 46-22 0-4-2-6-8 0z"/>
+  <path class="pk" d="M50 64c4-10 16-12 20-4 4 7 2 18-6 22-8 3-18-6-14-18z"/><path class="pk" d="M110 64c-4-10-16-12-20-4-4 7-2 18 6 22 8 3 18-6 14-18z"/>
+  <g class="pa-eyes pa-eyes-open"><g class="pa-pupils"><circle class="pa-eye-white" cx="62" cy="70" r="6.4"/><circle class="pa-pupil" cx="62.6" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="64.4" cy="68.4" r="1.8"/><circle class="pa-eye-white" cx="98" cy="70" r="6.4"/><circle class="pa-pupil" cx="97.4" cy="70.6" r="4.6"/><circle class="pa-eye-glint" cx="99.2" cy="68.4" r="1.8"/></g></g>
+  <g class="pa-eyes pa-eyes-happy"><path class="pa-eye-arc" d="M55 72q7-8 14 0M91 72q7-8 14 0"/></g>
+  <g class="pa-eyes pa-eyes-closed"><path class="pa-eye-arc" d="M55 70q7 6 14 0M91 70q7 6 14 0"/></g>
+  <ellipse class="pa-cheek" cx="50" cy="88" rx="7" ry="4.2"/><ellipse class="pa-cheek" cx="110" cy="88" rx="7" ry="4.2"/>
+  <path class="pk" d="M74.5 81.5c0-2 2-3 5.5-3s5.5 1 5.5 3c0 2.5-3 4.6-5.5 4.6s-5.5-2.1-5.5-4.6z"/>
+  <g class="pa-mouth pa-mouth-smile"><path class="pa-mouth-line" d="M80 86v2.6M73.5 88c2 3 5 3 6.5.6 1.5 2.4 4.5 2.4 6.5-.6"/></g>
+  <g class="pa-mouth pa-mouth-open"><path class="pa-mouth-fill" d="M74 89c0 6 3 9 6 9s6-3 6-9c-3 1.6-9 1.6-12 0z"/><path class="pa-tongue" d="M76.6 95c1.6-1.6 5.2-1.6 6.8 0-1 1.6-2.2 2.2-3.4 2.2s-2.4-.6-3.4-2.2z"/></g>
+  <g class="pa-f pa-f-master"><path class="pa-tuft" d="M72 34c0-9 10-13 16-8-6 1-8 4-6 9-4-4-7-3-10-1z"/><g class="pa-glasses"><circle cx="62" cy="71" r="11"/><circle cx="98" cy="71" r="11"/><path d="M73 70q7-4 14 0M51 68l-12-4M109 68l12-4"/></g></g>
+  <g class="pa-o pa-o-goggles"><path class="pa-goggle-band" d="M33 50c30-10 64-10 94 0"/><circle class="pa-goggle pa-line" cx="66" cy="44" r="10"/><circle class="pa-goggle pa-line" cx="94" cy="44" r="10"/><path class="pa-goggle-glint" d="M61 40q3-3 7-2M89 40q3-3 7-2"/></g>
+  <g class="pa-o pa-o-headphones"><rect class="pa-hp-cup" x="26" y="58" width="14" height="24" rx="7"/><rect class="pa-hp-cup" x="120" y="58" width="14" height="24" rx="7"/></g>
+  <g class="pa-o pa-o-flower"><g transform="translate(112 30)"><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(0)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(72)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(144)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(216)"/><ellipse class="pa-petal" cx="0" cy="-5.5" rx="4" ry="5.5" transform="rotate(288)"/><circle class="pa-gold" r="3.4"/></g></g>
+  <g class="pa-hat pa-f pa-f-engineer pa-hat-hard"><path class="pa-hardhat pa-line" d="M46 40c0-20 16-30 34-30s34 10 34 30z"/><rect class="pa-hardhat pa-line" x="40" y="37" width="80" height="7" rx="3.5"/><path class="pa-hardhat-ridge" d="M80 12v24"/></g>
+  <g class="pa-hat pa-o pa-o-cap"><path class="pa-capbase pa-line" d="M56 34c0-8 48-8 48 0v8c-14-4-34-4-48 0z"/><path class="pa-capboard pa-line" d="M80 14l40 12-40 12-40-12z"/><path class="pa-tassel" d="M114 27v18"/><circle class="pa-gold" cx="114" cy="47" r="3"/></g>
+  <g class="pa-hat pa-o pa-o-strawhat"><ellipse class="pa-straw pa-line" cx="80" cy="36" rx="50" ry="10"/><path class="pa-straw pa-line" d="M58 34c0-16 10-24 22-24s22 8 22 24c-14 3-30 3-44 0z"/><path class="pa-straw-band" d="M58 30c14 3 30 3 44 0"/></g>
+  <g class="pa-hat pa-o pa-o-raincoat"><path class="pa-rain pa-line" d="M40 38c4-16 20-26 40-26s36 10 40 26c-24-6-56-6-80 0z"/><path class="pa-rain pa-line" d="M34 40c28-8 64-8 92 0l-4 6c-26-6-58-6-84 0z"/></g>
+  <g class="pa-hat pa-o pa-o-wizard"><path class="pa-wizard pa-line" d="M54 36c8-12 16-28 34-34-4 10-2 20 18 34z"/><ellipse class="pa-wizard pa-line" cx="80" cy="37" rx="34" ry="6"/><path class="pa-gold" d="M84 16l2 4.4 4.8.6-3.5 3.3.9 4.8-4.2-2.3-4.2 2.3.9-4.8-3.5-3.3 4.8-.6z"/></g>
+  </g></g></svg></span><span>FoamLab<small>熊猫带你学 OpenFOAM</small></span></a>
+  <div class="version"><span class="status-dot"></span> OpenFOAM <strong>v2512</strong></div>
+  <nav aria-label="主要导航">
+    <a class="town-entry town-nav-entry" href="/town/"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>熊猫小镇</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>
+    <div class="nav-label">学习空间</div>
+    
+<div class="nav-group" data-nav-section="home">
+ <div class="nav-parent"><a href="/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>学习概览</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="start">
+ <div class="nav-parent"><a href="/start/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span>快速开始</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-start" aria-label="快速开始子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-start" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/read/?slug=cfd-and-openfoam"><span>认识 CFD 与 OpenFOAM</span></a><a class="nav-item nav-subitem" href="/read/?slug=start-openfoam-v2512"><span>安装与环境配置</span></a><a class="nav-item nav-subitem" href="/read/?slug=first-cavity-result"><span>运行第一个算例</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="courses">
+ <div class="nav-parent"><a href="/courses/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>系统学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-courses" aria-label="系统学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-courses" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/courses/?track=%E8%B5%B7%E6%AD%A5%E4%B8%8E%E7%AE%97%E4%BE%8B"><span>起步与算例</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E5%87%A0%E4%BD%95%E4%B8%8E%E7%BD%91%E6%A0%BC"><span>几何与网格</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>离散与求解</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span>计算与数据分析</span></a><a class="nav-item nav-subitem" href="/courses/?track=%E9%AA%8C%E8%AF%81%E4%B8%8E%E7%A0%94%E7%A9%B6%E6%96%B9%E6%B3%95"><span>验证与研究方法</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="topics">
+ <div class="nav-parent"><a href="/topics/" class="nav-item active" aria-current="page"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>专题学习</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-topics" aria-label="专题学习子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-topics" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/topics/finite-volume/"><span>有限体积法</span></a><a class="nav-item nav-subitem" href="/topics/turbulence/"><span>湍流</span></a><a class="nav-item nav-subitem" href="/topics/multiphase/"><span>多相流</span></a><a class="nav-item nav-subitem" href="/topics/heat-transfer/"><span>传热</span></a><a class="nav-item nav-subitem" href="/topics/electrochemistry/"><span>电化学</span></a><a class="nav-item nav-subitem" href="/topics/porous-media/"><span>渗流与多孔介质</span></a><a class="nav-item nav-subitem" href="/topics/meshing/"><span>网格划分</span></a><a class="nav-item nav-subitem" href="/topics/dynamic-mesh/"><span>动网格</span></a><a class="nav-item nav-subitem" href="/topics/function-objects/"><span>functionObject</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="quick-reference">
+ <div class="nav-parent"><a href="/quick-reference/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>速查手册</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-quick-reference" aria-label="速查手册子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-quick-reference" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="reference-general">
+ <div class="nav-parent"><a href="/quick-reference/#general" class="nav-item nav-subitem " ><span>通用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-general" aria-label="通用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-general" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="commands">
+ <div class="nav-parent"><a href="/commands/" class="nav-item nav-subitem " ><span>命令速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-commands" aria-label="命令速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-commands" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/commands/?category=%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7"><span>系统工具</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%89%8D%E5%A4%84%E7%90%86"><span>前处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E6%B1%82%E8%A7%A3%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span>求解与并行</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/commands/?category=%E7%8E%AF%E5%A2%83%E4%B8%8E%E7%BC%96%E8%AF%91"><span>环境与编译</span></a><a class="nav-item nav-subitem" href="/commands/?category=Linux"><span>Linux</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="dictionaries">
+ <div class="nav-parent"><a href="/dictionaries/" class="nav-item nav-subitem " ><span>配置与字典速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-dictionaries" aria-label="配置与字典速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-dictionaries" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BD%91%E6%A0%BC"><span>网格</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%8C%96"><span>初始化</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%88%9D%E5%A7%8B%E5%9C%BA"><span>初始场</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E8%AE%A1%E7%AE%97%E6%8E%A7%E5%88%B6"><span>计算控制</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E6%95%B0%E5%80%BC%E6%96%B9%E6%B3%95"><span>数值方法</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%89%A9%E7%90%86%E6%A8%A1%E5%9E%8B"><span>物理模型</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97"><span>并行计算</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span>函数对象</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E5%90%8E%E5%A4%84%E7%90%86"><span>后处理</span></a><a class="nav-item nav-subitem" href="/dictionaries/?group=%E7%BC%96%E8%AF%91"><span>编译</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="function-objects">
+ <div class="nav-parent"><a href="/function-objects/" class="nav-item nav-subitem " ><span>函数对象速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-function-objects" aria-label="函数对象速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-function-objects" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%9C%BA%E8%BF%90%E7%AE%97"><span>场运算</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%87%87%E6%A0%B7%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span>采样与统计</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6"><span>湍流与声学</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E5%8A%9B%E4%B8%8E%E7%89%A9%E7%90%86%E9%87%8F"><span>力与物理量</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E9%A2%97%E7%B2%92%E4%B8%8E%E4%B8%A4%E7%9B%B8"><span>颗粒与两相</span></a><a class="nav-item nav-subitem" href="/function-objects/?category=%E6%96%87%E4%BB%B6%E4%B8%8E%E6%8E%A7%E5%88%B6"><span>文件与控制</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="boundary-conditions">
+ <div class="nav-parent"><a href="/boundary-conditions/" class="nav-item nav-subitem " ><span>边界条件速查</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-boundary-conditions" aria-label="边界条件速查子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-boundary-conditions" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/boundary-conditions/?field=velocity"><span>速度 U</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=pressure"><span>压力 p / p_rgh</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=temperature"><span>温度 T</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=turbulence"><span>湍流字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=phase"><span>相分数 α</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=geometry"><span>几何与耦合</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=generic"><span>通用条件</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=species"><span>组分与标量</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=radiation"><span>辐射字段</span></a><a class="nav-item nav-subitem" href="/boundary-conditions/?field=atmosphere"><span>大气边界层</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="solvers">
+ <div class="nav-parent"><a href="/solvers/" class="nav-item nav-subitem " ><span>求解器速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="numerical-methods">
+ <div class="nav-parent"><a href="/numerical-methods/" class="nav-item nav-subitem " ><span>离散格式与算法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="linear-solvers">
+ <div class="nav-parent"><a href="/linear-solvers/" class="nav-item nav-subitem " ><span>线性与 ODE 求解方法</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="reference">
+ <div class="nav-parent"><a href="/reference/" class="nav-item nav-subitem " ><span>参考手册</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="reference-specialized">
+ <div class="nav-parent"><a href="/quick-reference/#specialized" class="nav-item nav-subitem " ><span>专用模块</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-reference-specialized" aria-label="专用模块子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-reference-specialized" class="nav-subgroup" hidden>
+<div class="nav-group" data-nav-section="turbulence-models">
+ <div class="nav-parent"><a href="/turbulence-models/" class="nav-item nav-subitem " ><span>湍流模型速查</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="thermophysical-models">
+ <div class="nav-parent"><a href="/thermophysical-models/" class="nav-item nav-subitem " ><span>热物性与状态方程</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="transport-models">
+ <div class="nav-parent"><a href="/transport-models/" class="nav-item nav-subitem " ><span>黏度与流变模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="radiation-models">
+ <div class="nav-parent"><a href="/radiation-models/" class="nav-item nav-subitem " ><span>辐射模型</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="combustion-models">
+ <div class="nav-parent"><a href="/combustion-models/" class="nav-item nav-subitem " ><span>燃烧与化学反应</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="particle-models">
+ <div class="nav-parent"><a href="/particle-models/" class="nav-item nav-subitem " ><span>颗粒、喷雾与液膜</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="multiphase-models">
+ <div class="nav-parent"><a href="/multiphase-models/" class="nav-item nav-subitem " ><span>多相流与相间作用</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="mesh-motion">
+ <div class="nav-parent"><a href="/mesh-motion/" class="nav-item nav-subitem " ><span>动网格与刚体运动</span></a>
+ </div>
+ 
+</div>
+
+<div class="nav-group" data-nav-section="fv-options">
+ <div class="nav-parent"><a href="/fv-options/" class="nav-item nav-subitem " ><span>源项、约束与修正</span></a>
+ </div>
+ 
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="nav-group" data-nav-section="programming">
+ <div class="nav-parent"><a href="/programming/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7 4 5-4 5m8 0h6"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg><span>OpenFOAM 编程</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-programming" aria-label="OpenFOAM 编程子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-programming" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/linux/"><span>Linux 入门</span></a><a class="nav-item nav-subitem" href="/cpp/"><span>C++ 入门</span></a><a class="nav-item nav-subitem" href="/programming/basics/"><span>OpenFOAM 编程基础</span></a><a class="nav-item nav-subitem" href="/programming/coded-fields/"><span>用代码设置初始与边界条件</span></a><a class="nav-item nav-subitem" href="/programming/solvers/"><span>求解器开发</span></a><a class="nav-item nav-subitem" href="/programming/boundaries/"><span>边界条件开发</span></a><a class="nav-item nav-subitem" href="/programming/utilities/"><span>后处理工具开发</span></a><a class="nav-item nav-subitem" href="/programming/extensions/"><span>网格、格式与模型扩展</span></a><a class="nav-item nav-subitem" href="/programming/vibe-coding/"><span>Vibe Coding 实训</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="tools">
+ <div class="nav-parent"><a href="/tools/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工具生态</span></a>
+ <button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-tools" aria-label="工具生态子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-tools" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/tools/paraview/"><span>ParaView 可视化</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-gmsh"><span>Gmsh 网格生成</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-salome"><span>SALOME 几何与网格</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyvista"><span>PyVista 数据分析</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-pyfoam"><span>PyFoam 运行管理</span></a><a class="nav-item nav-subitem" href="/read/?slug=tool-freecad-geometry"><span>FreeCAD 几何建模</span></a></div>
+</div>
+
+
+    <div class="nav-label">资源与社区</div>
+    
+<div class="nav-group" data-nav-section="resources">
+ <div class="nav-parent"><a href="/resources/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M3 16v6h18v-6"/></svg><span>资料中心</span></a><button type="button" class="nav-expand" aria-expanded="false" aria-controls="nav-children-resources" aria-label="资料中心子目录"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"/></svg></button></div>
+ <div id="nav-children-resources" class="nav-subgroup" hidden><a class="nav-item nav-subitem" href="/resources/?kind=resource"><span>算例与源码</span></a><a class="nav-item nav-subitem" href="/resources/?kind=recommendation"><span>资源推荐</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="sharing">
+ <div class="nav-parent"><a href="/sharing/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><span>实践与分享</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="community">
+ <div class="nav-parent"><a href="/community/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z"/><path d="M7 9h9m-9 5h6"/></svg><span>讨论中心</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="assignments">
+ <div class="nav-parent"><a href="/assignments/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2m-7 8 2 2 5-5M9 18h7"/></svg><span>作业与实践</span></a></div>
+</div>
+
+<div class="nav-group" data-nav-section="announcements">
+ <div class="nav-parent"><a href="/announcements/" class="nav-item " ><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M9 21h6"/></svg><span>网站公告</span></a></div>
+</div>
+
+
+  </nav>
+  <script src="/assets/navigation.js?v=3f7c823fe009"></script>
+  <div class="sidebar-bottom"><div class="tiny-label">软件版本</div><p>OpenFOAM v2512</p><a href="https://www.openfoam.com/news/main-news/openfoam-v2512" target="_blank" rel="noopener noreferrer">v2512 官方资料 ↗</a></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><button class="icon-button mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="breadcrumb"><a id="breadcrumb-parent" href="/topics/">专题学习</a> <span>/</span> <strong>偏心圆盘旋转：水轮机背腔与周期载荷</strong></div><button class="search-trigger" data-open-search><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><span>搜索课程、命令、配置…</span><kbd>Ctrl K</kbd></button><div class="account-actions" aria-label="账号"><span class="account-entry"><button class="account-nav" type="button" id="account-nav-label" aria-busy="true" aria-expanded="false" aria-controls="account-panel" aria-haspopup="dialog" aria-describedby="account-reply-count">个人中心</button><span id="account-reply-count" class="reply-count" data-reply-count hidden></span></span><button class="account-sign-out" id="nav-sign-out" type="button" hidden>退出登录</button></div><a class="github-link" href="https://github.com/foamlabshark/foamlabshark.github.io" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg></a></header>
+  <section id="account-panel" class="account-panel" role="dialog" aria-label="我的账号" hidden>
+ <div class="account-panel-heading"><strong>我的账号</strong><button type="button" class="icon-button" id="account-panel-close" aria-label="关闭账号面板">×</button></div>
+ <div class="account-panel-identity"><span id="account-panel-avatar" class="account-panel-avatar" aria-hidden="true">F</span><div><strong id="account-panel-name">个人中心</strong><p id="account-panel-status" role="status">正在恢复登录…</p></div><span class="account-panel-badge" id="account-panel-badge" hidden>已登录</span></div>
+ <div id="account-panel-member" hidden>
+  <a class="account-panel-growth" href="/account/#my-panda"><div><span>我的熊猫</span><strong id="account-panel-level">等级读取中…</strong></div><div class="account-panel-xp"><span id="account-panel-xp-bar"></span></div><p id="account-panel-xp">正在读取成长记录</p></a>
+  <nav class="account-panel-links" aria-label="账号常用入口"><a href="/account/#notifications">消息提醒 <span class="reply-count" data-reply-count hidden></span></a><a href="/account/#profile-form">个人资料 <span>→</span></a><a href="/account/#my-panda">我的熊猫 <span>→</span></a><a href="/account/#account-progress-state">学习进度 <span>→</span></a><a href="/studio/">作者工作台 <span>→</span></a><a href="/admin/" data-management-link hidden>管理平台 <span>→</span></a></nav>
+  <div class="account-panel-footer"><a href="/account/">打开个人中心 →</a><button type="button" class="account-sign-out" data-account-sign-out>退出登录</button></div>
+ </div>
+ <div id="account-panel-guest" hidden><p>登录后保存学习进度，查看熊猫等级并参与讨论。</p><button type="button" class="button" id="account-panel-sign-in"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6 0-2-1-3-2-4 0-1 0-3-1-4-2 0-4 1-4 1-2-.5-4-.5-6 0 0 0-2-1-4-1-1 1-1 3-1 4-1 1-2 2-2 4 0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/></svg> 使用 GitHub 登录</button></div>
+ <p id="account-panel-message" role="status" hidden></p>
+</section>
+
+  <main id="main"><div class="page-return"><a class="button secondary" id="page-back-link" href="/topics/">← 返回专题学习</a></div><div class="article-shell">
+  <article class="article" data-cms-slug="engineering-eccentric-disc" data-cms-state="loading">
+    <div class="eyebrow">OPENFOAM · v2512</div>
+    <h1>偏心圆盘旋转：水轮机背腔与周期载荷</h1>
+    <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
+    <div class="prose"><p>按公开水轮机背腔试验尺寸建立偏心圆盘模型，求解圆盘绕偏离圆心的固定轴旋转时的窄间隙流动、力矩和周期载荷。</p>
+<h2 id="工程场景：很小的偏心为什么会改变转子载荷"><a href="#工程场景：很小的偏心为什么会改变转子载荷" class="headerlink" title="工程场景：很小的偏心为什么会改变转子载荷"></a>工程场景：很小的偏心为什么会改变转子载荷</h2><p>水轮机转轮、泵叶轮和密封腔中的旋转部件，与静止壳体之间通常存在间隙。间隙中的液体一方面受转动壁面拖曳，另一方面受到泄漏压差驱动。当转子偏心时，周向间隙不再均匀，局部流动阻力和压力随位置变化，形成作用于转子的非对称载荷。</p>
+<p>载荷不仅包括绕主轴的阻力矩，还包括径向力和使转子倾斜的力矩。这些量与转子振动相互作用：流体可能消耗振动能量，也可能在某些运动相位向振动输入能量。因此，电机所需的平均转矩和转子的动态稳定性是两个相关但不同的问题。</p>
+<p>本案例以 Song 等开展的 Francis 水轮机背腔转子试验为几何依据。原装置以圆盘表示转轮背部，水从外周间隙进入背腔，再向内侧流出；试验分别控制圆盘自转与圆心绕行。公开论文给出了圆盘、壳体、间隙、偏心距及转速，能够建立带实际尺度的三维流动模型。</p>
+<p>这里选取自转角速度与圆心绕行角速度相等的同步工况。圆盘上每一点都等效为绕同一条固定偏心轴作刚体旋转，正是本案例所需的运动。圆心会绕轴走一圈，而不是停在容器内某个偏置位置原地自转。</p>
+<p><img src="/assets/engineering/eccentric-disc-geometry.webp" alt="偏心圆盘、圆心轨迹与水轮机背腔间隙"></p>
+<p>尺寸依据：<a href="https://www.jstage.jst.go.jp/article/ijfms/3/1/3_1_67/_article">Song 等，International Journal of Fluid Machinery and Systems 3(1), 67–79，2010，第 2 节及图 3</a>。圆盘厚度和详细试验说明见 <a href="https://doi.org/10.1115/1.4001802">Journal of Fluids Engineering 132, 071102</a>。</p>
+<h2 id="尺寸、计算范围与边界"><a href="#尺寸、计算范围与边界" class="headerlink" title="尺寸、计算范围与边界"></a>尺寸、计算范围与边界</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>取值</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>圆盘半径 <code>R</code></td>
+<td>149.5 mm</td>
+<td>外径为 299 mm</td>
+</tr>
+<tr>
+<td>圆盘厚度</td>
+<td>10 mm</td>
+<td>保留三维端面和外圆柱面</td>
+</tr>
+<tr>
+<td>平均径向间隙 <code>c</code>₁</td>
+<td>1 mm</td>
+<td>静止壳体内半径 150.5 mm</td>
+</tr>
+<tr>
+<td>轴向背腔间隙 <code>c</code>₂</td>
+<td>4 mm</td>
+<td>基准工况；再比较 2 mm 与 6 mm</td>
+</tr>
+<tr>
+<td>内侧流出半径</td>
+<td>47.5 mm</td>
+<td>背腔内侧截断边界</td>
+</tr>
+<tr>
+<td>偏心距 <code>e</code></td>
+<td>0.5 mm</td>
+<td>圆心相对固定旋转轴的距离</td>
+</tr>
+<tr>
+<td>转速 <code>n</code></td>
+<td>400 r/min</td>
+<td>自转和圆心绕行同速、同向</td>
+</tr>
+<tr>
+<td>工作介质</td>
+<td>水</td>
+<td>本节取 ρ=997.07 kg/m³、ν=1.0×10⁻⁶ m²/s</td>
+</tr>
+</tbody></table></div>
+<p>计算域取外周密封间隙与盘后径向背腔。外部供水管路用入口条件代替，内侧在 47.5 mm 半径处设置压力出口。这样可以保留决定背腔压力分布的两段窄间隙，同时把计算资源集中在圆盘附近。模型资料包分别给出圆盘表面、截面尺寸和边界位置。</p>
+<p>基准工况采用论文中的无预旋输入，并以名义间隙流速与叶尖速度之比 <span class="math-formula" data-tex="v_l/U_T=0.170"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>l</mi></msub><mi mathvariant="normal">/</mi><msub><mi>U</mi><mi>T</mi></msub><mo>=</mo><mn>0.170</mn></mrow><annotation encoding="application/x-tex">v_l/U_T=0.170</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.170</span></span></span></span></span> 设定泄漏流量。这里</p>
+<p><span class="math-formula math-display" data-tex="
+U_T=\omega R,\qquad
+Q=2\pi R c_1 v_l.
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>U</mi><mi>T</mi></msub><mo>=</mo><mi>ω</mi><mi>R</mi><mo separator="true">,</mo><mspace width="2em"></mspace><mi>Q</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>R</mi><msub><mi>c</mi><mn>1</mn></msub><msub><mi>v</mi><mi>l</mi></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+U_T=\omega R,\qquad
+Q=2\pi R c_1 v_l.
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">.</span></span></span></span></span></span></p>
+<p>400 r/min 对应 <span class="math-formula" data-tex="\omega=41.8879\ {\rm rad/s}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mn>41.8879</mn><mtext>&nbsp;</mtext><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">s</mi></mrow></mrow><annotation encoding="application/x-tex">\omega=41.8879\ {\rm rad/s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">41.8879</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord"><span class="mord mathrm">rad/s</span></span></span></span></span></span></span>，叶尖速度约 6.262 m/s。由此计算的名义流量约为 1.00×10⁻³ m³/s，即约 60 L/min。该流量施加在外周供水截面，背腔内侧由压力条件决定流出。</p>
+<h2 id="运动学：转轴必须放在正确位置"><a href="#运动学：转轴必须放在正确位置" class="headerlink" title="运动学：转轴必须放在正确位置"></a>运动学：转轴必须放在正确位置</h2><p>取固定旋转轴经过 <code>O</code>=(0,0,0)，方向为 <code>z</code>；初始圆心 <code>C</code>₀=(0.0005,0,0)。角速度恒定时，圆心轨迹为</p>
+<p><span class="math-formula math-display" data-tex="
+\mathbf C(t)=
+\begin{pmatrix}e\cos\omega t\\e\sin\omega t\\0\end{pmatrix}.
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="bold">C</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.16em" columnalign="center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>e</mi><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>e</mi><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+\mathbf C(t)=
+\begin{pmatrix}e\cos\omega t\\e\sin\omega t\\0\end{pmatrix}.
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">C</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.6em;vertical-align:-1.55em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.875em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.875em" height="3.6em" viewBox="0 0 875 3600"><path d="M863,9c0,-2,-2,-5,-6,-9c0,0,-17,0,-17,0c-12.7,0,-19.3,0.3,-20,1
+c-5.3,5.3,-10.3,11,-15,17c-242.7,294.7,-395.3,682,-458,1162c-21.3,163.3,-33.3,349,
+-36,557 l0,84c0.2,6,0,26,0,60c2,159.3,10,310.7,24,454c53.3,528,210,
+949.7,470,1265c4.7,6,9.7,11.7,15,17c0.7,0.7,7,1,19,1c0,0,18,0,18,0c4,-4,6,-7,6,-9
+c0,-2.7,-3.3,-8.7,-10,-18c-135.3,-192.7,-235.5,-414.3,-300.5,-665c-65,-250.7,-102.5,
+-544.7,-112.5,-882c-2,-104,-3,-167,-3,-189
+l0,-92c0,-162.7,5.7,-314,17,-454c20.7,-272,63.7,-513,129,-723c65.3,
+-210,155.3,-396.3,270,-559c6.7,-9.3,10,-15.3,10,-18z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.875em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.875em" height="3.6em" viewBox="0 0 875 3600"><path d="M76,0c-16.7,0,-25,3,-25,9c0,2,2,6.3,6,13c21.3,28.7,42.3,60.3,
+63,95c96.7,156.7,172.8,332.5,228.5,527.5c55.7,195,92.8,416.5,111.5,664.5
+c11.3,139.3,17,290.7,17,454c0,28,1.7,43,3.3,45l0,9
+c-3,4,-3.3,16.7,-3.3,38c0,162,-5.7,313.7,-17,455c-18.7,248,-55.8,469.3,-111.5,664
+c-55.7,194.7,-131.8,370.3,-228.5,527c-20.7,34.7,-41.7,66.3,-63,95c-2,3.3,-4,7,-6,11
+c0,7.3,5.7,11,17,11c0,0,11,0,11,0c9.3,0,14.3,-0.3,15,-1c5.3,-5.3,10.3,-11,15,-17
+c242.7,-294.7,395.3,-681.7,458,-1161c21.3,-164.7,33.3,-350.7,36,-558
+l0,-144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
+-470,-1265c-4.7,-6,-9.7,-11.7,-15,-17c-0.7,-0.7,-6.7,-1,-18,-1z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">.</span></span></span></span></span></span></p>
+<p>圆盘表面任意一点的速度为</p>
+<p><span class="math-formula math-display" data-tex="
+\mathbf U_w(\mathbf x,t)=\boldsymbol\omega\times(\mathbf x-\mathbf O).
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">U</mi><mi>w</mi></msub><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="bold-italic">ω</mi><mo>×</mo><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo>−</mo><mi mathvariant="bold">O</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+\mathbf U_w(\mathbf x,t)=\boldsymbol\omega\times(\mathbf x-\mathbf O).
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.037em;">ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">O</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></span></p>
+<p>如果把旋转原点误填成 <code>C</code>₀，圆心将保持静止，得到的就是另一种运动。资料包的 <code>motion_check.csv</code> 给出四分之一转等时刻的圆心坐标，可用于对照网格动画。400 r/min 时周期 <code>T</code>=0.15 s，经过 0.0375 s，圆心应到达 (0,0.0005,0)。</p>
+<p>最小径向间隙为 <span class="math-formula" data-tex="c_{\min}=c_1-e=0.5\ {\rm mm}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>min</mi><mo>⁡</mo></msub><mo>=</mo><msub><mi>c</mi><mn>1</mn></msub><mo>−</mo><mi>e</mi><mo>=</mo><mn>0.5</mn><mtext>&nbsp;</mtext><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">m</mi></mrow></mrow><annotation encoding="application/x-tex">c_{\min}=c_1-e=0.5\ {\rm mm}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">i</span><span class="mtight">n</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span><span class="mspace">&nbsp;</span><span class="mord"><span class="mord"><span class="mord mathrm">mm</span></span></span></span></span></span></span>，最大间隙为 1.5 mm。一个周期内，窄间隙的位置沿圆周移动，这也是压力峰值和径向载荷随时间变化的来源。</p>
+<h2 id="为什么选择重叠网格"><a href="#为什么选择重叠网格" class="headerlink" title="为什么选择重叠网格"></a>为什么选择重叠网格</h2><p>圆盘附近的贴体网格随圆盘作刚体旋转，壳体附近网格保持静止。两套网格通过重叠区域传递场量，避免将整圈偏心运动持续压缩进同一层变形网格。本节采用 OpenCFD <code>v2512</code> 的 <code>overPimpleDyMFoam</code> 与 <code>dynamicOversetFvMesh</code>。</p>
+<p>重叠网格必须在最窄处仍有足够的有效单元。若以 0.5 mm 间隙内至少 10 个单元作为首轮目标，局部尺度约为 0.05 mm；随转子移动，供体和受体单元都需要维持相近尺度。外部粗网格不能一直延伸到细小间隙，再希望插值自动补回局部流动。</p>
+<p>对本节固定偏心轴的同步刚体运动，也可以设计包住完整扫掠区域的旋转区并使用 AMI。旋转接口应绕 <code>O</code> 同轴，且全程不穿过圆盘或壳体。本节选择重叠网格，是为了后续进一步研究自转与绕行不同速的运动；两者不同速时，需要改写运动组合，不能继续只用一条 <code>rotatingMotion</code>。</p>
+<h2 id="OpenFOAM-配置与运行顺序"><a href="#OpenFOAM-配置与运行顺序" class="headerlink" title="OpenFOAM 配置与运行顺序"></a>OpenFOAM 配置与运行顺序</h2><h3 id="1-建立转子和背景网格"><a href="#1-建立转子和背景网格" class="headerlink" title="1. 建立转子和背景网格"></a>1. 建立转子和背景网格</h3><p>运行 <code>build_disc.py</code>，生成中心位于 (0.5,0,0) mm、半径 149.5 mm、厚度 10 mm 的圆盘 STL。转子附近建立独立网格，外表面命名为 <code>overset</code>，圆盘壁面命名为 <code>disc</code>；固定背景网格包含 <code>casing</code>、<code>inlet</code> 和 <code>outlet</code>。</p>
+<div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">python3 build_disc.py
+surfaceCheck geometry/disc.stl
+</code></pre></div>
+<p>圆盘 STL 的 <code>z</code> 范围为 −0.01 至 0 m，轴向背腔位于盘后 <code>z</code>=0 至 0.004 m。圆盘和流体域应使用同一原点。背景域与转子网格合并后，建立 <code>movingZone</code>，只包含转子网格的单元；同时用 <code>zoneID</code> 区分背景网格与转子网格。</p>
+<p>先分别划分和检查两套网格，再用 <code>mergeMeshes</code> 合并，并确认合并后 <code>patch</code> 名称没有被自动改名。<code>zoneID</code> 在背景区域设为 0，在转子区域设为 1；该标量字段用于重叠插值分区，与 <code>cellZone</code> 不是同一个对象。</p>
+<h3 id="2-写入偏心轴运动"><a href="#2-写入偏心轴运动" class="headerlink" title="2. 写入偏心轴运动"></a>2. 写入偏心轴运动</h3><p>以下 <code>constant/dynamicMeshDict</code> 采用官方 <code>overPimpleDyMFoam/simpleRotor</code> 的结构，运动原点和角速度按本案例修改：</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh dynamicOversetFvMesh;
+<span class="hljs-keyword">solver</span> multiSolidBodyMotionSolver;
+multiSolidBodyMotionSolverCoeffs
+{
+    movingZone
+    {
+        solidBodyMotionFunction rotatingMotion;
+        rotatingMotionCoeffs
+        {
+            origin  (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+            axis    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+            omega   <span class="hljs-number">41.88790205</span>;
+        }
+    }
+}
+</code></pre></div>
+<p><code>movingZone</code> 必须与网格中的区域同名。这里的 <code>omega</code> 单位为 rad/s，不能直接填 400。偏心距已经写进几何位置，不能再将 <code>origin</code> 也偏移 0.5 mm，否则会改变圆心轨迹。</p>
+<h3 id="3-让壁面速度跟随网格运动"><a href="#3-让壁面速度跟随网格运动" class="headerlink" title="3. 让壁面速度跟随网格运动"></a>3. 让壁面速度跟随网格运动</h3><p><code>0/U</code> 中圆盘和重叠边界采用：</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">disc
+{
+    <span class="hljs-keyword">type</span>    movingWallVelocity;
+    <span class="hljs-keyword">value</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+}
+overset
+{
+    <span class="hljs-keyword">type</span>    overset;
+}
+</code></pre></div>
+<p><code>movingWallVelocity</code> 根据网格运动确定圆盘壁面速度，并保持壁面通量的一致性。此处的 <code>value</code> 是初始化值。对于发生法向位移的偏心转子，仅在固定网格上设置 <code>rotatingWallVelocity</code> 不能替代几何运动。</p>
+<p>固定壳体用 <code>noSlip</code>；入口按 <code>Q</code> 使用 <code>flowRateInletVelocity</code>，无预旋时不给切向速度；出口速度用 <code>inletOutlet</code>，压力固定为 0。<code>p</code> 为运动学压力，壳体和圆盘可采用与移动通量相配的 <code>fixedFluxPressure</code>。<code>k</code>、ω、<code>nut</code> 和 <code>p</code> 的重叠 <code>patch</code> 同样需要 <code>overset</code> 类型。</p>
+<h3 id="4-设置重叠插值、湍流和压力修正"><a href="#4-设置重叠插值、湍流和压力修正" class="headerlink" title="4. 设置重叠插值、湍流和压力修正"></a>4. 设置重叠插值、湍流和压力修正</h3><p>在 <code>fvSchemes</code> 中设置：</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">oversetInterpolation
+{
+    method inverseDistance;
+}
+</code></pre></div>
+<p>该方法从有效供体单元插值得到受体场量。重叠耦合使线性系统一般不再对称，压力求解器应选用适合非对称系统的配置，例如 <code>PBiCGStab</code> 配合 <code>DILU</code>；不能直接沿用针对对称压力矩阵的设置。</p>
+<p>以 <span class="math-formula" data-tex="Re_\omega=\omega R^2/\nu"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><msub><mi>e</mi><mi>ω</mi></msub><mo>=</mo><mi>ω</mi><msup><mi>R</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>ν</mi></mrow><annotation encoding="application/x-tex">Re_\omega=\omega R^2/\nu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">ω</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0637em;">ν</span></span></span></span></span> 估算，本工况约为 9.36×10⁵，不能仅因为间隙窄就把整个背腔视为层流。首轮采用 <code>kOmegaSST</code>，在窄间隙壁面解析边界层，并检查 <code>y</code>⁺。重叠网格中壁距计算还需采用能够跨越重叠连接的处理，按官方 <code>overset</code> 配置选用 <code>Poisson</code> 等方法后检查壁距场。</p>
+<p>初始时间步可取 10⁻⁵ s，随局部 Courant 数控制；输出间隔取一个转动周期的 1/120，即 0.00125 s。时间步既要限制流体穿越单元的距离，也要限制移动网格每步扫过的间隙尺度，二者取更严格者。</p>
+<h3 id="5-先检查一圈网格，再求解流动"><a href="#5-先检查一圈网格，再求解流动" class="headerlink" title="5. 先检查一圈网格，再求解流动"></a>5. 先检查一圈网格，再求解流动</h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">checkMesh -allTopology -allGeometry
+overPimpleDyMFoam
+</code></pre></div>
+<p>正式统计前，先保存足够密集的早期网格，查看转过 90°、180°、270°、360° 时的圆心位置、最小间隙和重叠插值带。检查日志中供体搜索、空洞单元和网格质量的变化。几何周期运动正确后，再延长计算至流体载荷形成重复周期。</p>
+<p>串行流程通过后可使用 <code>decomposePar</code> 与并行运行。并行分区后应再次检查重叠连接和载荷，尤其关注非常薄的间隙是否被分区边界切成少量单元。</p>
+<h2 id="力矩、周期载荷与功率"><a href="#力矩、周期载荷与功率" class="headerlink" title="力矩、周期载荷与功率"></a>力矩、周期载荷与功率</h2><p>在 <code>controlDict</code> 的 <code>functions</code> 中记录圆盘载荷：</p>
+<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">discLoads
+{
+    <span class="hljs-keyword">type</span>            forces;
+    <span class="hljs-keyword">libs</span>            (forces);
+    patches         (disc);
+    rho             rhoInf;
+    rhoInf          <span class="hljs-number">997.07</span>;
+    CofR            (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    writeControl    timeStep;
+    writeInterval   <span class="hljs-number">1</span>;
+}
+</code></pre></div>
+<p>这里积分的是流体作用于圆盘的力和关于固定轴 <code>O</code> 的力矩。主轴所需驱动功率由 <span class="math-formula" data-tex="-M_{O,z}\omega"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mi>M</mi><mrow><mi>O</mi><mo separator="true">,</mo><mi>z</mi></mrow></msub><mi>ω</mi></mrow><annotation encoding="application/x-tex">-M_{O,z}\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord">−</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.044em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></span> 估算；符号取决于流体力矩方向，输出时保留原始符号并注明正方向。</p>
+<p>需要与关于瞬时圆心 <code>C</code> 的试验力矩比较时，先变换力矩参考点：</p>
+<p><span class="math-formula math-display" data-tex="
+\mathbf M_C=\mathbf M_O-(\mathbf C-\mathbf O)\times\mathbf F.
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">M</mi><mi>C</mi></msub><mo>=</mo><msub><mi mathvariant="bold">M</mi><mi>O</mi></msub><mo>−</mo><mo stretchy="false">(</mo><mi mathvariant="bold">C</mi><mo>−</mo><mi mathvariant="bold">O</mi><mo stretchy="false">)</mo><mo>×</mo><mi mathvariant="bold">F</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+\mathbf M_C=\mathbf M_O-(\mathbf C-\mathbf O)\times\mathbf F.
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathbf">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">O</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord mathbf">F</span><span class="mord">.</span></span></span></span></span></span></p>
+<p>不能将固定轴的力矩直接当成圆心力矩，偏心力产生的附加力臂会进入结果。进一步定义随圆心运动的径向、切向单位向量：</p>
+<p><span class="math-formula math-display" data-tex="
+\mathbf e_r=(\cos\omega t,\sin\omega t,0),\qquad
+\mathbf e_t=(-\sin\omega t,\cos\omega t,0).
+"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">e</mi><mi>r</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi mathvariant="bold">e</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mo>−</mo><mi>sin</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mi>cos</mi><mo>⁡</mo><mi>ω</mi><mi>t</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+\mathbf e_r=(\cos\omega t,\sin\omega t,0),\qquad
+\mathbf e_t=(-\sin\omega t,\cos\omega t,0).
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">sin</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">cos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></span></p>
+<p>将 <code>F</code> 投影到这两个方向，可得到径向与切向载荷；对横向力矩也作相同坐标变换。资料包的 <code>analyse_loads.py</code> 读取明确列名的载荷 CSV，计算参考点转换、周期平均、峰峰值以及第一谐波。</p>
+<p>检查结果时，先看入口出口质量平衡，再看圆周压力分布。随窄间隙旋转的压力高低区应与径向载荷相位对应。然后比较 2、4、6 mm 轴向间隙下的平均阻力矩和载荷幅值，解释间隙改变如何影响泄漏阻力与流体动量交换。</p>
+<p>网格和时间步独立性分别检查最小间隙单元数、重叠带宽度与时间步长。比较指标采用平均转矩、径向载荷幅值及相位，不能只比较某一瞬间的最大速度。原论文还研究转子结构与流体力矩的耦合；要判断振动是否增长，需要进一步输入轴刚度、质量和阻尼，单独一条流体力矩曲线不能给出结构稳定性结论。</p>
+<blockquote>
+<p><strong>熊猫说：</strong></p>
+<p>偏心运动有三个位置需要统一：几何中的初始圆心、运动字典中的旋转轴、后处理中的力矩参考点。先用圆心轨迹检查运动，再用力矩平移公式对齐载荷，能排除一类很难从流场云图发现的错误。</p>
+</blockquote>
+<h2 id="模型与配置资料"><a href="#模型与配置资料" class="headerlink" title="模型与配置资料"></a>模型与配置资料</h2><ul>
+<li><a href="/downloads/engineering/eccentric-disc.zip">下载圆盘 STL 生成、运动校核、载荷分析和配置资料包</a>。几何按公开尺寸重建，背腔入口、出口截断位置在图中标出。</li>
+<li><a href="https://www.jstage.jst.go.jp/article/ijfms/3/1/3_1_67/_article">原始试验与动力学分析论文</a>。</li>
+<li><a href="https://doi.org/10.1115/1.4001802">圆盘厚度及绕行试验说明</a>。</li>
+<li><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overPimpleDyMFoam/simpleRotor/constant/dynamicMeshDict">v2512 simpleRotor 运动字典</a>：本文运动配置的出处。</li>
+<li><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/applications/solvers/incompressible/overPimpleDyMFoam">v2512 overPimpleDyMFoam 源码</a>。</li>
+</ul>
+<p><a href="/topics/engineering/">返回实际工程应用</a></p>
+</div>
+  </article>
+  <aside class="article-toc"><div>本页目录</div><nav id="toc" aria-label="本页目录"></nav></aside>
+</div>
+
+</main>
+  <footer class="footer"><span>FoamLab · OpenFOAM v2512 学习站</span><span><a href="/read/?slug=sources-and-validation">资料来源</a> <a href="/support/" data-support-open>支持作者</a> <span class="footer-contact" data-footer-contact>
+  <button class="footer-contact-trigger" type="button" aria-expanded="false" aria-controls="footer-contact-panel">交流与分享</button>
+  <div class="footer-contact-panel" id="footer-contact-panel" role="region" aria-label="QQ 群与小红书" hidden>
+    <div class="footer-contact-cards">
+      <div class="footer-contact-card">
+        <strong>QQ 学习交流群</strong>
+        <a class="footer-contact-code footer-contact-qq" href="/assets/contact/qq-group.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看 QQ 群二维码原图">
+          <img src="/assets/contact/qq-group.jpg" alt="FoamLab QQ 群二维码，群号 537804875" width="1284" height="2283" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">群号：<b>537804875</b></span>
+      </div>
+      <div class="footer-contact-card">
+        <strong>小红书 · 夕阳下的奔跑</strong>
+        <a class="footer-contact-code footer-contact-xhs" href="/assets/contact/xiaohongshu.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看小红书二维码原图">
+          <img src="/assets/contact/xiaohongshu.jpg" alt="夕阳下的奔跑的小红书二维码，小红书号 8436161477" width="987" height="1347" loading="lazy" decoding="async">
+        </a>
+        <span class="footer-contact-number">小红书号：<b>8436161477</b></span>
+      </div>
+    </div>
+    <small>点击二维码查看原图</small>
+  </div>
+</span>
+ <a href="/admin/" data-management-link hidden>管理入口</a></span><div class="site-stats" data-site-stats data-state="loading" aria-label="网站访问统计"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17M8 15v-4m5 4V6m5 9V9"/></svg>累计访问 <strong data-site-visits>—</strong> 次</span><span title="按北京时间统计，每日零点开始新一天">今日访问 <strong data-site-today-visits>—</strong> 次</span><span><i class="online-dot" aria-hidden="true"></i>当前在线 <strong data-site-online>—</strong> 人</span></div></footer>
+</div>
+<dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词，先查看正文或代码中的匹配内容。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
+<div class="toast" role="status" hidden></div>
+</body></html>
