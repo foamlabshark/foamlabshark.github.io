@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -360,46 +360,44 @@ bash Allmesh
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <p>贴合网格时，<code>system/meshQualityDict</code> 将内部面和边界面的最大偏斜度均限制为 3.5，常规与 <code>relaxed</code> 设置采用相同限值。区域拆分后分别检查空气、处理器和鳍片网格，三者均通过后再启动共轭传热求解。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-处理器热源"><a href="#1-处理器热源" class="headerlink" title="1. 处理器热源"></a>1. 处理器热源</h3><p>文件：<code>system/v_CPU/fvOptions</code>。本段设置处理器热源。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">v_CPU_AbsoluteEnergySource
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">v_CPU_AbsoluteEnergySource
 {
-    <span class="hljs-keyword">type</span>            scalarSemiImplicitSource;
-    active          <span class="hljs-literal">true</span>;
-
-    selectionMode   cellZone;
-    cellZone        v_CPU;
-    volumeMode      absolute;
-
+    <span class="hljs-keyword">type</span> scalarSemiImplicitSource;
+    active <span class="hljs-literal">true</span>;
+    selectionMode cellZone;
+    cellZone v_CPU;
+    volumeMode absolute;
     sources
     {
-        h           ( <span class="hljs-number">100</span> <span class="hljs-number">0</span> );
+        h ( <span class="hljs-number">100</span> <span class="hljs-number">0</span> );
     }
 }
 </code></pre></div>
 <p><code>selectionMode cellZone</code> 将热源施加于 <code>v_CPU</code> 单元区，<code>h</code> 对应焓方程。括号中的两项分别为显式热源和线性系数。采用 <code>volumeMode absolute</code> 时，<code>h (100 0)</code> 表示该选区总功率为 100 W。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/v_CPU/fvOptions">查看该配置的官方原文件</a>。</p>
 <h3 id="2-风扇旋转区域"><a href="#2-风扇旋转区域" class="headerlink" title="2. 风扇旋转区域"></a>2. 风扇旋转区域</h3><p>文件：<code>constant/domain0/MRFProperties</code>。本段设置风扇旋转区域。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">VC_1
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">VC_1
 {
-    cellZone        v_MRF;
-    active          <span class="hljs-literal">true</span>;
+    cellZone v_MRF;
+    active <span class="hljs-literal">true</span>;
     nonRotatingPatches ();
-    origin          (<span class="hljs-number">-0.01</span> <span class="hljs-number">0.04</span> <span class="hljs-number">-0.06</span>);
-    axis            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    omega           <span class="hljs-number">209.44</span>;
+    origin (<span class="hljs-number">-0.01</span> <span class="hljs-number">0.04</span> <span class="hljs-number">-0.06</span>);
+    axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    omega <span class="hljs-number">209.44</span>;
 }
 </code></pre></div>
 <p><code>origin</code>、<code>axis</code> 和 <code>omega</code> 分别规定旋转轴位置、方向与角速度，<code>cellZone</code> 指定风扇流体区。转速研究保持几何和选区不变；改变风扇位置时，曲面与旋转选区应同步移动。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-处理器与空气的热耦合"><a href="#3-处理器与空气的热耦合" class="headerlink" title="3. 处理器与空气的热耦合"></a>3. 处理器与空气的热耦合</h3><p>文件：<code>0.orig/domain0/T</code>。本段设置处理器与空气的热耦合。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">domain0_to_v_CPU
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">domain0_to_v_CPU
 {
-    <span class="hljs-keyword">type</span>            compressible::turbulentTemperatureRadCoupledMixed;
-    qrNbr           none;
-    qr              none;
-    Tnbr            T;
-    kappaMethod     fluidThermo;
-    useImplicit     <span class="hljs-literal">true</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+    <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed;
+    qrNbr none;
+    qr none;
+    Tnbr T;
+    kappaMethod fluidThermo;
+    useImplicit <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
 }
 </code></pre></div>
 <p>温度边界根据相邻区域的温度和导热能力计算界面热流。空气侧使用 <code>fluidThermo</code>，固体侧使用 <code>solidThermo</code>；区域分割后，两侧界面通过相应边界名称配对。</p>

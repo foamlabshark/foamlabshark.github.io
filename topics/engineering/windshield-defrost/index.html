@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -359,10 +359,10 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-暖风启动曲线"><a href="#1-暖风启动曲线" class="headerlink" title="1. 暖风启动曲线"></a>1. 暖风启动曲线</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置暖风启动曲线。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            uniformFixedValue;
-    uniformValue    table
+    <span class="hljs-keyword">type</span> uniformFixedValue;
+    uniformValue table
     (
         (<span class="hljs-number">0</span> <span class="hljs-number">260</span>)
         (<span class="hljs-number">10</span> <span class="hljs-number">293</span>)
@@ -373,38 +373,34 @@ bash Allmesh
 <p>入口温度表规定 0～10 s 的升温过程，以秒为时间单位。该曲线决定初期热量输入，最终 293 K 对应升温结束后的送风状态。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/0.orig/cabin/T">查看该配置的官方原文件</a>。</p>
 <h3 id="2-冰层潜热"><a href="#2-冰层潜热" class="headerlink" title="2. 冰层潜热"></a>2. 冰层潜热</h3><p>文件：<code>system/ice/fvOptions</code>。本段设置冰层潜热。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">iceZone
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">iceZone
 {
-    <span class="hljs-keyword">type</span>            solidificationMeltingSource;
-    active          <span class="hljs-literal">on</span>;
-
+    <span class="hljs-keyword">type</span> solidificationMeltingSource;
+    active <span class="hljs-literal">on</span>;
     solidificationMeltingSourceCoeffs
     {
-        selectionMode   all;
-
-        Tmelt           <span class="hljs-number">273</span>;
-        L               <span class="hljs-number">334000</span>; <span class="hljs-comment">// enthalpy of fusion for water [J/kg]</span>
-        thermoMode      thermo; <span class="hljs-comment">// retrieve thermo properties from thermo model</span>
-        beta            <span class="hljs-number">50e-6</span>;  <span class="hljs-comment">// thermal expansion coeff [1/K]</span>
-
-        rhoRef          <span class="hljs-number">1000</span>;
+        selectionMode all;
+        Tmelt <span class="hljs-number">273</span>;
+        L <span class="hljs-number">334000</span>; <span class="hljs-comment">// enthalpy of fusion for water [J/kg]</span>
+        thermoMode thermo; <span class="hljs-comment">// retrieve thermo properties from thermo model</span>
+        beta <span class="hljs-number">50e-6</span>; <span class="hljs-comment">// thermal expansion coeff [1/K]</span>
+        rhoRef <span class="hljs-number">1000</span>;
     }
 }
 </code></pre></div>
 <p><code>solidificationMeltingSource</code> 在整个 <code>ice</code> 区域计算相变。<code>Tmelt</code> 规定融化温度，<code>L</code> 规定单位质量相变潜热，二者共同决定升温转入融化的时刻及所需能量。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/windshieldDefrost/system/ice/fvOptions">查看该配置的官方原文件</a>。</p>
 <h3 id="3-玻璃导热热阻"><a href="#3-玻璃导热热阻" class="headerlink" title="3. 玻璃导热热阻"></a>3. 玻璃导热热阻</h3><p>文件：<code>0.orig/cabin/T</code>。本段设置玻璃导热热阻。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cabin_to_ice
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">cabin_to_ice
 {
-    <span class="hljs-keyword">type</span>            compressible::turbulentTemperatureRadCoupledMixed;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">260</span>;
-    Tnbr            T;
-    kappaMethod     fluidThermo;
-    kappa           none;
-
+    <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">260</span>;
+    Tnbr T;
+    kappaMethod fluidThermo;
+    kappa none;
     <span class="hljs-comment">// windshield 3 mm</span>
     thicknessLayers (<span class="hljs-number">0.003</span>);
-    kappaLayers     (<span class="hljs-number">0.9</span>);
+    kappaLayers (<span class="hljs-number">0.9</span>);
 }
 </code></pre></div>
 <p>耦合温度边界中的附加层表示玻璃导热热阻。<code>thicknessLayers</code> 与 <code>kappaLayers</code> 分别给出厚度和导热系数，玻璃两侧温降由热流与该热阻共同确定。</p>

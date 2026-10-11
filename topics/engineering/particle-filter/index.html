@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -355,25 +355,21 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-过滤区阻力"><a href="#1-过滤区阻力" class="headerlink" title="1. 过滤区阻力"></a>1. 过滤区阻力</h3><p>文件：<code>constant/fvOptions</code>。本段设置过滤区阻力。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">filter1
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">filter1
 {
-    <span class="hljs-keyword">type</span>            explicitPorositySource;
-
+    <span class="hljs-keyword">type</span> explicitPorositySource;
     explicitPorositySourceCoeffs
     {
-        selectionMode   cellZone;
-        cellZone        filter;
-
-        <span class="hljs-keyword">type</span>            DarcyForchheimer;
-
-        d   (<span class="hljs-number">500000</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
-        f   (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-
+        selectionMode cellZone;
+        cellZone filter;
+        <span class="hljs-keyword">type</span> DarcyForchheimer;
+        d (<span class="hljs-number">500000</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
+        f (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
         coordinateSystem
         {
-            origin  (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e1      (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-            e2      (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+            origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+            e1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+            e2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
         }
     }
 }
@@ -381,37 +377,35 @@ bash Allmesh
 <p><code>cellZone filter</code> 指定阻力区域，<code>d</code> 和局部坐标系共同规定各方向黏性阻力。检查选区范围和方向后，才能将压差变化归因于阻力系数。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/fvOptions">查看该配置的官方原文件</a>。</p>
 <h3 id="2-液滴注入状态"><a href="#2-液滴注入状态" class="headerlink" title="2. 液滴注入状态"></a>2. 液滴注入状态</h3><p>文件：<code>constant/reactingCloud1Properties</code>。本段设置液滴注入状态。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">model1
 {
-    <span class="hljs-keyword">type</span>            reactingMultiphaseLookupTableInjection;
-    massTotal       <span class="hljs-number">1e-2</span>;
+    <span class="hljs-keyword">type</span> reactingMultiphaseLookupTableInjection;
+    massTotal <span class="hljs-number">1e-2</span>;
     parcelBasisType mass;
-    SOI             <span class="hljs-number">0.5</span>;
-    inputFile       <span class="hljs-string">"parcelInjectionProperties"</span>;
-    duration        <span class="hljs-number">1.0</span>;
+    SOI <span class="hljs-number">0.5</span>;
+    inputFile <span class="hljs-string">"parcelInjectionProperties"</span>;
+    duration <span class="hljs-number">1.0</span>;
     parcelsPerSecond <span class="hljs-number">250</span>;
-    randomise       <span class="hljs-literal">true</span>;
+    randomise <span class="hljs-literal">true</span>;
 }
 </code></pre></div>
 <p>查表注入文件逐项给出位置、速度、温度和粒径，<code>massTotal</code> 规定整个注入阶段的质量。该方式可组织多个入口或不同液滴状态。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/filter/constant/reactingCloud1Properties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-反弹、流出与沉积"><a href="#3-反弹、流出与沉积" class="headerlink" title="3. 反弹、流出与沉积"></a>3. 反弹、流出与沉积</h3><p>文件：<code>constant/reactingCloud1Properties</code>。本段设置反弹、流出与沉积。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">localInteractionCoeffs
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">localInteractionCoeffs
 {
     patches
     (
         <span class="hljs-string">"(walls|cyc.*)"</span>
         {
-            <span class="hljs-keyword">type</span>        rebound;
+            <span class="hljs-keyword">type</span> rebound;
         }
-
         <span class="hljs-string">"(inlet|outlet)"</span>
         {
             <span class="hljs-keyword">type</span> escape;
         }
     );
-
-    writeToFile     <span class="hljs-literal">yes</span>;
+    writeToFile <span class="hljs-literal">yes</span>;
 }
 </code></pre></div>
 <p>壁面 <code>rebound</code> 计算反弹，进出口 <code>escape</code> 记录离开。研究沉积时将目标滤面设为 <code>stick</code>，并保留其他壁面的独立统计。</p>

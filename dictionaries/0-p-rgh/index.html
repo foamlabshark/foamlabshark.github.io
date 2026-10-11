@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -290,15 +290,15 @@ p_{rgh}=p-\rho gh.
 <h2 id="nested-configuration">场量纲与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>分别为字段量纲与内部单元初值；<code>uniform</code> 表示统一值，<code>nonuniform</code> 列表长度需匹配网格。</td></tr><tr><td><code>boundaryField.&lt;patch&gt;.type / value</code></td><td><code>type</code> 选择该字段的边界条件。<code>value</code> 在 <code>fixedValue</code> 中为指定值，在许多派生条件中仅作初始化。</td></tr><tr><td><code>&lt;patch&gt;</code></td><td><code>movingWall</code>、<code>fixedWalls</code>、<code>upperWall</code>、<code>lowerWall</code>、<code>inlet</code>、<code>outlet</code> 等均为算例自定名称，要与 <code>constant/polyMesh/boundary</code> 对应。</td></tr></tbody></table></div><p><a href="/boundary-conditions/prgh-pressure/">prghPressure 的参数、示例与配套算例</a></p><p><a href="/boundary-conditions/prgh-fixed-flux/">fixedFluxPressure 的参数、示例与配套算例</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · interFoam 的壁面和大气开口</h3><p>在已有 <code>0/p_rgh</code> 的 <code>boundaryField</code> 内，为相应的 <code>wall</code> 和 <code>atmosphere</code> <code>patch</code> 设置：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">wall
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">wall
 {
-    <span class="hljs-keyword">type</span>  <span class="hljs-built_in">fixedFluxPressure</span>;
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>;
     <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 }
 atmosphere
 {
     <span class="hljs-keyword">type</span> totalPressure;
-    p0   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+    p0 <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 }
 </code></pre></div>
 <p><code>fixedFluxPressure</code> 通过压力梯度与速度边界要求的通量配合，适用于该溃坝案例的无穿透壁面。<code>totalPressure</code> 用于案例中的开口压力处理，<code>p0</code> 为所选压力基准下的总压值。与之配套，开口的 <code>U</code> 使用 <code>pressureInletOutletVelocity</code>，相分数使用允许空气回流的 <code>inletOutlet</code>。</p>
@@ -309,7 +309,7 @@ atmosphere
 <li>重构实际压力还需要密度、重力方向与重力势参考，关系由求解器处理。</li>
 </ul>
 <p>改变水深或容器运动时，保持 <code>p_rgh</code>、相分数、重力与壁面速度条件相容。</p>
-<p><a href="/assets/examples/v2512/p-rgh/1-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh"><code>multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/1-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh"><code>multiphase/interFoam/laminar/sloshingTank3D/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -318,26 +318,21 @@ atmosphere
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p_rgh;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p_rgh;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     walls
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedFluxPressure</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interIsoFoam/sphereInReversedVortexFlow</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interIsoFoam/sphereInReversedVortexFlow"><h3>算例问题：sphereInReversedVortexFlow</h3><p class="reference-case-problem">球形相区置于规定的涡旋速度场中，先被拉伸变形，再随反向速度场回到初始状态附近。该算例主要检验界面输运的形状保持与体积守恒，速度场用于驱动界面运动。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow</code></a>。</p></section><!-- /reference-case-contexts --><p>反向涡流中的球形界面测试把外边界 <code>p_rgh</code> 设为统一参考值。</p>
 <ul>
 <li><code>dimensions [1 -1 -2 0 0 0 0]</code> 表示压力单位 Pa。</li>
@@ -345,7 +340,7 @@ atmosphere
 <li>这与配套给定速度场、界面输运测试共同组成问题。</li>
 </ul>
 <p>更换为封闭容器时重新选择压力边界和参考设置，而球形相区的几何仍由初始化文件决定。</p>
-<p><a href="/assets/examples/v2512/p-rgh/2-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/2-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh"><code>multiphase/interIsoFoam/sphereInReversedVortexFlow/0.orig/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -354,26 +349,22 @@ atmosphere
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p_rgh;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p_rgh;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     sides
     {
-        <span class="hljs-keyword">type</span>    <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
 }
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · lagrangian/reactingParcelFoam/movingInjectorBox</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="lagrangian/reactingParcelFoam/movingInjectorBox"><h3>算例问题：movingInjectorBox</h3><p class="reference-case-problem">喷射位置随时间移动，向箱体中的载气持续注入颗粒或液滴。算例将移动注入器的位置、方向和注入量与颗粒跟踪相联系，主要观察喷射轨迹和粒子空间分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox"><code>lagrangian/reactingParcelFoam/movingInjectorBox</code></a>。</p></section><!-- /reference-case-contexts --><p><code>movingInjectorBox</code> 为颗粒注入的连续相建立 <code>p_rgh</code> 初值和封闭壁面条件。</p>
 <ul>
 <li><code>internalField uniform 100000</code> 给定 100000 Pa 的初始 <code>p_rgh</code>。</li>
@@ -381,7 +372,7 @@ atmosphere
 <li><code>walls/fixedFluxPressure</code> 与壁面通量对应，保持压力梯度和速度约束一致。</li>
 </ul>
 <p>改变初始热力状态时同时调整温度与热物性，检查密度是否符合预期。</p>
-<p><a href="/assets/examples/v2512/p-rgh/3-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh"><code>lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p-rgh/3-p_rgh.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh"><code>lagrangian/reactingParcelFoam/movingInjectorBox/0/p_rgh</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -390,27 +381,22 @@ atmosphere
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">location</span>    <span class="hljs-string">"0"</span>;
-    <span class="hljs-keyword">object</span>      p_rgh;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">location</span> <span class="hljs-string">"0"</span>;
+    <span class="hljs-keyword">object</span> p_rgh;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">100000</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">100000</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     walls
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedFluxPressure</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/interfoam/">interFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

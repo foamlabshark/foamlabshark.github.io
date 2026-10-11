@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -338,33 +338,33 @@ bash Allmesh
 </tbody></table></div>
 <p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-表观气速边界"><a href="#1-表观气速边界" class="headerlink" title="1. 表观气速边界"></a>1. 表观气速边界</h3><p>文件：<code>0/U.air</code>。本段设置表观气速边界。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">bottom
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">bottom
 {
-    <span class="hljs-keyword">type</span>            interstitialInletVelocity;
-    inletVelocity   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
-    phi             phi.air;
-    alpha           alpha.air;
+    <span class="hljs-keyword">type</span> interstitialInletVelocity;
+    inletVelocity <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.875</span>);
+    phi phi.air;
+    alpha alpha.air;
 }
 </code></pre></div>
 <p><code>interstitialInletVelocity</code> 将 1.875 m/s 的表观速度除以局部气相体积分数，得到孔隙内速度，从而维持所需气体流量。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/0/U.air">查看该配置的官方原文件</a>。</p>
 <h3 id="2-初始颗粒装填"><a href="#2-初始颗粒装填" class="headerlink" title="2. 初始颗粒装填"></a>2. 初始颗粒装填</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置初始颗粒装填。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">model1
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">model1
 {
-    <span class="hljs-keyword">type</span>            manualInjection;
-    massTotal       <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">type</span> manualInjection;
+    massTotal <span class="hljs-number">0</span>;
     parcelBasisType fixed;
-    nParticle       <span class="hljs-number">1</span>;
-    SOI             <span class="hljs-number">0</span>;
-    positionsFile   <span class="hljs-string">"kinematicCloudPositions"</span>;
-    U0              (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    nParticle <span class="hljs-number">1</span>;
+    SOI <span class="hljs-number">0</span>;
+    positionsFile <span class="hljs-string">"kinematicCloudPositions"</span>;
+    U0 (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     sizeDistribution
     {
-        <span class="hljs-keyword">type</span>        <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
         fixedValueDistribution
         {
-            <span class="hljs-keyword">value</span>   <span class="hljs-number">0.0025</span>;
+            <span class="hljs-keyword">value</span> <span class="hljs-number">0.0025</span>;
         }
     }
 }
@@ -372,8 +372,7 @@ bash Allmesh
 <p>初始粒子位置、粒径、材料密度与 <code>nParticle 1</code> 共同确定装料质量。<code>parcelBasisType fixed</code> 固定粒子团权重，此时 <code>massTotal 0</code> 不承担装料量定义。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/MPPICFoam/Goldschmidt/constant/kinematicCloudProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-高浓度颗粒应力"><a href="#3-高浓度颗粒应力" class="headerlink" title="3. 高浓度颗粒应力"></a>3. 高浓度颗粒应力</h3><p>文件：<code>constant/kinematicCloudProperties</code>。本段设置高浓度颗粒应力。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">packingModel explicit;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">packingModel explicit;
 explicitCoeffs
 {
     particleStressModel
@@ -390,7 +389,6 @@ explicitCoeffs
         e <span class="hljs-number">0.9</span>;
     }
 }
-
 implicitCoeffs
 </code></pre></div>
 <p>颗粒应力随固相浓度上升而加强，抵抗局部过度压缩。<code>alphaPacked</code> 规定堆积相关尺度，会影响致密区和床层膨胀。</p>

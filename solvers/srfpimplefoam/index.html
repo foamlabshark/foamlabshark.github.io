@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -279,420 +279,326 @@
     <div class="prose"><p>在单一旋转参考系中求解瞬态不可压缩流动。</p><div data-solver-guide="v1"><section data-solver-stage="intro"><h2 id="solver-intro">简要介绍</h2><p>在随叶轮转动的坐标系中，叶轮几何保持静止，流体速度则相对于旋转坐标系定义。恒定角速度下，动量方程需计入 Coriolis 与离心加速度：</p><p><span class="math-formula math-display" data-tex="\mathbf U_{\rm abs}=\mathbf U_{\rm rel}+\boldsymbol\Omega\times\mathbf r,\qquad\mathbf a_{\rm rot}=2\boldsymbol\Omega\times\mathbf U_{\rm rel}+\boldsymbol\Omega\times(\boldsymbol\Omega\times\mathbf r)"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="bold">U</mi><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">b</mi><mi mathvariant="normal">s</mi></mrow></msub><mo>=</mo><msub><mi mathvariant="bold">U</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>+</mo><mi mathvariant="bold">Ω</mi><mo>×</mo><mi mathvariant="bold">r</mi><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi mathvariant="bold">a</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><mn>2</mn><mi mathvariant="bold">Ω</mi><mo>×</mo><msub><mi mathvariant="bold">U</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>+</mo><mi mathvariant="bold">Ω</mi><mo>×</mo><mo stretchy="false">(</mo><mi mathvariant="bold">Ω</mi><mo>×</mo><mi mathvariant="bold">r</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf U_{\rm abs}=\mathbf U_{\rm rel}+\boldsymbol\Omega\times\mathbf r,\qquad\mathbf a_{\rm rot}=2\boldsymbol\Omega\times\mathbf U_{\rm rel}+\boldsymbol\Omega\times(\boldsymbol\Omega\times\mathbf r)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">abs</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7694em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">Ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathbf">r</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rot</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7694em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord"><span class="mord"><span class="mord mathbf">Ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7694em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">Ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord mathbf">Ω</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbf">r</span><span class="mclose">)</span></span></span></span></span></span></p><p>Ω 为角速度向量，<code>r</code> 为相对于转轴原点的位置，<span class="math-formula" data-tex="\mathbf U_{\rm rel}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="bold">U</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mathbf U_{\rm rel}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 为相对速度。Coriolis 项改变相对运动的方向，离心项对应偏离转轴的惯性作用。该方法适合整个问题可放在同一个旋转参考系中表达的构型，入口和壁面速度需按同一参考系解释。</p><p><code>SRFPimpleFoam</code> 在单一旋转参考系中推进瞬态不可压缩流动，以相对速度计算非定常叶轮或旋转通道流动。旋转速度、静止环境和随转壁面需按各自的相对运动关系定义。</p></section><section data-solver-stage="case"><h2 id="solver-case">1. 了解算例问题</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/SRFPimpleFoam/rotor2D"><h3>算例问题：rotor2D</h3><p class="reference-case-problem">转子在流体中旋转，转子表面的运动向流体输入动量。动网格、AMI 或重叠网格用于处理转子与背景区域的连接，主要观察叶轮附近速度、压力及运动区域的连续性。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D"><code>incompressible/SRFPimpleFoam/rotor2D</code></a>。</p></section><!-- /reference-case-contexts --></section><section data-solver-stage="run"><h2 id="solver-run">2. 运行与准备</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/incompressible/SRFPimpleFoam/rotor2D"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/rotor2D-reference"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/rotor2D-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p></section><section data-solver-stage="setup"><h2 id="solver-setup">3. 修改配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>先修改什么</th></tr></thead><tbody><tr><td><code>0.orig/Urel</code></td><td>相对旋转参考系的速度；入口条件须区分绝对速度与相对速度。</td></tr><tr><td><code>0.orig/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr><tr><td><code>constant/transportProperties</code></td><td>流体输运物性。改变材料时，在此修改黏度、密度或扩散率；各字段的量纲需保持一致。</td></tr><tr><td><code>constant/SRFProperties</code></td><td>单旋转参考系的转轴、原点和转速；配合相对速度字段使用。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr></tbody></table></div><p>本例时间格式为 <code>Euler</code>，时间步与该格式共同决定非定常过程的时间分辨率。</p><p><code>system/controlDict</code> 设置为：结束时刻 <code>endTime 2</code>；初始时间步 <code>deltaT 2e-4</code>；输出依据 <code>writeControl runTime</code>；输出间隔 <code>writeInterval 2e-2</code>。非定常计算中还应结合 Courant 数检查时间步。</p><p><code>system/fvSolution</code> 的 <code>PIMPLE</code> 设置为 <code>nOuterCorrectors 1</code>、<code>nCorrectors 2</code>、<code>nNonOrthogonalCorrectors 0</code>。各校正步骤及线性方程容差的完整解读列在下方。</p><p>当前启用 <code>kEpsilon</code>，需检查 <code>k</code>、<code>epsilon</code> 及其壁面条件。目录中保留的其他模型字段仅在切换到相应模型时使用。</p><p>表中列出本例首先需要检查的文件。其余字段、数值字典和完整解读见下方“完整配置与逐项解读”。</p></section><section data-solver-stage="results"><h2 id="solver-results">4. 检查计算结果</h2><p>对照速度剖面、流量和压力差；有分离时检查回流区位置。稳态监测量应趋于稳定，入口和出口的净质量通量应闭合。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p></section><section data-solver-stage="files"><h2 id="solver-files">完整配置与逐项解读</h2><details class="solver-file-reference"><summary>展开完整字段、字典及逐项说明</summary><h3>初始场与边界条件</h3><p>下表列出本算例提供的初始字段。带 <code>0.orig</code> 的路径是初始化模板，<code>Allrun</code> 通常先将其恢复为 <code>0</code>；若脚本随后执行 <code>setFields</code>，实际初始分布以初始化后的文件为准。</p><div class="table-scroll"><table><thead><tr><th>文件</th><th>设置内容</th></tr></thead><tbody><tr><td><code>0.orig/Urel</code></td><td>相对旋转参考系的速度；入口条件须区分绝对速度与相对速度。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr><tr><td><code>0.orig/nut</code></td><td>运动学湍动黏度，m²/s；通常由模型计算，壁面仍需选择相应的边界条件。</td></tr><tr><td><code>0.orig/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr></tbody></table></div><details><summary>0.orig/Urel：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/Urel</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p></section><section data-solver-stage="setup"><h2 id="solver-setup">3. 修改配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>先修改什么</th></tr></thead><tbody><tr><td><code>0.orig/Urel</code></td><td>相对旋转参考系的速度；入口条件须区分绝对速度与相对速度。</td></tr><tr><td><code>0.orig/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr><tr><td><code>constant/transportProperties</code></td><td>流体输运物性。改变材料时，在此修改黏度、密度或扩散率；各字段的量纲需保持一致。</td></tr><tr><td><code>constant/SRFProperties</code></td><td>单旋转参考系的转轴、原点和转速；配合相对速度字段使用。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr></tbody></table></div><p>本例时间格式为 <code>Euler</code>，时间步与该格式共同决定非定常过程的时间分辨率。</p><p><code>system/controlDict</code> 设置为：结束时刻 <code>endTime 2</code>；初始时间步 <code>deltaT 2e-4</code>；输出依据 <code>writeControl runTime</code>；输出间隔 <code>writeInterval 2e-2</code>。非定常计算中还应结合 Courant 数检查时间步。</p><p><code>system/fvSolution</code> 的 <code>PIMPLE</code> 设置为 <code>nOuterCorrectors 1</code>、<code>nCorrectors 2</code>、<code>nNonOrthogonalCorrectors 0</code>。各校正步骤及线性方程容差的完整解读列在下方。</p><p>当前启用 <code>kEpsilon</code>，需检查 <code>k</code>、<code>epsilon</code> 及其壁面条件。目录中保留的其他模型字段仅在切换到相应模型时使用。</p><p>表中列出本例首先需要检查的文件。其余字段、数值字典和完整解读见下方“完整配置与逐项解读”。</p></section><section data-solver-stage="results"><h2 id="solver-results">4. 检查计算结果</h2><p>对照速度剖面、流量和压力差；有分离时检查回流区位置。稳态监测量应趋于稳定，入口和出口的净质量通量应闭合。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p></section><section data-solver-stage="files"><h2 id="solver-files">完整配置与逐项解读</h2><details class="solver-file-reference"><summary>展开完整字段、字典及逐项说明</summary><h3>初始场与边界条件</h3><p>下表列出本算例提供的初始字段。带 <code>0.orig</code> 的路径是初始化模板，<code>Allrun</code> 通常先将其恢复为 <code>0</code>；若脚本随后执行 <code>setFields</code>，实际初始分布以初始化后的文件为准。</p><div class="table-scroll"><table><thead><tr><th>文件</th><th>设置内容</th></tr></thead><tbody><tr><td><code>0.orig/Urel</code></td><td>相对旋转参考系的速度；入口条件须区分绝对速度与相对速度。</td></tr><tr><td><code>0.orig/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr><tr><td><code>0.orig/nut</code></td><td>运动学湍动黏度，m²/s；通常由模型计算，壁面仍需选择相应的边界条件。</td></tr><tr><td><code>0.orig/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr></tbody></table></div><details><summary>0.orig/Urel：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/Urel</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volVectorField;
-    <span class="hljs-keyword">object</span>      Urel;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volVectorField;
+    <span class="hljs-keyword">object</span> Urel;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 <span class="hljs-keyword">boundaryField</span>
 {
     rotor
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">noSlip</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
     }
-
     freestream
     {
-        <span class="hljs-keyword">type</span>            SRFFreestreamVelocity;
-        UInf            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        <span class="hljs-keyword">type</span> SRFFreestreamVelocity;
+        UInf (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     }
-
     front
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
-
     back
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/Urel</code> 设置 <code>Urel</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>noSlip</code>，壁面速度为零。</li><li><code>freestream</code> 采用 <code>SRFFreestreamVelocity</code>。参数为 <code>UInf</code> <code>(1 0 0)</code>，<code>value</code> <code>uniform (0 0 0)</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel.txt">下载此配置文件</a></p></details><details><summary>0.orig/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0.orig/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/Urel</code> 设置 <code>Urel</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>noSlip</code>，壁面速度为零。</li><li><code>freestream</code> 采用 <code>SRFFreestreamVelocity</code>。参数为 <code>UInf</code> <code>(1 0 0)</code>，<code>value</code> <code>uniform (0 0 0)</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/Urel.txt">下载此配置文件</a></p></details><details><summary>0.orig/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0.orig/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      epsilon;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> epsilon;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     rotor
     {
-        <span class="hljs-keyword">type</span>            epsilonWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
+        <span class="hljs-keyword">type</span> epsilonWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
     }
-
     freestream
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-4</span>;
     }
-
     front
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
-
     back
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 3.75e-4</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>uniform 3.75e-4</code>。</li><li><code>freestream</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 3.75e-4</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon.txt">下载此配置文件</a></p></details><details><summary>0.orig/k：湍动能，m²/s²。</summary><h3><code>0.orig/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/k"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 3.75e-4</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>uniform 3.75e-4</code>。</li><li><code>freestream</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 3.75e-4</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/epsilon.txt">下载此配置文件</a></p></details><details><summary>0.orig/k：湍动能，m²/s²。</summary><h3><code>0.orig/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/k"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/k</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      k;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> k;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     rotor
     {
-        <span class="hljs-keyword">type</span>            kqRWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
+        <span class="hljs-keyword">type</span> kqRWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
     }
-
     freestream
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">3.75e-3</span>;
     }
-
     front
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
-
     back
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 3.75e-3</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>kqRWallFunction</code>，为壁面 <code>k</code> 提供与壁面函数体系配套的零梯度处理。参数为 <code>value</code> <code>uniform 3.75e-3</code>。</li><li><code>freestream</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 3.75e-3</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/k.txt">下载此配置文件</a></p></details><details><summary>0.orig/nut：模型计算的运动学湍动黏度，m²/s。</summary><h3><code>0.orig/nut</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/nut</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 3.75e-3</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>kqRWallFunction</code>，为壁面 <code>k</code> 提供与壁面函数体系配套的零梯度处理。参数为 <code>value</code> <code>uniform 3.75e-3</code>。</li><li><code>freestream</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 3.75e-3</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/k.txt">下载此配置文件</a></p></details><details><summary>0.orig/nut：模型计算的运动学湍动黏度，m²/s。</summary><h3><code>0.orig/nut</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/nut</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      nut;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> nut;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     rotor
     {
-        <span class="hljs-keyword">type</span>            nutkWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> nutkWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     freestream
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     front
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
-
     back
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/nut</code> 设置 <code>nut</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -1 0 0 0 0]</code>，单位为 m²/s。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>nutkWallFunction</code>，由近壁 <code>k</code> 和壁面律计算湍动黏度 <code>nut</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>freestream</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut.txt">下载此配置文件</a></p></details><details><summary>0.orig/p：压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</summary><h3><code>0.orig/p</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/p"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/p</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/nut</code> 设置 <code>nut</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -1 0 0 0 0]</code>，单位为 m²/s。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code> 采用 <code>nutkWallFunction</code>，由近壁 <code>k</code> 和壁面律计算湍动黏度 <code>nut</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>freestream</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/nut.txt">下载此配置文件</a></p></details><details><summary>0.orig/p：压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</summary><h3><code>0.orig/p</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/p"><code>incompressible/SRFPimpleFoam/rotor2D/0.orig/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     rotor
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     freestream
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     front
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
-
     back
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/p</code> 设置 <code>p</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，单位为 m²/s²。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code>、<code>freestream</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/p">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/p.txt">下载此配置文件</a></p></details><h3>物性与模型配置</h3><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/SRFProperties</code></td><td>单旋转参考系的转轴、原点和转速；配合相对速度字段使用。</td></tr><tr><td><code>constant/transportProperties</code></td><td>流体输运物性。改变材料时，在此修改黏度、密度或扩散率；各字段的量纲需保持一致。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr></tbody></table></div><details><summary><code>constant/SRFProperties</code>：本算例的配套配置，字段和参数见文件正文。</summary><h3><code>constant/SRFProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/p</code> 设置 <code>p</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，单位为 m²/s²。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>rotor</code>、<code>freestream</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>front</code>、<code>back</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/0.orig/p">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/0.orig/p.txt">下载此配置文件</a></p></details><h3>物性与模型配置</h3><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/SRFProperties</code></td><td>单旋转参考系的转轴、原点和转速；配合相对速度字段使用。</td></tr><tr><td><code>constant/transportProperties</code></td><td>流体输运物性。改变材料时，在此修改黏度、密度或扩散率；各字段的量纲需保持一致。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr></tbody></table></div><details><summary><code>constant/SRFProperties</code>：本算例的配套配置，字段和参数见文件正文。</summary><h3><code>constant/SRFProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      SRFProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> SRFProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-SRFModel        rpm;
-
-origin          (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-axis            (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-
+SRFModel rpm;
+origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
 rpmCoeffs
 {
-    rpm             <span class="hljs-number">60</span>;
+    rpm <span class="hljs-number">60</span>;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>SRFModel</code>=<code>rpm</code> 以转速定义单旋转参考系。<code>origin</code>=<code>(0 0 0)</code> 给定转轴通过点，<code>axis</code>=<code>(0 0 1)</code> 给定转轴方向，rpm=<code>60</code> 的单位为 r/min。该设置改变参考系而不旋转网格；入口 <code>Urel</code> 需要按相对速度边界解释。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/transportProperties</code>：密度、黏度等输运物性；结构随求解器变化。</summary><h3><code>constant/transportProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>SRFModel</code>=<code>rpm</code> 以转速定义单旋转参考系。<code>origin</code>=<code>(0 0 0)</code> 给定转轴通过点，<code>axis</code>=<code>(0 0 1)</code> 给定转轴方向，rpm=<code>60</code> 的单位为 r/min。该设置改变参考系而不旋转网格；入口 <code>Urel</code> 需要按相对速度边界解释。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/SRFProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/transportProperties</code>：密度、黏度等输运物性；结构随求解器变化。</summary><h3><code>constant/transportProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      transportProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> transportProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-transportModel  Newtonian;
-
-nu              <span class="hljs-number">1e-05</span>;
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/transportProperties</code> 中各项设置的作用如下。</p><ul><li><code>transportModel</code> 设为 <code>Newtonian</code>：选择运动黏度关系。</li><li><code>nu</code> 设为 <code>1e-05</code>：运动黏度，单位 m²/s。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+transportModel Newtonian;
+nu <span class="hljs-number">1e-05</span>;
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/transportProperties</code> 中各项设置的作用如下。</p><ul><li><code>transportModel</code> 设为 <code>Newtonian</code>：选择运动黏度关系。</li><li><code>nu</code> 设为 <code>1e-05</code>：运动黏度，单位 m²/s。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/transportProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties"><code>incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      turbulenceProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> turbulenceProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-simulationType      <span class="hljs-built_in">RAS</span>;
-
+simulationType <span class="hljs-built_in">RAS</span>;
 <span class="hljs-built_in">RAS</span>
 {
-    RASModel        kEpsilon;
-
-    turbulence      <span class="hljs-literal">on</span>;
-
-    printCoeffs     <span class="hljs-literal">on</span>;
+    RASModel kEpsilon;
+    turbulence <span class="hljs-literal">on</span>;
+    printCoeffs <span class="hljs-literal">on</span>;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/turbulenceProperties</code> 中各项设置的作用如下。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilon</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：<code>Gauss</code> <code>limitedLinear</code> 1。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h3>离散格式与方程求解</h3><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes"><code>incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">49 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/turbulenceProperties</code> 中各项设置的作用如下。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>kEpsilon</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：<code>Gauss</code> <code>limitedLinear</code> 1。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h3>离散格式与方程求解</h3><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes"><code>incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSchemes;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSchemes;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 ddtSchemes
 {
-    default         <span class="hljs-built_in">Euler</span>;
+    default <span class="hljs-built_in">Euler</span>;
 }
-
 gradSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 divSchemes
 {
-    default         none;
-
-    div(phi,Urel)   <span class="hljs-built_in">Gauss</span> limitedLinearV <span class="hljs-number">1</span>;
-
-    turbulence      <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phi,k)      <span class="hljs-variable">$turbulence</span>;
+    default none;
+    div(phi,Urel) <span class="hljs-built_in">Gauss</span> limitedLinearV <span class="hljs-number">1</span>;
+    turbulence <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phi,k) <span class="hljs-variable">$turbulence</span>;
     div(phi,epsilon) <span class="hljs-variable">$turbulence</span>;
-
     div((nuEff*dev2(T(grad(Urel))))) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 laplacianSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
 }
-
 interpolationSchemes
 {
-    default         <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">linear</span>;
 }
-
 snGradSchemes
 {
-    default         corrected;
+    default corrected;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,Urel)</code></td><td><code>Gauss limitedLinearV 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/turbulence</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div((nuEff*dev2(T(grad(Urel)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution"><code>incompressible/SRFPimpleFoam/rotor2D/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">75 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,Urel)</code></td><td><code>Gauss limitedLinearV 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/turbulence</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div((nuEff*dev2(T(grad(Urel)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution"><code>incompressible/SRFPimpleFoam/rotor2D/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     p
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">GAMG</span>;
-        tolerance       <span class="hljs-number">1e-08</span>;
-        relTol          <span class="hljs-number">0.05</span>;
-        smoother        GaussSeidel;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
+        tolerance <span class="hljs-number">1e-08</span>;
+        relTol <span class="hljs-number">0.05</span>;
+        smoother GaussSeidel;
         nCellsInCoarsestLevel <span class="hljs-number">20</span>;
     }
-
     pFinal
     {
         <span class="hljs-variable">$p</span>;
-        relTol          <span class="hljs-number">0</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     <span class="hljs-string">"Urel.*"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        GaussSeidel;
-        nSweeps         <span class="hljs-number">2</span>;
-        tolerance       <span class="hljs-number">1e-07</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother GaussSeidel;
+        nSweeps <span class="hljs-number">2</span>;
+        tolerance <span class="hljs-number">1e-07</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     <span class="hljs-string">"k.*"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        GaussSeidel;
-        nSweeps         <span class="hljs-number">2</span>;
-        tolerance       <span class="hljs-number">1e-07</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother GaussSeidel;
+        nSweeps <span class="hljs-number">2</span>;
+        tolerance <span class="hljs-number">1e-07</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     <span class="hljs-string">"epsilon.*"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        GaussSeidel;
-        nSweeps         <span class="hljs-number">2</span>;
-        tolerance       <span class="hljs-number">1e-07</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother GaussSeidel;
+        nSweeps <span class="hljs-number">2</span>;
+        tolerance <span class="hljs-number">1e-07</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
 }
-
 <span class="hljs-built_in">PIMPLE</span>
 {
     nOuterCorrectors <span class="hljs-number">1</span>;
-    nCorrectors     <span class="hljs-number">2</span>;
+    nCorrectors <span class="hljs-number">2</span>;
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    pRefCell        <span class="hljs-number">0</span>;
-    pRefValue       <span class="hljs-number">0</span>;
+    pRefCell <span class="hljs-number">0</span>;
+    pRefValue <span class="hljs-number">0</span>;
 }
-
 relaxationFactors
 {
     equations
     {
-        <span class="hljs-string">"Urel.*"</span>        <span class="hljs-number">1</span>;
-        <span class="hljs-string">"k.*"</span>           <span class="hljs-number">1</span>;
-        <span class="hljs-string">"epsilon.*"</span>     <span class="hljs-number">1</span>;
+        <span class="hljs-string">"Urel.*"</span> <span class="hljs-number">1</span>;
+        <span class="hljs-string">"k.*"</span> <span class="hljs-number">1</span>;
+        <span class="hljs-string">"epsilon.*"</span> <span class="hljs-number">1</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p</code></td><td><code>solver</code> <code>GAMG</code>：线性方程采用 <code>GAMG</code> 方法；<code>tolerance</code> <code>1e-08</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.05</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法。</td></tr><tr><td><code>pFinal</code></td><td><code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"Urel.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"k.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"epsilon.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/nOuterCorrectors</code> = <code>1</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>2</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>PIMPLE/pRefCell</code> = <code>0</code>：设置压力参考单元。</li><li><code>PIMPLE/pRefValue</code> = <code>0</code>：设置该单元的压力参考值。</li><li><code>relaxationFactors/equations/"Urel.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"k.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"epsilon.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution.txt">下载此配置文件</a></p></details><h3>时间、迭代与输出设置</h3><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/controlDict"><code>incompressible/SRFPimpleFoam/rotor2D/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p</code></td><td><code>solver</code> <code>GAMG</code>：线性方程采用 <code>GAMG</code> 方法；<code>tolerance</code> <code>1e-08</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.05</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法。</td></tr><tr><td><code>pFinal</code></td><td><code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"Urel.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"k.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"epsilon.*"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法；<code>nSweeps</code> <code>2</code>：规定检查残差之间的光顺次数；<code>tolerance</code> <code>1e-07</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/nOuterCorrectors</code> = <code>1</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>2</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>PIMPLE/pRefCell</code> = <code>0</code>：设置压力参考单元。</li><li><code>PIMPLE/pRefValue</code> = <code>0</code>：设置该单元的压力参考值。</li><li><code>relaxationFactors/equations/"Urel.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"k.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/"epsilon.*"</code> = <code>1</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/system/fvSolution.txt">下载此配置文件</a></p></details><h3>时间、迭代与输出设置</h3><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/controlDict"><code>incompressible/SRFPimpleFoam/rotor2D/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     SRFPimpleFoam;
-
-startFrom       startTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">2</span>;
-
-deltaT          <span class="hljs-number">2e-4</span>;
-
-writeControl    runTime;
-
-writeInterval   <span class="hljs-number">2e-2</span>;
-
-purgeWrite      <span class="hljs-number">0</span>;
-
-writeFormat     ascii;
-
-writePrecision  <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">application</span> SRFPimpleFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">2</span>;
+deltaT <span class="hljs-number">2e-4</span>;
+writeControl runTime;
+writeInterval <span class="hljs-number">2e-2</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat ascii;
+writePrecision <span class="hljs-number">6</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">yes</span>;
-
-adjustTimeStep  <span class="hljs-literal">no</span>;
-
-maxCo           <span class="hljs-number">0.5</span>;
-
-
+adjustTimeStep <span class="hljs-literal">no</span>;
+maxCo <span class="hljs-number">0.5</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>system/controlDict</code> 中各项设置的作用如下。</p><ul><li><code>application</code> 设为 <code>SRFPimpleFoam</code>：指定由 <code>Allrun</code> 等脚本调用的应用程序。</li><li><code>startFrom</code> 设为 <code>startTime</code>：决定从给定起始时刻还是已有结果继续计算。</li><li><code>startTime</code> 设为 <code>0</code>：给定起始时刻。</li><li><code>endTime</code> 设为 <code>2</code>：规定计算结束的时间或稳态迭代终点。</li><li><code>deltaT</code> 设为 <code>2e-4</code>：设置时间步；启用自动调步后它用于起步。</li><li><code>writeControl</code> 设为 <code>runTime</code>：选择按时间步、模拟时间等事件写出结果。</li><li><code>writeInterval</code> 设为 <code>2e-2</code>：给出与 <code>writeControl</code> 配套的写出间隔。</li><li><code>purgeWrite</code> 设为 <code>0</code>：控制保留多少个结果时间目录；0 表示不自动清除。</li><li><code>runTimeModifiable</code> 设为 <code>yes</code>：决定运行中是否重新读取可修改的字典。</li><li><code>adjustTimeStep</code> 设为 <code>no</code>：控制是否根据 Courant 数自动调整时间步。</li><li><code>maxCo</code> 设为 <code>0.5</code>：限制流动 Courant 数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/SRFPimpleFoam/rotor2D/system/controlDict.txt">下载此配置文件</a></p><p>瞬态计算应同时检查时间步与写出间隔：前者影响时间离散和稳定性，后者只决定保存结果的频率。仅缩小 <code>writeInterval</code> 不会提高计算本身的时间分辨率。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/SRFPimpleFoam/rotor2D/Allrun"><code>incompressible/SRFPimpleFoam/rotor2D/Allrun</code></a>（原文件）。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
 . <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>

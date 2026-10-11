@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -277,33 +277,45 @@
     <h1>第 16 章　system/snappyHexMeshDict</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><h2>16.1 三阶段开关与总体结构</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>;      <span class="hljs-comment">// ① 按几何切割背景网格 + 局部加密</span>
-snap            <span class="hljs-literal">true</span>;      <span class="hljs-comment">// ② 把切割后的网格贴合到几何表面</span>
-addLayers       <span class="hljs-literal">true</span>;      <span class="hljs-comment">// ③ 在壁面上长边界层</span>
-
-geometry { ... }                 <span class="hljs-comment">// 几何来源</span>
-castellatedMeshControls { ... }
-snapControls { ... }
-addLayersControls { ... }
-meshQualityControls { ... }
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>; <span class="hljs-comment">// ① 按几何切割背景网格 + 局部加密</span>
+snap <span class="hljs-literal">true</span>; <span class="hljs-comment">// ② 把切割后的网格贴合到几何表面</span>
+addLayers <span class="hljs-literal">true</span>; <span class="hljs-comment">// ③ 在壁面上长边界层</span>
+geometry
+{
+    ...
+}
+<span class="hljs-comment">// 几何来源</span>
+castellatedMeshControls
+{
+    ...
+}
+snapControls
+{
+    ...
+}
+addLayersControls
+{
+    ...
+}
+meshQualityControls
+{
+    ...
+}
 mergeTolerance <span class="hljs-number">1e-6</span>;</code></pre></div><!-- example-reading --><p>三个开关分别启用网格切割与加密、表面贴合和近壁层生成。<code>geometry</code> 给出几何来源，三个 Controls 子字典填写各阶段参数，<code>meshQualityControls</code> 给出质量限制。省略号代表尚待填写的内容；这段是文件结构示意，不能直接作为完整 <code>snappyHexMeshDict</code> 使用。</p><!-- /example-reading -->
 <h2>16.2 geometry</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">geometry
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">geometry
 {
-    body.stl                              <span class="hljs-comment">// 文件放在 constant/triSurface/</span>
+    body.stl <span class="hljs-comment">// 文件放在 constant/triSurface/</span>
     {
         <span class="hljs-keyword">type</span> triSurfaceMesh;
-        <span class="hljs-keyword">name</span> body;                        <span class="hljs-comment">// 后面用这个名字引用</span>
+        <span class="hljs-keyword">name</span> body; <span class="hljs-comment">// 后面用这个名字引用</span>
     }
-
-    refineBox                             <span class="hljs-comment">// 也可以用解析形状定义加密区</span>
+    refineBox <span class="hljs-comment">// 也可以用解析形状定义加密区</span>
     {
         <span class="hljs-keyword">type</span> searchableBox;
-        min  (<span class="hljs-number">-1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-1</span>);
-        max  ( <span class="hljs-number">3</span>  <span class="hljs-number">1</span>  <span class="hljs-number">1</span>);
+        min (<span class="hljs-number">-1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-1</span>);
+        max ( <span class="hljs-number">3</span>  <span class="hljs-number">1</span>  <span class="hljs-number">1</span>);
     }
-
     refineSphere
     {
         <span class="hljs-keyword">type</span> searchableSphere;
@@ -312,39 +324,44 @@ mergeTolerance <span class="hljs-number">1e-6</span>;</code></pre></div><!-- exa
     }
 };</code></pre></div><!-- example-reading --><p><code>type</code> 识别命令是别名、函数还是程序文件。</p><!-- /example-reading -->
 <h2>16.3 castellatedMeshControls</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMeshControls
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMeshControls
 {
-    maxLocalCells        <span class="hljs-number">1000000</span>;    <span class="hljs-comment">// 单进程最大单元数</span>
-    maxGlobalCells       <span class="hljs-number">20000000</span>;   <span class="hljs-comment">// 全局最大单元数（超了会自动降级加密）</span>
-    minRefinementCells   <span class="hljs-number">10</span>;
-    nCellsBetweenLevels  <span class="hljs-number">3</span>;          <span class="hljs-comment">// ★ 相邻加密等级之间的缓冲层数，2–4 合适</span>
-
-    features                          <span class="hljs-comment">// 特征边捕捉（先跑 surfaceFeatureExtract）</span>
+    maxLocalCells <span class="hljs-number">1000000</span>; <span class="hljs-comment">// 单进程最大单元数</span>
+    maxGlobalCells <span class="hljs-number">20000000</span>; <span class="hljs-comment">// 全局最大单元数（超了会自动降级加密）</span>
+    minRefinementCells <span class="hljs-number">10</span>;
+    nCellsBetweenLevels <span class="hljs-number">3</span>; <span class="hljs-comment">// ★ 相邻加密等级之间的缓冲层数，2–4 合适</span>
+    features <span class="hljs-comment">// 特征边捕捉（先跑 surfaceFeatureExtract）</span>
     (
-        { file <span class="hljs-string">"body.eMesh"</span>; level <span class="hljs-number">3</span>; }
+        {
+            file <span class="hljs-string">"body.eMesh"</span>;
+            level <span class="hljs-number">3</span>;
+        }
     );
-
-    refinementSurfaces               <span class="hljs-comment">// 表面加密</span>
+    refinementSurfaces <span class="hljs-comment">// 表面加密</span>
     {
         body
         {
-            level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>);             <span class="hljs-comment">// (最小 最大) 加密等级</span>
-            patchInfo { <span class="hljs-keyword">type</span> wall; } <span class="hljs-comment">// ★ 生成的 patch 类型，壁面一定写 wall</span>
+            level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>); <span class="hljs-comment">// (最小 最大) 加密等级</span>
+            patchInfo
+            {
+                <span class="hljs-keyword">type</span> wall;
+            }
+            <span class="hljs-comment">// ★ 生成的 patch 类型，壁面一定写 wall</span>
         }
     }
-
-    resolveFeatureAngle  <span class="hljs-number">30</span>;         <span class="hljs-comment">// 夹角大于此值的地方自动加密</span>
-
-    refinementRegions                <span class="hljs-comment">// 区域加密</span>
+    resolveFeatureAngle <span class="hljs-number">30</span>; <span class="hljs-comment">// 夹角大于此值的地方自动加密</span>
+    refinementRegions <span class="hljs-comment">// 区域加密</span>
     {
         refineBox
         {
-            mode   inside;           <span class="hljs-comment">// inside / outside / distance</span>
-            levels ((<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>));       <span class="hljs-comment">// (距离 等级)；inside 模式下距离随便填大数</span>
+            mode inside; <span class="hljs-comment">// inside / outside / distance</span>
+            levels
+            (
+                (<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>)
+            ); <span class="hljs-comment">// (距离 等级)；inside 模式下距离随便填大数</span>
         }
     }
-
-    locationInMesh (<span class="hljs-number">2.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span>);    <span class="hljs-comment">// ★★ 保留哪一侧：必须落在"流体区域"内</span>
+    locationInMesh (<span class="hljs-number">2.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span>); <span class="hljs-comment">// ★★ 保留哪一侧：必须落在"流体区域"内</span>
     allowFreeStandingZoneFaces <span class="hljs-literal">true</span>;
 }</code></pre></div>
 <p><code>locationInMesh</code> 指定待保留流体区域内部的一个点。该点应位于目标连通区域内，并避开几何表面和网格面。坐标选择应依据几何尺寸和区域拓扑，不宜使用与模型尺度无关的固定偏移。</p>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -382,44 +382,37 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-压力驱动边界"><a href="#1-压力驱动边界" class="headerlink" title="1. 压力驱动边界"></a>1. 压力驱动边界</h3><p>文件：<code>0.orig/p</code>。本段设置压力驱动边界。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            totalPressure;
-    p0              <span class="hljs-keyword">uniform</span> <span class="hljs-number">300e5</span>;
+    <span class="hljs-keyword">type</span> totalPressure;
+    p0 <span class="hljs-keyword">uniform</span> <span class="hljs-number">300e5</span>;
 }
 </code></pre></div>
 <p>入口总压与出口静压形成驱动压差。喉部静压还受局部加速和下游恢复影响，需由求解结果提取；它决定蒸气首先出现的位置。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/RAS/throttle/0.orig/p">查看该配置的官方原文件</a>。</p>
 <h3 id="2-均相混合物的热力学关系"><a href="#2-均相混合物的热力学关系" class="headerlink" title="2. 均相混合物的热力学关系"></a>2. 均相混合物的热力学关系</h3><p>文件：<code>constant/thermodynamicProperties</code>。本段设置均相混合物的热力学关系。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">barotropicCompressibilityModel <span class="hljs-built_in">linear</span>;
-
-psiv            <span class="hljs-number">2.5e-06</span>;
-
-rholSat         <span class="hljs-number">830</span>;
-
-psil            <span class="hljs-number">5e-07</span>;
-
-pSat            <span class="hljs-number">4500</span>;
-
-rhoMin          <span class="hljs-number">0.001</span>;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">barotropicCompressibilityModel <span class="hljs-built_in">linear</span>;
+psiv <span class="hljs-number">2.5e-06</span>;
+rholSat <span class="hljs-number">830</span>;
+psil <span class="hljs-number">5e-07</span>;
+pSat <span class="hljs-number">4500</span>;
+rhoMin <span class="hljs-number">0.001</span>;
 </code></pre></div>
 <p>该文件规定压力—密度关系和相变物性。饱和蒸气压确定汽化的压力尺度，相密度和可压缩性参数共同决定液—蒸气混合物对压力的响应。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/RAS/throttle/constant/thermodynamicProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-液相与蒸气的输运物性"><a href="#3-液相与蒸气的输运物性" class="headerlink" title="3. 液相与蒸气的输运物性"></a>3. 液相与蒸气的输运物性</h3><p>文件：<code>constant/transportProperties</code>。本段设置液相与蒸气的输运物性。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">phases (vapour water);
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">phases (vapour water);
 water
 {
-    transportModel  Newtonian;
-    nu              <span class="hljs-number">7.831e-06</span>;
-    rho             <span class="hljs-number">830</span>;
+    transportModel Newtonian;
+    nu <span class="hljs-number">7.831e-06</span>;
+    rho <span class="hljs-number">830</span>;
 }
-
 vapour
 {
-    transportModel  Newtonian;
-    nu              <span class="hljs-number">4.252e-05</span>;
-    rho             <span class="hljs-number">0.14</span>;
+    transportModel Newtonian;
+    nu <span class="hljs-number">4.252e-05</span>;
+    rho <span class="hljs-number">0.14</span>;
 }
 </code></pre></div>
 <p>基准液相密度为 830 kg/m³，相名称沿用 <code>water</code>。解释计算结果时采用此处给定的物性；替换液体时，同时修改输运与热力学参数。</p>

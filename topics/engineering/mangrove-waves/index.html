@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -355,40 +355,34 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-造波与吸收"><a href="#1-造波与吸收" class="headerlink" title="1. 造波与吸收"></a>1. 造波与吸收</h3><p>文件：<code>constant/waveProperties</code>。本段设置造波与吸收。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">left
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">left
 {
-    alpha           alpha.water;
-
-    waveModel       Boussinesq;
-
-    nPaddle         <span class="hljs-number">1</span>;
-
-    waveHeight      <span class="hljs-number">0.05</span>;
-
-    waveAngle       <span class="hljs-number">0.0</span>;
-
+    alpha alpha.water;
+    waveModel Boussinesq;
+    nPaddle <span class="hljs-number">1</span>;
+    waveHeight <span class="hljs-number">0.05</span>;
+    waveAngle <span class="hljs-number">0.0</span>;
     activeAbsorption <span class="hljs-literal">yes</span>;
 }
 </code></pre></div>
 <p>左边界采用 Boussinesq 波模型和主动吸收，右边界采用浅水吸收。波高、初始水深与吸收条件共同组成水槽波浪设置。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/constant/waveProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="2-植被等效作用"><a href="#2-植被等效作用" class="headerlink" title="2. 植被等效作用"></a>2. 植被等效作用</h3><p>文件：<code>system/fvOptions</code>。本段设置植被等效作用。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Mangroves
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">Mangroves
 {
-    <span class="hljs-keyword">type</span>            multiphaseMangrovesSource;
-    active          <span class="hljs-literal">yes</span>;
-
+    <span class="hljs-keyword">type</span> multiphaseMangrovesSource;
+    active <span class="hljs-literal">yes</span>;
     multiphaseMangrovesSourceCoeffs
     {
         regions
         {
             region1
             {
-                cellZone        c0;
-                a               <span class="hljs-number">0.01</span>;
-                N               <span class="hljs-number">560</span>;
-                Cm              <span class="hljs-number">1</span>;
-                Cd              <span class="hljs-number">1.52</span>;
+                cellZone c0;
+                a <span class="hljs-number">0.01</span>;
+                N <span class="hljs-number">560</span>;
+                Cm <span class="hljs-number">1</span>;
+                Cd <span class="hljs-number">1.52</span>;
             }
         }
     }
@@ -397,17 +391,18 @@ bash Allmesh
 <p><code>cellZone c0</code> 指定源项区域，<code>Cd</code> 表示阻力作用，<code>Cm</code> 表示惯性相关作用，植被尺寸和密度进一步确定源项强度。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/waves/mangroveInteraction/system/fvOptions">查看该配置的官方原文件</a>。</p>
 <h3 id="3-植被范围选取"><a href="#3-植被范围选取" class="headerlink" title="3. 植被范围选取"></a>3. 植被范围选取</h3><p>文件：<code>system/setFieldsDict</code>。本段设置植被范围选取。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">surfaceToCell
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">surfaceToCell
 {
-    file            <span class="hljs-string">"constant/triSurface/seaweed.stl.gz"</span>;
-    outsidePoints   ((<span class="hljs-number">2</span> <span class="hljs-number">0.25</span> <span class="hljs-number">0.15</span>));
-    includeCut      <span class="hljs-literal">true</span>;
-    includeInside   <span class="hljs-literal">true</span>;
-    includeOutside  <span class="hljs-literal">false</span>;
-    nearDistance    <span class="hljs-number">-1</span>;
-
-    curvature       <span class="hljs-number">-100</span>;
-
+    file <span class="hljs-string">"constant/triSurface/seaweed.stl.gz"</span>;
+    outsidePoints
+    (
+        (<span class="hljs-number">2</span> <span class="hljs-number">0.25</span> <span class="hljs-number">0.15</span>)
+    );
+    includeCut <span class="hljs-literal">true</span>;
+    includeInside <span class="hljs-literal">true</span>;
+    includeOutside <span class="hljs-literal">false</span>;
+    nearDistance <span class="hljs-number">-1</span>;
+    curvature <span class="hljs-number">-100</span>;
     fieldValues
     (
         volScalarFieldValue MangrovesIndex <span class="hljs-number">1</span>

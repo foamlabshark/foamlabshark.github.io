@@ -25,7 +25,7 @@
   
   <script src="/assets/function-objects.js?v=2d3cba1704ad" defer></script>
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -278,24 +278,24 @@
     
     <div class="prose"><p><code>functionObject</code> 在求解过程中完成场运算、采样、统计和结果输出。例如 <code>probes</code> 记录测点压力，<code>forces</code> 积分壁面载荷，<code>mag</code> 把速度向量转换为速度大小。一个算例可以同时配置多个对象。</p>
 <h2 id="1-在-controlDict-中添加对象"><a href="#1-在-controlDict-中添加对象" class="headerlink" title="1. 在 controlDict 中添加对象"></a>1. 在 controlDict 中添加对象</h2><p>在已有算例的 <code>system/controlDict</code> 中找到 <code>functions</code>，加入下面的对象：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">functions</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
 {
     speed
     {
-        <span class="hljs-keyword">type</span>            mag;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        field           U;
-        result          speed;
-        executeControl  timeStep;
+        <span class="hljs-keyword">type</span> mag;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        field U;
+        result speed;
+        executeControl timeStep;
         executeInterval <span class="hljs-number">1</span>;
-        writeControl    writeTime;
-        writeInterval   <span class="hljs-number">1</span>;
+        writeControl writeTime;
+        writeInterval <span class="hljs-number">1</span>;
     }
 }
 </code></pre></div>
 <p><code>speed</code> 是对象名；<code>type mag</code> 选择求模运算。输入为速度场 <code>U</code>，输出为标量场 <code>speed</code>。每一步更新结果，在求解器保存完整场时同时保存它。运行原算例的求解器后，时间目录中会出现 <code>speed</code>，可在 ParaView 中选择该场查看速度云图。</p>
 <h2 id="2-把对象放在单独文件"><a href="#2-把对象放在单独文件" class="headerlink" title="2. 把对象放在单独文件"></a>2. 把对象放在单独文件</h2><p>对象较多时，可以把 <code>functions</code> 内的对象放到 <code>system/functions</code> 中，主文件保留：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">functions</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
 {
     <span class="hljs-meta">#include "functions"</span>
 }
@@ -373,10 +373,10 @@ postProcess -<span class="hljs-keyword">case</span> ../cavity -func vorticity -l
 </tbody></table></div>
 <p><code>timeStep</code> 的间隔是步数；<code>runTime</code> 的间隔是模拟时间；<code>writeTime</code> 跟随主计算的保存时刻。<code>onEnd</code> 在计算结束时调用，<code>none</code> 关闭对应调度。还有按实际耗时触发的 <code>clockTime</code>、<code>cpuTime</code>，以及参与输出时间对齐的 <code>adjustableRunTime</code>。</p>
 <p>例如平均场应每步累积，而文件可以每十步保存一次：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">executeControl  timeStep;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">executeControl timeStep;
 executeInterval <span class="hljs-number">1</span>;
-writeControl    timeStep;
-writeInterval   <span class="hljs-number">10</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">10</span>;
 </code></pre></div>
 <h2 id="5-查看输出"><a href="#5-查看输出" class="headerlink" title="5. 查看输出"></a>5. 查看输出</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table>
 <thead>

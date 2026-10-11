@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -355,11 +355,22 @@ k(z)=\frac32u_{\rm rms}(z)^2,
 <p><code>constant/triSurface/city.stl</code> 保存米制曲面，<code>blockMeshDict</code> 定义背景域，<code>snappyHexMeshDict</code> 在城区和建筑表面加密。原模型在 <code>z</code>=0 的外缘与地面边界相接，体积网格保留地面以上的流体区域。网格检查应同时确认 <code>city</code> 边界、入口与地面均存在，再核对建筑最高点 225 m 和 22 个北风测点位置。</p>
 <p><code>0.orig/U</code>、<code>k</code> 和 <code>epsilon</code> 的入口使用随包 <code>inletProfiles.csv</code> 数据生成的高度插值。插值在相邻高度点间线性进行，超出表格范围时采用端点值；速度方向固定为负 <code>y</code>。入口耗散率按本文给定的长度尺度计算，改变该假设时应同步更新对应剖面。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下配置来自下载包的同名文件。</p>
-<h3 id="constant-turbulenceProperties"><a href="#constant-turbulenceProperties" class="headerlink" title="constant/turbulenceProperties"></a><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">simulationType <span class="hljs-built_in">RAS</span>; <span class="hljs-built_in">RAS</span> { RASModel kEpsilon; turbulence <span class="hljs-literal">on</span>; printCoeffs <span class="hljs-literal">on</span>; }
+<h3 id="constant-turbulenceProperties"><a href="#constant-turbulenceProperties" class="headerlink" title="constant/turbulenceProperties"></a><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">simulationType <span class="hljs-built_in">RAS</span>;
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel kEpsilon;
+    turbulence <span class="hljs-literal">on</span>;
+    printCoeffs <span class="hljs-literal">on</span>;
+}
 </code></pre></div>
 <p>基准采用 <code>k</code>–<code>epsilon</code> 模型求解平均风场。入口 <code>k</code> 来自风洞归一化数据，<code>epsilon</code> 通过规定的长度尺度构造，二者与 <code>U</code> 使用同一高度坐标。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet { <span class="hljs-keyword">type</span> codedFixedValue; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">-10</span> <span class="hljs-number">0</span>); <span class="hljs-keyword">name</span> northProfileU; <span class="hljs-keyword">code</span>
-<span class="hljs-meta">#{</span>
+<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
+{
+    <span class="hljs-keyword">type</span> codedFixedValue;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">-10</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">name</span> northProfileU;
+    <span class="hljs-keyword">code</span>
+    <span class="hljs-meta">#{</span>
 const scalar z[] = {<span class="hljs-number">10.0</span>,<span class="hljs-number">20.0</span>,<span class="hljs-number">35.0</span>,<span class="hljs-number">40.0</span>,<span class="hljs-number">50.0</span>,<span class="hljs-number">60.0</span>,<span class="hljs-number">65.0</span>,<span class="hljs-number">80.0</span>,<span class="hljs-number">100.0</span>,<span class="hljs-number">120.0</span>,<span class="hljs-number">140.0</span>,<span class="hljs-number">160.0</span>,<span class="hljs-number">200.0</span>,<span class="hljs-number">240.0</span>,<span class="hljs-number">280.0</span>,<span class="hljs-number">320.0</span>,<span class="hljs-number">360.0</span>,<span class="hljs-number">400.0</span>,<span class="hljs-number">470.0</span>,<span class="hljs-number">500.0</span>};
 const scalar v[] = {<span class="hljs-number">3.2</span>,<span class="hljs-number">4.2</span>,<span class="hljs-number">4.6000000000000005</span>,<span class="hljs-number">5.0</span>,<span class="hljs-number">5.5</span>,<span class="hljs-number">5.8</span>,<span class="hljs-number">6.0</span>,<span class="hljs-number">6.2</span>,<span class="hljs-number">6.3</span>,<span class="hljs-number">6.5</span>,<span class="hljs-number">6.800000000000001</span>,<span class="hljs-number">7.3</span>,<span class="hljs-number">7.7</span>,<span class="hljs-number">8.100000000000001</span>,<span class="hljs-number">8.4</span>,<span class="hljs-number">8.9</span>,<span class="hljs-number">9.200000000000001</span>,<span class="hljs-number">9.399999999999999</span>,<span class="hljs-number">9.6</span>,<span class="hljs-number">10.0</span>};
 const vectorField&amp; C = patch().Cf();
@@ -373,36 +384,43 @@ forAll(C,i)
  result[i]=vector(<span class="hljs-number">0</span>,-<span class="hljs-keyword">value</span>,<span class="hljs-number">0</span>);
 }
 operator==(result);
-#}; }
+#};
+}
 </code></pre></div>
 <p><code>northProfileU</code> 按边界面中心高度读取插值速度；结果的 <code>y</code> 分量为负。建筑与地面采用无滑移，顶部和侧边界采用滑移。改变风向时，需要同时改变入口所在面和速度方向。</p>
-<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">windProbes { <span class="hljs-keyword">type</span> probes; <span class="hljs-keyword">libs</span> (sampling); fields (U); writeControl timeStep; writeInterval <span class="hljs-number">1</span>;
-probeLocations
-(
-    (<span class="hljs-number">268.6</span> <span class="hljs-number">364.1</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">165.4</span> <span class="hljs-number">299.3</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">20.7</span> <span class="hljs-number">343.4</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">40.5</span> <span class="hljs-number">304.1</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">40.5</span> <span class="hljs-number">304.1</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">1.2</span> <span class="hljs-number">220.3</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">1.2</span> <span class="hljs-number">220.3</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">-81.9</span> <span class="hljs-number">164.7</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-81.9</span> <span class="hljs-number">164.7</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">-128.7</span> <span class="hljs-number">194.6</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-128.7</span> <span class="hljs-number">194.6</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">-195.4</span> <span class="hljs-number">181</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-195.4</span> <span class="hljs-number">181</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">-263.7</span> <span class="hljs-number">293.8</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-93.6</span> <span class="hljs-number">-493.6</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-93.6</span> <span class="hljs-number">-493.6</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">51.4</span> <span class="hljs-number">143</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">51.4</span> <span class="hljs-number">143</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">81.3</span> <span class="hljs-number">284.7</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">81.3</span> <span class="hljs-number">284.7</span> <span class="hljs-number">30</span>)
-    (<span class="hljs-number">-50.2</span> <span class="hljs-number">87.5</span> <span class="hljs-number">19</span>)
-    (<span class="hljs-number">-50.2</span> <span class="hljs-number">87.5</span> <span class="hljs-number">30</span>)
-);
- }
+<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">windProbes
+{
+    <span class="hljs-keyword">type</span> probes;
+    <span class="hljs-keyword">libs</span> (sampling);
+    fields (U);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
+    probeLocations
+    (
+        (<span class="hljs-number">268.6</span> <span class="hljs-number">364.1</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">165.4</span> <span class="hljs-number">299.3</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">20.7</span> <span class="hljs-number">343.4</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">40.5</span> <span class="hljs-number">304.1</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">40.5</span> <span class="hljs-number">304.1</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">1.2</span> <span class="hljs-number">220.3</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">1.2</span> <span class="hljs-number">220.3</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">-81.9</span> <span class="hljs-number">164.7</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-81.9</span> <span class="hljs-number">164.7</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">-128.7</span> <span class="hljs-number">194.6</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-128.7</span> <span class="hljs-number">194.6</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">-195.4</span> <span class="hljs-number">181</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-195.4</span> <span class="hljs-number">181</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">-263.7</span> <span class="hljs-number">293.8</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-93.6</span> <span class="hljs-number">-493.6</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-93.6</span> <span class="hljs-number">-493.6</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">51.4</span> <span class="hljs-number">143</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">51.4</span> <span class="hljs-number">143</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">81.3</span> <span class="hljs-number">284.7</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">81.3</span> <span class="hljs-number">284.7</span> <span class="hljs-number">30</span>)
+        (<span class="hljs-number">-50.2</span> <span class="hljs-number">87.5</span> <span class="hljs-number">19</span>)
+        (<span class="hljs-number">-50.2</span> <span class="hljs-number">87.5</span> <span class="hljs-number">30</span>)
+    );
+}
 </code></pre></div>
 <p><code>windProbes</code> 在公开北风测点位置记录 <code>U</code>。使用速度模除以 500 m 高度参考风速 10 m/s，得到与测量表一致的无量纲风速。测点若因局部网格分辨率落入实体，应先检查几何和测点位置。</p>
 <h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p><a href="/downloads/engineering/shinjuku-wind.zip">下载完整算例与配置代码</a>，解压后进入 <code>shinjuku-wind</code> 目录：</p>

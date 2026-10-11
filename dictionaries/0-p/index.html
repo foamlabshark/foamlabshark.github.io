@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,14 +284,27 @@
 <h2 id="nested-configuration">场量纲与边界设置</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>dimensions / internalField</code></td><td>分别为字段量纲与内部单元初值；<code>uniform</code> 表示统一值，<code>nonuniform</code> 列表长度需匹配网格。</td></tr><tr><td><code>boundaryField.&lt;patch&gt;.type / value</code></td><td><code>type</code> 选择该字段的边界条件。<code>value</code> 在 <code>fixedValue</code> 中为指定值，在许多派生条件中仅作初始化。</td></tr><tr><td><code>&lt;patch&gt;</code></td><td><code>movingWall</code>、<code>fixedWalls</code>、<code>upperWall</code>、<code>lowerWall</code>、<code>inlet</code>、<code>outlet</code> 等均为算例自定名称，要与 <code>constant/polyMesh/boundary</code> 对应。</td></tr></tbody></table></div><p><a href="/boundary-conditions/p-total-pressure/">totalPressure 的参数、示例与配套算例</a></p><p><a href="/boundary-conditions/p-fixed-value/">fixedValue 的参数、示例与配套算例</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 不可压缩通道压力</h3><p>以下片段放在 <code>0/p</code> 的文件头之后，文件头使用 <code>class volScalarField</code> 和 <code>object p</code>。网格具有表中列出的四个 <code>patch</code>。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
 <span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }
-    walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    frontAndBack { <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+    }
+    walls
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    frontAndBack
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
+    }
 }
 </code></pre></div>
 <p><code>[0 2 -2 0 0 0 0]</code> 对应 m²/s²，即物理压力除以恒定密度。出口固定为零，建立压力参考；入口与静止壁面使用此通道案例中的零梯度设置。与给定入口速度配合后，压力分布由动量与连续性求出。</p>
@@ -304,7 +317,7 @@
 <li>全域压力缺少固定值边界时，配套 <code>fvSolution</code> 中的 <code>pRefCell 0</code>、<code>pRefValue 0</code> 提供参考。</li>
 </ul>
 <p>比较物理压差时再乘流体密度；变更开口边界后重新安排压力参考与速度条件。</p>
-<p><a href="/assets/examples/v2512/p/1-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p"><code>incompressible/icoFoam/cavity/cavity/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p/1-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/0/p"><code>incompressible/icoFoam/cavity/cavity/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -313,36 +326,29 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     movingWall
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     fixedWalls
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDaily 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption><code>pitzDaily</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p><code>pitzDaily</code> 在出口给定运动学压力参考，让入口速度决定通过流量。</p>
 <ul>
 <li>压力量纲 <code>[0 2 -2 0 0 0 0]</code>，初值为零。</li>
@@ -351,7 +357,7 @@
 <li><code>frontAndBack/empty</code> 保持二维约束。</li>
 </ul>
 <p>若改为压差驱动，应成组调整入口出口的 <code>p</code> 与 <code>U</code> 条件，并按目标物理问题设置压力值。</p>
-<p><a href="/assets/examples/v2512/p/2-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p"><code>incompressible/simpleFoam/pitzDaily/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p/2-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/p"><code>incompressible/simpleFoam/pitzDaily/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -360,47 +366,38 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     upperWall
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     lowerWall
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · compressible/rhoSimpleFoam/gasMixing/injectorPipe</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoSimpleFoam/gasMixing/injectorPipe"><h3>算例问题：injectorPipe</h3><p class="reference-case-problem">流体从不同入口进入管道并混合，组分随速度场输运。算例用于检查气体混合物物性、组分入口和质量守恒，结果包括组分浓度、速度及混合区的位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe"><code>compressible/rhoSimpleFoam/gasMixing/injectorPipe</code></a>。</p></section><!-- /reference-case-contexts --><p>气体混合喷管使用可压缩求解器，这里的 <code>p</code> 是绝对物理压力。</p>
 <ul>
 <li>量纲 <code>[1 -1 -2 0 0 0 0]</code> 对应 Pa。</li>
@@ -409,7 +406,7 @@
 <li><code>".*"/zeroGradient</code> 给其他一般边界默认梯度条件，公共 <code>include</code> 处理几何约束类型。</li>
 </ul>
 <p>改变背压时结合入口总压、温度和气体状态方程检查流动，尤其关注是否发生阻塞或激波。</p>
-<p><a href="/assets/examples/v2512/p/3-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p"><code>compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">38 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/p/3-p.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p"><code>compressible/rhoSimpleFoam/gasMixing/injectorPipe/0.orig/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -418,34 +415,27 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     <span class="hljs-string">".*"</span>
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/icofoam/">icoFoam</a> · <a href="/commands/simplefoam/">simpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界条件未识别，或与网格边界类型不匹配：<code>Unknown patchField / patch type mismatch</code></td><td>同时检查网格 <code>patch</code> 类型与场边界类型，例如 <code>empty</code> 网格面应使用相容的场条件。</td></tr><tr><td>速度与压力约束不相容</td><td>在入口、出口和封闭壁面共同考虑通量约束与压力参考。</td></tr><tr><td>湍流场出现非法值</td><td>检查 <code>k</code>、<code>epsilon</code>、<code>omega</code> 等场的正性、湍流模型设置及壁面函数的适用范围。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,7 +284,7 @@
 <h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>probes</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>sampling</code>)</td></tr><tr><td><code>fields</code></td><td>需要处理的场名称列表。</td><td>必填</td><td>—</td></tr><tr><td><code>probeLocations</code></td><td>探针坐标列表，每个坐标写成 (<code>x</code> <code>y</code> <code>z</code>)。</td><td>必填</td><td>—</td></tr><tr><td><code>verbose</code></td><td>是否打印更详细的运行信息。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>sampleOnExecute</code></td><td>在执行阶段采样并保存到内存，而不只在写出阶段采样。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>fixedLocations</code></td><td>固定空间采样位置；<code>false</code> 时允许采样位置随网格运动处理。</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>includeOutOfBounds</code></td><td>是否保留网格范围之外的探针位置。</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>interpolationScheme</code></td><td>插值方法；<code>cell</code> 取单元值，<code>cellPoint</code> 结合单元和顶点值插值。</td><td>可选</td><td><code>cell</code></td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr></tbody></table></div><p><a href="/function-objects/probes/">probes 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 记录方腔中心速度与压力</h3><p>把以下对象加入 <code>system/controlDict</code> 的 <code>functions { ... }</code> 内：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">cavityProbes
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">cavityProbes
 {
     <span class="hljs-keyword">type</span> probes;
     <span class="hljs-keyword">libs</span> (sampling);
@@ -308,17 +308,13 @@
 <li><code>probeLocations ((0 1 0))</code> 指定一个物理位置，应落在对应网格范围内。</li>
 </ul>
 <p>移动探针时按实际坐标修改位置；比较发展过程时保持采样间隔能够解析速度变化。</p>
-<p><a href="/assets/examples/v2512/probes/1-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes"><code>incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
-
+<p><a href="/assets/examples/v2512/probes/1-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes"><code>incompressible/pimpleFoam/laminar/planarPoiseuille/setups.orig/common/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// -*- C++ -*-</span>
 <span class="hljs-meta">#includeEtc "caseDicts/postProcessing/probes/probes.cfg"</span>
-
 fields (U);
 probeLocations
 (
     (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>)
 );
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 同时监测部件平均温度和局部探针，用于区分整体温升与局部热点。</p>
 <ul>
 <li><code>Volume1_v_CPU</code>、<code>Volume3_v_fins</code> 采用 <code>volAverage</code> 对各自区域的 <code>T</code> 做体积加权平均。</li>
@@ -327,73 +323,62 @@ probeLocations
 <li><code>writeControl timeStep</code>、<code>writeInterval 1</code> 每个求解步记录，<code>interpolationScheme cell</code> 读取所在单元值。</li>
 </ul>
 <p>改动部件几何后重新检查 <code>region</code> 名称和探针坐标，避免采样点落到其他区域或域外。</p>
-<p><a href="/assets/examples/v2512/probes/2-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">76 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">// -*- C++ -*-</span>
-
+<p><a href="/assets/examples/v2512/probes/2-probes.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/probes</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">64 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// -*- C++ -*-</span>
 _volFieldValue
 {
-    <span class="hljs-keyword">type</span>            volFieldValue;
-    <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-    enabled         <span class="hljs-literal">true</span>;
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
-    log             <span class="hljs-literal">true</span>;
-    valueOutput     <span class="hljs-literal">false</span>;
-    writeFields     <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">type</span> volFieldValue;
+    <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+    enabled <span class="hljs-literal">true</span>;
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
+    log <span class="hljs-literal">true</span>;
+    valueOutput <span class="hljs-literal">false</span>;
+    writeFields <span class="hljs-literal">false</span>;
 }
-
 Volume1_v_CPU
 {
     <span class="hljs-variable">${_volFieldValue}</span>
-
-    regionType      cellZone;
-    <span class="hljs-keyword">name</span>            v_CPU;
-    region          v_CPU;
-    operation       volAverage;
-    fields          ( T );
+    regionType cellZone;
+    <span class="hljs-keyword">name</span> v_CPU;
+    region v_CPU;
+    operation volAverage;
+    fields ( T );
 }
-
 Volume3_v_fins
 {
     <span class="hljs-variable">${_volFieldValue}</span>
-
-    regionType      cellZone;
-    <span class="hljs-keyword">name</span>            v_fins;
-    region          v_fins;
-    operation       volAverage;
-    fields          ( T );
+    regionType cellZone;
+    <span class="hljs-keyword">name</span> v_fins;
+    region v_fins;
+    operation volAverage;
+    fields ( T );
 }
-
 probesFins
 {
-    <span class="hljs-keyword">type</span>            probes;
-    <span class="hljs-keyword">libs</span>            (sampling);
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">type</span> probes;
+    <span class="hljs-keyword">libs</span> (sampling);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
     interpolationScheme cell;
-    region          v_fins;
-
-    fields          ( T );
-
+    region v_fins;
+    fields ( T );
     probeLocations
     (
         (<span class="hljs-number">0.118</span> <span class="hljs-number">0.01</span> <span class="hljs-number">-0.125</span>)
         (<span class="hljs-number">0.118</span> <span class="hljs-number">0.03</span> <span class="hljs-number">-0.125</span>)
     );
 }
-
 probesFluid
 {
-    <span class="hljs-keyword">type</span>            probes;
-    <span class="hljs-keyword">libs</span>            (sampling);
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">type</span> probes;
+    <span class="hljs-keyword">libs</span> (sampling);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
     interpolationScheme cell;
-    region         domain0;
-    log             <span class="hljs-literal">true</span>;
-    verbose         <span class="hljs-literal">true</span>;
-
-    fields          (T U);
-
+    region domain0;
+    log <span class="hljs-literal">true</span>;
+    verbose <span class="hljs-literal">true</span>;
+    fields (T U);
     probeLocations
     (
         (<span class="hljs-number">0.118</span> <span class="hljs-number">0.035</span> <span class="hljs-number">-0.125</span>)
@@ -401,7 +386,6 @@ probesFluid
     );
 }
 <span class="hljs-meta">#remove (_volFieldValue _surfaceFieldValue)</span>
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D"><h3>算例问题：rutlandVortex2D</h3><p class="reference-case-problem">规定的二维涡旋在可压缩、绝热流动条件下演化。算例用于观察涡结构和热力学状态的耦合，重点检查速度、压力、密度及数值耗散对涡旋保持的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D"><code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D</code></a>。</p></section><!-- /reference-case-contexts --><p>Rutland 涡算例在两个对称位置记录压力，以观察可压缩涡运动的时间变化。</p>
 <ul>
 <li><code>functions/probes</code> 的 <code>type probes</code> 与 <code>libs (sampling)</code> 启用点采样。</li>
@@ -410,7 +394,7 @@ probesFluid
 <li><code>writeFormat binary</code> 使用二进制主场文件，采样文件由函数对象自身的输出设置管理。</li>
 </ul>
 <p>比较两个探针的相位和幅值时使用同一时间轴，并核对采样频率是否满足目标频率范围。</p>
-<p><a href="/assets/examples/v2512/probes/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict"><code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">69 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/probes/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict"><code>compressible/rhoPimpleAdiabaticFoam/rutlandVortex2D/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -419,65 +403,44 @@ probesFluid
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>       rhoPimpleAdiabaticFoam;
-
-startFrom         startTime;
-
-startTime         <span class="hljs-number">0</span>;
-
-stopAt            endTime;
-
-endTime           <span class="hljs-number">0.22528</span>;
-
-deltaT            <span class="hljs-number">3.2e-05</span>;
-
-writeControl      timeStep;
-
-writeInterval     <span class="hljs-number">100</span>;
-
-purgeWrite        <span class="hljs-number">0</span>;
-
-writeFormat       binary;
-
-writePrecision    <span class="hljs-number">10</span>;
-
-writeCompression  <span class="hljs-literal">off</span>;
-
-timeFormat        general;
-
-timePrecision     <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">application</span> rhoPimpleAdiabaticFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">0.22528</span>;
+deltaT <span class="hljs-number">3.2e-05</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat binary;
+writePrecision <span class="hljs-number">10</span>;
+writeCompression <span class="hljs-literal">off</span>;
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     probes
     {
         <span class="hljs-keyword">type</span> probes;
-
         <span class="hljs-keyword">libs</span> (sampling);
-
         probeLocations
         (
             (<span class="hljs-number">3.0</span>  <span class="hljs-number">2.0</span>  <span class="hljs-number">0.0</span>)
             (<span class="hljs-number">3.0</span> <span class="hljs-number">-2.0</span>  <span class="hljs-number">0.0</span>)
         );
-
         fields
         (
             p
         );
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

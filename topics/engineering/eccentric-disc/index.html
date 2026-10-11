@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -377,7 +377,7 @@ l0,-144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 <p>该界面位于圆盘最大扫掠半径 150 mm 与壳体半径 150.5 mm 之间。转子与壳体网格分别由随包的两个 <code>blockMeshDict</code> 建立，使用圆弧描述圆周；合并后由 <code>createPatch</code> 建立 <code>rotorAMI</code>、<code>backgroundAMI</code> 配对边界。圆盘轴向范围为 −10～0 mm，背腔为 0～4 mm，内侧流出半径为 47.5 mm。</p>
 <p>本例采用不可压缩瞬态流动与 <code>kOmegaSST</code> 模型；按角速度、半径和运动黏度估算的旋转雷诺数约为 9.36×10⁵。每圈设 192 个周向单元。转子侧外周间隙有 8 层径向单元，壳体侧有 6 层；背腔沿半径分为 40 层，并向圆盘外缘加密。窄间隙单元沿壁面呈各向异性，网格质量字典保留相应行列式阈值，同时检查非正交性、面插值权重和体积比。加密比较同时关注最小间隙和 AMI 两侧分辨率。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下配置来自下载包的同名文件。</p>
-<h3 id="constant-dynamicMeshDict"><a href="#constant-dynamicMeshDict" class="headerlink" title="constant/dynamicMeshDict"></a><code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh dynamicMotionSolverFvMesh;
+<h3 id="constant-dynamicMeshDict"><a href="#constant-dynamicMeshDict" class="headerlink" title="constant/dynamicMeshDict"></a><code>constant/dynamicMeshDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
 motionSolverLibs (fvMotionSolvers);
 motionSolver solidBody;
 cellZone rotating;
@@ -387,30 +387,110 @@ axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <spa
 omega <span class="hljs-number">41.88790205</span>;
 </code></pre></div>
 <p><code>rotating</code> 单元区随圆盘转动，固定轴经过原点并沿 <code>z</code> 方向。初始几何已包含 0.5 mm 偏心，运动原点保持为 <code>O</code>；因此圆心在计算过程中绕 <code>O</code> 运动。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
+<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.060825</span>); }
-    outlet { <span class="hljs-keyword">type</span> pressureInletOutletVelocity; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    disc { <span class="hljs-keyword">type</span> movingWallVelocity; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    casing { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }
-    rotorAMI { <span class="hljs-keyword">type</span> cyclicAMI; }
-    backgroundAMI { <span class="hljs-keyword">type</span> cyclicAMI; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1.060825</span>);
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    disc
+    {
+        <span class="hljs-keyword">type</span> movingWallVelocity;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    casing
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
+    }
+    rotorAMI
+    {
+        <span class="hljs-keyword">type</span> cyclicAMI;
+    }
+    backgroundAMI
+    {
+        <span class="hljs-keyword">type</span> cyclicAMI;
+    }
 }
 </code></pre></div>
 <p><code>movingWallVelocity</code> 使圆盘壁面速度跟随网格，固定壳体为无滑移。入口沿 <code>z</code> 正方向供水，速度 1.060825 m/s 对应约 60 L/min；AMI 两侧使用配对耦合边界。出口在背腔内圆处由压力约束流出。</p>
-<h3 id="system-fvSolution"><a href="#system-fvSolution" class="headerlink" title="system/fvSolution"></a><code>system/fvSolution</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solvers
+<h3 id="system-fvSolution"><a href="#system-fvSolution" class="headerlink" title="system/fvSolution"></a><code>system/fvSolution</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">72 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solvers
 {
     p
-    { <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>; tolerance <span class="hljs-number">1e-6</span>; relTol <span class="hljs-number">0.02</span>; smoother DICGaussSeidel; nPreSweeps <span class="hljs-number">2</span>; nPostSweeps <span class="hljs-number">2</span>; nFinestSweeps <span class="hljs-number">2</span>; }
+    {
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
+        tolerance <span class="hljs-number">1e-6</span>;
+        relTol <span class="hljs-number">0.02</span>;
+        smoother DICGaussSeidel;
+        nPreSweeps <span class="hljs-number">2</span>;
+        nPostSweeps <span class="hljs-number">2</span>;
+        nFinestSweeps <span class="hljs-number">2</span>;
+    }
     pFinal
-    { <span class="hljs-variable">$p</span>; relTol <span class="hljs-number">0</span>; }
-    <span class="hljs-string">"pcorr.*"</span> { <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>; tolerance <span class="hljs-number">1e-5</span>; relTol <span class="hljs-number">0.01</span>; smoother DICGaussSeidel; nPreSweeps <span class="hljs-number">2</span>; nPostSweeps <span class="hljs-number">2</span>; nFinestSweeps <span class="hljs-number">2</span>; }
-    <span class="hljs-string">"(U|k|omega|epsilon|h|tracer|rho)"</span> { <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>; smoother symGaussSeidel; tolerance <span class="hljs-number">1e-8</span>; relTol <span class="hljs-number">0.05</span>; }
-    <span class="hljs-string">"(U|k|omega|epsilon|h)Final"</span> { <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>; smoother symGaussSeidel; tolerance <span class="hljs-number">1e-8</span>; relTol <span class="hljs-number">0</span>; }
-    <span class="hljs-string">"alpha.water.*"</span> { nAlphaCorr <span class="hljs-number">2</span>; nAlphaSubCycles <span class="hljs-number">2</span>; cAlpha <span class="hljs-number">1</span>; MULESCorr <span class="hljs-literal">yes</span>; nLimiterIter <span class="hljs-number">3</span>; <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>; smoother symGaussSeidel; tolerance <span class="hljs-number">1e-9</span>; relTol <span class="hljs-number">0</span>; }
+    {
+        <span class="hljs-variable">$p</span>;
+        relTol <span class="hljs-number">0</span>;
+    }
+    <span class="hljs-string">"pcorr.*"</span>
+    {
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
+        tolerance <span class="hljs-number">1e-5</span>;
+        relTol <span class="hljs-number">0.01</span>;
+        smoother DICGaussSeidel;
+        nPreSweeps <span class="hljs-number">2</span>;
+        nPostSweeps <span class="hljs-number">2</span>;
+        nFinestSweeps <span class="hljs-number">2</span>;
+    }
+    <span class="hljs-string">"(U|k|omega|epsilon|h|tracer|rho)"</span>
+    {
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-8</span>;
+        relTol <span class="hljs-number">0.05</span>;
+    }
+    <span class="hljs-string">"(U|k|omega|epsilon|h)Final"</span>
+    {
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-8</span>;
+        relTol <span class="hljs-number">0</span>;
+    }
+    <span class="hljs-string">"alpha.water.*"</span>
+    {
+        nAlphaCorr <span class="hljs-number">2</span>;
+        nAlphaSubCycles <span class="hljs-number">2</span>;
+        cAlpha <span class="hljs-number">1</span>;
+        MULESCorr <span class="hljs-literal">yes</span>;
+        nLimiterIter <span class="hljs-number">3</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-9</span>;
+        relTol <span class="hljs-number">0</span>;
+    }
 }
-<span class="hljs-built_in">PIMPLE</span> { correctPhi <span class="hljs-literal">true</span>; checkMeshCourantNo <span class="hljs-literal">true</span>; momentumPredictor <span class="hljs-literal">yes</span>; nOuterCorrectors <span class="hljs-number">2</span>; nCorrectors <span class="hljs-number">2</span>; nNonOrthogonalCorrectors <span class="hljs-number">0</span>; pRefCell <span class="hljs-number">0</span>; pRefValue <span class="hljs-number">0</span>; }
-relaxationFactors { equations { <span class="hljs-string">".*"</span> <span class="hljs-number">1</span>; } }
+<span class="hljs-built_in">PIMPLE</span>
+{
+    correctPhi <span class="hljs-literal">true</span>;
+    checkMeshCourantNo <span class="hljs-literal">true</span>;
+    momentumPredictor <span class="hljs-literal">yes</span>;
+    nOuterCorrectors <span class="hljs-number">2</span>;
+    nCorrectors <span class="hljs-number">2</span>;
+    nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
+    pRefCell <span class="hljs-number">0</span>;
+    pRefValue <span class="hljs-number">0</span>;
+}
+relaxationFactors
+{
+    equations
+    {
+        <span class="hljs-string">".*"</span> <span class="hljs-number">1</span>;
+    }
+}
 </code></pre></div>
 <p><code>PIMPLE</code> 每个时间步执行两次外迭代、两次压力修正，<code>correctPhi</code> 在网格运动后修正通量。压力使用运动学量纲，参考值为零；SST 模型的 <code>k</code> 和 <code>omega</code> 与速度一起更新。</p>
 <p>压力与通量修正均采用 <code>GAMG</code>，配合 <code>DICGaussSeidel</code> 平滑和各层预、后扫掠。普通压力求解以 <code>relTol 0.02</code> 控制相对下降幅度，最后一次压力修正令 <code>relTol 0</code>，以 <code>tolerance 1e-6</code> 作为停止阈值；网格运动后的 <code>pcorr</code> 修正采用 <code>tolerance 1e-5</code>。瞬态方程松弛因子设为 1，时间推进仍由 <code>maxCo 0.3</code> 和最大时间步 <span class="math-formula" data-tex="10^{-5}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-5}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span></span> s 控制。结合入口、出口流量记录检查每步通量平衡。</p>
@@ -424,16 +504,16 @@ bash Allsolve
 <p>默认计算到 0.45 s，即三个旋转周期，场输出间隔为 0.00125 s。检查初始阶段的 AMI 权重、流量收支和圆心轨迹，再根据载荷周期重复性延长计算。分析多个完整周期时，将结束时间延长到所选统计窗口之后。</p>
 <h2 id="结果提取与工程分析"><a href="#结果提取与工程分析" class="headerlink" title="结果提取与工程分析"></a>结果提取与工程分析</h2><p>程序同时输出 <code>analysis/loads.csv</code>，包含时间或迭代序号、三向总力以及关于转轴原点的三向总力矩。分别从 <code>force.dat</code> 和 <code>moment.dat</code> 按相同时间对齐，后续功率和周期统计使用这一文件。</p>
 <p>在 <code>controlDict</code> 的 <code>functions</code> 中记录圆盘载荷：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">discLoads
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">discLoads
 {
-    <span class="hljs-keyword">type</span>            forces;
-    <span class="hljs-keyword">libs</span>            (forces);
-    patches         (disc);
-    rho             rhoInf;
-    rhoInf          <span class="hljs-number">997.07</span>;
-    CofR            (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">type</span> forces;
+    <span class="hljs-keyword">libs</span> (forces);
+    patches (disc);
+    rho rhoInf;
+    rhoInf <span class="hljs-number">997.07</span>;
+    CofR (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
 }
 </code></pre></div>
 <p>这里积分的是流体作用于圆盘的力和关于固定轴 <code>O</code> 的力矩。主轴所需驱动功率由 <span class="math-formula" data-tex="-M_{O,z}\omega"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msub><mi>M</mi><mrow><mi>O</mi><mo separator="true">,</mo><mi>z</mi></mrow></msub><mi>ω</mi></mrow><annotation encoding="application/x-tex">-M_{O,z}\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord">−</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.044em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></span> 估算；符号取决于流体力矩方向，输出时保留原始符号并注明正方向。</p>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -276,215 +276,176 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>ODE · 刚性化学积分</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在 <code>chemistryProperties</code> 中选择常微分方程求解器，控制化学积分的局部误差。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>化学反应在一个单元内形成 dc/dt=<code>f</code>(<code>c</code>,<code>T</code>,<code>p</code>) 形式的常微分方程组。不同反应速率相差很大时，快速分量对稳定时间步施加强限制，这种性质称为刚性。</p><p>化学动力学等模型会形成常微分方程组。刚性较强时，需要在一个流体时间步内采用更小的积分子步，解析快速反应过程。</p><p><code>odeCoeffs</code> 设置积分方法与误差控制。容差影响组分、温度的积分精度及计算量，应在保持机理和初始状态一致的条件下进行比较。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/laminar/counterFlowFlame2D"><h3>算例问题：counterFlowFlame2D</h3><p class="reference-case-problem">燃料与氧化剂从相对边界进入，在中间的混合区发生反应并形成对向流火焰。包含颗粒的版本还将液滴的运动、蒸发与气相反应耦合，主要观察火焰位置、温度和组分梯度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D"><code>combustion/reactingFoam/laminar/counterFlowFlame2D</code></a>。</p><figure class="reference-case-figure"><img alt="对向流入口及其间的反应区" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/counterflow-flame.svg" width="720"><figcaption>对向流入口及其间的反应区。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>solver</code></td><td>odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</td></tr><tr><td><code>absTol / relTol</code></td><td>绝对和相对误差阈值。</td></tr><tr><td><code>maxSteps</code></td><td>积分子步数上限，是否支持及默认值按相应求解器确定。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/chemistryProperties</code></h3><p>化学积分与误差控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+    <div class="prose"><p>在 <code>chemistryProperties</code> 中选择常微分方程求解器，控制化学积分的局部误差。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>化学反应在一个单元内形成 dc/dt=<code>f</code>(<code>c</code>,<code>T</code>,<code>p</code>) 形式的常微分方程组。不同反应速率相差很大时，快速分量对稳定时间步施加强限制，这种性质称为刚性。</p><p>化学动力学等模型会形成常微分方程组。刚性较强时，需要在一个流体时间步内采用更小的积分子步，解析快速反应过程。</p><p><code>odeCoeffs</code> 设置积分方法与误差控制。容差影响组分、温度的积分精度及计算量，应在保持机理和初始状态一致的条件下进行比较。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/reactingFoam/laminar/counterFlowFlame2D"><h3>算例问题：counterFlowFlame2D</h3><p class="reference-case-problem">燃料与氧化剂从相对边界进入，在中间的混合区发生反应并形成对向流火焰。包含颗粒的版本还将液滴的运动、蒸发与气相反应耦合，主要观察火焰位置、温度和组分梯度。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D"><code>combustion/reactingFoam/laminar/counterFlowFlame2D</code></a>。</p><figure class="reference-case-figure"><img alt="对向流入口及其间的反应区" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/counterflow-flame.svg" width="720"><figcaption>对向流入口及其间的反应区。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>solver</code></td><td>odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</td></tr><tr><td><code>absTol / relTol</code></td><td>绝对和相对误差阈值。</td></tr><tr><td><code>maxSteps</code></td><td>积分子步数上限，是否支持及默认值按相应求解器确定。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/chemistryProperties</code></h3><p>化学积分与误差控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      chemistryProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> chemistryProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 chemistryType
 {
-    <span class="hljs-keyword">solver</span>          EulerImplicit;
+    <span class="hljs-keyword">solver</span> EulerImplicit;
 }
-
-chemistry           <span class="hljs-literal">on</span>;
-
+chemistry <span class="hljs-literal">on</span>;
 initialChemicalTimeStep <span class="hljs-number">1e-07</span>;
-
 EulerImplicitCoeffs
 {
-    cTauChem        <span class="hljs-number">1</span>;
+    cTauChem <span class="hljs-number">1</span>;
     equilibriumRateLimiter <span class="hljs-literal">off</span>;
 }
-
 odeCoeffs
 {
-    <span class="hljs-keyword">solver</span>          Rosenbrock34;
-    absTol          <span class="hljs-number">1e-12</span>;
-    relTol          <span class="hljs-number">0.01</span>;
+    <span class="hljs-keyword">solver</span> Rosenbrock34;
+    absTol <span class="hljs-number">1e-12</span>;
+    relTol <span class="hljs-number">0.01</span>;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/chemistryProperties</code> 中各项设置的作用如下。</p><ul><li><code>chemistryType/solver</code> 设为 <code>EulerImplicit</code>：odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</li><li><code>chemistry</code> 设为 <code>on</code>：控制化学反应是否启用。</li><li><code>initialChemicalTimeStep</code> 设为 <code>1e-07</code>：设置化学积分的初始子步，单位 s。</li><li><code>odeCoeffs/solver</code> 设为 <code>Rosenbrock34</code>：odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</li><li><code>odeCoeffs/absTol</code> 设为 <code>1e-12</code>：绝对和相对误差阈值。</li><li><code>odeCoeffs/relTol</code> 设为 <code>0.01</code>：绝对和相对误差阈值。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0/CH4</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/CO2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/H2O</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/N2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/O2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/T</code></td><td>温度，K。</td></tr><tr><td><code>0/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0/Ydefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0/CH4：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/CH4</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/chemistryProperties</code> 中各项设置的作用如下。</p><ul><li><code>chemistryType/solver</code> 设为 <code>EulerImplicit</code>：odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</li><li><code>chemistry</code> 设为 <code>on</code>：控制化学反应是否启用。</li><li><code>initialChemicalTimeStep</code> 设为 <code>1e-07</code>：设置化学积分的初始子步，单位 s。</li><li><code>odeCoeffs/solver</code> 设为 <code>Rosenbrock34</code>：odeCoeffs 内选择 Rosenbrock 等具体 ODE 方法。</li><li><code>odeCoeffs/absTol</code> 设为 <code>1e-12</code>：绝对和相对误差阈值。</li><li><code>odeCoeffs/relTol</code> 设为 <code>0.01</code>：绝对和相对误差阈值。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/constant/chemistryProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0/CH4</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/CO2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/H2O</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/N2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/O2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/T</code></td><td>温度，K。</td></tr><tr><td><code>0/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0/Ydefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0/CH4：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/CH4</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      CH4;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> CH4;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     fuel
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
     }
-
     air
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/CH4</code> 设置 <code>CH4</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>fuel</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 1</code>。</li><li><code>air</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 1</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4.txt">下载此配置文件</a></p></details><details><summary>0/CO2：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/CO2</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/CH4</code> 设置 <code>CH4</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>fuel</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 1</code>。</li><li><code>air</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 1</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CH4.txt">下载此配置文件</a></p></details><details><summary>0/CO2：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/CO2</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      CO2;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> CO2;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     <span class="hljs-string">"(fuel|air)"</span>
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/CO2</code> 设置 <code>CO2</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>"(fuel|air)"</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2.txt">下载此配置文件</a></p></details><details><summary>0/H2O：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/H2O</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/CO2</code> 设置 <code>CO2</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>"(fuel|air)"</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/CO2.txt">下载此配置文件</a></p></details><details><summary>0/H2O：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/H2O</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      H2O;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> H2O;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     fuel
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     air
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/H2O</code> 设置 <code>H2O</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>fuel</code>、<code>air</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">61 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/H2O</code> 设置 <code>H2O</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>fuel</code>、<code>air</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>uniform 0</code>，<code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/0/H2O.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution"><code>combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     <span class="hljs-string">"rho.*"</span>
     {
-        <span class="hljs-keyword">solver</span>          diagonal;
+        <span class="hljs-keyword">solver</span> diagonal;
     }
-
     p
     {
-        <span class="hljs-keyword">solver</span>           <span class="hljs-built_in">PCG</span>;
-        preconditioner   DIC;
-        tolerance        <span class="hljs-number">1e-6</span>;
-        relTol           <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
+        preconditioner DIC;
+        tolerance <span class="hljs-number">1e-6</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     pFinal
     {
         <span class="hljs-variable">$p</span>;
-        tolerance        <span class="hljs-number">1e-6</span>;
-        relTol           <span class="hljs-number">0.0</span>;
+        tolerance <span class="hljs-number">1e-6</span>;
+        relTol <span class="hljs-number">0.0</span>;
     }
-
     <span class="hljs-string">"(U|h|k|epsilon)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-6</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">1e-6</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     <span class="hljs-string">"(U|h|k|epsilon)Final"</span>
     {
         <span class="hljs-variable">$U</span>;
-        relTol          <span class="hljs-number">0</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     Yi
     {
         <span class="hljs-variable">$hFinal</span>;
     }
 }
-
 <span class="hljs-built_in">PIMPLE</span>
 {
     momentumPredictor <span class="hljs-literal">no</span>;
-    nOuterCorrectors  <span class="hljs-number">1</span>;
-    nCorrectors       <span class="hljs-number">2</span>;
+    nOuterCorrectors <span class="hljs-number">1</span>;
+    nCorrectors <span class="hljs-number">2</span>;
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>"rho.*"</code></td><td><code>solver</code> <code>diagonal</code>：线性方程采用 <code>diagonal</code> 方法。</td></tr><tr><td><code>p</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-6</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>pFinal</code></td><td><code>tolerance</code> <code>1e-6</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|h|k|epsilon)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-6</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|h|k|epsilon)Final"</code></td><td><code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/momentumPredictor</code> = <code>no</code>：控制是否单独求解动量预测步骤。</li><li><code>PIMPLE/nOuterCorrectors</code> = <code>1</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>2</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/reactingFoam/laminar/counterFlowFlame2D/system/fvSolution.txt">下载此配置文件</a></p></details><h2>运行入口</h2><p>此配置来自组合算例或模型对照目录。先复制并查看其上级算例的 <code>Allrun</code>，按该脚本准备网格和初始场；本页的单个配置文件用于对照参数。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/reactingFoam/laminar/counterFlowFlame2D">打开官方算例目录</a></p><h2>结果检查</h2><p>检查反应温度和组分的时间积分，化学积分可在一个流体时间步内采用多个子步。</p><p><a href="/linear-solvers/">返回线性与 ODE 求解方法</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div>
   </article>

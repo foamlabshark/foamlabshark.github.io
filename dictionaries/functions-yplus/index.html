@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -300,7 +300,7 @@ M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlis
 <h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>yPlus</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>fieldFunctionObjects</code>)</td></tr><tr><td><code>useWallFunction</code></td><td><code>true</code> 时采用所选 <code>nut</code> 壁面函数提供的 <code>yPlus</code>；<code>false</code> 时从流场直接计算。</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writeFields</code></td><td>是否将计算得到的场或所选原始场写出。</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writeToFile</code></td><td>是否保存统计文本文件</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writePrecision</code></td><td>文本数值的有效位数</td><td>可选</td><td>全局写出精度</td></tr><tr><td><code>useUserTime</code></td><td>是否采用用户时间单位</td><td>可选</td><td><code>true</code></td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr></tbody></table></div><p><a href="/function-objects/yplus/">yPlus 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 求解时写出 y⁺</h3><p>在已有湍流模型的 <code>system/controlDict/functions</code> 中加入：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">wallResolution
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">wallResolution
 {
     <span class="hljs-keyword">type</span> yPlus;
     <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
@@ -321,7 +321,7 @@ M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlis
 <li>配置还输出速度极值、单元中心和壁面剪应力，便于联合分析。</li>
 </ul>
 <p>调整首层高度后比较沿壁 <code>y</code>⁺ 分布和摩阻系数，目标范围应由选定湍流模型与壁面处理确定。</p>
-<p><a href="/assets/examples/v2512/yplus/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict"><code>incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">71 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/yplus/1-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict"><code>incompressible/simpleFoam/turbulentFlatPlate/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -330,67 +330,47 @@ M1001 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlis
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     simpleFoam;
-
-startFrom       startTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">5000</span>;
-
-deltaT          <span class="hljs-number">1</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">100</span>;
-
-purgeWrite      <span class="hljs-number">1</span>;
-
-writeFormat     ascii;
-
-writePrecision  <span class="hljs-number">8</span>;
-
+<span class="hljs-keyword">application</span> simpleFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">5000</span>;
+deltaT <span class="hljs-number">1</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">1</span>;
+writeFormat ascii;
+writePrecision <span class="hljs-number">8</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">8</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">8</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     minMax
     {
-        <span class="hljs-keyword">type</span>          fieldMinMax;
-        <span class="hljs-keyword">libs</span>          (fieldFunctionObjects);
-        writeControl  timeStep;
-        fields        (U);
+        <span class="hljs-keyword">type</span> fieldMinMax;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl timeStep;
+        fields (U);
     }
-
     yPlus
     {
-        <span class="hljs-keyword">type</span>            yPlus;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        patches         (fixedWall);
-        writeFields     <span class="hljs-literal">yes</span>;
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> yPlus;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        patches (fixedWall);
+        writeFields <span class="hljs-literal">yes</span>;
+        writeControl writeTime;
     }
-
     <span class="hljs-meta">#includeFunc "writeCellCentres"</span>
     <span class="hljs-meta">#includeFunc "wallShearStress"</span>
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/bump2D/setups.orig/common</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/bump2D/setups.orig/common"><h3>算例问题：incompressible/simpleFoam/bump2D/setups.orig/common</h3><p class="reference-case-problem">来流越过壁面上的凸起，压力梯度引起边界层增厚、分离或再附着。算例用于研究湍流闭合和近壁处理对回流区、壁面压力及摩擦的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common"><code>incompressible/simpleFoam/bump2D/setups.orig/common</code></a>。</p></section><!-- /reference-case-contexts --><p>bump2D 用 <code>y</code>⁺、壁面剪应力、压力系数与总载荷共同检查凸起壁面附近流动。</p>
 <ul>
 <li><code>yPlus</code> 开启 <code>writeFields yes</code> 并在 <code>writeTime</code> 保存。</li>
@@ -399,7 +379,7 @@ runTimeModifiable <span class="hljs-literal">true</span>;
 <li>主场每 100 次迭代写出，最多保留最近 3 份结果。</li>
 </ul>
 <p>改变近壁网格后同时比较 <code>y</code>⁺、<code>Cp</code> 和分离位置，保留同一参考速度与几何尺度。</p>
-<p><a href="/assets/examples/v2512/yplus/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict"><code>incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">113 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/yplus/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict"><code>incompressible/simpleFoam/bump2D/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">90 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -408,109 +388,86 @@ runTimeModifiable <span class="hljs-literal">true</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     simpleFoam;
-
-startFrom       startTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">10000</span>;
-
-deltaT          <span class="hljs-number">1</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">100</span>;
-
-purgeWrite      <span class="hljs-number">3</span>;
-
-writeFormat     ascii;
-
-writePrecision  <span class="hljs-number">8</span>;
-
+<span class="hljs-keyword">application</span> simpleFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">10000</span>;
+deltaT <span class="hljs-number">1</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">3</span>;
+writeFormat ascii;
+writePrecision <span class="hljs-number">8</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">8</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">8</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     pressure
     {
-        <span class="hljs-keyword">type</span>            pressure;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
-        result          Cp;
-        mode            staticCoeff;
-        rho             rhoInf;
-        rhoInf          <span class="hljs-number">1</span>;
-        U               UInf;
-        UInf            (<span class="hljs-number">69.44</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        pInf            <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> pressure;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
+        result Cp;
+        mode staticCoeff;
+        rho rhoInf;
+        rhoInf <span class="hljs-number">1</span>;
+        U UInf;
+        UInf (<span class="hljs-number">69.44</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        pInf <span class="hljs-number">0</span>;
     }
-
     forceCoeffs
     {
-        <span class="hljs-keyword">type</span>            forceCoeffs;
-        <span class="hljs-keyword">libs</span>            (forces);
-        writeControl    writeTime;
-        rho             rhoInf;
-        rhoInf          <span class="hljs-number">1</span>;
-        liftDir         (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
-        dragDir         (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        CofR            (<span class="hljs-number">0.75</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// bump midpoint</span>
-        pitchAxis       (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-        magUInf         <span class="hljs-number">69.44</span>;
-        lRef            <span class="hljs-number">0.9</span>; <span class="hljs-comment">// length of bump</span>
-        Aref            <span class="hljs-number">0.1</span>; <span class="hljs-comment">// mesh span = 2, bump height = 0.05; 2*0.05=0.1</span>
-        patches         (bump);
+        <span class="hljs-keyword">type</span> forceCoeffs;
+        <span class="hljs-keyword">libs</span> (forces);
+        writeControl writeTime;
+        rho rhoInf;
+        rhoInf <span class="hljs-number">1</span>;
+        liftDir (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+        dragDir (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        CofR (<span class="hljs-number">0.75</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// bump midpoint</span>
+        pitchAxis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+        magUInf <span class="hljs-number">69.44</span>;
+        lRef <span class="hljs-number">0.9</span>; <span class="hljs-comment">// length of bump</span>
+        Aref <span class="hljs-number">0.1</span>; <span class="hljs-comment">// mesh span = 2, bump height = 0.05; 2*0.05=0.1</span>
+        patches (bump);
     }
-
     wallShearStress
     {
-        <span class="hljs-keyword">type</span>            wallShearStress;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeFields     <span class="hljs-literal">yes</span>;
-        writeControl    writeTime;
-        patches         (bump);
+        <span class="hljs-keyword">type</span> wallShearStress;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeFields <span class="hljs-literal">yes</span>;
+        writeControl writeTime;
+        patches (bump);
     }
-
     yPlus
     {
-        <span class="hljs-keyword">type</span>            yPlus;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeFields     <span class="hljs-literal">yes</span>;
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> yPlus;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeFields <span class="hljs-literal">yes</span>;
+        writeControl writeTime;
     }
-
     cellCentres
     {
-        <span class="hljs-keyword">type</span>            writeCellCentres;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> writeCellCentres;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
     }
-
     residuals
     {
-        <span class="hljs-keyword">type</span>            solverInfo;
-        <span class="hljs-keyword">libs</span>            (utilityFunctionObjects);
-        fields          (<span class="hljs-string">".*"</span>);
+        <span class="hljs-keyword">type</span> solverInfo;
+        <span class="hljs-keyword">libs</span> (utilityFunctionObjects);
+        fields (<span class="hljs-string">".*"</span>);
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase"><h3>算例问题：fullCase</h3><p class="reference-case-problem">壁面上安装方块，来流边界层遇到方块后分离，并在侧面和下游形成复杂回流。主算例关注方块周围流动，initChannel 子算例用于准备与主计算相配合的入口通道流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase"><code>incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase</code></a>。</p></section><!-- /reference-case-contexts --><p>绕立方体的 <code>LES</code> 完整算例把近壁分辨率、涡结构和时间统计一并输出。</p>
 <ul>
 <li><code>yPlus</code> 使用 <code>fieldFunctionObjects</code>，<code>writeFields yes</code> 保存场。</li>
@@ -519,7 +476,7 @@ runTimeModifiable <span class="hljs-literal">true</span>;
 <li><code>Q</code>、<code>vorticity</code> 与 <code>DESField</code> 提供流动结构和模型区域信息。</li>
 </ul>
 <p>比较壁面模型或网格时固定统计时段，再看 <code>y</code>⁺、平均流动与波动强度是否共同变化。</p>
-<p><a href="/assets/examples/v2512/yplus/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict"><code>incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">133 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/yplus/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict"><code>incompressible/pimpleFoam/LES/surfaceMountedCube/fullCase/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">107 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -528,129 +485,103 @@ runTimeModifiable <span class="hljs-literal">true</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">libs</span>            (turbulenceModelSchemes);
-
-<span class="hljs-keyword">application</span>     pimpleFoam;
-
-startFrom       startTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">100</span>;
-
-deltaT          <span class="hljs-number">0.002</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">100</span>;
-
-purgeWrite      <span class="hljs-number">3</span>;
-
-writeFormat     binary;
-
-writePrecision  <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">libs</span> (turbulenceModelSchemes);
+<span class="hljs-keyword">application</span> pimpleFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">100</span>;
+deltaT <span class="hljs-number">0.002</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">3</span>;
+writeFormat binary;
+writePrecision <span class="hljs-number">6</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     minMax
     {
-        <span class="hljs-keyword">type</span>            fieldMinMax;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        fields          (U p);
+        <span class="hljs-keyword">type</span> fieldMinMax;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        fields (U p);
     }
-
     DESField
     {
         <span class="hljs-comment">// Mandatory entries</span>
-        <span class="hljs-keyword">type</span>            DESModelRegions;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-
+        <span class="hljs-keyword">type</span> DESModelRegions;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
         <span class="hljs-comment">// Optional entries</span>
-        result          DESField;
-
+        result DESField;
         <span class="hljs-comment">// Optional (inherited) entries</span>
-        writePrecision   <span class="hljs-number">6</span>;
-        writeToFile      <span class="hljs-literal">true</span>;
-        useUserTime      <span class="hljs-literal">false</span>;
-
-        region          region0;
-        enabled         <span class="hljs-literal">true</span>;
-        log             <span class="hljs-literal">true</span>;
-        timeStart       <span class="hljs-number">0</span>;
-        timeEnd         <span class="hljs-number">1000</span>;
-        executeControl  timeStep;
+        writePrecision <span class="hljs-number">6</span>;
+        writeToFile <span class="hljs-literal">true</span>;
+        useUserTime <span class="hljs-literal">false</span>;
+        region region0;
+        enabled <span class="hljs-literal">true</span>;
+        log <span class="hljs-literal">true</span>;
+        timeStart <span class="hljs-number">0</span>;
+        timeEnd <span class="hljs-number">1000</span>;
+        executeControl timeStep;
         executeInterval <span class="hljs-number">1</span>;
-        writeControl    writeTime;
-        writeInterval   <span class="hljs-number">-1</span>;
+        writeControl writeTime;
+        writeInterval <span class="hljs-number">-1</span>;
     }
     Q1
     {
-        <span class="hljs-keyword">type</span>            Q;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> Q;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
     }
     vorticity1
     {
-        <span class="hljs-keyword">type</span>            vorticity;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> vorticity;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
     }
     yPlus
     {
-        <span class="hljs-keyword">type</span>            yPlus;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeFields     <span class="hljs-literal">yes</span>;
-        writeControl    writeTime;
+        <span class="hljs-keyword">type</span> yPlus;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeFields <span class="hljs-literal">yes</span>;
+        writeControl writeTime;
     }
     fieldAverage1
     {
-        <span class="hljs-keyword">type</span>            fieldAverage;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
-        timeStart       <span class="hljs-number">10</span>;
-
+        <span class="hljs-keyword">type</span> fieldAverage;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
+        timeStart <span class="hljs-number">10</span>;
         fields
         (
             U
             {
-                mean        <span class="hljs-literal">on</span>;
-                prime2Mean  <span class="hljs-literal">on</span>;
-                base        time;
+                mean <span class="hljs-literal">on</span>;
+                prime2Mean <span class="hljs-literal">on</span>;
+                base time;
             }
-
             p
             {
-                mean        <span class="hljs-literal">on</span>;
-                prime2Mean  <span class="hljs-literal">on</span>;
-                base        time;
+                mean <span class="hljs-literal">on</span>;
+                prime2Mean <span class="hljs-literal">on</span>;
+                base time;
             }
         );
     }
-
     sample1
     {
         <span class="hljs-meta">#include "sample"</span>
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a> · <a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

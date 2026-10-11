@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -278,13 +278,34 @@
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><p>它管什么：每一项微分算子用什么数值格式离散。这是精度与稳定性的主要旋钮，也是初学者最容易被卡住的地方。</p>
 <h2>13.1 六个子字典</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes          { }   <span class="hljs-comment">// 时间导数 ∂/∂t</span>
-gradSchemes         { }   <span class="hljs-comment">// 梯度 ∇</span>
-divSchemes          { }   <span class="hljs-comment">// 对流项 ∇·( )   ← 最关键</span>
-laplacianSchemes    { }   <span class="hljs-comment">// 扩散项 ∇²</span>
-interpolationSchemes{ }   <span class="hljs-comment">// 单元中心 → 面 的插值</span>
-snGradSchemes       { }   <span class="hljs-comment">// 面法向梯度</span>
-wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍流模型需要）</span></code></pre></div><!-- example-reading --><p>这些空子字典展示 <code>fvSchemes</code> 的组织结构，还没有给出可运行的离散设置。<code>ddtSchemes</code> 处理时间导数，<code>gradSchemes</code> 和 <code>snGradSchemes</code> 分别处理体梯度与面法向梯度，<code>divSchemes</code> 处理散度项，<code>laplacianSchemes</code> 处理扩散项；后面的小节分别给出填入各子字典的格式。</p><!-- /example-reading -->
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes
+{
+}
+<span class="hljs-comment">// 时间导数 ∂/∂t</span>
+gradSchemes
+{
+}
+<span class="hljs-comment">// 梯度 ∇</span>
+divSchemes
+{
+}
+<span class="hljs-comment">// 对流项 ∇·( )   ← 最关键</span>
+laplacianSchemes
+{
+}
+<span class="hljs-comment">// 扩散项 ∇²</span>
+interpolationSchemes
+{
+}
+<span class="hljs-comment">// 单元中心 → 面 的插值</span>
+snGradSchemes
+{
+}
+<span class="hljs-comment">// 面法向梯度</span>
+wallDist
+{
+}
+<span class="hljs-comment">// 壁面距离算法（湍流模型需要）</span></code></pre></div><!-- example-reading --><p>这些空子字典展示 <code>fvSchemes</code> 的组织结构，还没有给出可运行的离散设置。<code>ddtSchemes</code> 处理时间导数，<code>gradSchemes</code> 和 <code>snGradSchemes</code> 分别处理体梯度与面法向梯度，<code>divSchemes</code> 处理散度项，<code>laplacianSchemes</code> 处理扩散项；后面的小节分别给出填入各子字典的格式。</p><!-- /example-reading -->
 <h2>13.2 ddtSchemes</h2>
 <div class="table-scroll"><table>
 <tbody><tr><th>写法</th><th>精度/性质</th><th>何时用</th></tr>
@@ -294,7 +315,10 @@ wallDist            { }   <span class="hljs-comment">// 壁面距离算法（湍
 <tr><td><code>CrankNicolson</code> 0.9</td><td>二阶，系数 0~1（0=<code>Euler</code>，1=纯 CN）</td><td>精度要求高时，一般取 0.9 保稳</td></tr>
 <tr><td><code>localEuler</code></td><td>伪时间步（局部时间步长加速收敛）</td><td>稳态加速</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes { default <span class="hljs-built_in">backward</span>; }</code></pre></div>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">ddtSchemes
+{
+    default <span class="hljs-built_in">backward</span>;
+}</code></pre></div>
 <p><code>LES</code> 需要控制时空离散的数值耗散。可选择 <code>backward</code> 或适当的 <code>CrankNicolson</code> 配置，并检查稳定性、网格分辨率与统计量；使用一阶 <code>Euler</code> 时，重点检查时间步对结果的影响。</p>
 <h2>13.3 gradSchemes</h2>
 <div class="table-scroll"><table>

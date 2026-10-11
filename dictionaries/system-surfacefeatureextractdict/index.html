@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -283,23 +283,32 @@
 <p>位置：<code>system/surfaceFeatureExtractDict</code></p><!-- reference-configuration-supplement -->
 <h2 id="nested-configuration">特征提取与筛选</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>extractionMethod</code></td><td><code>extractFromSurface</code> 从面片夹角提取，<code>extractFromFile</code> 从已有特征边文件读取，<code>none</code> 不提取新的边。</td></tr><tr><td><code>extractFromSurfaceCoeffs.includedAngle</code></td><td>相邻面法向构成的特征判别角；放在提取方法的系数字典中。</td></tr><tr><td><code>extractFromFileCoeffs.featureEdgeFile</code></td><td><code>extractFromFile</code> 的输入特征文件。</td></tr><tr><td><code>subsetFeatures / trimFeatures</code></td><td>对提取结果进行筛选或裁剪，在各自的子字典中填写几何条件。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/applications/utilities/surface/surfaceFeatureExtract/surfaceFeatureExtract.C">v2512 参数读取实现</a></p>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
 }
 body.stl
 {
     extractionMethod extractFromSurface;
-    extractFromSurfaceCoeffs { includedAngle <span class="hljs-number">150</span>; }
+    extractFromSurfaceCoeffs
+    {
+        includedAngle <span class="hljs-number">150</span>;
+    }
     writeObj <span class="hljs-literal">yes</span>;
 }</code></pre></div>
-<p>输入表面 body.stl 存放于 <code>constant/triSurface</code>。<code>includedAngle</code> 按特征提取器的包含角定义取值，其定义与 <code>resolveFeatureAngle</code> 不同。<code>writeObj</code> 控制可视化文件输出。运行 <code>surfaceFeatureExtract</code> 后，将生成的 <code>eMesh</code> 文件名用于后续特征线配置。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">body.stl
+<p>输入表面 body.stl 存放于 <code>constant/triSurface</code>。<code>includedAngle</code> 按特征提取器的包含角定义取值，其定义与 <code>resolveFeatureAngle</code> 不同。<code>writeObj</code> 控制可视化文件输出。运行 <code>surfaceFeatureExtract</code> 后，将生成的 <code>eMesh</code> 文件名用于后续特征线配置。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">body.stl
 {
-    extractionMethod    extractFromSurface;
-    includedAngle       <span class="hljs-number">150</span>;          <span class="hljs-comment">// 夹角超过它的棱视为特征边</span>
-    subsetFeatures      { nonManifoldEdges <span class="hljs-literal">no</span>; openEdges <span class="hljs-literal">yes</span>; }
-    writeObj            <span class="hljs-literal">yes</span>;          <span class="hljs-comment">// 输出 obj 方便在 ParaView 里检查</span>
+    extractionMethod extractFromSurface;
+    includedAngle <span class="hljs-number">150</span>; <span class="hljs-comment">// 夹角超过它的棱视为特征边</span>
+    subsetFeatures
+    {
+        nonManifoldEdges <span class="hljs-literal">no</span>;
+        openEdges <span class="hljs-literal">yes</span>;
+    }
+    writeObj <span class="hljs-literal">yes</span>; <span class="hljs-comment">// 输出 obj 方便在 ParaView 里检查</span>
 }</code></pre></div>
 <p><code>includedAngle</code> 越大，提取的边越多。150 是常用起点：太小会漏掉圆角过渡处的特征，太大会把曲面上的三角片棱也当成特征。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/windAroundBuildings</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/windAroundBuildings"><h3>算例问题：windAroundBuildings</h3><p class="reference-case-problem">风流过建筑群并受到遮挡、绕流和尾流的影响。入口风场、地面与建筑壁面条件共同决定局部风速，主要观察建筑间通道及背风区的流动分布。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings"><code>incompressible/simpleFoam/windAroundBuildings</code></a>。</p></section><!-- /reference-case-contexts --><p>建筑绕流先提取 <code>buildings.obj</code> 的尖锐特征边，供后续网格贴合使用。</p>
 <ul>
@@ -308,7 +317,7 @@ body.stl
 <li>产生的特征文件需要在 <code>snappyHexMesh</code> 的 <code>features</code> 中对应引用。</li>
 </ul>
 <p>更换建筑几何后重新提取；要调整识别敏感度，可在该子字典中覆盖 <code>includedAngle</code>，并查看提取出的边。</p>
-<p><a href="/assets/examples/v2512/surfacefeatureextractdict/1-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict"><code>incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefeatureextractdict/1-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict"><code>incompressible/simpleFoam/windAroundBuildings/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -317,19 +326,16 @@ body.stl
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      surfaceFeatureExtractDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 buildings.obj
 {
     <span class="hljs-meta">#includeEtc "caseDicts/surface/surfaceFeatureExtractDict.cfg"</span>
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/overInterDyMFoam/rigidBodyHull/overset-1</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/overInterDyMFoam/rigidBodyHull/overset-1"><h3>算例问题：overset-1</h3><p class="reference-case-problem">船体置于水与空气组成的计算域中，流体压力和黏性力驱动允许的刚体运动，运动又改变船体附近的流场和自由液面。船体网格与背景网格通过重叠网格连接，需关注船体姿态、受力、波面和网格插值区域。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1"><code>multiphase/overInterDyMFoam/rigidBodyHull/overset-1</code></a>。</p><figure class="reference-case-figure"><img alt="overset-1 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/hull.svg" width="720"><figcaption>overset-1 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>船体重叠网格中的 <code>HULL.obj</code> 需要保留棱边特征，避免贴合时抹平重要几何。</p>
 <ul>
 <li><code>extractionMethod extractFromSurface</code> 直接从三角表面提取特征。</li>
@@ -337,7 +343,7 @@ buildings.obj
 <li><code>writeObj yes</code> 额外输出可视化文件，便于检查提取结果。</li>
 </ul>
 <p>改变船体离散精度或夹角阈值后，在几何查看器中检查关键棱边是否连续，再更新网格。</p>
-<p><a href="/assets/examples/v2512/surfacefeatureextractdict/2-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict"><code>multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefeatureextractdict/2-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict"><code>multiphase/overInterDyMFoam/rigidBodyHull/overset-1/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -346,25 +352,21 @@ buildings.obj
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      surfaceFeatureExtractDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 HULL.obj
 {
     extractionMethod extractFromSurface;
-    writeObj        <span class="hljs-literal">yes</span>;
-
+    writeObj <span class="hljs-literal">yes</span>;
     extractFromSurfaceCoeffs
     {
-        includedAngle   <span class="hljs-number">150</span>;
+        includedAngle <span class="hljs-number">150</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 的 <code>MRF_region.obj</code> 定义需要保留几何特征的区域表面，提取结果用于相关网格生成步骤。</p>
 <ul>
 <li><code>extractFromSurface</code> 从已有表面得到特征边。</li>
@@ -372,7 +374,7 @@ HULL.obj
 <li><code>writeObj yes</code> 输出可视化数据，方便对照原表面检查。</li>
 </ul>
 <p>更改风扇区域尺寸或位置后重新生成特征，确保 <code>snappyHexMesh</code> 引用的文件与几何一致。</p>
-<p><a href="/assets/examples/v2512/surfacefeatureextractdict/3-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/surfacefeatureextractdict/3-surfaceFeatureExtractDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/system/surfaceFeatureExtractDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -381,25 +383,21 @@ HULL.obj
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      surfaceFeatureExtractDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 MRF_region.obj
 {
     extractionMethod extractFromSurface;
-    writeObj        <span class="hljs-literal">yes</span>;
-
+    writeObj <span class="hljs-literal">yes</span>;
     extractFromSurfaceCoeffs
     {
-        includedAngle   <span class="hljs-number">150</span>;
+        includedAngle <span class="hljs-number">150</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/surfacefeatureextract/">surfaceFeatureExtract</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

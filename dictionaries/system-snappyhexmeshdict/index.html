@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -310,10 +310,14 @@
 <tr><td><code>meshQualityControls</code></td><td>质量约束</td><td>通常包含系统 <code>meshQualityDict</code></td></tr>
 <tr><td><code>mergeTolerance</code></td><td>点合并相对容差</td><td>常用 1e-6，以几何包围盒尺度为基准</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 片段：放入对应的 snappyHexMeshDict</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">65 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 片段：放入对应的 snappyHexMeshDict</span>
 geometry
 {
-    body.stl { <span class="hljs-keyword">type</span> triSurfaceMesh; <span class="hljs-keyword">name</span> body; }
+    body.stl
+    {
+        <span class="hljs-keyword">type</span> triSurfaceMesh;
+        <span class="hljs-keyword">name</span> body;
+    }
     refineBox
     {
         <span class="hljs-keyword">type</span> searchableBox;
@@ -327,23 +331,45 @@ castellatedMeshControls
     maxGlobalCells <span class="hljs-number">3000000</span>;
     minRefinementCells <span class="hljs-number">0</span>;
     nCellsBetweenLevels <span class="hljs-number">3</span>;
-    features ({ file <span class="hljs-string">"body.eMesh"</span>; level <span class="hljs-number">2</span>; });
+    features
+    (
+        {
+            file <span class="hljs-string">"body.eMesh"</span>;
+            level <span class="hljs-number">2</span>;
+        }
+    );
     refinementSurfaces
     {
-        body { level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>); patchInfo { <span class="hljs-keyword">type</span> wall; } }
+        body
+        {
+            level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>);
+            patchInfo
+            {
+                <span class="hljs-keyword">type</span> wall;
+            }
+        }
     }
     resolveFeatureAngle <span class="hljs-number">30</span>;
     refinementRegions
     {
-        refineBox { mode inside; levels ((<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>)); }
+        refineBox
+        {
+            mode inside;
+            levels
+            (
+                (<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>)
+            );
+        }
     }
     locationInMesh (<span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     allowFreeStandingZoneFaces <span class="hljs-literal">true</span>;
 }
 snapControls
 {
-    nSmoothPatch <span class="hljs-number">3</span>; tolerance <span class="hljs-number">2.0</span>;
-    nSolveIter <span class="hljs-number">30</span>; nRelaxIter <span class="hljs-number">5</span>;
+    nSmoothPatch <span class="hljs-number">3</span>;
+    tolerance <span class="hljs-number">2.0</span>;
+    nSolveIter <span class="hljs-number">30</span>;
+    nRelaxIter <span class="hljs-number">5</span>;
     nFeatureSnapIter <span class="hljs-number">10</span>;
     implicitFeatureSnap <span class="hljs-literal">false</span>;
     explicitFeatureSnap <span class="hljs-literal">true</span>;
@@ -351,13 +377,19 @@ snapControls
 }</code></pre></div>
 <p><code>locationInMesh</code> 中的 (2 0 0) 表示待保留流体区域内的一点，该点须位于背景网格范围内及物体外部。网格生成前应消除 STL 自相交，统一长度单位，并检查背景网格。</p>
 <p>边界层生成配置如下。<code>snapControls</code> 和质量控制参数保留模板中的完整设置。将 <code>addLayers</code> 设为 <code>false</code>，可单独检查切割细化和表面贴合结果。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>;
 snap <span class="hljs-literal">true</span>;
 addLayers <span class="hljs-literal">true</span>;
 addLayersControls
 {
     relativeSizes <span class="hljs-literal">true</span>;
-    layers { body { nSurfaceLayers <span class="hljs-number">3</span>; } }
+    layers
+    {
+        body
+        {
+            nSurfaceLayers <span class="hljs-number">3</span>;
+        }
+    }
     expansionRatio <span class="hljs-number">1.2</span>;
     finalLayerThickness <span class="hljs-number">0.3</span>;
     minThickness <span class="hljs-number">0.1</span>;
@@ -386,7 +418,7 @@ mergeTolerance <span class="hljs-number">1e-6</span>;</code></pre></div><h3>配�
 <li><code>nSurfaceLayers 1</code>、<code>relativeSizes true</code>、<code>finalLayerThickness 0.3</code> 给指定壁面加一层相对厚度网格。</li>
 </ul>
 <p>目标 <code>y</code>⁺ 变化时，应联动背景分辨率与层厚；修改几何后重新检查保留点、层覆盖率和质量。</p>
-<p><a href="/assets/examples/v2512/snappyhexmeshdict/1-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/snappyHexMeshDict"><code>incompressible/simpleFoam/motorBike/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">321 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/snappyhexmeshdict/1-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/motorBike/system/snappyHexMeshDict"><code>incompressible/simpleFoam/motorBike/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">250 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -395,19 +427,16 @@ mergeTolerance <span class="hljs-number">1e-6</span>;</code></pre></div><h3>配�
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      snappyHexMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> snappyHexMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 <span class="hljs-comment">// Which of the steps to run</span>
 castellatedMesh <span class="hljs-literal">true</span>;
-snap            <span class="hljs-literal">true</span>;
-addLayers       <span class="hljs-literal">true</span>;
-
-
+snap <span class="hljs-literal">true</span>;
+addLayers <span class="hljs-literal">true</span>;
 <span class="hljs-comment">// Geometry. Definition of all surfaces. All surfaces are of class</span>
 <span class="hljs-comment">// searchableSurface.</span>
 <span class="hljs-comment">// Surfaces are used</span>
@@ -421,57 +450,44 @@ geometry
         <span class="hljs-keyword">type</span> triSurfaceMesh;
         <span class="hljs-keyword">name</span> motorBike;
     }
-
     refinementBox
     {
         <span class="hljs-keyword">type</span> box;
-        min  (<span class="hljs-number">-1.0</span> <span class="hljs-number">-0.7</span> <span class="hljs-number">0.0</span>);
-        max  ( <span class="hljs-number">8.0</span>  <span class="hljs-number">0.7</span> <span class="hljs-number">2.5</span>);
+        min (<span class="hljs-number">-1.0</span> <span class="hljs-number">-0.7</span> <span class="hljs-number">0.0</span>);
+        max ( <span class="hljs-number">8.0</span>  <span class="hljs-number">0.7</span> <span class="hljs-number">2.5</span>);
     }
 }
-
-
 <span class="hljs-comment">// Settings for the castellatedMesh generation.</span>
 castellatedMeshControls
 {
-
     <span class="hljs-comment">// Refinement parameters</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// If local number of cells is &gt;= maxLocalCells on any processor</span>
     <span class="hljs-comment">// switches from from refinement followed by balancing</span>
     <span class="hljs-comment">// (current method) to (weighted) balancing before refinement.</span>
     maxLocalCells <span class="hljs-number">100000</span>;
-
     <span class="hljs-comment">// Overall cell limit (approximately). Refinement will stop immediately</span>
     <span class="hljs-comment">// upon reaching this number so a refinement level might not complete.</span>
     <span class="hljs-comment">// Note that this is the number of cells before removing the part which</span>
     <span class="hljs-comment">// is not 'visible' from the keepPoint. The final number of cells might</span>
     <span class="hljs-comment">// actually be a lot less.</span>
     maxGlobalCells <span class="hljs-number">2000000</span>;
-
     <span class="hljs-comment">// The surface refinement loop might spend lots of iterations refining just a</span>
     <span class="hljs-comment">// few cells. This setting will cause refinement to stop if &lt;= minimumRefine</span>
     <span class="hljs-comment">// are selected for refinement. Note: it will at least do one iteration</span>
     <span class="hljs-comment">// (unless the number of cells to refine is 0)</span>
     minRefinementCells <span class="hljs-number">10</span>;
-
     <span class="hljs-comment">// Allow a certain level of imbalance during refining</span>
     <span class="hljs-comment">// (since balancing is quite expensive)</span>
     <span class="hljs-comment">// Expressed as fraction of perfect balance (= overall number of cells /</span>
     <span class="hljs-comment">// nProcs). 0=balance always.</span>
     maxLoadUnbalance <span class="hljs-number">0.10</span>;
-
-
     <span class="hljs-comment">// Number of buffer layers between different levels.</span>
     <span class="hljs-comment">// 1 means normal 2:1 refinement restriction, larger means slower</span>
     <span class="hljs-comment">// refinement.</span>
     nCellsBetweenLevels <span class="hljs-number">3</span>;
-
-
     <span class="hljs-comment">// Explicit feature edge refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies a level for any cell intersected by its edges.</span>
     <span class="hljs-comment">// This is a featureEdgeMesh, read from constant/triSurface for now.</span>
     features
@@ -481,24 +497,19 @@ castellatedMeshControls
             level <span class="hljs-number">6</span>;
         }
     );
-
-
     <span class="hljs-comment">// Surface based refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies two levels for every surface. The first is the minimum level,</span>
     <span class="hljs-comment">// every cell intersecting a surface gets refined up to the minimum level.</span>
     <span class="hljs-comment">// The second level is the maximum level. Cells that 'see' multiple</span>
     <span class="hljs-comment">// intersections where the intersections make an</span>
     <span class="hljs-comment">// angle &gt; resolveFeatureAngle get refined up to the maximum level.</span>
-
     refinementSurfaces
     {
         motorBike
         {
             <span class="hljs-comment">// Surface-wise min and max refinement level</span>
             level (<span class="hljs-number">5</span> <span class="hljs-number">6</span>);
-
             <span class="hljs-comment">// Optional specification of patch type (default is wall). No</span>
             <span class="hljs-comment">// constraint types (cyclic, symmetry) etc. are allowed.</span>
             patchInfo
@@ -508,14 +519,10 @@ castellatedMeshControls
             }
         }
     }
-
     <span class="hljs-comment">// Resolve sharp angles</span>
     resolveFeatureAngle <span class="hljs-number">30</span>;
-
-
     <span class="hljs-comment">// Region-wise refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies refinement level for cells in relation to a surface. One of</span>
     <span class="hljs-comment">// three modes</span>
     <span class="hljs-comment">// - distance. 'levels' specifies per distance to the surface the</span>
@@ -525,79 +532,63 @@ castellatedMeshControls
     <span class="hljs-comment">//   cells inside the surface get refined up to the level. The surface</span>
     <span class="hljs-comment">//   needs to be closed for this to be possible.</span>
     <span class="hljs-comment">// - outside. Same but cells outside.</span>
-
     refinementRegions
     {
         refinementBox
         {
             mode inside;
-            levels ((<span class="hljs-number">1E15</span> <span class="hljs-number">4</span>));
+            levels
+            (
+                (<span class="hljs-number">1E15</span> <span class="hljs-number">4</span>)
+            );
         }
     }
-
-
     <span class="hljs-comment">// Mesh selection</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// After refinement patches get added for all refinementSurfaces and</span>
     <span class="hljs-comment">// all cells intersecting the surfaces get put into these patches. The</span>
     <span class="hljs-comment">// section reachable from the locationInMesh is kept.</span>
     <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> This point should never be on a face, always inside a cell, even</span>
     <span class="hljs-comment">// after refinement.</span>
     locationInMesh (<span class="hljs-number">3.0001</span> <span class="hljs-number">3.0001</span> <span class="hljs-number">0.43</span>);
-
-
     <span class="hljs-comment">// Whether any faceZones (as specified in the refinementSurfaces)</span>
     <span class="hljs-comment">// are only on the boundary of corresponding cellZones or also allow</span>
     <span class="hljs-comment">// free-standing zone faces. Not used if there are no faceZones.</span>
     allowFreeStandingZoneFaces <span class="hljs-literal">true</span>;
 }
-
-
 <span class="hljs-comment">// Settings for the snapping.</span>
 snapControls
 {
     <span class="hljs-comment">//- Number of patch smoothing iterations before finding correspondence</span>
     <span class="hljs-comment">//  to surface</span>
     nSmoothPatch <span class="hljs-number">3</span>;
-
     <span class="hljs-comment">//- Relative distance for points to be attracted by surface feature point</span>
     <span class="hljs-comment">//  or edge. True distance is this factor times local</span>
     <span class="hljs-comment">//  maximum edge length.</span>
     tolerance <span class="hljs-number">2.0</span>;
-
     <span class="hljs-comment">//- Number of mesh displacement relaxation iterations.</span>
     nSolveIter <span class="hljs-number">30</span>;
-
     <span class="hljs-comment">//- Maximum number of snapping relaxation iterations. Should stop</span>
     <span class="hljs-comment">//  before upon reaching a correct mesh.</span>
     nRelaxIter <span class="hljs-number">5</span>;
-
     <span class="hljs-comment">// Feature snapping</span>
-
-        <span class="hljs-comment">//- Number of feature edge snapping iterations.</span>
-        <span class="hljs-comment">//  Leave out altogether to disable.</span>
-        nFeatureSnapIter <span class="hljs-number">10</span>;
-
-        <span class="hljs-comment">//- Detect (geometric only) features by sampling the surface</span>
-        <span class="hljs-comment">//  (default=false).</span>
-        implicitFeatureSnap <span class="hljs-literal">false</span>;
-
-        <span class="hljs-comment">//- Use castellatedMeshControls::features (default = true)</span>
-        explicitFeatureSnap <span class="hljs-literal">true</span>;
-
-        <span class="hljs-comment">//- Detect points on multiple surfaces (only for explicitFeatureSnap)</span>
-        multiRegionFeatureSnap <span class="hljs-literal">false</span>;
+    <span class="hljs-comment">//- Number of feature edge snapping iterations.</span>
+    <span class="hljs-comment">//  Leave out altogether to disable.</span>
+    nFeatureSnapIter <span class="hljs-number">10</span>;
+    <span class="hljs-comment">//- Detect (geometric only) features by sampling the surface</span>
+    <span class="hljs-comment">//  (default=false).</span>
+    implicitFeatureSnap <span class="hljs-literal">false</span>;
+    <span class="hljs-comment">//- Use castellatedMeshControls::features (default = true)</span>
+    explicitFeatureSnap <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">//- Detect points on multiple surfaces (only for explicitFeatureSnap)</span>
+    multiRegionFeatureSnap <span class="hljs-literal">false</span>;
 }
-
-
 <span class="hljs-comment">// Settings for the layer addition.</span>
 addLayersControls
 {
     <span class="hljs-comment">// Are the thickness parameters below relative to the undistorted</span>
     <span class="hljs-comment">// size of the refined cell outside layer (true) or absolute sizes (false).</span>
     relativeSizes <span class="hljs-literal">true</span>;
-
     <span class="hljs-comment">// Per final patch (so not geometry!) the layer information</span>
     layers
     {
@@ -606,106 +597,76 @@ addLayersControls
             nSurfaceLayers <span class="hljs-number">1</span>;
         }
     }
-
     <span class="hljs-comment">// Expansion factor for layer mesh</span>
     expansionRatio <span class="hljs-number">1.0</span>;
-
     <span class="hljs-comment">// Wanted thickness of final added cell layer. If multiple layers</span>
     <span class="hljs-comment">// is the thickness of the layer furthest away from the wall.</span>
     <span class="hljs-comment">// Relative to undistorted size of cell outside layer.</span>
     <span class="hljs-comment">// See relativeSizes parameter.</span>
     finalLayerThickness <span class="hljs-number">0.3</span>;
-
     <span class="hljs-comment">// Minimum thickness of cell layer. If for any reason layer</span>
     <span class="hljs-comment">// cannot be above minThickness do not add layer.</span>
     <span class="hljs-comment">// Relative to undistorted size of cell outside layer.</span>
     minThickness <span class="hljs-number">0.1</span>;
-
     <span class="hljs-comment">// If points get not extruded do nGrow layers of connected faces that are</span>
     <span class="hljs-comment">// also not grown. This helps convergence of the layer addition process</span>
     <span class="hljs-comment">// close to features.</span>
     <span class="hljs-comment">// Note: changed(corrected) w.r.t 1.7.x! (didn't do anything in 1.7.x)</span>
     nGrow <span class="hljs-number">0</span>;
-
     <span class="hljs-comment">// Advanced settings</span>
-
     <span class="hljs-comment">// When not to extrude surface. 0 is flat surface, 90 is when two faces</span>
     <span class="hljs-comment">// are perpendicular</span>
     featureAngle <span class="hljs-number">60</span>;
-
     <span class="hljs-comment">// At non-patched sides allow mesh to slip if extrusion direction makes</span>
     <span class="hljs-comment">// angle larger than slipFeatureAngle.</span>
     slipFeatureAngle <span class="hljs-number">30</span>;
-
     <span class="hljs-comment">// Maximum number of snapping relaxation iterations. Should stop</span>
     <span class="hljs-comment">// before upon reaching a correct mesh.</span>
     nRelaxIter <span class="hljs-number">3</span>;
-
     <span class="hljs-comment">// Number of smoothing iterations of surface normals</span>
     nSmoothSurfaceNormals <span class="hljs-number">1</span>;
-
     <span class="hljs-comment">// Number of smoothing iterations of interior mesh movement direction</span>
     nSmoothNormals <span class="hljs-number">3</span>;
-
     <span class="hljs-comment">// Smooth layer thickness over surface patches</span>
     nSmoothThickness <span class="hljs-number">10</span>;
-
     <span class="hljs-comment">// Stop layer growth on highly warped cells</span>
     maxFaceThicknessRatio <span class="hljs-number">0.5</span>;
-
     <span class="hljs-comment">// Reduce layer growth where ratio thickness to medial</span>
     <span class="hljs-comment">// distance is large</span>
     maxThicknessToMedialRatio <span class="hljs-number">0.3</span>;
-
     <span class="hljs-comment">// Angle used to pick up medial axis points</span>
     <span class="hljs-comment">// Note: changed(corrected) w.r.t 1.7.x! 90 degrees corresponds to 130</span>
     <span class="hljs-comment">// in 1.7.x.</span>
     minMedialAxisAngle <span class="hljs-number">90</span>;
-
-
     <span class="hljs-comment">// Create buffer region for new layer terminations</span>
     nBufferCellsNoExtrude <span class="hljs-number">0</span>;
-
-
     <span class="hljs-comment">// Overall max number of layer addition iterations. The mesher will exit</span>
     <span class="hljs-comment">// if it reaches this number of iterations; possibly with an illegal</span>
     <span class="hljs-comment">// mesh.</span>
     nLayerIter <span class="hljs-number">50</span>;
 }
-
-
 <span class="hljs-comment">// Generic mesh quality settings. At any undoable phase these determine</span>
 <span class="hljs-comment">// where to undo.</span>
 meshQualityControls
 {
     <span class="hljs-meta">#include "meshQualityDict"</span>
-
-
     <span class="hljs-comment">// Advanced</span>
-
     <span class="hljs-comment">//- Number of error distribution iterations</span>
     nSmoothScale <span class="hljs-number">4</span>;
     <span class="hljs-comment">//- Amount to scale back displacement at error points</span>
     errorReduction <span class="hljs-number">0.75</span>;
 }
-
-
 <span class="hljs-comment">// Advanced</span>
-
 <span class="hljs-comment">// Write flags</span>
 writeFlags
 (
     scalarLevels
     layerSets
-    layerFields     <span class="hljs-comment">// write volScalarField for layer coverage</span>
+    layerFields <span class="hljs-comment">// write volScalarField for layer coverage</span>
 );
-
-
 <span class="hljs-comment">// Merge tolerance. Is fraction of overall bounding box of initial mesh.</span>
 <span class="hljs-comment">// Note: the write tolerance needs to be higher than this.</span>
 mergeTolerance <span class="hljs-number">1e-6</span>;
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · mesh/snappyHexMesh/faceZoneRegions</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/snappyHexMesh/faceZoneRegions"><h3>算例问题：faceZoneRegions</h3><p class="reference-case-problem">根据表面区域生成网格，并建立对应的 <code>faceZone</code> 或 <code>cellZone</code>，供后续区域选择和接口处理使用。重点是几何区域与网格区域名称的对应，以及各区域的连通关系。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions"><code>mesh/snappyHexMesh/faceZoneRegions</code></a>。</p><figure class="reference-case-figure"><img alt="faceZoneRegions 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption>faceZoneRegions 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>这个网格示例演示表面区域命名与 faceZone/cellZone 的生成，便于后续把旋转区与固定区分开。</p>
 <ul>
 <li>开头 <code>#includeEtc</code> 引入 <code>snappyHexMesh</code> 的公共默认配置，本地条目作具体覆盖。</li>
@@ -715,7 +676,7 @@ mergeTolerance <span class="hljs-number">1e-6</span>;
 <li><code>strictRegionSnap true</code> 强调贴合时的区域对应，<code>locationInMesh</code> 决定保留连通域。</li>
 </ul>
 <p>更换表面文件时逐项对应 <code>region</code> 名称；区域正确后再设置旋转或耦合边界。</p>
-<p><a href="/assets/examples/v2512/snappyhexmeshdict/2-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict"><code>mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">167 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/snappyhexmeshdict/2-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict"><code>mesh/snappyHexMesh/faceZoneRegions/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">178 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -724,26 +685,23 @@ mergeTolerance <span class="hljs-number">1e-6</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      snappyHexMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> snappyHexMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 <span class="hljs-meta">#includeEtc "caseDicts/mesh/generation/snappyHexMeshDict.cfg"</span>
-
 castellatedMesh <span class="hljs-literal">on</span>;
-snap            <span class="hljs-literal">on</span>;
-addLayers       <span class="hljs-literal">off</span>;
-
+snap <span class="hljs-literal">on</span>;
+addLayers <span class="hljs-literal">off</span>;
 geometry
 {
     dummy
     {
-        <span class="hljs-keyword">type</span>    box;
-        min     (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        max     (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>);
+        <span class="hljs-keyword">type</span> box;
+        min (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        max (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>);
     }
     fixed.obj
     {
@@ -752,12 +710,20 @@ geometry
         <span class="hljs-keyword">name</span> fixed;
         regions
         {
-            patch0 { <span class="hljs-keyword">name</span> slipWall; }
-            patch1 { <span class="hljs-keyword">name</span> outlet; }
-            patch2 { <span class="hljs-keyword">name</span> inlet; }
+            patch0
+            {
+                <span class="hljs-keyword">name</span> slipWall;
+            }
+            patch1
+            {
+                <span class="hljs-keyword">name</span> outlet;
+            }
+            patch2
+            {
+                <span class="hljs-keyword">name</span> inlet;
+            }
         }
     }
-
     box-randomAligned.stl
     {
         <span class="hljs-comment">// Rename some of the regions inside the obj file</span>
@@ -765,122 +731,128 @@ geometry
         <span class="hljs-keyword">name</span> rotatingZone;
         regions
         {
-            front { <span class="hljs-keyword">name</span> myFront; }
+            front
+            {
+                <span class="hljs-keyword">name</span> myFront;
+            }
         }
     }
 }
-
 castellatedMeshControls
 {
     features
     (
-      { file <span class="hljs-string">"fixed.eMesh"</span>; level <span class="hljs-number">2</span>; }
-      { file <span class="hljs-string">"rotatingZone.eMesh"</span>; level <span class="hljs-number">4</span>; }
+        {
+            file <span class="hljs-string">"fixed.eMesh"</span>;
+            level <span class="hljs-number">2</span>;
+        }
+        {
+            file <span class="hljs-string">"rotatingZone.eMesh"</span>;
+            level <span class="hljs-number">4</span>;
+        }
     );
-
     refinementSurfaces
     {
         fixed
         {
-            level       (<span class="hljs-number">2</span> <span class="hljs-number">2</span>);
-            patchInfo   { <span class="hljs-keyword">type</span> wall; }
-            inGroups    (fixed);
-
+            level (<span class="hljs-number">2</span> <span class="hljs-number">2</span>);
+            patchInfo
+            {
+                <span class="hljs-keyword">type</span> wall;
+            }
+            inGroups (fixed);
             <span class="hljs-comment">// Override per-patch information</span>
             regions
             {
                 patch0
                 {
                     level (<span class="hljs-number">3</span> <span class="hljs-number">3</span>);
-                    patchInfo { <span class="hljs-keyword">type</span> patch; }
+                    patchInfo
+                    {
+                        <span class="hljs-keyword">type</span> patch;
+                    }
                 }
-
                 patch1
                 {
                     level (<span class="hljs-number">2</span> <span class="hljs-number">2</span>);
-                    patchInfo { <span class="hljs-keyword">type</span> patch; }
+                    patchInfo
+                    {
+                        <span class="hljs-keyword">type</span> patch;
+                    }
                 }
-
                 patch2
                 {
                     level (<span class="hljs-number">2</span> <span class="hljs-number">2</span>);
-                    patchInfo { <span class="hljs-keyword">type</span> patch; }
+                    patchInfo
+                    {
+                        <span class="hljs-keyword">type</span> patch;
+                    }
                 }
             }
         }
         rotatingZone
         {
-            level       (<span class="hljs-number">4</span> <span class="hljs-number">4</span>);
-
+            level (<span class="hljs-number">4</span> <span class="hljs-number">4</span>);
             <span class="hljs-comment">// How to handle faceZones</span>
             <span class="hljs-comment">//  a. no faceZone. No keyword 'faceZone' or 'faceZoneNaming'</span>
             <span class="hljs-comment">//  b. single user-specified faceZone:</span>
             <span class="hljs-comment">//      faceZone myZone;</span>
             <span class="hljs-comment">//  c. faceZones according to the surface/region:</span>
             <span class="hljs-comment">//      faceZoneNaming region;</span>
-
             <span class="hljs-comment">// c. faceZones according to the surface/region</span>
-            faceZoneNaming  region;
-
-            cellZone    rotatingZone;
-            cellZoneInside  inside;
+            faceZoneNaming region;
+            cellZone rotatingZone;
+            cellZoneInside inside;
         }
-
     }
-
     refinementRegions
     {
         fixed
         {
             mode inside;
-            levels ((<span class="hljs-number">1e-5</span> <span class="hljs-number">1</span>));
+            levels
+            (
+                (<span class="hljs-number">1e-5</span> <span class="hljs-number">1</span>)
+            );
         }
         rotatingZone
         {
             mode inside;
-            levels ((<span class="hljs-number">1e-5</span> <span class="hljs-number">4</span>));
+            levels
+            (
+                (<span class="hljs-number">1e-5</span> <span class="hljs-number">4</span>)
+            );
         }
     }
-
-    locationInMesh (<span class="hljs-number">1e-5</span> <span class="hljs-number">-1e-2</span> <span class="hljs-number">1e-5</span>);<span class="hljs-comment">// Offset from (0 0 0) to avoid</span>
-                                     <span class="hljs-comment">// coinciding with face or edge and keep</span>
-                                     <span class="hljs-comment">// away from disk itself</span>
-
-    allowFreeStandingZoneFaces  <span class="hljs-literal">false</span>;
-
+    locationInMesh (<span class="hljs-number">1e-5</span> <span class="hljs-number">-1e-2</span> <span class="hljs-number">1e-5</span>); <span class="hljs-comment">// Offset from (0 0 0) to avoid</span>
+    <span class="hljs-comment">// coinciding with face or edge and keep</span>
+    <span class="hljs-comment">// away from disk itself</span>
+    allowFreeStandingZoneFaces <span class="hljs-literal">false</span>;
     <span class="hljs-comment">// Optional: switch off topological test for cells to-be-squashed</span>
     <span class="hljs-comment">//           and use geometric test instead</span>
     useTopologicalSnapDetection <span class="hljs-literal">false</span>;
 }
-
 snapControls
 {
     tolerance <span class="hljs-number">1.0</span>;
-    implicitFeatureSnap     <span class="hljs-literal">true</span>;
-    strictRegionSnap        <span class="hljs-literal">true</span>;
+    implicitFeatureSnap <span class="hljs-literal">true</span>;
+    strictRegionSnap <span class="hljs-literal">true</span>;
 }
-
 addLayersControls
 {
     layers
     {
     }
-
-    relativeSizes       <span class="hljs-literal">true</span>; <span class="hljs-comment">// false, usually with firstLayerThickness</span>
-    expansionRatio      <span class="hljs-number">1.2</span>;
+    relativeSizes <span class="hljs-literal">true</span>; <span class="hljs-comment">// false, usually with firstLayerThickness</span>
+    expansionRatio <span class="hljs-number">1.2</span>;
     finalLayerThickness <span class="hljs-number">0.5</span>;
-    minThickness        <span class="hljs-number">1e-3</span>;
+    minThickness <span class="hljs-number">1e-3</span>;
 }
-
 meshQualityControls
 {
-<span class="hljs-comment">//    minTetQuality -1e+30;</span>
+    <span class="hljs-comment">//    minTetQuality -1e+30;</span>
 }
-
-
 mergeTolerance <span class="hljs-number">1e-6</span>;
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · mesh/snappyHexMesh/gap_detection</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/snappyHexMesh/gap_detection"><h3>算例问题：gap_detection</h3><p class="reference-case-problem">在含狭缝或相近表面的几何中生成网格，利用间隙检测控制局部单元保留与细化。该示例关注窄间隙能否被网格正确表示，以及局部质量和连通性。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection"><code>mesh/snappyHexMesh/gap_detection</code></a>。</p><figure class="reference-case-figure"><img alt="gap_detection 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption>gap_detection 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>gap_detection 主要检查窄间隙加密，配置只执行切割加密阶段。</p>
 <ul>
 <li><code>castellatedMesh true</code>、<code>snap false</code>、<code>addLayers false</code> 将测试集中在间隙识别。</li>
@@ -889,7 +861,7 @@ mergeTolerance <span class="hljs-number">1e-6</span>;
 <li><code>locationInMesh (-100 -5 -300)</code> 选择需要保留的流体连通区域；<code>maxGlobalCells 2000000</code> 限制规模。</li>
 </ul>
 <p>细小间隙可能迅速增加单元数，先检查间隙内实际网格层数，再调整 <code>gapLevel</code> 和总体单元上限。</p>
-<p><a href="/assets/examples/v2512/snappyhexmeshdict/3-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict"><code>mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">291 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/snappyhexmeshdict/3-snappyHexMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict"><code>mesh/snappyHexMesh/gap_detection/system/snappyHexMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">224 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -898,19 +870,16 @@ mergeTolerance <span class="hljs-number">1e-6</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      snappyHexMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> snappyHexMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 <span class="hljs-comment">// Which of the steps to run</span>
 castellatedMesh <span class="hljs-literal">true</span>;
-snap            <span class="hljs-literal">false</span>;
-addLayers       <span class="hljs-literal">false</span>;
-
-
+snap <span class="hljs-literal">false</span>;
+addLayers <span class="hljs-literal">false</span>;
 <span class="hljs-comment">// Geometry. Definition of all surfaces. All surfaces are of class</span>
 <span class="hljs-comment">// searchableSurface.</span>
 <span class="hljs-comment">// Surfaces are used</span>
@@ -926,62 +895,46 @@ geometry
     all
     {
         <span class="hljs-keyword">type</span> box;
-        min  (<span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
-        max  (<span class="hljs-number">1000</span> <span class="hljs-number">1000</span> <span class="hljs-number">1000</span>);
+        min (<span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
+        max (<span class="hljs-number">1000</span> <span class="hljs-number">1000</span> <span class="hljs-number">1000</span>);
     }
 }
-
-
 <span class="hljs-comment">// Settings for the castellatedMesh generation.</span>
 castellatedMeshControls
 {
-
     <span class="hljs-comment">// Refinement parameters</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// If local number of cells is &gt;= maxLocalCells on any processor</span>
     <span class="hljs-comment">// switches from from refinement followed by balancing</span>
     <span class="hljs-comment">// (current method) to (weighted) balancing before refinement.</span>
     maxLocalCells <span class="hljs-number">100000</span>;
-
     <span class="hljs-comment">// Overall cell limit (approximately). Refinement will stop immediately</span>
     <span class="hljs-comment">// upon reaching this number so a refinement level might not complete.</span>
     <span class="hljs-comment">// Note that this is the number of cells before removing the part which</span>
     <span class="hljs-comment">// is not 'visible' from the keepPoint. The final number of cells might</span>
     <span class="hljs-comment">// actually be a lot less.</span>
     maxGlobalCells <span class="hljs-number">2000000</span>;
-
     <span class="hljs-comment">// The surface refinement loop might spend lots of iterations refining just a</span>
     <span class="hljs-comment">// few cells. This setting will cause refinement to stop if &lt;= minimumRefine</span>
     <span class="hljs-comment">// are selected for refinement. Note: it will at least do one iteration</span>
     <span class="hljs-comment">// (unless the number of cells to refine is 0)</span>
     minRefinementCells <span class="hljs-number">0</span>;
-
     <span class="hljs-comment">// Number of buffer layers between different levels.</span>
     <span class="hljs-comment">// 1 means normal 2:1 refinement restriction, larger means slower</span>
     <span class="hljs-comment">// refinement.</span>
     nCellsBetweenLevels <span class="hljs-number">1</span>;
-
-
     <span class="hljs-comment">// Explicit feature edge refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies a level for any cell intersected by its edges.</span>
     <span class="hljs-comment">// This is a featureEdgeMesh, read from constant/triSurface for now.</span>
-    features
-    (
-    );
-
-
+    features ( );
     <span class="hljs-comment">// Surface based refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies two levels for every surface. The first is the minimum level,</span>
     <span class="hljs-comment">// every cell intersecting a surface gets refined up to the minimum level.</span>
     <span class="hljs-comment">// The second level is the maximum level. Cells that 'see' multiple</span>
     <span class="hljs-comment">// intersections where the intersections make an</span>
     <span class="hljs-comment">// angle &gt; resolveFeatureAngle get refined up to the maximum level.</span>
-
     refinementSurfaces
     {
         mech_test.obj
@@ -990,14 +943,10 @@ castellatedMeshControls
             level (<span class="hljs-number">0</span> <span class="hljs-number">0</span>);
         }
     }
-
     <span class="hljs-comment">// Resolve sharp angles</span>
     resolveFeatureAngle <span class="hljs-number">60</span>;
-
-
     <span class="hljs-comment">// Region-wise refinement</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// Specifies refinement level for cells in relation to a surface. One of</span>
     <span class="hljs-comment">// three modes</span>
     <span class="hljs-comment">// - distance. 'levels' specifies per distance to the surface the</span>
@@ -1007,178 +956,134 @@ castellatedMeshControls
     <span class="hljs-comment">//   cells inside the surface get refined up to the level. The surface</span>
     <span class="hljs-comment">//   needs to be closed for this to be possible.</span>
     <span class="hljs-comment">// - outside. Same but cells outside.</span>
-
     refinementRegions
     {
         all
         {
-            mode        inside;
-
+            mode inside;
             <span class="hljs-comment">// Dummy base level</span>
-            levels      ((<span class="hljs-number">10000</span> <span class="hljs-number">0</span>));
-
+            levels
+            (
+                (<span class="hljs-number">10000</span> <span class="hljs-number">0</span>)
+            );
             <span class="hljs-comment">// If cells</span>
             <span class="hljs-comment">// - have level 0..9</span>
             <span class="hljs-comment">// - and are in a gap &lt; 3 cell sizes across</span>
             <span class="hljs-comment">// - with the gap on the inside ('inside'), outside ('outside')</span>
             <span class="hljs-comment">//   or both ('mixed') of the surface</span>
             <span class="hljs-comment">// refine them</span>
-            gapLevel    (<span class="hljs-number">4</span> <span class="hljs-number">0</span> <span class="hljs-number">10</span>);
-            gapMode     outside;
+            gapLevel (<span class="hljs-number">4</span> <span class="hljs-number">0</span> <span class="hljs-number">10</span>);
+            gapMode outside;
         }
     }
-
-
     <span class="hljs-comment">// Mesh selection</span>
     <span class="hljs-comment">// ~~~~~~~~~~~~~~</span>
-
     <span class="hljs-comment">// After refinement patches get added for all refinementSurfaces and</span>
     <span class="hljs-comment">// all cells intersecting the surfaces get put into these patches. The</span>
     <span class="hljs-comment">// section reachable from the locationInMesh is kept.</span>
     <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> This point should never be on a face, always inside a cell, even</span>
     <span class="hljs-comment">// after refinement.</span>
     locationInMesh (<span class="hljs-number">-100</span> <span class="hljs-number">-5</span> <span class="hljs-number">-300</span>);
-
-
     <span class="hljs-comment">// Whether any faceZones (as specified in the refinementSurfaces)</span>
     <span class="hljs-comment">// are only on the boundary of corresponding cellZones or also allow</span>
     <span class="hljs-comment">// free-standing zone faces. Not used if there are no faceZones.</span>
     allowFreeStandingZoneFaces <span class="hljs-literal">false</span>;
 }
-
-
 <span class="hljs-comment">// Settings for the snapping.</span>
 snapControls
 {
     <span class="hljs-comment">//- Number of patch smoothing iterations before finding correspondence</span>
     <span class="hljs-comment">//  to surface</span>
     nSmoothPatch <span class="hljs-number">3</span>;
-
     <span class="hljs-comment">//- Relative distance for points to be attracted by surface feature point</span>
     <span class="hljs-comment">//  or edge. True distance is this factor times local</span>
     <span class="hljs-comment">//  maximum edge length.</span>
     tolerance <span class="hljs-number">2.0</span>;
-
     <span class="hljs-comment">//- Number of mesh displacement relaxation iterations.</span>
     nSolveIter <span class="hljs-number">30</span>;
-
     <span class="hljs-comment">//- Maximum number of snapping relaxation iterations. Should stop</span>
     <span class="hljs-comment">//  before upon reaching a correct mesh.</span>
     nRelaxIter <span class="hljs-number">5</span>;
-
-
     <span class="hljs-comment">// Feature snapping</span>
-
-        <span class="hljs-comment">//- Number of feature edge snapping iterations.</span>
-        <span class="hljs-comment">//  Leave out altogether to disable.</span>
-        nFeatureSnapIter <span class="hljs-number">10</span>;
-
-        <span class="hljs-comment">//- Detect (geometric) features by sampling the surface (default=false)</span>
-        implicitFeatureSnap <span class="hljs-literal">true</span>;
-
-        <span class="hljs-comment">//- Use castellatedMeshControls::features (default = true)</span>
-        explicitFeatureSnap <span class="hljs-literal">false</span>;
+    <span class="hljs-comment">//- Number of feature edge snapping iterations.</span>
+    <span class="hljs-comment">//  Leave out altogether to disable.</span>
+    nFeatureSnapIter <span class="hljs-number">10</span>;
+    <span class="hljs-comment">//- Detect (geometric) features by sampling the surface (default=false)</span>
+    implicitFeatureSnap <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">//- Use castellatedMeshControls::features (default = true)</span>
+    explicitFeatureSnap <span class="hljs-literal">false</span>;
 }
-
-
 <span class="hljs-comment">// Settings for the layer addition.</span>
 addLayersControls
 {
     <span class="hljs-comment">// Are the thickness parameters below relative to the undistorted</span>
     <span class="hljs-comment">// size of the refined cell outside layer (true) or absolute sizes (false).</span>
     relativeSizes <span class="hljs-literal">true</span>;
-
     <span class="hljs-comment">// Per final patch (so not geometry!) the layer information</span>
     layers
     {
     }
-
     <span class="hljs-comment">// Expansion factor for layer mesh</span>
     expansionRatio <span class="hljs-number">1.0</span>;
-
     <span class="hljs-comment">// Wanted thickness of final added cell layer. If multiple layers</span>
     <span class="hljs-comment">// is the thickness of the layer furthest away from the wall.</span>
     <span class="hljs-comment">// Relative to undistorted size of cell outside layer.</span>
     <span class="hljs-comment">// is the thickness of the layer furthest away from the wall.</span>
     <span class="hljs-comment">// See relativeSizes parameter.</span>
     finalLayerThickness <span class="hljs-number">0.5</span>;
-
     <span class="hljs-comment">// Minimum thickness of cell layer. If for any reason layer</span>
     <span class="hljs-comment">// cannot be above minThickness do not add layer.</span>
     <span class="hljs-comment">// Relative to undistorted size of cell outside layer.</span>
     <span class="hljs-comment">// See relativeSizes parameter.</span>
     minThickness <span class="hljs-number">0.25</span>;
-
     <span class="hljs-comment">// If points get not extruded do nGrow layers of connected faces that are</span>
     <span class="hljs-comment">// also not grown. This helps convergence of the layer addition process</span>
     <span class="hljs-comment">// close to features.</span>
     <span class="hljs-comment">// Note: changed(corrected) w.r.t 1.7.x! (didn't do anything in 1.7.x)</span>
     nGrow <span class="hljs-number">0</span>;
-
-
     <span class="hljs-comment">// Advanced settings</span>
-
     <span class="hljs-comment">// When not to extrude surface. 0 is flat surface, 90 is when two faces</span>
     <span class="hljs-comment">// are perpendicular</span>
     featureAngle <span class="hljs-number">60</span>;
-
     <span class="hljs-comment">// Maximum number of snapping relaxation iterations. Should stop</span>
     <span class="hljs-comment">// before upon reaching a correct mesh.</span>
     nRelaxIter <span class="hljs-number">5</span>;
-
     <span class="hljs-comment">// Number of smoothing iterations of surface normals</span>
     nSmoothSurfaceNormals <span class="hljs-number">1</span>;
-
     <span class="hljs-comment">// Number of smoothing iterations of interior mesh movement direction</span>
     nSmoothNormals <span class="hljs-number">3</span>;
-
     <span class="hljs-comment">// Smooth layer thickness over surface patches</span>
     nSmoothThickness <span class="hljs-number">10</span>;
-
     <span class="hljs-comment">// Stop layer growth on highly warped cells</span>
     maxFaceThicknessRatio <span class="hljs-number">0.5</span>;
-
     <span class="hljs-comment">// Reduce layer growth where ratio thickness to medial</span>
     <span class="hljs-comment">// distance is large</span>
     maxThicknessToMedialRatio <span class="hljs-number">0.3</span>;
-
     <span class="hljs-comment">// Angle used to pick up medial axis points</span>
     <span class="hljs-comment">// Note: changed(corrected) w.r.t 16x! 90 degrees corresponds to 130 in 16x.</span>
     minMedialAxisAngle <span class="hljs-number">90</span>;
-
     <span class="hljs-comment">// Create buffer region for new layer terminations</span>
     nBufferCellsNoExtrude <span class="hljs-number">0</span>;
-
-
     <span class="hljs-comment">// Overall max number of layer addition iterations. The mesher will exit</span>
     <span class="hljs-comment">// if it reaches this number of iterations; possibly with an illegal</span>
     <span class="hljs-comment">// mesh.</span>
     nLayerIter <span class="hljs-number">50</span>;
 }
-
-
 <span class="hljs-comment">// Generic mesh quality settings. At any undoable phase these determine</span>
 <span class="hljs-comment">// where to undo.</span>
 meshQualityControls
 {
     <span class="hljs-meta">#include "meshQualityDict"</span>
-
     <span class="hljs-comment">// Advanced</span>
-
     <span class="hljs-comment">//- Number of error distribution iterations</span>
     nSmoothScale <span class="hljs-number">4</span>;
     <span class="hljs-comment">//- amount to scale back displacement at error points</span>
     errorReduction <span class="hljs-number">0.75</span>;
 }
-
-
 <span class="hljs-comment">// Advanced</span>
-
 <span class="hljs-comment">// Merge tolerance. Is fraction of overall bounding box of initial mesh.</span>
 <span class="hljs-comment">// Note: the write tolerance needs to be higher than this.</span>
 mergeTolerance <span class="hljs-number">1e-6</span>;
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/snappyhexmesh/">snappyHexMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

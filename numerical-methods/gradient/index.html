@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -276,245 +276,199 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>梯度与面插值</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>梯度用于黏性项、应力和高阶重构；面插值将单元中心值转换到面上。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>梯度给出一个场沿各空间方向的变化率。例如压力梯度进入动量方程，温度梯度决定导热方向。有限体积网格只保存离散位置的场值，需要用相邻信息重建这些导数。</p><p>梯度计算描述场的空间变化，插值则将单元中心数据传递到面上。两者共同参与通量计算及高阶重构，但在 <code>fvSchemes</code> 中分别配置。</p><p>网格非正交或长宽比较大时，应检查所选梯度与插值方式是否产生异常极值，再决定是否使用限制处理。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="后向台阶通道及台阶后的分离回流" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption>后向台阶通道及台阶后的分离回流。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>incompressible/simpleFoam/pitzDaily/system/fvSchemes</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>gradSchemes</code></td><td>设置 <code>Gauss</code> <code>linear</code>、<code>leastSquares</code> 或限制梯度。</td></tr><tr><td><code>interpolationSchemes</code></td><td>控制普通面插值，不能代替每个对流项的 <code>divSchemes</code>。</td></tr><tr><td><code>cellLimited</code></td><td>限制重构梯度，系数决定限制强度。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>system/fvSchemes</code></h3><p>每个方程项的空间和时间离散格式。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes"><code>incompressible/simpleFoam/pitzDaily/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">56 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+    <div class="prose"><p>梯度用于黏性项、应力和高阶重构；面插值将单元中心值转换到面上。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>梯度给出一个场沿各空间方向的变化率。例如压力梯度进入动量方程，温度梯度决定导热方向。有限体积网格只保存离散位置的场值，需要用相邻信息重建这些导数。</p><p>梯度计算描述场的空间变化，插值则将单元中心数据传递到面上。两者共同参与通量计算及高阶重构，但在 <code>fvSchemes</code> 中分别配置。</p><p>网格非正交或长宽比较大时，应检查所选梯度与插值方式是否产生异常极值，再决定是否使用限制处理。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="后向台阶通道及台阶后的分离回流" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption>后向台阶通道及台阶后的分离回流。</figcaption></figure></section><!-- /reference-case-contexts --><p>本页重点配置：<code>incompressible/simpleFoam/pitzDaily/system/fvSchemes</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>gradSchemes</code></td><td>设置 <code>Gauss</code> <code>linear</code>、<code>leastSquares</code> 或限制梯度。</td></tr><tr><td><code>interpolationSchemes</code></td><td>控制普通面插值，不能代替每个对流项的 <code>divSchemes</code>。</td></tr><tr><td><code>cellLimited</code></td><td>限制重构梯度，系数决定限制强度。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>system/fvSchemes</code></h3><p>每个方程项的空间和时间离散格式。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes"><code>incompressible/simpleFoam/pitzDaily/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSchemes;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSchemes;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 ddtSchemes
 {
-    default         steadyState;
+    default steadyState;
 }
-
 gradSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 divSchemes
 {
-    default         none;
-
-    div(phi,U)      bounded <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linearUpwind</span> grad(U);
-
-    turbulence      bounded <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phi,k)      <span class="hljs-variable">$turbulence</span>;
+    default none;
+    div(phi,U) bounded <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linearUpwind</span> grad(U);
+    turbulence bounded <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phi,k) <span class="hljs-variable">$turbulence</span>;
     div(phi,epsilon) <span class="hljs-variable">$turbulence</span>;
-    div(phi,omega)  <span class="hljs-variable">$turbulence</span>;
-
+    div(phi,omega) <span class="hljs-variable">$turbulence</span>;
     div(nonlinearStress) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
     div((nuEff*dev2(T(grad(U))))) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 laplacianSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
 }
-
 interpolationSchemes
 {
-    default         <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">linear</span>;
 }
-
 snGradSchemes
 {
-    default         corrected;
+    default corrected;
 }
-
 wallDist
 {
-    method          meshWave;
+    method meshWave;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>steadyState</code></td><td>时间导数的默认设置，忽略时间导数，用于稳态迭代。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,U)</code></td><td><code>bounded Gauss linearUpwind grad(U)</code></td><td>散度及对流项；括号内给出通量与所输运的量；在迎风值上加入梯度修正，所用梯度在末尾指定。</td></tr><tr><td><code>divSchemes/turbulence</code></td><td><code>bounded Gauss limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,omega)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(nonlinearStress)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((nuEff*dev2(T(grad(U)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr><tr><td><code>wallDist/method</code></td><td><code>meshWave</code></td><td>到壁面的距离算法，从壁面传播距离信息。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/system/fvSchemes.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0/epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>0/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0/nuTilda</code></td><td>SA 模型输运的修正黏度，m²/s。</td></tr><tr><td><code>0/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0/omega</code></td><td>比耗散率，1/s。</td></tr><tr><td><code>0/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>constant/transportProperties</code></td><td>密度、黏度等输运物性；结构随求解器变化。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0/U：速度向量，m/s。</summary><h3><code>0/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/U"><code>incompressible/simpleFoam/pitzDaily/0/U</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>steadyState</code></td><td>时间导数的默认设置，忽略时间导数，用于稳态迭代。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,U)</code></td><td><code>bounded Gauss linearUpwind grad(U)</code></td><td>散度及对流项；括号内给出通量与所输运的量；在迎风值上加入梯度修正，所用梯度在末尾指定。</td></tr><tr><td><code>divSchemes/turbulence</code></td><td><code>bounded Gauss limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(phi,omega)</code></td><td><code>$turbulence</code></td><td>散度及对流项；括号内给出通量与所输运的量；复用 <code>turbulence</code> 的设置。</td></tr><tr><td><code>divSchemes/div(nonlinearStress)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((nuEff*dev2(T(grad(U)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr><tr><td><code>wallDist/method</code></td><td><code>meshWave</code></td><td>到壁面的距离算法，从壁面传播距离信息。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/system/fvSchemes.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0/epsilon</code></td><td>湍动能耗散率，m²/s³。</td></tr><tr><td><code>0/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0/nuTilda</code></td><td>SA 模型输运的修正黏度，m²/s。</td></tr><tr><td><code>0/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0/omega</code></td><td>比耗散率，1/s。</td></tr><tr><td><code>0/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>constant/transportProperties</code></td><td>密度、黏度等输运物性；结构随求解器变化。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0/U：速度向量，m/s。</summary><h3><code>0/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/U"><code>incompressible/simpleFoam/pitzDaily/0/U</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volVectorField;
-    <span class="hljs-keyword">object</span>      U;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volVectorField;
+    <span class="hljs-keyword">object</span> U;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     upperWall
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">noSlip</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
     }
-
     lowerWall
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">noSlip</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform (10 0 0)</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>noSlip</code>，壁面速度为零。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/U.txt">下载此配置文件</a></p></details><details><summary>0/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/epsilon"><code>incompressible/simpleFoam/pitzDaily/0/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">46 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform (10 0 0)</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>noSlip</code>，壁面速度为零。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/U.txt">下载此配置文件</a></p></details><details><summary>0/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/epsilon"><code>incompressible/simpleFoam/pitzDaily/0/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      epsilon;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> epsilon;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     upperWall
     {
-        <span class="hljs-keyword">type</span>            epsilonWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
+        <span class="hljs-keyword">type</span> epsilonWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
     }
-
     lowerWall
     {
-        <span class="hljs-keyword">type</span>            epsilonWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
+        <span class="hljs-keyword">type</span> epsilonWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 14.855</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 14.855</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>uniform 14.855</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/epsilon.txt">下载此配置文件</a></p></details><details><summary>0/k：湍动能，m²/s²。</summary><h3><code>0/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/k"><code>incompressible/simpleFoam/pitzDaily/0/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">46 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 14.855</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 14.855</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>epsilonWallFunction</code>，计算壁面附近的湍流耗散率及相关生成项。参数为 <code>value</code> <code>uniform 14.855</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/epsilon.txt">下载此配置文件</a></p></details><details><summary>0/k：湍动能，m²/s²。</summary><h3><code>0/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/k"><code>incompressible/simpleFoam/pitzDaily/0/k</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      k;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> k;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     upperWall
     {
-        <span class="hljs-keyword">type</span>            kqRWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
+        <span class="hljs-keyword">type</span> kqRWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
     }
-
     lowerWall
     {
-        <span class="hljs-keyword">type</span>            kqRWallFunction;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
+        <span class="hljs-keyword">type</span> kqRWallFunction;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 0.375</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0.375</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>kqRWallFunction</code>，为壁面 <code>k</code> 提供与壁面函数体系配套的零梯度处理。参数为 <code>value</code> <code>uniform 0.375</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/k.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution"><code>incompressible/simpleFoam/pitzDaily/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 0.375</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。参数为 <code>value</code> <code>uniform 0.375</code>。</li><li><code>outlet</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>upperWall</code>、<code>lowerWall</code> 采用 <code>kqRWallFunction</code>，为壁面 <code>k</code> 提供与壁面函数体系配套的零梯度处理。参数为 <code>value</code> <code>uniform 0.375</code>。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/0/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/0/k.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution"><code>incompressible/simpleFoam/pitzDaily/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     p
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">GAMG</span>;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0.1</span>;
-        smoother        GaussSeidel;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0.1</span>;
+        smoother GaussSeidel;
     }
-
     <span class="hljs-string">"(U|k|epsilon|omega|f|v2)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        symGaussSeidel;
-        tolerance       <span class="hljs-number">1e-05</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-05</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
 }
-
 <span class="hljs-built_in">SIMPLE</span>
 {
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    consistent      <span class="hljs-literal">yes</span>;
-
+    consistent <span class="hljs-literal">yes</span>;
     residualControl
     {
-        p               <span class="hljs-number">1e-2</span>;
-        U               <span class="hljs-number">1e-3</span>;
+        p <span class="hljs-number">1e-2</span>;
+        U <span class="hljs-number">1e-3</span>;
         <span class="hljs-string">"(k|epsilon|omega|f|v2)"</span> <span class="hljs-number">1e-3</span>;
     }
 }
-
 relaxationFactors
 {
     equations
     {
-        U               <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
-        <span class="hljs-string">".*"</span>            <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
+        U <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
+        <span class="hljs-string">".*"</span> <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>p</code></td><td><code>solver</code> <code>GAMG</code>：线性方程采用 <code>GAMG</code> 方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断；<code>smoother</code> <code>GaussSeidel</code>：选择光顺方法。</td></tr><tr><td><code>"(U|k|epsilon|omega|f|v2)"</code></td><td><code>solver</code> <code>smoothSolver</code>：线性方程采用 <code>smoothSolver</code> 方法；<code>smoother</code> <code>symGaussSeidel</code>：选择光顺方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>SIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li><li><code>SIMPLE/residualControl/p</code> = <code>1e-2</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/U</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>SIMPLE/residualControl/"(k|epsilon|omega|f|v2)"</code> = <code>1e-3</code>：用于判断外层耦合或稳态迭代是否达到残差要求。</li><li><code>relaxationFactors/equations/U</code> = <code>0.9</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li><li><code>relaxationFactors/equations/".*"</code> = <code>0.9</code>：限制每轮迭代的更新幅度；越接近 1，松弛越弱。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/incompressible/simpleFoam/pitzDaily/system/fvSolution.txt">下载此配置文件</a></p></details><h2>运行入口</h2><p>此配置来自组合算例或模型对照目录。先复制并查看其上级算例的 <code>Allrun</code>，按该脚本准备网格和初始场；本页的单个配置文件用于对照参数。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">打开官方算例目录</a></p><h2>结果检查</h2><p>观察高梯度区域的解及非正交网格上的稳定性。</p><p><a href="/numerical-methods/">返回离散格式与算法</a> · <a href="/quick-reference/official-modules/">官方模块对照表</a></p>
 </div>
   </article>

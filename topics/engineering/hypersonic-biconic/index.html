@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -370,36 +370,36 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-低压高速来流"><a href="#1-低压高速来流" class="headerlink" title="1. 低压高速来流"></a>1. 低压高速来流</h3><p>文件：<code>0.orig/U.gz</code>。本段设置低压高速来流。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">freestream
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">freestream
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">2713</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">2713</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
 <p>速度、静压和静温共同确定来流密度与马赫数。Run 35 的低压条件通过这三项输入进入计算。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/U.gz">查看该配置的官方原文件</a>。</p>
 <h3 id="2-壁面温度跳跃"><a href="#2-壁面温度跳跃" class="headerlink" title="2. 壁面温度跳跃"></a>2. 壁面温度跳跃</h3><p>文件：<code>0.orig/T.gz</code>。本段设置壁面温度跳跃。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">    cone
-    {
-        <span class="hljs-keyword">type</span>            smoluchowskiJumpT;
-        accommodationCoeff <span class="hljs-number">0.85</span>;
-        Twall           <span class="hljs-keyword">uniform</span> <span class="hljs-number">296.1</span>;
-        gamma           <span class="hljs-number">1.4</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">nonuniform</span> List&lt;scalar&gt;
-<span class="hljs-number">255</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">cone
+{
+    <span class="hljs-keyword">type</span> smoluchowskiJumpT;
+    accommodationCoeff <span class="hljs-number">0.85</span>;
+    Twall <span class="hljs-keyword">uniform</span> <span class="hljs-number">296.1</span>;
+    gamma <span class="hljs-number">1.4</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">nonuniform</span> List&lt;scalar&gt;
+    <span class="hljs-number">255</span>
 </code></pre></div>
 <p><code>smoluchowskiJumpT</code> 描述气体壁温相对固体壁温的跳跃，<code>Twall</code> 给定固体温度，<code>value</code> 保存与当前网格对应的气体初值。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoCentralFoam/biconic25-55Run35/0.orig/T.gz">查看该配置的官方原文件</a>。</p>
 <h3 id="3-氮气热物性"><a href="#3-氮气热物性" class="headerlink" title="3. 氮气热物性"></a>3. 氮气热物性</h3><p>文件：<code>constant/thermophysicalProperties</code>。本段设置氮气热物性。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">thermoType
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">thermoType
 {
-    <span class="hljs-keyword">type</span>            hePsiThermo;
-    mixture         pureMixture;
-    transport       sutherland;
-    thermo          janaf;
+    <span class="hljs-keyword">type</span> hePsiThermo;
+    mixture pureMixture;
+    transport sutherland;
+    thermo janaf;
     equationOfState perfectGas;
-    specie          specie;
-    energy          sensibleInternalEnergy;
+    specie specie;
+    energy sensibleInternalEnergy;
 }
 </code></pre></div>
 <p>氮气采用 JANAF 热力学数据与 Sutherland 输运关系，以显内能为能量变量。激波温升通过这些物性关系反馈到压力、密度和输运过程。</p>

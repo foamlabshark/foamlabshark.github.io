@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -292,7 +292,7 @@
 <li><code>rhoRef 1.205</code> 给参考密度；文件中 <code>pointNoiseCoeffs</code> 是另一种输入方式的配置入口。</li>
 </ul>
 <p>改变采样频率或记录长度后同时重新选择 N、频率范围与分段重叠。</p>
-<p><a href="/assets/examples/v2512/noisedict/1-noiseDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/noiseDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">149 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/noisedict/1-noiseDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/noiseDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">117 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -301,32 +301,27 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">location</span>    <span class="hljs-string">"system"</span>;
-    <span class="hljs-keyword">object</span>      noiseDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">location</span> <span class="hljs-string">"system"</span>;
+    <span class="hljs-keyword">object</span> noiseDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-noiseModel      surfaceNoise;
-
+noiseModel surfaceNoise;
 surfaceNoiseCoeffs
 {
-    windowModel     Hanning;
-
+    windowModel Hanning;
     HanningCoeffs
     {
         <span class="hljs-comment">// Window overlap percentage</span>
-        overlapPercent  <span class="hljs-number">50</span>;
-        symmetric       <span class="hljs-literal">yes</span>;
-        extended        <span class="hljs-literal">yes</span>;
-
+        overlapPercent <span class="hljs-number">50</span>;
+        symmetric <span class="hljs-literal">yes</span>;
+        extended <span class="hljs-literal">yes</span>;
         <span class="hljs-comment">// Optional number of windows, default = all available</span>
         <span class="hljs-comment">// nWindow         1;</span>
     }
-
-<span class="hljs-comment">/*
+    <span class="hljs-comment">/*
     windowModel     uniform;
 
     uniformCoeffs
@@ -340,20 +335,15 @@ surfaceNoiseCoeffs
         // nWindow         1;
     }
 */</span>
-
-
     <span class="hljs-comment">// Input file(s)</span>
-    file   <span class="hljs-string">"postProcessing/faceSource1/surface/patch1/patch1.case"</span>;
+    file <span class="hljs-string">"postProcessing/faceSource1/surface/patch1/patch1.case"</span>;
     <span class="hljs-comment">// Multiple inputs</span>
     <span class="hljs-comment">//files   ( "postProcessing/faceSource1/surface/patch1/patch1.case"</span>
     <span class="hljs-comment">//          "postProcessing/faceSource2/surface/patch2/patch2.case" );</span>
-
     <span class="hljs-comment">// Surface reader</span>
-    reader      ensight;
-
+    reader ensight;
     <span class="hljs-comment">// Surface writer</span>
-    writer      ensight;
-
+    writer ensight;
     <span class="hljs-comment">// Collate times for ensight output - ensures geometry is only written once</span>
     writeOptions
     {
@@ -362,84 +352,62 @@ surfaceNoiseCoeffs
             collateTimes <span class="hljs-literal">true</span>;
         }
     }
-
     <span class="hljs-comment">// Reference density (to convert from kinematic to static pressure)</span>
-    rhoRef          <span class="hljs-number">1.205</span>;
-
+    rhoRef <span class="hljs-number">1.205</span>;
     <span class="hljs-comment">// Number of samples in sampling window, default = 2^16 (=65536)</span>
-    N               <span class="hljs-number">4096</span>; <span class="hljs-comment">// 8192; // 4096;</span>
-
+    N <span class="hljs-number">4096</span>; <span class="hljs-comment">// 8192; // 4096;</span>
     <span class="hljs-comment">// Lower frequency limit, default = 25Hz</span>
     <span class="hljs-comment">//fl              25;</span>
-
     <span class="hljs-comment">// Upper frequency limit, default = 10kHz</span>
-    fu              <span class="hljs-number">15000</span>;
-
+    fu <span class="hljs-number">15000</span>;
     <span class="hljs-comment">// Start time, default = 0s</span>
     <span class="hljs-comment">//startTime       0;</span>
-
     <span class="hljs-comment">// Write interval for FFT data, default = 1</span>
     <span class="hljs-comment">//fftWriteInterval 100;</span>
-
     <span class="hljs-comment">// Bounds for valid pressure from input source</span>
-        <span class="hljs-comment">// Maximum pressure, default 0.5*VGREAT</span>
-        <span class="hljs-comment">//maxPressure 150e5;</span>
-
-        <span class="hljs-comment">// Minimum pressure, default -0.5*VGREAT</span>
-        <span class="hljs-comment">//minPressure -150e5;</span>
+    <span class="hljs-comment">// Maximum pressure, default 0.5*VGREAT</span>
+    <span class="hljs-comment">//maxPressure 150e5;</span>
+    <span class="hljs-comment">// Minimum pressure, default -0.5*VGREAT</span>
+    <span class="hljs-comment">//minPressure -150e5;</span>
 }
-
 pointNoiseCoeffs
 {
-    file            <span class="hljs-string">"pressureData"</span>;
+    file <span class="hljs-string">"pressureData"</span>;
     <span class="hljs-comment">//files           ( "pressureData" "pressureData2");</span>
-    nHeaderLine     <span class="hljs-number">1</span>;
-    refColumn       <span class="hljs-number">0</span>;
+    nHeaderLine <span class="hljs-number">1</span>;
+    refColumn <span class="hljs-number">0</span>;
     componentColumns (<span class="hljs-number">1</span>);
-    separator       <span class="hljs-string">" "</span>;
+    separator <span class="hljs-string">" "</span>;
     mergeSeparators <span class="hljs-literal">yes</span>;
-
     HanningCoeffs
     {
         <span class="hljs-comment">// Window overlap percentage</span>
-        overlapPercent  <span class="hljs-number">50</span>;
-        symmetric       <span class="hljs-literal">yes</span>;
-        extended        <span class="hljs-literal">yes</span>;
-
+        overlapPercent <span class="hljs-number">50</span>;
+        symmetric <span class="hljs-literal">yes</span>;
+        extended <span class="hljs-literal">yes</span>;
         <span class="hljs-comment">// Optional number of windows, default = all available</span>
         <span class="hljs-comment">//nWindow         5;</span>
     }
-
     <span class="hljs-comment">// Graph format, default = raw</span>
-    graphFormat     raw;
-
+    graphFormat raw;
     <span class="hljs-comment">// Reference density (to convert from kinematic to static pressure)</span>
-    rhoRef          <span class="hljs-number">1.2</span>;
-
+    rhoRef <span class="hljs-number">1.2</span>;
     <span class="hljs-comment">// Number of samples in sampling window, default = 2^16 (=65536)</span>
-    N               <span class="hljs-number">4096</span>;
-
+    N <span class="hljs-number">4096</span>;
     <span class="hljs-comment">// Lower frequency limit, default = 25Hz</span>
     <span class="hljs-comment">//fl              25;</span>
-
     <span class="hljs-comment">// Upper frequency limit, default = 10kHz</span>
     <span class="hljs-comment">//fu              10000;</span>
-
     <span class="hljs-comment">// Start time, default = 0s</span>
     <span class="hljs-comment">//startTime       0;</span>
-
     <span class="hljs-comment">// Write interval for FFT data, default = 1</span>
     fftWriteInterval <span class="hljs-number">100</span>;
-
     <span class="hljs-comment">// Bounds for valid pressure from input source</span>
-        <span class="hljs-comment">// Maximum pressure, default 0.5*VGREAT</span>
-        <span class="hljs-comment">//maxPressure 150e5;</span>
-
-        <span class="hljs-comment">// Minimum pressure, default -0.5*VGREAT</span>
-        <span class="hljs-comment">//minPressure -150e5;</span>
+    <span class="hljs-comment">// Maximum pressure, default 0.5*VGREAT</span>
+    <span class="hljs-comment">//maxPressure 150e5;</span>
+    <span class="hljs-comment">// Minimum pressure, default -0.5*VGREAT</span>
+    <span class="hljs-comment">//minPressure -150e5;</span>
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/noise/">noise</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>未找到指定场或函数对象：<code>No field / No functionObject</code></td><td>确认场已写出、当前时刻正确且所需库已加载；派生量可能必须先生成。</td></tr><tr><td>结果坐标或单位错误</td><td>记录采样坐标、截面法向和物理单位，尤其注意压力定义与法向通量符号。</td></tr><tr><td>峰值随采样方式改变</td><td>比较插值方案与网格分辨率；点值、面平均和体平均不是同一个量。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

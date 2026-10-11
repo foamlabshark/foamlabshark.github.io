@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -339,11 +339,9 @@ bash Allmesh
 </tbody></table></div>
 <p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-活塞运动规律"><a href="#1-活塞运动规律" class="headerlink" title="1. 活塞运动规律"></a>1. 活塞运动规律</h3><p>文件：<code>constant/engineGeometry</code>。本段设置活塞运动规律。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">engineMesh      layered;
-
-engineType  freePiston;
-
-pistonPositionTime  table
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">engineMesh layered;
+engineType freePiston;
+pistonPositionTime table
 (
     (<span class="hljs-number">0</span> <span class="hljs-number">0.13</span>)
     (<span class="hljs-number">0.020</span> <span class="hljs-number">0.013</span>)
@@ -352,19 +350,19 @@ pistonPositionTime  table
 <p><code>engineType freePiston</code> 从时间—位置表插值得到活塞运动。表中位置对应气柱高度；最小位置保持为正值，使压缩终点仍具有有限气体体积。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/coldEngineFoam/freePiston/constant/engineGeometry">查看该配置的官方原文件</a>。</p>
 <h3 id="2-气体初始状态"><a href="#2-气体初始状态" class="headerlink" title="2. 气体初始状态"></a>2. 气体初始状态</h3><p>文件：<code>0/include/caseSettings</code>。本段设置气体初始状态。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">internalField</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">internalField</span>
 {
-    U               (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    epsilon         <span class="hljs-number">5.70e-5</span>;
-    k               <span class="hljs-number">2.40e-5</span>;
-    T               <span class="hljs-number">350</span>;
-    p               <span class="hljs-number">1e5</span>;
+    U (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    epsilon <span class="hljs-number">5.70e-5</span>;
+    k <span class="hljs-number">2.40e-5</span>;
+    T <span class="hljs-number">350</span>;
+    p <span class="hljs-number">1e5</span>;
 }
 </code></pre></div>
 <p>初始压力 100000 Pa 和温度 350 K 与气缸容积共同确定气体质量。初始速度为零，随后由活塞运动建立缸内流动。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/coldEngineFoam/freePiston/0/include/caseSettings">查看该配置的官方原文件</a>。</p>
 <h3 id="3-移动活塞边界"><a href="#3-移动活塞边界" class="headerlink" title="3. 移动活塞边界"></a>3. 移动活塞边界</h3><p>文件：<code>0/U</code>。本段设置移动活塞边界。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">piston
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">piston
 {
     $/piston/U;
 }

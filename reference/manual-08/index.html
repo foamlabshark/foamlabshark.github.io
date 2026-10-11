@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -277,10 +277,12 @@
     <h1>08 时间控制与数值求解设置</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><h2>8.1 system/controlDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-keyword">application</span> pimpleFoam;
 startFrom startTime;
@@ -300,7 +302,9 @@ runTimeModifiable <span class="hljs-literal">true</span>;
 adjustTimeStep <span class="hljs-literal">true</span>;
 maxCo <span class="hljs-number">0.5</span>;
 maxDeltaT <span class="hljs-number">0.01</span>;
-<span class="hljs-keyword">functions</span> {};</code></pre></div>
+<span class="hljs-keyword">functions</span>
+{
+};</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>含义与可选值</th><th>设置方法</th></tr>
 <tr><td><code>application</code></td><td>供运行脚本选择的应用名称</td><td>脚本按此项调用程序；终端直接调用时执行指定程序</td></tr>
@@ -325,23 +329,43 @@ maxDeltaT <span class="hljs-number">0.01</span>;
 <p>Courant 数由局部速度、通量、单元尺寸和时间步共同决定。可压缩激波计算还需考虑声速约束，时间步上限应结合所用求解器和离散格式确定。</p>
 <h2>8.2 system/fvSchemes</h2>
 <p>下例给出不可压缩非稳态层流的离散设置。采用湍流模型或求解能量方程时，应补充相应方程的对流项。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">37 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> fvSchemes;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSchemes;
 }
-ddtSchemes { default <span class="hljs-built_in">Euler</span>; }
-gradSchemes { default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>; }
+ddtSchemes
+{
+    default <span class="hljs-built_in">Euler</span>;
+}
+gradSchemes
+{
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+}
 divSchemes
 {
     default none;
     div(phi,U) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linearUpwind</span> grad(U);
     div((nuEff*dev2(T(grad(U))))) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-laplacianSchemes { default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected; }
-interpolationSchemes { default <span class="hljs-built_in">linear</span>; }
-snGradSchemes { default corrected; }
-wallDist { method meshWave; }</code></pre></div>
+laplacianSchemes
+{
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
+}
+interpolationSchemes
+{
+    default <span class="hljs-built_in">linear</span>;
+}
+snGradSchemes
+{
+    default corrected;
+}
+wallDist
+{
+    method meshWave;
+}</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>字典</th><th>控制对象</th><th>常用设置</th></tr>
 <tr><td><code>ddtSchemes</code></td><td>时间导数</td><td><code>Euler</code> 为一阶；<code>backward</code> 为二阶；<code>CrankNicolson</code> 0.9 为混合格式；<code>steadyState</code> 用于稳态</td></tr>
@@ -356,10 +380,12 @@ wallDist { method meshWave; }</code></pre></div>
 </tbody></table></div>
 <p>湍流方程可采用 <code>div</code>(<code>phi</code>,<code>k</code>) <code>Gauss</code> <code>upwind</code>; 和 <code>div</code>(<code>phi</code>,<code>omega</code>) <code>Gauss</code> <code>upwind</code>;，字段名称随模型确定。VOF 求解器的 <code>div</code>(<code>phi</code>,<code>alpha</code>)、<code>div</code>(<code>phirb</code>,<code>alpha</code>) 等条目采用其配套教程的定义。<code>rhoCentralFoam</code> 还需设置 fluxScheme 及变量重构格式。</p>
 <h2>8.3 system/fvSolution</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 solvers
 {
@@ -370,7 +396,11 @@ solvers
         relTol <span class="hljs-number">0.05</span>;
         smoother GaussSeidel;
     }
-    pFinal { <span class="hljs-variable">$p</span>; relTol <span class="hljs-number">0</span>; }
+    pFinal
+    {
+        <span class="hljs-variable">$p</span>;
+        relTol <span class="hljs-number">0</span>;
+    }
     U
     {
         <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
@@ -390,7 +420,10 @@ solvers
 }
 relaxationFactors
 {
-    equations { U <span class="hljs-number">1</span>; }
+    equations
+    {
+        U <span class="hljs-number">1</span>;
+    }
 }</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>条目</th><th>含义</th><th>设置原则</th></tr>
@@ -427,10 +460,12 @@ relaxationFactors
 }</code></pre></div>
 <p><code>residualControl</code> 的结构由算法接口确定，部分 <code>PIMPLE</code> 控制采用 tolerance/relTol 子字典。收敛判定应同时考察残差、质量守恒及力、流量、温度等目标量的稳定性。</p>
 <h2>8.4 system/decomposeParDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> decomposeParDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> decomposeParDict;
 }
 numberOfSubdomains <span class="hljs-number">4</span>;
 method scotch;</code></pre></div>

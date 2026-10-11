@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -369,36 +369,32 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-两路气流的工况参数"><a href="#1-两路气流的工况参数" class="headerlink" title="1. 两路气流的工况参数"></a>1. 两路气流的工况参数</h3><p>文件：<code>constant/caseSettings</code>。本段设置两路气流的工况参数。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">innerInlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">innerInlet
 {
-    U               (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
-    epsilon         <span class="hljs-number">5.70e-5</span>;
-    k               <span class="hljs-number">2.40e-5</span>;
-    T               <span class="hljs-number">233</span>;
+    U (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
+    epsilon <span class="hljs-number">5.70e-5</span>;
+    k <span class="hljs-number">2.40e-5</span>;
+    T <span class="hljs-number">233</span>;
 }
 </code></pre></div>
 <p>两路入口各自给定速度、温度与湍流变量。质量流量由入口面积、速度和对应温度下的密度共同确定，因此计算混合温度时采用质量流量权重。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/constant/caseSettings">查看该配置的官方原文件</a>。</p>
 <h3 id="2-旋转区域运动"><a href="#2-旋转区域运动" class="headerlink" title="2. 旋转区域运动"></a>2. 旋转区域运动</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置旋转区域运动。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
-
-motionSolver    solidBody;
-
-cellZone        rotatingZone;
-
-solidBodyMotionFunction  rotatingMotion;
-
-origin      (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-axis        (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-omega       $/meshMotionProperties/omega;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
+motionSolver solidBody;
+cellZone rotatingZone;
+solidBodyMotionFunction rotatingMotion;
+origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+omega $/meshMotionProperties/omega;
 </code></pre></div>
 <p>运动参数从公共字典引用，<code>omega</code> 同时用于相关运动设置。通过这一入口修改转速，可保持网格运动与速度边界所用参数一致。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/compressible/rhoPimpleFoam/RAS/annularThermalMixer/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
 <h3 id="3-冷热入口边界"><a href="#3-冷热入口边界" class="headerlink" title="3. 冷热入口边界"></a>3. 冷热入口边界</h3><p>文件：<code>0.orig/T</code>。本段设置冷热入口边界。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">innerInlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">innerInlet
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> $/innerInlet/T;
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> $/innerInlet/T;
 }
 </code></pre></div>
 <p>内、外入口温度分别读取对应的公共参数，出口温度由能量输运求得。保留入口面积、速度方向和密度信息，才能由两股焓流解释出口平均温度。</p>

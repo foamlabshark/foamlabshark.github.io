@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -332,66 +332,80 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 <tr><td><code>timeStart</code> / <code>timeEnd</code></td><td>只在某段时间内工作（如统计平均只从流动充分发展后开始）</td></tr>
 </tbody></table></div>
 <p>① 探针：监测某几个点的时间序列</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">probes
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">probes
 {
-    <span class="hljs-keyword">type</span>            probes;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
-    fields          (p U);
-    probeLocations  ( (<span class="hljs-number">0.1</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>) (<span class="hljs-number">0.2</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>) );
+    <span class="hljs-keyword">type</span> probes;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
+    fields (p U);
+    probeLocations
+    (
+        (<span class="hljs-number">0.1</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
+        (<span class="hljs-number">0.2</span> <span class="hljs-number">0.05</span> <span class="hljs-number">0.005</span>)
+    );
 }</code></pre></div>
 <p>输出在 postProcessing/probes/0/p。用途：看涡脱落频率、判断是否进入统计定常。</p>
 <p>② 力与力系数：算阻力升力</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">forceCoeffs
 {
-    <span class="hljs-keyword">type</span>            forceCoeffs;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libforces.so"</span>);
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
-    patches         (cylinder);       <span class="hljs-comment">// 作用在哪个边界上</span>
-    rho             rhoInf;           <span class="hljs-comment">// 不可压时写 rhoInf</span>
-    rhoInf          <span class="hljs-number">1.0</span>;              <span class="hljs-comment">// 参考密度</span>
-    liftDir         (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
-    dragDir         (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    CofR            (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);          <span class="hljs-comment">// 力矩参考点</span>
-    pitchAxis       (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    magUInf         <span class="hljs-number">1.0</span>;              <span class="hljs-comment">// 参考速度</span>
-    lRef            <span class="hljs-number">0.1</span>;              <span class="hljs-comment">// 参考长度</span>
-    Aref            <span class="hljs-number">0.001</span>;            <span class="hljs-comment">// 参考面积</span>
+    <span class="hljs-keyword">type</span> forceCoeffs;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libforces.so"</span>);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
+    patches (cylinder); <span class="hljs-comment">// 作用在哪个边界上</span>
+    rho rhoInf; <span class="hljs-comment">// 不可压时写 rhoInf</span>
+    rhoInf <span class="hljs-number">1.0</span>; <span class="hljs-comment">// 参考密度</span>
+    liftDir (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+    dragDir (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    CofR (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 力矩参考点</span>
+    pitchAxis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+    magUInf <span class="hljs-number">1.0</span>; <span class="hljs-comment">// 参考速度</span>
+    lRef <span class="hljs-number">0.1</span>; <span class="hljs-comment">// 参考长度</span>
+    Aref <span class="hljs-number">0.001</span>; <span class="hljs-comment">// 参考面积</span>
 }</code></pre></div>
 <p><code>forceCoeffs</code> 的输出目录由函数对象实例名和起始时刻决定。使用运动学压力的不可压缩求解器时，应按 forces/forceCoeffs 的接口配置密度引用（常见为 <code>rho</code> <code>rhoInf</code> 与 <code>rhoInf</code> 数值）；如果使用热力学压力或可压缩密度场，则应采用相应处理。还应检查参考面积、参考长度、来流速度与力矩中心。</p>
 <p>③ 场平均：LES/URANS 的统计量</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">fieldAverage
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">fieldAverage
 {
-    <span class="hljs-keyword">type</span>            fieldAverage;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    timeStart       <span class="hljs-number">5</span>;                <span class="hljs-comment">// ★ 等流动充分发展后再开始统计</span>
-    writeControl    writeTime;
+    <span class="hljs-keyword">type</span> fieldAverage;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
+    timeStart <span class="hljs-number">5</span>; <span class="hljs-comment">// ★ 等流动充分发展后再开始统计</span>
+    writeControl writeTime;
     fields
     (
-        U { mean <span class="hljs-literal">on</span>; prime2Mean <span class="hljs-literal">on</span>; base time; }
-        p { mean <span class="hljs-literal">on</span>; prime2Mean <span class="hljs-literal">on</span>; base time; }
+        U
+        {
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">on</span>;
+            base time;
+        }
+        p
+        {
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">on</span>;
+            base time;
+        }
     );
 }</code></pre></div>
 <p>得到 <code>UMean</code>、<code>UPrime2Mean</code>（雷诺应力）等。<code>timeStart</code> 不设对，统计里会混入初始瞬态，结果没法用。</p>
 <p>④ 沿线取样（画剖面图）</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">singleGraph
 {
-    <span class="hljs-keyword">type</span>            sets;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl    writeTime;
-    setFormat       raw;              <span class="hljs-comment">// csv / raw / gnuplot</span>
+    <span class="hljs-keyword">type</span> sets;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
+    writeControl writeTime;
+    setFormat raw; <span class="hljs-comment">// csv / raw / gnuplot</span>
     interpolationScheme cellPoint;
-    fields          (U p);
+    fields (U p);
     sets
     (
         line1
         {
-            <span class="hljs-keyword">type</span>    <span class="hljs-keyword">uniform</span>;          <span class="hljs-comment">// 均匀取 N 个点</span>
-            axis    distance;         <span class="hljs-comment">// 横坐标用弧长；也可 x/y/z</span>
-            start   (<span class="hljs-number">0</span> <span class="hljs-number">-0.025</span> <span class="hljs-number">0.005</span>);
-            end     (<span class="hljs-number">0</span>  <span class="hljs-number">0.025</span> <span class="hljs-number">0.005</span>);
+            <span class="hljs-keyword">type</span> <span class="hljs-keyword">uniform</span>; <span class="hljs-comment">// 均匀取 N 个点</span>
+            axis distance; <span class="hljs-comment">// 横坐标用弧长；也可 x/y/z</span>
+            start (<span class="hljs-number">0</span> <span class="hljs-number">-0.025</span> <span class="hljs-number">0.005</span>);
+            end (<span class="hljs-number">0</span>  <span class="hljs-number">0.025</span> <span class="hljs-number">0.005</span>);
             nPoints <span class="hljs-number">100</span>;
         }
     );
@@ -400,26 +414,26 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 <p>⑤ 切面取样（导出面数据给 ParaView 或做面积分）</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">surfaces
 {
-    <span class="hljs-keyword">type</span>            surfaces;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libsampling.so"</span>);
-    writeControl    writeTime;
-    surfaceFormat   vtk;
-    fields          (p U);
+    <span class="hljs-keyword">type</span> surfaces;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libsampling.so"</span>);
+    writeControl writeTime;
+    surfaceFormat vtk;
+    fields (p U);
     surfaces
     (
         zNormal
         {
-            <span class="hljs-keyword">type</span>            cuttingPlane;
-            point           (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.005</span>);
-            normal          (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-            interpolate     <span class="hljs-literal">true</span>;
+            <span class="hljs-keyword">type</span> cuttingPlane;
+            point (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.005</span>);
+            normal (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+            interpolate <span class="hljs-literal">true</span>;
         }
         isoQ
         {
-            <span class="hljs-keyword">type</span>            isoSurface;
-            isoField        Q;
-            isoValue        <span class="hljs-number">100</span>;
-            interpolate     <span class="hljs-literal">true</span>;
+            <span class="hljs-keyword">type</span> isoSurface;
+            isoField Q;
+            isoValue <span class="hljs-number">100</span>;
+            interpolate <span class="hljs-literal">true</span>;
         }
     );
 }</code></pre></div>
@@ -427,22 +441,22 @@ simpleFoam -postProcess -func yPlus -latestTime</code></pre></div>
 <p>⑥ 积分与极值</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">outletFlux
 {
-    <span class="hljs-keyword">type</span>            surfaceFieldValue;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    regionType      patch;
-    <span class="hljs-keyword">name</span>            outlet;
-    operation       sum;             <span class="hljs-comment">// sum/areaAverage/areaIntegrate/min/max/CoV</span>
-    fields          (phi);
-    writeControl    timeStep;
+    <span class="hljs-keyword">type</span> surfaceFieldValue;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
+    regionType patch;
+    <span class="hljs-keyword">name</span> outlet;
+    operation sum; <span class="hljs-comment">// sum/areaAverage/areaIntegrate/min/max/CoV</span>
+    fields (phi);
+    writeControl timeStep;
 }
 volAvgT
 {
-    <span class="hljs-keyword">type</span>            volFieldValue;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
-    regionType      all;             <span class="hljs-comment">// 或 cellZone + name</span>
-    operation       volAverage;
-    fields          (T);
-    writeControl    timeStep;
+    <span class="hljs-keyword">type</span> volFieldValue;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libfieldFunctionObjects.so"</span>);
+    regionType all; <span class="hljs-comment">// 或 cellZone + name</span>
+    operation volAverage;
+    fields (T);
+    writeControl timeStep;
 }</code></pre></div>
 <p>用途：检查质量守恒（进出口 <code>phi</code> 之和应接近 0）、监测平均温度等全局量随时间的变化。</p>
 <p>⑦ 残差与求解器信息</p>
@@ -450,10 +464,10 @@ volAvgT
 <p>或</p>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solverInfo
 {
-    <span class="hljs-keyword">type</span>            solverInfo;
-    <span class="hljs-keyword">libs</span>            (<span class="hljs-string">"libutilityFunctionObjects.so"</span>);
-    fields          (U p);
-    writeResidualFields <span class="hljs-literal">yes</span>;         <span class="hljs-comment">// 把残差也写成场，可在 ParaView 里看"哪儿不收敛"</span>
+    <span class="hljs-keyword">type</span> solverInfo;
+    <span class="hljs-keyword">libs</span> (<span class="hljs-string">"libutilityFunctionObjects.so"</span>);
+    fields (U p);
+    writeResidualFields <span class="hljs-literal">yes</span>; <span class="hljs-comment">// 把残差也写成场，可在 ParaView 里看"哪儿不收敛"</span>
 }</code></pre></div>
 <p><code>writeResidualFields</code> 可以输出初始残差的空间分布，辅助定位离散误差或局部迭代困难，同时会增加输出量。高残差区域也可能来自启动瞬态或物理源项，需要结合网格、边界和方程分析。</p>
 <h2>8.4 foamToVTK / foamToEnsight —— 导出到别的软件</h2>

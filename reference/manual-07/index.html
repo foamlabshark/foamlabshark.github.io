@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -279,21 +279,29 @@
     <div class="prose"><h2>7.1 system/blockMeshDict</h2>
 <p><code>blockMeshDict</code> 通过 <code>vertices</code> 定义顶点，以 <code>hex</code> 后的 8 个顶点编号确定块的局部方向和体积符号。(Nx Ny Nz) 指定三个方向的单元数，<code>scale</code> 指定坐标缩放系数，<code>simpleGrading</code> 指定各方向末端与起始单元的尺寸比。</p>
 <p>下例建立长 1 m、宽 0.1 m、厚 0.01 m 的二维通道。厚度方向设置一层单元，两侧边界设为 <code>empty</code>。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">41 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> blockMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> blockMeshDict;
 }
 scale <span class="hljs-number">1</span>;
 vertices
 (
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>) (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>)
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>) (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>) (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>) (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>)
+    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+    (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>)
+    (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0</span>)
+    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>)
+    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.01</span>)
+    (<span class="hljs-number">1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>)
+    (<span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.01</span>)
 );
 blocks
 (
     hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) (<span class="hljs-number">100</span> <span class="hljs-number">20</span> <span class="hljs-number">1</span>)
-        simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
+    simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)
 );
 edges ();
 boundary
@@ -301,22 +309,36 @@ boundary
     inlet
     {
         <span class="hljs-keyword">type</span> patch;
-        faces ((<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>));
+        faces
+        (
+            (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>)
+        );
     }
     outlet
     {
         <span class="hljs-keyword">type</span> patch;
-        faces ((<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span>));
+        faces
+        (
+            (<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span>)
+        );
     }
     walls
     {
         <span class="hljs-keyword">type</span> wall;
-        faces ((<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span>) (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>));
+        faces
+        (
+            (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span>)
+            (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>)
+        );
     }
     frontAndBack
     {
         <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
-        faces ((<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>) (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>));
+        faces
+        (
+            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>)
+            (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>)
+        );
     }
 );
 mergePatchPairs ();</code></pre></div>
@@ -360,10 +382,14 @@ mergePatchPairs ();</code></pre></div>
 <tr><td><code>meshQualityControls</code></td><td>质量约束</td><td>通常包含系统 <code>meshQualityDict</code></td></tr>
 <tr><td><code>mergeTolerance</code></td><td>点合并相对容差</td><td>常用 1e-6，以几何包围盒尺度为基准</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 片段：放入对应的 snappyHexMeshDict</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">65 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 片段：放入对应的 snappyHexMeshDict</span>
 geometry
 {
-    body.stl { <span class="hljs-keyword">type</span> triSurfaceMesh; <span class="hljs-keyword">name</span> body; }
+    body.stl
+    {
+        <span class="hljs-keyword">type</span> triSurfaceMesh;
+        <span class="hljs-keyword">name</span> body;
+    }
     refineBox
     {
         <span class="hljs-keyword">type</span> searchableBox;
@@ -377,23 +403,45 @@ castellatedMeshControls
     maxGlobalCells <span class="hljs-number">3000000</span>;
     minRefinementCells <span class="hljs-number">0</span>;
     nCellsBetweenLevels <span class="hljs-number">3</span>;
-    features ({ file <span class="hljs-string">"body.eMesh"</span>; level <span class="hljs-number">2</span>; });
+    features
+    (
+        {
+            file <span class="hljs-string">"body.eMesh"</span>;
+            level <span class="hljs-number">2</span>;
+        }
+    );
     refinementSurfaces
     {
-        body { level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>); patchInfo { <span class="hljs-keyword">type</span> wall; } }
+        body
+        {
+            level (<span class="hljs-number">2</span> <span class="hljs-number">3</span>);
+            patchInfo
+            {
+                <span class="hljs-keyword">type</span> wall;
+            }
+        }
     }
     resolveFeatureAngle <span class="hljs-number">30</span>;
     refinementRegions
     {
-        refineBox { mode inside; levels ((<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>)); }
+        refineBox
+        {
+            mode inside;
+            levels
+            (
+                (<span class="hljs-number">1e15</span> <span class="hljs-number">2</span>)
+            );
+        }
     }
     locationInMesh (<span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     allowFreeStandingZoneFaces <span class="hljs-literal">true</span>;
 }
 snapControls
 {
-    nSmoothPatch <span class="hljs-number">3</span>; tolerance <span class="hljs-number">2.0</span>;
-    nSolveIter <span class="hljs-number">30</span>; nRelaxIter <span class="hljs-number">5</span>;
+    nSmoothPatch <span class="hljs-number">3</span>;
+    tolerance <span class="hljs-number">2.0</span>;
+    nSolveIter <span class="hljs-number">30</span>;
+    nRelaxIter <span class="hljs-number">5</span>;
     nFeatureSnapIter <span class="hljs-number">10</span>;
     implicitFeatureSnap <span class="hljs-literal">false</span>;
     explicitFeatureSnap <span class="hljs-literal">true</span>;
@@ -401,13 +449,19 @@ snapControls
 }</code></pre></div>
 <p><code>locationInMesh</code> 中的 (2 0 0) 表示待保留流体区域内的一点，该点须位于背景网格范围内及物体外部。网格生成前应消除 STL 自相交，统一长度单位，并检查背景网格。</p>
 <p>边界层生成配置如下。<code>snapControls</code> 和质量控制参数保留模板中的完整设置。将 <code>addLayers</code> 设为 <code>false</code>，可单独检查切割细化和表面贴合结果。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">33 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">castellatedMesh <span class="hljs-literal">true</span>;
 snap <span class="hljs-literal">true</span>;
 addLayers <span class="hljs-literal">true</span>;
 addLayersControls
 {
     relativeSizes <span class="hljs-literal">true</span>;
-    layers { body { nSurfaceLayers <span class="hljs-number">3</span>; } }
+    layers
+    {
+        body
+        {
+            nSurfaceLayers <span class="hljs-number">3</span>;
+        }
+    }
     expansionRatio <span class="hljs-number">1.2</span>;
     finalLayerThickness <span class="hljs-number">0.3</span>;
     minThickness <span class="hljs-number">0.1</span>;
@@ -429,15 +483,20 @@ meshQualityControls
 }
 mergeTolerance <span class="hljs-number">1e-6</span>;</code></pre></div>
 <h2>7.3 system/surfaceFeatureExtractDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFeatureExtractDict;
 }
 body.stl
 {
     extractionMethod extractFromSurface;
-    extractFromSurfaceCoeffs { includedAngle <span class="hljs-number">150</span>; }
+    extractFromSurfaceCoeffs
+    {
+        includedAngle <span class="hljs-number">150</span>;
+    }
     writeObj <span class="hljs-literal">yes</span>;
 }</code></pre></div>
 <p>输入表面 body.stl 存放于 <code>constant/triSurface</code>。<code>includedAngle</code> 按特征提取器的包含角定义取值，其定义与 <code>resolveFeatureAngle</code> 不同。<code>writeObj</code> 控制可视化文件输出。运行 <code>surfaceFeatureExtract</code> 后，将生成的 <code>eMesh</code> 文件名用于后续特征线配置。</p>
@@ -460,10 +519,12 @@ body.stl
 </tbody></table></div>
 <h2>7.5 system/setFieldsDict</h2>
 <p><code>setFields</code> 首先按 <code>defaultFieldValues</code> 设置全域初值，再依次执行 <code>regions</code> 中的区域赋值。区域重叠时，后续赋值覆盖先前结果。目标场文件须预先建立，并设置相应的 <code>class</code> 和 <code>dimensions</code>。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> setFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> setFieldsDict;
 }
 defaultFieldValues
 (
@@ -481,10 +542,12 @@ regions
 <p><code>boxToCell</code> 按单元位置选取长方体区域；<code>sphereToCell</code> 通过 <code>centre</code> 和 <code>radius</code> 定义球形区域；<code>cylinderToCell</code> 通过 <code>p1</code>、<code>p2</code> 和 <code>radius</code> 定义圆柱区域。边界面可采用 <code>boxToFace</code> 等选择器。</p>
 <p>赋值后检查 <code>alpha.water</code> 的极值与空间分布，边界条件在场文件中另行设置。需采用数学表达式赋值时，使用 <code>setExprFields</code>。</p>
 <h2>7.6 system/setExprFieldsDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> setExprFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> setExprFieldsDict;
 }
 expressions
 (
@@ -496,10 +559,12 @@ expressions
 );</code></pre></div>
 <p>下例在已有温度场 <code>T</code> 上设置随坐标变化的温度，运行 <code>setExprFields</code> 后生效。<code>fieldMask</code> 限定赋值区域，<code>create</code> 和 <code>dimensions</code> 用于新建场。表达式语法可通过 <code>foamExprParserInfo</code> 查询。边界表达式使用 <code>setExprBoundaryFieldsDict</code>，其结构按边界场接口配置。</p>
 <h2>7.7 system/topoSetDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> topoSetDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> topoSetDict;
 }
 actions
 (
@@ -527,17 +592,22 @@ actions
 <tr><td><code>sourceInfo</code></td><td>选择源参数子字典</td><td>多数选择源可将参数直接写入动作字典；名称冲突时采用 <code>sourceInfo</code></td></tr>
 </tbody></table></div>
 <h2>7.8 system/createPatchDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> createPatchDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> createPatchDict;
 }
 pointSync <span class="hljs-literal">false</span>;
 patches
 (
     {
         <span class="hljs-keyword">name</span> walls;
-        patchInfo { <span class="hljs-keyword">type</span> wall; }
+        patchInfo
+        {
+            <span class="hljs-keyword">type</span> wall;
+        }
         constructFrom patches;
         patches (wallA wallB);
     }
@@ -545,7 +615,7 @@ patches
 <p><code>constructFrom</code> <code>patches</code> 从已有边界选面；<code>constructFrom</code> <code>set</code> 从指定 <code>faceSet</code> 选面。<code>pointSync</code> 控制耦合点同步。执行 <code>createPatch</code> <code>-overwrite</code> 后，将 0/U、0/p 等场文件中的边界条目与新建 <code>walls</code> 对应。</p>
 <h2>7.9 system/createBafflesDict</h2>
 <p><code>createBaffles</code> 将内部面转换为成对边界面。<code>internalFacesOnly</code> 控制选面范围，<code>baffles</code> 定义各挡板的 <code>type</code>、<code>zoneName</code> 和 <code>patches</code>。下例采用预先建立的 <code>interfaceZone</code> 面区域。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">internalFacesOnly <span class="hljs-literal">true</span>;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">internalFacesOnly <span class="hljs-literal">true</span>;
 baffles
 {
     interface
@@ -554,17 +624,27 @@ baffles
         zoneName interfaceZone;
         patches
         {
-            master { <span class="hljs-keyword">name</span> sideA; <span class="hljs-keyword">type</span> wall; }
-            slave  { <span class="hljs-keyword">name</span> sideB; <span class="hljs-keyword">type</span> wall; }
+            master
+            {
+                <span class="hljs-keyword">name</span> sideA;
+                <span class="hljs-keyword">type</span> wall;
+            }
+            slave
+            {
+                <span class="hljs-keyword">name</span> sideB;
+                <span class="hljs-keyword">type</span> wall;
+            }
         }
     }
 }</code></pre></div>
 <p>运行 <code>createBaffles</code> <code>-overwrite</code> 生成挡板边界。两侧的传热和流动耦合由场边界条件及物理模型确定。</p>
 <h2>7.10 system/refineMeshDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> refineMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> refineMeshDict;
 }
 set heaterCells;
 coordinateSystem global;
@@ -593,10 +673,12 @@ mergeFaces false;
 mergeTol 0;</code></pre></div>
 <h2>7.12 system/mapFieldsDict</h2>
 <p><code>mapFieldsDict</code> 用于源算例与目标算例边界不一致时的场映射。<code>patchMap</code> 中每组名称依次为目标边界和源边界。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> mapFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> mapFieldsDict;
 }
 patchMap
 (
@@ -606,10 +688,12 @@ patchMap
 cuttingPatches (newCutBoundary);</code></pre></div>
 <p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> <code>latestTime</code>。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p>
 <h2>7.13 system/changeDictionaryDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> changeDictionaryDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> changeDictionaryDict;
 }
 dictionaryReplacement
 {
@@ -617,7 +701,11 @@ dictionaryReplacement
     {
         <span class="hljs-keyword">boundaryField</span>
         {
-            inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
+            inlet
+            {
+                <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+                <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+            }
         }
     }
 }</code></pre></div>

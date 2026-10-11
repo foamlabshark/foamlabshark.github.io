@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -457,20 +457,79 @@
 </tbody></table></div>
 <p>多块网格在肋片边缘、支路开口和分区界面处共享坐标平面，使边界与几何位置一致。默认加密级别为 2，薄通道与窄缝另外保留最低单元层数。共轭传热案例先建立包含流固单元区的整体网格，再按 <code>fluid</code>、<code>solid</code> 拆分；配对界面用于交换热量，<code>topoSet</code> 选出固体发热区。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下条目取自本页下载包的同名文件，几何和边界名称与上表对应。</p>
-<h3 id="constant-fluid-thermophysicalProperties"><a href="#constant-fluid-thermophysicalProperties" class="headerlink" title="constant/fluid/thermophysicalProperties"></a><code>constant/fluid/thermophysicalProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">thermoType { <span class="hljs-keyword">type</span> heRhoThermo; mixture pureMixture; transport const; thermo hConst; equationOfState rhoConst; specie specie; energy sensibleEnthalpy; }
-mixture { specie { molWeight <span class="hljs-number">28.97</span>; } equationOfState { rho <span class="hljs-number">1.184</span>; } thermodynamics { Cp <span class="hljs-number">1006</span>; Hf <span class="hljs-number">0</span>; } transport { mu <span class="hljs-number">1.84704e-05</span>; Pr <span class="hljs-number">0.7065103574144487</span>; } }
+<h3 id="constant-fluid-thermophysicalProperties"><a href="#constant-fluid-thermophysicalProperties" class="headerlink" title="constant/fluid/thermophysicalProperties"></a><code>constant/fluid/thermophysicalProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">thermoType
+{
+    <span class="hljs-keyword">type</span> heRhoThermo;
+    mixture pureMixture;
+    transport const;
+    thermo hConst;
+    equationOfState rhoConst;
+    specie specie;
+    energy sensibleEnthalpy;
+}
+mixture
+{
+    specie
+    {
+        molWeight <span class="hljs-number">28.97</span>;
+    }
+    equationOfState
+    {
+        rho <span class="hljs-number">1.184</span>;
+    }
+    thermodynamics
+    {
+        Cp <span class="hljs-number">1006</span>;
+        Hf <span class="hljs-number">0</span>;
+    }
+    transport
+    {
+        mu <span class="hljs-number">1.84704e-05</span>;
+        Pr <span class="hljs-number">0.7065103574144487</span>;
+    }
+}
 </code></pre></div>
 <p><code>rhoConst</code> 使用给定密度，<code>Cp</code> 控制单位质量流体升温所需的热量，<code>mu</code> 为动力黏度。<code>Pr</code> 由黏度、比热和导热系数计算，使传热模型采用与物性表一致的导热能力。</p>
-<h3 id="constant-solid-fvOptions"><a href="#constant-solid-fvOptions" class="headerlink" title="constant/solid/fvOptions"></a><code>constant/solid/fvOptions</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">heatInput
-{ <span class="hljs-keyword">type</span> scalarSemiImplicitSource; active <span class="hljs-literal">true</span>; selectionMode cellSet; cellSet heatingCells; volumeMode absolute; injectionRateSuSp { h (<span class="hljs-number">80</span> <span class="hljs-number">0</span>); } }
+<h3 id="constant-solid-fvOptions"><a href="#constant-solid-fvOptions" class="headerlink" title="constant/solid/fvOptions"></a><code>constant/solid/fvOptions</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">heatInput
+{
+    <span class="hljs-keyword">type</span> scalarSemiImplicitSource;
+    active <span class="hljs-literal">true</span>;
+    selectionMode cellSet;
+    cellSet heatingCells;
+    volumeMode absolute;
+    injectionRateSuSp
+    {
+        h (<span class="hljs-number">80</span> <span class="hljs-number">0</span>);
+    }
+}
 </code></pre></div>
 <p><code>heatingCells</code> 由固体区域的 <code>topoSetDict</code> 选出；<code>volumeMode absolute</code> 把 <code>h</code> 条目中的 80 作为该选区的总热功率，单位 W。改变选区体积时，总功率保持不变，体积发热率随之变化。</p>
-<h3 id="0-orig-fluid-T"><a href="#0-orig-fluid-T" class="headerlink" title="0.orig/fluid/T"></a><code>0.orig/fluid/T</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
+<h3 id="0-orig-fluid-T"><a href="#0-orig-fluid-T" class="headerlink" title="0.orig/fluid/T"></a><code>0.orig/fluid/T</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>; }
-    walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>; inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>; }
-    fluid_to_solid { <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed; Tnbr T; qr none; qrNbr none; kappaMethod fluidThermo; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>;
+    }
+    walls
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>;
+    }
+    fluid_to_solid
+    {
+        <span class="hljs-keyword">type</span> compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr T;
+        qr none;
+        qrNbr none;
+        kappaMethod fluidThermo;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">298.15</span>;
+    }
 }
 </code></pre></div>
 <p>入口温度规定冷却介质的供给状态。<code>fluid_to_solid</code> 与固体侧界面配对，耦合边界通过两侧导热能力求取界面温度和热流。出口回流时采用入口温度作为回流初值。</p>

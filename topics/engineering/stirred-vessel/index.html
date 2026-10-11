@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -367,11 +367,10 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-初始水位与相分布"><a href="#1-初始水位与相分布" class="headerlink" title="1. 初始水位与相分布"></a>1. 初始水位与相分布</h3><p>文件：<code>system/setFieldsDict</code>。本段设置初始水位与相分布。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">defaultFieldValues
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
 );
-
 regions
 (
     boxToCell
@@ -387,23 +386,19 @@ regions
 <p>初始化以空气为背景，将 0.74 m 以下单元设置为水。<code>alpha.water</code> 的 1 与 0 分别表示水和空气，入口相分数沿用同一约定。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
 <h3 id="2-叶轮和轴面转动"><a href="#2-叶轮和轴面转动" class="headerlink" title="2. 叶轮和轴面转动"></a>2. 叶轮和轴面转动</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置叶轮和轴面转动。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
 motionSolverLibs (fvMotionSolvers);
-
-motionSolver    solidBody;
-
-cellZone        rotating;
-
-solidBodyMotionFunction  rotatingMotion;
+motionSolver solidBody;
+cellZone rotating;
+solidBodyMotionFunction rotatingMotion;
 </code></pre></div>
 <p>角速度 −5 rad/s 表示相对给定 <code>z</code> 轴的负向转动。运动单元区与轴面边界分别读取转速，参数比较时同步修改两处。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/mixerVesselAMI/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
 <h3 id="3-底部通气"><a href="#3-底部通气" class="headerlink" title="3. 底部通气"></a>3. 底部通气</h3><p>文件：<code>0.orig/U</code>。本段设置底部通气。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">gasInlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">gasInlet
 {
-    <span class="hljs-keyword">type</span>           <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>          <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>);
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>);
 }
 </code></pre></div>
 <p>通气速度沿正 <code>z</code>，气相组成由入口 <code>alpha.water = 0</code> 给定。速度确定动量和流量，相分数确定流入物质，两项共同构成通气条件。</p>

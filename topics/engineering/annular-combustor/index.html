@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -382,52 +382,43 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-入口旋流"><a href="#1-入口旋流" class="headerlink" title="1. 入口旋流"></a>1. 入口旋流</h3><p>文件：<code>0.orig/U</code>。本段设置入口旋流。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            cylindricalInletVelocity;
-    origin          (<span class="hljs-number">-0.64</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span>);
-    axis            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    axialVelocity   <span class="hljs-number">40</span>;
-    radialVelocity  <span class="hljs-number">20</span>;
-    rpm             <span class="hljs-number">12732</span>; <span class="hljs-comment">// ut=40,r=3e-2,omega=ut/r,rpm=omega*60/(2*pi)</span>
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> cylindricalInletVelocity;
+    origin (<span class="hljs-number">-0.64</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span>);
+    axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    axialVelocity <span class="hljs-number">40</span>;
+    radialVelocity <span class="hljs-number">20</span>;
+    rpm <span class="hljs-number">12732</span>; <span class="hljs-comment">// ut=40,r=3e-2,omega=ut/r,rpm=omega*60/(2*pi)</span>
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
 <p><code>cylindricalInletVelocity</code> 以给定轴线为基准组合轴向、径向和周向速度。<code>rpm</code> 规定入口气流的旋转强度；叶排运动由 <code>dynamicMeshDict</code> 中的 <code>omega</code> 规定。两个参数分别控制来流和固体转动。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h3 id="2-叶排运动与转静连接"><a href="#2-叶排运动与转静连接" class="headerlink" title="2. 叶排运动与转静连接"></a>2. 叶排运动与转静连接</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置叶排运动与转静连接。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">dynamicFvMesh   dynamicMotionSolverFvMesh;
-
-<span class="hljs-keyword">solver</span>          solidBody;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dynamicFvMesh dynamicMotionSolverFvMesh;
+<span class="hljs-keyword">solver</span> solidBody;
 solidBodyCoeffs
 {
-    cellZone        rotating;
-
-    solidBodyMotionFunction  rotatingMotion;
+    cellZone rotating;
+    solidBodyMotionFunction rotatingMotion;
     rotatingMotionCoeffs
     {
-        origin        (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        axis          (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-        omega         <span class="hljs-number">10</span>;
+        origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        omega <span class="hljs-number">10</span>;
     }
 </code></pre></div>
 <p><code>rotating</code> 指定作刚体转动的单元区，外部通道保持静止。该区域的交界面采用 AMI；转动过程中，两侧面的重叠范围决定场量能否连续传递。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
 <h3 id="3-预混燃烧参数"><a href="#3-预混燃烧参数" class="headerlink" title="3. 预混燃烧参数"></a>3. 预混燃烧参数</h3><p>文件：<code>constant/combustionProperties</code>。本段设置预混燃烧参数。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">laminarFlameSpeedCorrelation Gulders;
-
-fuel            Methane;
-
-Su              Su [ <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">0.434</span>;
-
-SuModel         unstrained;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">laminarFlameSpeedCorrelation Gulders;
+fuel Methane;
+Su Su [ <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">0.434</span>;
+SuModel unstrained;
 equivalenceRatio equivalenceRatio [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">0.7</span>;
-
-sigmaExt        sigmaExt [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">100000</span>;
-
-XiModel         transport;
+sigmaExt sigmaExt [ <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> ] <span class="hljs-number">100000</span>;
+XiModel transport;
 </code></pre></div>
 <p>燃料、当量比和层流火焰速度关联式确定未燃混合物的基础燃烧特性。<code>XiModel transport</code> 通过输运方程描述火焰褶皱，使湍流对传播速度的影响进入燃烧计算。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiDyMFoam/annularCombustorTurbine/constant/combustionProperties">查看该配置的官方原文件</a>。</p>

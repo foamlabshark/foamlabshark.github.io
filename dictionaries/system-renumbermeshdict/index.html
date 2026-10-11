@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -291,7 +291,7 @@
 <li><code>springCoeffs/maxCo 0.01</code> 只在 spring 方法下控制编号跳动尺度，含义与流动 Courant 数不同。</li>
 </ul>
 <p>需要追踪原编号时开启 <code>writeMaps</code>；更换算法后用相同算例比较矩阵带宽和实际求解耗时。</p>
-<p><a href="/assets/examples/v2512/renumbermeshdict/1-renumberMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/renumberMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">123 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/renumbermeshdict/1-renumberMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/etc/caseDicts/annotated/renumberMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/etc/caseDicts/annotated">案例目录</a></p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">97 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -300,25 +300,21 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    note        <span class="hljs-string">"mesh renumbering dictionary"</span>;
-    <span class="hljs-keyword">object</span>      renumberMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    note <span class="hljs-string">"mesh renumbering dictionary"</span>;
+    <span class="hljs-keyword">object</span> renumberMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 <span class="hljs-comment">// Additional libraries</span>
 <span class="hljs-comment">//libs        (SloanRenumber);</span>
 <span class="hljs-comment">//libs        (zoltanRenumber);</span>
-
 <span class="hljs-comment">// Optional entry: write maps from renumbered back to original mesh</span>
-writeMaps   <span class="hljs-literal">false</span>;
-
+writeMaps <span class="hljs-literal">false</span>;
 <span class="hljs-comment">// Optional entry: sort cells on coupled boundaries to last for use with</span>
 <span class="hljs-comment">// e.g. nonBlockingGaussSeidel.</span>
 sortCoupledFaceCells <span class="hljs-literal">false</span>;
-
 <span class="hljs-comment">// Optional entry: renumber on a block-by-block basis. It uses a</span>
 <span class="hljs-comment">// blockCoeffs dictionary to construct a decompositionMethod to do</span>
 <span class="hljs-comment">// a block subdivision) and then applies the renumberMethod to each</span>
@@ -327,17 +323,13 @@ sortCoupledFaceCells <span class="hljs-literal">false</span>;
 <span class="hljs-comment">// This number is the approximate size of the blocks - this gets converted</span>
 <span class="hljs-comment">// to a number of blocks that is the input to the decomposition method.</span>
 <span class="hljs-comment">//blockSize 1000;</span>
-
 <span class="hljs-comment">// Optional entry: sort points into internal and boundary points</span>
 <span class="hljs-comment">//orderPoints false;</span>
-
 <span class="hljs-comment">// Optional entry (experimental) - for block-by-block (blockSize &gt; 0) option:</span>
 <span class="hljs-comment">// - sort intra-region and iter-region faces separately.</span>
 <span class="hljs-comment">//   This will likely lead to non-upper triangular ordering between regions.</span>
 <span class="hljs-comment">//regionFaceOrder false;</span>
-
-
-method          CuthillMcKee;
+method CuthillMcKee;
 <span class="hljs-comment">//method          RCM;  // == reverseCuthillMcKee;</span>
 <span class="hljs-comment">//method          Sloan;        //&lt;-  libs (zoltanRenumber);</span>
 <span class="hljs-comment">//method          manual;</span>
@@ -345,58 +337,44 @@ method          CuthillMcKee;
 <span class="hljs-comment">//method          structured;</span>
 <span class="hljs-comment">//method          spring;</span>
 <span class="hljs-comment">//method          zoltan;       //&lt;-  libs (zoltanRenumber);</span>
-
 <span class="hljs-comment">//CuthillMcKeeCoeffs</span>
 <span class="hljs-comment">//{</span>
 <span class="hljs-comment">//    // Plain or reverse CuthillMcKee (RCM)</span>
 <span class="hljs-comment">//    reverse     true;</span>
 <span class="hljs-comment">//}</span>
-
 manualCoeffs
 {
     <span class="hljs-comment">// In system directory: new-to-original (i.e. order) labelIOList</span>
-    dataFile    <span class="hljs-string">"cellMap"</span>;
+    dataFile <span class="hljs-string">"cellMap"</span>;
 }
-
-
 <span class="hljs-comment">// For extruded (i.e. structured in one direction) meshes</span>
 structuredCoeffs
 {
     <span class="hljs-comment">// Patches that mesh was extruded from.</span>
     <span class="hljs-comment">// These determine the starting layer of cells</span>
-    patches     (movingWall);
-
+    patches (movingWall);
     <span class="hljs-comment">// Method to renumber the starting layer of cells</span>
-    method      random;
-
+    method random;
     <span class="hljs-comment">// Renumber in columns (depthFirst) or in layers</span>
-    depthFirst  <span class="hljs-literal">true</span>;
-
+    depthFirst <span class="hljs-literal">true</span>;
     <span class="hljs-comment">// Reverse ordering</span>
-    reverse     <span class="hljs-literal">false</span>;
+    reverse <span class="hljs-literal">false</span>;
 }
-
-
 springCoeffs
 {
     <span class="hljs-comment">// Maximum jump of cell indices. Is fraction of number of cells</span>
-    maxCo       <span class="hljs-number">0.01</span>;
-
+    maxCo <span class="hljs-number">0.01</span>;
     <span class="hljs-comment">// Limit the amount of movement; the fraction maxCo gets decreased</span>
     <span class="hljs-comment">// with every iteration</span>
     freezeFraction <span class="hljs-number">0.999</span>;
-
     <span class="hljs-comment">// Maximum number of iterations</span>
-    maxIter    <span class="hljs-number">1000</span>;
-
+    maxIter <span class="hljs-number">1000</span>;
     <span class="hljs-comment">// Enable/disable verbosity</span>
-    verbose    <span class="hljs-literal">true</span>;
+    verbose <span class="hljs-literal">true</span>;
 }
-
-
 blockCoeffs
 {
-    method      scotch;
+    method scotch;
     <span class="hljs-comment">//method      hierarchical;</span>
     <span class="hljs-comment">//hierarchicalCoeffs</span>
     <span class="hljs-comment">//{</span>
@@ -405,14 +383,10 @@ blockCoeffs
     <span class="hljs-comment">//    order       xyz;</span>
     <span class="hljs-comment">//}</span>
 }
-
-
 zoltanCoeffs
 {
-    ORDER_METHOD    LOCAL_HSFC;
+    ORDER_METHOD LOCAL_HSFC;
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/renumbermesh/">renumberMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

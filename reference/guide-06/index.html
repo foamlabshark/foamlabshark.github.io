@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -399,14 +399,23 @@ transformPoints -rollPitchYaw '(0 10 0)'              # 按滚转/俯仰/偏航�
 topoSet -dict system/topoSetDict.refine
 topoSet -constant             <span class="hljs-comment"># 作用在 constant 时刻的网格上</span></code></pre></div>
 <p>示例：选出一个盒子区域的单元，再转成 <code>cellZone</code></p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// system/topoSetDict</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// system/topoSetDict</span>
 actions
 (
-    { <span class="hljs-keyword">name</span> c0;  <span class="hljs-keyword">type</span> cellSet;  action new;
-      source boxToCell;  box (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>); }
-
-    { <span class="hljs-keyword">name</span> porousZone;  <span class="hljs-keyword">type</span> cellZoneSet;  action new;
-      source setToCellZone;  set c0; }
+    {
+        <span class="hljs-keyword">name</span> c0;
+        <span class="hljs-keyword">type</span> cellSet;
+        action new;
+        source boxToCell;
+        box (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>);
+    }
+    {
+        <span class="hljs-keyword">name</span> porousZone;
+        <span class="hljs-keyword">type</span> cellZoneSet;
+        action new;
+        source setToCellZone;
+        set c0;
+    }
 );</code></pre></div>
 <p><code>cellSet</code> 与 <code>cellZone</code> 的区别：Set 是临时的选择结果（存在 constant/polyMesh/sets/），Zone 是网格的正式组成部分（写进 <code>constant/polyMesh/cellZones</code>），求解器里的多孔介质、<code>MRF</code>、<code>fvOptions</code> 认的是 Zone。所以流程通常是”先 Set 后 Zone”。</p>
 <p>常用 <code>source</code> 类型见第 17 章。</p>

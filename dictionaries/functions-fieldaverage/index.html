@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,7 +284,7 @@
 <h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>fieldAverage</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>fieldFunctionObjects</code>)</td></tr><tr><td><code>fields</code></td><td>每个字段的平均设置列表；内部填写 <code>mean</code>、<code>prime2Mean</code> 和 <code>base</code>。</td><td>必填</td><td>—</td></tr><tr><td><code>restartOnRestart</code></td><td>重新启动计算时重新开始累积平均值。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>restartOnOutput</code></td><td>每次保存后重新开始累积平均值。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>periodicRestart</code></td><td>是否按固定周期重新开始平均。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>restartPeriod</code></td><td>周期性重置平均的时间间隔。</td><td>条件必填</td><td>—</td></tr><tr><td><code>restartTime</code></td><td>到指定时间时执行一次平均重置。</td><td>可选</td><td>GREAT</td></tr><tr><td><code>subRegion</code></td><td>存放采样表面等数据的子对象数据库名称。</td><td>可选</td><td>""</td></tr><tr><td><code>fields.&lt;场名&gt;.mean</code></td><td>是否计算平均场</td><td>必填</td><td><code>true</code> / <code>false</code></td></tr><tr><td><code>fields.&lt;场名&gt;.prime2Mean</code></td><td>是否计算二阶脉动矩</td><td>必填</td><td><code>true</code> / <code>false</code></td></tr><tr><td><code>fields.&lt;场名&gt;.base</code></td><td><code>time</code> 按时间加权，<code>iteration</code> 按样本数统计</td><td>必填</td><td><code>time</code> / <code>iteration</code></td></tr><tr><td><code>fields.&lt;场名&gt;.window</code></td><td>该字段的平均窗口长度</td><td>可选</td><td>累计整个统计时段</td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr></tbody></table></div><p><a href="/function-objects/fieldaverage/">fieldAverage 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p><h2 id="configuration-details">其他参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>fields.&lt;字段&gt;.windowType</code></td><td>每个字段的平均设置：<code>none</code>、approximate 或 exact；精确窗口需要保存窗口内的场，内存和磁盘开销更高。</td></tr><tr><td><code>fields.&lt;字段&gt;.windowName</code></td><td>窗口名称，用作统计场名的一部分，以区分不同窗口。</td></tr><tr><td><code>fields.&lt;字段&gt;.allowRestart</code></td><td>是否允许该字段的窗口统计重启，默认 <code>true</code>。程序自动保存 <code>totalIter</code>、<code>totalTime</code>、<code>windowTimes</code> 和 <code>windowFieldNames</code>，并在重启时恢复。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/functionObjects/field/fieldAverage/fieldAverage.H">v2512 实现与参数读取</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 2 s 后开始平均</h3><p>加入 <code>system/controlDict/functions</code>：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">meanFlow
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">meanFlow
 {
     <span class="hljs-keyword">type</span> fieldAverage;
     <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
@@ -320,21 +320,21 @@
 <li><code>writeControl writeTime</code> 让统计字段随主结果保存。</li>
 </ul>
 <p>用于非定常湍流统计时应按物理时间设计平均窗口，并在启动瞬态结束后开始累计。</p>
-<p><a href="/assets/examples/v2512/fieldaverage/1-fieldAverage.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar/system/fieldAverage">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar/system/fieldAverage"><code>incompressible/simpleFoam/simpleCar/system/fieldAverage</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">fieldAverage1
+<p><a href="/assets/examples/v2512/fieldaverage/1-fieldAverage.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar/system/fieldAverage">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/simpleCar/system/fieldAverage"><code>incompressible/simpleFoam/simpleCar/system/fieldAverage</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">fieldAverage1
 {
-    <span class="hljs-keyword">type</span>            fieldAverage;
-    <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-    triggerStart    <span class="hljs-number">1</span>;
-    timeStart       <span class="hljs-number">500</span>;
-    controlMode     timeOrTrigger;
-    writeControl    writeTime;
+    <span class="hljs-keyword">type</span> fieldAverage;
+    <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+    triggerStart <span class="hljs-number">1</span>;
+    timeStart <span class="hljs-number">500</span>;
+    controlMode timeOrTrigger;
+    writeControl writeTime;
     fields
     (
         U
         {
-            base        iteration;
-            mean        <span class="hljs-literal">on</span>;
-            prime2Mean  <span class="hljs-literal">off</span>;
+            base iteration;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">off</span>;
         }
     );
 }</code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>incompressible/pimpleFoam/LES/NACA4412</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/pimpleFoam/LES/NACA4412"><h3>算例问题：NACA4412</h3><p class="reference-case-problem">来流绕过带弯度的 NACA4412 翼型，在较强逆压梯度下形成分离流动。算例用于观察翼面压力、分离剪切层和尾流，以及它们对升力和阻力的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412"><code>incompressible/pimpleFoam/LES/NACA4412</code></a>。</p><figure class="reference-case-figure"><img alt="NACA4412 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>NACA4412 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>NACA4412 的 <code>LES</code> 统计在指定开始时刻后累计均值与速度脉动二阶矩。</p>
@@ -345,59 +345,54 @@
 <li><code>writeControl writeTime</code> 输出当前累计统计字段。</li>
 </ul>
 <p>延长统计时长后比较均值与脉动量是否稳定，改变重启策略时同时检查已有统计累计状态。</p>
-<p><a href="/assets/examples/v2512/fieldaverage/2-fieldAverage.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage"><code>incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">54 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fieldaverage/2-fieldAverage.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage"><code>incompressible/pimpleFoam/LES/NACA4412/system/fieldAverage</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">49 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/</span>
-
 fieldAverage
 {
-    <span class="hljs-keyword">type</span>            fieldAverage;
-    <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-
-    enabled         <span class="hljs-literal">true</span>;
-    writeControl    writeTime;
-
-    timeStart       <span class="hljs-variable">$tStartAvg</span>;
-
+    <span class="hljs-keyword">type</span> fieldAverage;
+    <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+    enabled <span class="hljs-literal">true</span>;
+    writeControl writeTime;
+    timeStart <span class="hljs-variable">$tStartAvg</span>;
     fields
     (
         U
         {
-            mean            <span class="hljs-literal">on</span>;
-            prime2Mean      <span class="hljs-literal">on</span>;
-            base            time;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">on</span>;
+            base time;
         }
         p
         {
-            mean            <span class="hljs-literal">on</span>;
-            prime2Mean      <span class="hljs-literal">off</span>;
-            base            time;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">off</span>;
+            base time;
         }
         nut
         {
-            mean            <span class="hljs-literal">on</span>;
-            prime2Mean      <span class="hljs-literal">off</span>;
-            base            time;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">off</span>;
+            base time;
         }
         nuTilda
         {
-            mean            <span class="hljs-literal">on</span>;
-            prime2Mean      <span class="hljs-literal">off</span>;
-            base            time;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">off</span>;
+            base time;
         }
         wallShearStress
         {
-            mean            <span class="hljs-literal">on</span>;
-            prime2Mean      <span class="hljs-literal">off</span>;
-            base            time;
+            mean <span class="hljs-literal">on</span>;
+            prime2Mean <span class="hljs-literal">off</span>;
+            base time;
         }
     );
 }
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common"><h3>算例问题：common</h3><p class="reference-case-problem">风在平坦粗糙地面上形成大气边界层，平均速度和湍流量随高度变化。算例用于配套设置对数入口剖面与地面壁面函数，并检查下游剖面能否保持预期状态。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common</code></a>。</p></section><!-- /reference-case-contexts --><p>大气边界层 successor 在这里累计 <code>U</code> 的平均字段，便于检查稳态结果的变化。</p>
 <ul>
 <li><code>type fieldAverage</code>、<code>fields (U ...)</code> 选择速度统计。</li>
@@ -406,7 +401,7 @@ fieldAverage
 <li>主场每 500 步写出，文本 <code>writePrecision 16</code> 提高保存有效位数，统计也在 <code>writeTime</code> 输出。</li>
 </ul>
 <p>转为非定常边界层时需重新选择采样开始时刻和足够长的物理平均时间。</p>
-<p><a href="/assets/examples/v2512/fieldaverage/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">71 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fieldaverage/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -415,67 +410,47 @@ fieldAverage
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 <span class="hljs-comment">// Make sure all utilities know specialised models</span>
-<span class="hljs-keyword">libs</span>            (atmosphericModels);
-
-<span class="hljs-keyword">application</span>     buoyantBoussinesqSimpleFoam;
-
-startFrom       latestTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">1000</span>;
-
-deltaT          <span class="hljs-number">1</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">500</span>;
-
-purgeWrite      <span class="hljs-number">0</span>;
-
-writeFormat     ascii;
-
-writePrecision  <span class="hljs-number">16</span>;
-
+<span class="hljs-keyword">libs</span> (atmosphericModels);
+<span class="hljs-keyword">application</span> buoyantBoussinesqSimpleFoam;
+startFrom latestTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">1000</span>;
+deltaT <span class="hljs-number">1</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">500</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat ascii;
+writePrecision <span class="hljs-number">16</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">false</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     fieldAverage1
     {
-        <span class="hljs-keyword">type</span>            fieldAverage;
-        <span class="hljs-keyword">libs</span>            (fieldFunctionObjects);
-        writeControl    writeTime;
-
+        <span class="hljs-keyword">type</span> fieldAverage;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        writeControl writeTime;
         fields
         (
             U
             {
-                mean        <span class="hljs-literal">on</span>;
-                prime2Mean  <span class="hljs-literal">off</span>;
-                base        time;
+                mean <span class="hljs-literal">on</span>;
+                prime2Mean <span class="hljs-literal">off</span>;
+                base time;
             }
         );
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -343,42 +343,39 @@ bash Allmesh
 </tbody></table></div>
 <p>本例的起始场位于 <code>0/</code>，修改初始场时直接编辑该目录。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-污泥相对沉降"><a href="#1-污泥相对沉降" class="headerlink" title="1. 污泥相对沉降"></a>1. 污泥相对沉降</h3><p>文件：<code>constant/transportProperties</code>。本段设置污泥相对沉降。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">relativeVelocityModel simple;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">relativeVelocityModel simple;
 <span class="hljs-string">"(simple|general)Coeffs"</span>
 {
-    V0              (<span class="hljs-number">0</span> <span class="hljs-number">-0.002198</span> <span class="hljs-number">0</span>);
-    a               <span class="hljs-number">285.84</span>;
-    a1              <span class="hljs-number">0.1</span>;
-    residualAlpha   <span class="hljs-number">0</span>;
+    V0 (<span class="hljs-number">0</span> <span class="hljs-number">-0.002198</span> <span class="hljs-number">0</span>);
+    a <span class="hljs-number">285.84</span>;
+    a1 <span class="hljs-number">0.1</span>;
+    residualAlpha <span class="hljs-number">0</span>;
 }
 </code></pre></div>
 <p><code>V0</code> 给出基准沉降速度与方向，浓度参数控制沉降随固相含量的变化。目标污泥的沉降试验用于确定这组关系。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/constant/transportProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="2-入口与初始浓度"><a href="#2-入口与初始浓度" class="headerlink" title="2. 入口与初始浓度"></a>2. 入口与初始浓度</h3><p>文件：<code>0/alpha.sludge</code>。本段设置入口与初始浓度。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.001</span>;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.001</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-variable">$internalField</span>;
     }
 </code></pre></div>
 <p>0.001 表示污泥体积分数。质量浓度数据需结合污泥密度换算，入口和初始场采用相同定义。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/driftFluxFoam/RAS/dahl/0/alpha.sludge">查看该配置的官方原文件</a>。</p>
 <h3 id="3-底部出口条件"><a href="#3-底部出口条件" class="headerlink" title="3. 底部出口条件"></a>3. 底部出口条件</h3><p>文件：<code>0/U</code>。本段设置底部出口条件。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">outlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">outlet
 {
-    <span class="hljs-keyword">type</span>            pressureInletOutletVelocity;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
 <p>右下出口抽出该高度附近的流体与污泥，池底和端壁无滑移。出口位置直接影响底部浓缩区的排出，因此它是水力模型的一部分。</p>

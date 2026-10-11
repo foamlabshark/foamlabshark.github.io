@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -347,42 +347,38 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-通道入口速度"><a href="#1-通道入口速度" class="headerlink" title="1. 通道入口速度"></a>1. 通道入口速度</h3><p>文件：<code>0.orig/U</code>。本段设置通道入口速度。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
 </code></pre></div>
 <p>入口施加固定速度向量，壁面采用无滑移条件。0.1 m/s 的低速来流允许浮力明显参与流量分配；调整风速后，应按相应流动状态检查入口湍流参数。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/circuitBoardCooling/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h3 id="2-一维板件的热阻与热源"><a href="#2-一维板件的热阻与热源" class="headerlink" title="2. 一维板件的热阻与热源"></a>2. 一维板件的热阻与热源</h3><p>文件：<code>0.orig/include/1DBaffle/1DTemperatureMasterBafflePatches</code>。本段设置一维板件的热阻与热源。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">T
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">T
 {
-    <span class="hljs-keyword">type</span>   compressible::thermalBaffle1D&lt;hConstSolidThermoPhysics&gt;;
-
-    thickness       <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.005</span>;  <span class="hljs-comment">// thickness [m]</span>
-    qs              <span class="hljs-keyword">uniform</span> <span class="hljs-number">100</span>;    <span class="hljs-comment">// heat flux [W/m2]</span>
-
+    <span class="hljs-keyword">type</span> compressible::thermalBaffle1D&lt;hConstSolidThermoPhysics&gt;;
+    thickness <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.005</span>; <span class="hljs-comment">// thickness [m]</span>
+    qs <span class="hljs-keyword">uniform</span> <span class="hljs-number">100</span>; <span class="hljs-comment">// heat flux [W/m2]</span>
     # <span class="hljs-keyword">include</span> <span class="hljs-string">"1DbaffleSolidThermo"</span>
-
-    <span class="hljs-keyword">value</span>               <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
 }
 </code></pre></div>
 <p><code>thickness</code> 与固体导热系数共同确定厚度热阻，<code>qs</code> 为板面热源。固体物性由相邻 <code>include</code> 文件引入，热边界与物性文件共同组成完整的板件传热设置。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantSimpleFoam/circuitBoardCooling/0.orig/include/1DBaffle/1DTemperatureMasterBafflePatches">查看该配置的官方原文件</a>。</p>
 <h3 id="3-板面边界生成"><a href="#3-板面边界生成" class="headerlink" title="3. 板面边界生成"></a>3. 板面边界生成</h3><p>文件：<code>system/createBafflesDict</code>。本段设置板面边界生成。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">baffles
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">baffles
 {
     baffleFacesThermoBaffle1D
     {
         <span class="hljs-comment">//- Use predefined faceZone to select faces and orientation.</span>
-        <span class="hljs-keyword">type</span>        searchableSurface;
-        surface     triSurfaceMesh;
-        <span class="hljs-keyword">name</span>        baffle1D.stl;
-
+        <span class="hljs-keyword">type</span> searchableSurface;
+        surface triSurfaceMesh;
+        <span class="hljs-keyword">name</span> baffle1D.stl;
         patchPairs
         {
-            <span class="hljs-keyword">type</span>            wall;
+            <span class="hljs-keyword">type</span> wall;
             patchFields
             {
                 <span class="hljs-meta">#include "&lt;case&gt;/0/include/wallBafflePatches"</span>
@@ -390,22 +386,19 @@ bash Allmesh
             }
         }
     }
-
     <span class="hljs-meta">#include "&lt;case&gt;/0/include/baffle3DSetup"</span>
-
     baffleFacesThermoBaffle3D
     {
-        <span class="hljs-keyword">type</span>        searchableSurface;
-        surface     triSurfaceMesh;
-        <span class="hljs-keyword">name</span>        baffle3D.stl;
-
+        <span class="hljs-keyword">type</span> searchableSurface;
+        surface triSurfaceMesh;
+        <span class="hljs-keyword">name</span> baffle3D.stl;
         patchPairs
         {
-            <span class="hljs-keyword">type</span>            mappedWall;
-            sampleMode      nearestPatchFace;
+            <span class="hljs-keyword">type</span> mappedWall;
+            sampleMode nearestPatchFace;
             <span class="hljs-comment">// Put master and slave patch in same group (default on)</span>
             <span class="hljs-comment">// Otherwise makeup group names xxx_master and xxx_slave</span>
-            sameGroup       <span class="hljs-literal">off</span>;
+            sameGroup <span class="hljs-literal">off</span>;
             patchFields
             {
                 <span class="hljs-meta">#include "&lt;case&gt;/0/include/wallBafflePatches"</span>

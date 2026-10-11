@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,7 +284,7 @@
 <h2 id="function-configuration">功能对象参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>forces</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td>(<code>forces</code>)</td></tr><tr><td><code>patches</code></td><td>需要处理的边界名称列表；支持名称匹配表达式。</td><td>必填</td><td>—</td></tr><tr><td><code>directForceDensity</code></td><td><code>true</code> 时直接读取体积力密度场；<code>false</code> 时根据压力与黏性应力计算。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>porosity</code></td><td>是否计入多孔区域的阻力贡献。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>writeFields</code></td><td>是否将计算得到的场或所选原始场写出。</td><td>可选</td><td><code>false</code></td></tr><tr><td><code>coordinateSystem</code></td><td>局部坐标系子字典，包含原点与轴向设置。</td><td>条件必填</td><td>—</td></tr><tr><td><code>CofR</code></td><td>计算力矩使用的参考中心坐标。</td><td>条件必填</td><td>—</td></tr><tr><td><code>origin</code></td><td>局部坐标系或旋转轴的原点。</td><td>条件必填</td><td>—</td></tr><tr><td><code>e3</code></td><td>局部坐标系的第三基向量。</td><td>条件必填</td><td>—</td></tr><tr><td><code>e1</code></td><td>局部坐标系的第一基向量。</td><td>条件必填</td><td>—</td></tr><tr><td><code>fD</code></td><td><code>directForceDensity</code> 为 <code>true</code> 时使用的力密度场名称。</td><td>条件必填</td><td>—</td></tr><tr><td><code>p</code></td><td>压力场名称。</td><td>条件必填</td><td><code>p</code></td></tr><tr><td><code>U</code></td><td>速度场名称。</td><td>条件必填</td><td><code>U</code></td></tr><tr><td><code>rho</code></td><td>密度场名称；使用常密度时按示例选择 <code>rhoInf</code>。</td><td>条件必填</td><td><code>rho</code></td></tr><tr><td><code>rhoInf</code></td><td>不可压缩计算使用的参考密度。</td><td>条件必填</td><td>—</td></tr><tr><td><code>pRef</code></td><td>参考压力。</td><td>条件必填</td><td>0</td></tr><tr><td><code>writeToFile</code></td><td>是否保存统计文本文件</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writePrecision</code></td><td>文本数值的有效位数</td><td>可选</td><td>全局写出精度</td></tr><tr><td><code>useUserTime</code></td><td>是否采用用户时间单位</td><td>可选</td><td><code>true</code></td></tr></tbody></table></div><h3>其余配置条目</h3><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>application</code></td><td>供运行脚本查询的求解器名称；直接在终端执行程序时，以执行的命令为准。</td></tr></tbody></table></div><p><a href="/function-objects/forces/">forces 独立速查与更多示例</a></p><p><a href="/dictionaries/system-controldict/">controlDict 全局设置</a></p><h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p>
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 不可压缩绕流的受力</h3><p>在具有壁面 <code>patch</code> <code>body</code> 的 <code>simpleFoam</code> 案例中，将以下对象加入 <code>system/controlDict/functions</code>：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">bodyForces
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">bodyForces
 {
     <span class="hljs-keyword">type</span> forces;
     <span class="hljs-keyword">libs</span> (forces);
@@ -308,30 +308,25 @@
 <li>每 10 个求解步写出，<code>log false</code> 减少终端打印。</li>
 </ul>
 <p>改变翼型厚度方向范围时按实际三维面积解释总力；力矩比较应使用同一个参考中心。</p>
-<p><a href="/assets/examples/v2512/forces/1-forces.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces"><code>incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/1-forces.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces"><code>incompressible/pimpleFoam/RAS/wingMotion/wingMotion2D_simpleFoam/system/forces</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/</span>
-
 forces
 {
-    <span class="hljs-keyword">type</span>            forces;
-    <span class="hljs-keyword">libs</span>            (forces);
-
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">10</span>;
-    log             <span class="hljs-literal">false</span>;
-
-    patches         (wing);
-    rho             rhoInf;
-    rhoInf          <span class="hljs-number">1</span>;
-    CofR            (<span class="hljs-number">0.4974612746</span> <span class="hljs-number">-0.01671895744</span> <span class="hljs-number">0.125</span>);
+    <span class="hljs-keyword">type</span> forces;
+    <span class="hljs-keyword">libs</span> (forces);
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">10</span>;
+    log <span class="hljs-literal">false</span>;
+    patches (wing);
+    rho rhoInf;
+    rhoInf <span class="hljs-number">1</span>;
+    CofR (<span class="hljs-number">0.4974612746</span> <span class="hljs-number">-0.01671895744</span> <span class="hljs-number">0.125</span>);
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · multiphase/interFoam/RAS/DTCHull</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/RAS/DTCHull"><h3>算例问题：DTCHull</h3><p class="reference-case-problem">船体固定在水气两相计算域中，给定来流后计算船体附近的压力、黏性流动和自由表面波。由船体表面积分得到阻力，并检查船首、船尾及尾流区的波面形态。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull"><code>multiphase/interFoam/RAS/DTCHull</code></a>。</p><figure class="reference-case-figure"><img alt="DTCHull 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/hull.svg" width="720"><figcaption>DTCHull 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>DTCHull 在每个求解步统计 <code>hull</code> 表面的载荷，用于观察船体阻力随迭代或时间的发展。</p>
 <ul>
 <li><code>patches (hull)</code> 限定船体受力表面。</li>
@@ -340,7 +335,7 @@ forces
 <li><code>writeControl timeStep</code>、<code>writeInterval 1</code> 每步记录载荷，<code>log on</code> 同时打印到日志；主场则每 100 步保存。</li>
 </ul>
 <p>更换船体或姿态后检查 <code>patch</code> 和参考中心，并结合求解器当前时间处理解释载荷曲线。</p>
-<p><a href="/assets/examples/v2512/forces/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict"><code>multiphase/interFoam/RAS/DTCHull/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/2-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/controlDict"><code>multiphase/interFoam/RAS/DTCHull/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -349,59 +344,41 @@ forces
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     interFoam;
-
-startFrom       startTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">4000</span>;
-
-deltaT          <span class="hljs-number">1</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">100</span>;
-
-purgeWrite      <span class="hljs-number">0</span>;
-
-writeFormat     binary;
-
-writePrecision  <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">application</span> interFoam;
+startFrom startTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">4000</span>;
+deltaT <span class="hljs-number">1</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat binary;
+writePrecision <span class="hljs-number">6</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">yes</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     forces
     {
-        <span class="hljs-keyword">type</span>            forces;
-        <span class="hljs-keyword">libs</span>            (forces);
-        patches         (hull);
-        rhoInf          <span class="hljs-number">998.8</span>;
-        log             <span class="hljs-literal">on</span>;
-        writeControl    timeStep;
-        writeInterval   <span class="hljs-number">1</span>;
-        CofR            (<span class="hljs-number">2.929541</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
+        <span class="hljs-keyword">type</span> forces;
+        <span class="hljs-keyword">libs</span> (forces);
+        patches (hull);
+        rhoInf <span class="hljs-number">998.8</span>;
+        log <span class="hljs-literal">on</span>;
+        writeControl timeStep;
+        writeInterval <span class="hljs-number">1</span>;
+        CofR (<span class="hljs-number">2.929541</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset"><h3>算例问题：aeroFoil_overset</h3><p class="reference-case-problem">来流绕过二维翼型，在表面形成边界层并在下游形成尾流。入口来流、攻角和近壁网格共同影响表面压力及升阻力；重叠网格版本将翼型附近网格与背景网格分别建立。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset"><code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset</code></a>。</p><figure class="reference-case-figure"><img alt="aeroFoil_overset 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/airfoil.svg" width="720"><figcaption>aeroFoil_overset 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>重叠网格翼型算例对 <code>wing</code> 表面输出力与力矩，便于与普通网格结果比较。</p>
 <ul>
 <li><code>type forces</code>、<code>patches (wing)</code> 选择积分对象。</li>
@@ -410,7 +387,7 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
 <li>主求解采用 <code>overSimpleFoam</code> 与 <code>startFrom latestTime</code>，从已有结果继续稳态迭代。</li>
 </ul>
 <p>比较不同重叠区域或网格分辨率时，保持来流、参考密度与积分表面一致。</p>
-<p><a href="/assets/examples/v2512/forces/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict"><code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/forces/3-controlDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict"><code>incompressible/overSimpleFoam/aeroFoil/aeroFoil_overset/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -419,62 +396,44 @@ runTimeModifiable <span class="hljs-literal">yes</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     overSimpleFoam;
-
-startFrom       latestTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">3000</span>;
-
-deltaT          <span class="hljs-number">1</span>;
-
-writeControl    runTime;
-
-writeInterval   <span class="hljs-number">100</span>;
-
-purgeWrite      <span class="hljs-number">0</span>;
-
-writeFormat     binary;
-
-writePrecision  <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">application</span> overSimpleFoam;
+startFrom latestTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">3000</span>;
+deltaT <span class="hljs-number">1</span>;
+writeControl runTime;
+writeInterval <span class="hljs-number">100</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat binary;
+writePrecision <span class="hljs-number">6</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
 <span class="hljs-keyword">functions</span>
 {
     forces
     {
-        <span class="hljs-keyword">type</span>                forces;
-        <span class="hljs-keyword">libs</span>                (forces);
-        writeControl        timeStep;
-        writeInterval       <span class="hljs-number">10</span>;
-        patches             (wing);
-        pName               p;
-        UName               U;
-        rhoName             rhoInf;
-        log                 <span class="hljs-literal">true</span>;
-        rhoInf              <span class="hljs-number">1</span>;
-        CofR                (<span class="hljs-number">0.4974612746</span> <span class="hljs-number">-0.01671895744</span> <span class="hljs-number">0.125</span>);
+        <span class="hljs-keyword">type</span> forces;
+        <span class="hljs-keyword">libs</span> (forces);
+        writeControl timeStep;
+        writeInterval <span class="hljs-number">10</span>;
+        patches (wing);
+        pName p;
+        UName U;
+        rhoName rhoInf;
+        log <span class="hljs-literal">true</span>;
+        rhoInf <span class="hljs-number">1</span>;
+        CofR (<span class="hljs-number">0.4974612746</span> <span class="hljs-number">-0.01671895744</span> <span class="hljs-number">0.125</span>);
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a> · <a href="/commands/postprocess/">postProcess</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>函数对象未执行</td><td>核对 <code>libs</code>、<code>type</code>、<code>enabled</code>、<code>executeControl</code> 与选定时间；求解器创建的模型对象可能是必要依赖。</td></tr><tr><td>输出路径找不到</td><td>检查 postProcessing/实例名/起始时刻，部分函数对象把场写入常规时间目录。</td></tr><tr><td>统计量定义不一致</td><td>明确面积/体积/时间加权，检查 <code>fields</code>、<code>operation</code> 与 <code>base</code> 的含义。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

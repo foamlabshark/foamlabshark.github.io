@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -281,10 +281,12 @@
 <p>两套算例边界名称或覆盖范围不一致时，<code>mapFieldsDict</code> 描述目标边界与源边界之间的映射关系。它用于换网格后继承已有解，让速度、压力等场能够作为新计算的初值。</p>
 <!-- /reference-introduction -->
 <p>位置：<code>system/mapFieldsDict</code></p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>mapFieldsDict</code> 用于源算例与目标算例边界不一致时的场映射。<code>patchMap</code> 中每组名称依次为目标边界和源边界。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> mapFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> mapFieldsDict;
 }
 patchMap
 (
@@ -292,8 +294,8 @@ patchMap
     outlet sourceOutlet
 );
 cuttingPatches (newCutBoundary);</code></pre></div>
-<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> <code>latestTime</code>。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">patchMap        ( inlet1 inlet );   <span class="hljs-comment">// 源算例 patch → 目标算例 patch</span>
-cuttingPatches  ( outlet );         <span class="hljs-comment">// 被切开的 patch（源网格不覆盖的部分）</span></code></pre></div>
+<p>在目标算例中执行 <code>mapFields</code> ../sourceCase <code>-sourceTime</code> <code>latestTime</code>。<code>cuttingPatches</code> 指定切穿源计算域的目标边界，其数值由源域内部插值得到。<code>-consistent</code> 适用于边界拓扑匹配的算例。映射体积分数等守恒量后，应检查有界性及积分守恒。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">patchMap ( inlet1 inlet ); <span class="hljs-comment">// 源算例 patch → 目标算例 patch</span>
+cuttingPatches ( outlet ); <span class="hljs-comment">// 被切开的 patch（源网格不覆盖的部分）</span></code></pre></div>
 <p>网格边界一致时可以完全不用这个文件，直接 <code>mapFields</code> ../src <code>-consistent</code>。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/icoFoam/cavity/cavityGrade</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/icoFoam/cavity/cavityGrade"><h3>算例问题：cavityGrade</h3><p class="reference-case-problem">封闭方腔的顶盖沿切向运动，其他壁面保持静止，顶盖通过黏性作用带动腔内流体。计算产生主涡和角部回流，用于检查速度、压力以及网格分辨率对流动结构的影响。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade"><code>incompressible/icoFoam/cavity/cavityGrade</code></a>。</p><figure class="reference-case-figure"><img alt="cavityGrade 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/lid-cavity.svg" width="720"><figcaption>cavityGrade 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure><p class="reference-case-source">同一物理问题的另一配置算例：incompressible/icoFoam/cavity/cavityClipped。</p></section><!-- /reference-case-contexts --><p>cavityGrade 用较粗或不同分布的方腔结果初始化新网格。</p>
 <ul>
 <li><code>patchMap ()</code> 没有额外列出需要配对的边界名称。</li>
@@ -301,7 +303,7 @@ cuttingPatches  ( outlet );         <span class="hljs-comment">// 被切开的 p
 <li>此配置只补充映射规则，源算例路径、源时刻和映射方法由 <code>mapFields</code> 的调用确定。</li>
 </ul>
 <p>两份网格边界完全对应时可结合一致映射用法；若边界改名或目标域被裁切，需要补充相应列表。</p>
-<p><a href="/assets/examples/v2512/mapfieldsdict/1-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict"><code>incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mapfieldsdict/1-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict"><code>incompressible/icoFoam/cavity/cavityGrade/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -310,18 +312,14 @@ cuttingPatches  ( outlet );         <span class="hljs-comment">// 被切开的 p
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      mapFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> mapFieldsDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-patchMap        ( );
-
-cuttingPatches  ( );
-
-
+patchMap ( );
+cuttingPatches ( );
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common"><h3>算例问题：common</h3><p class="reference-case-problem">风在平坦粗糙地面上形成大气边界层，平均速度和湍流量随高度变化。算例用于配套设置对数入口剖面与地面壁面函数，并检查下游剖面能否保持预期状态。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common</code></a>。</p></section><!-- /reference-case-contexts --><p>大气边界层 successor 区从已有流场取得初值，同时处理 <code>terrain</code> 和 <code>top</code> 这两类切割边界。</p>
 <ul>
 <li><code>patchMap ()</code> 未建立额外名称映射。</li>
@@ -329,7 +327,7 @@ cuttingPatches  ( );
 <li>坐标、地形位置和源场覆盖范围应与目标区域一致。</li>
 </ul>
 <p>更换 successor 范围后先检查源域能否覆盖目标网格，再调整切割边界清单。</p>
-<p><a href="/assets/examples/v2512/mapfieldsdict/2-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mapfieldsdict/2-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict"><code>verificationAndValidation/atmosphericModels/atmFlatTerrain/successor/setups.orig/common/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -338,21 +336,17 @@ cuttingPatches  ( );
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      mapFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> mapFieldsDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 patchMap ( );
-
 cuttingPatches
 (
     terrain top
 );
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/icoFoam/cavity/cavityClipped</summary><p>cavityClipped 的目标边界名与源方腔不同，因此需要一项名称对应。</p>
 <ul>
 <li><code>patchMap (lid movingWall)</code> 将目标 <code>lid</code> 与源 <code>movingWall</code> 配对。</li>
@@ -360,7 +354,7 @@ cuttingPatches
 <li>映射时还需提供源算例和相应结果时刻，字典不会自动选择数据来源。</li>
 </ul>
 <p>目标边界继续改名时同步更新配对；执行后查看顶盖速度与其他边界是否仍符合目标问题。</p>
-<p><a href="/assets/examples/v2512/mapfieldsdict/3-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict"><code>incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mapfieldsdict/3-mapFieldsDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict"><code>incompressible/icoFoam/cavity/cavityClipped/system/mapFieldsDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -369,18 +363,14 @@ cuttingPatches
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      mapFieldsDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> mapFieldsDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-patchMap        (lid movingWall);
-
-cuttingPatches  ();
-
-
+patchMap (lid movingWall);
+cuttingPatches ();
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/mapfields/">mapFields</a> · <a href="/commands/mapfieldspar/">mapFieldsPar</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>场没有发生预期变化</td><td>核对写入时刻、区域和所选集合；检查工具是否读取了实际传入的字典。</td></tr><tr><td>初始化破坏守恒</td><td>统计积分质量、体积或组分和；局部赋值可能覆盖其他已经设定的区域。</td></tr><tr><td>边界值与内部值冲突</td><td>初始化赋值后，按物理问题设置边界类型；求解过程中边界值按该类型更新。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

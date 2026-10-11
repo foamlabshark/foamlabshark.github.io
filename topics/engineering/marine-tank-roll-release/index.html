@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -420,20 +420,37 @@
 </tbody></table></div>
 <p>多块网格在肋片边缘、支路开口和分区界面处共享坐标平面，使边界与几何位置一致。默认加密级别为 2，薄通道与窄缝另外保留最低单元层数。网格完成后，<code>setFields</code> 按初始液位设置相分数，液位以上为空气；液舱恢复案例按分段高度形成倾斜初始液面。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下条目取自本页下载包的同名文件，几何和边界名称与上表对应。</p>
-<h3 id="constant-transportProperties"><a href="#constant-transportProperties" class="headerlink" title="constant/transportProperties"></a><code>constant/transportProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">phases (water air);
-water { transportModel Newtonian; nu <span class="hljs-number">1.004e-06</span>; rho <span class="hljs-number">998.2</span>; }
-air { transportModel Newtonian; nu <span class="hljs-number">1.5e-5</span>; rho <span class="hljs-number">1.2</span>; }
+<h3 id="constant-transportProperties"><a href="#constant-transportProperties" class="headerlink" title="constant/transportProperties"></a><code>constant/transportProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">phases (water air);
+water
+{
+    transportModel Newtonian;
+    nu <span class="hljs-number">1.004e-06</span>;
+    rho <span class="hljs-number">998.2</span>;
+}
+air
+{
+    transportModel Newtonian;
+    nu <span class="hljs-number">1.5e-5</span>;
+    rho <span class="hljs-number">1.2</span>;
+}
 sigma <span class="hljs-number">0.072</span>;
 </code></pre></div>
 <p><code>phases</code> 确定两种流体，<code>nu</code> 的单位为 m²/s，<code>rho</code> 的单位为 kg/m³，<code>sigma</code> 的单位为 N/m。相分数字段沿用 <code>alpha.water</code>；润滑油案例中该字段代表此处设置物性的油相。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
+<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
 {
-    walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }
-    atmosphere { <span class="hljs-keyword">type</span> pressureInletOutletVelocity; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
+    walls
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
+    }
+    atmosphere
+    {
+        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
 }
 </code></pre></div>
 <p>液舱侧壁和底部为无滑移边界，顶部与空气相通。初始液面倾斜提供恢复运动的势能，计算开始时没有持续入口供液。</p>
-<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">application</span> interFoam;
+<h3 id="system-controlDict"><a href="#system-controlDict" class="headerlink" title="system/controlDict"></a><code>system/controlDict</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">application</span> interFoam;
 startFrom startTime;
 startTime <span class="hljs-number">0</span>;
 stopAt endTime;
@@ -448,7 +465,10 @@ writeCompression <span class="hljs-literal">off</span>;
 timeFormat general;
 timePrecision <span class="hljs-number">10</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-adjustTimeStep <span class="hljs-literal">yes</span>; maxCo <span class="hljs-number">0.3</span>; maxAlphaCo <span class="hljs-number">0.2</span>; maxDeltaT <span class="hljs-number">0.005</span>;
+adjustTimeStep <span class="hljs-literal">yes</span>;
+maxCo <span class="hljs-number">0.3</span>;
+maxAlphaCo <span class="hljs-number">0.2</span>;
+maxDeltaT <span class="hljs-number">0.005</span>;
 </code></pre></div>
 <p><code>deltaT</code> 给出初始时间步，<code>maxCo</code> 与 <code>maxAlphaCo</code> 分别限制流动和界面输运的 Courant 数。<code>writeInterval</code> 是场文件输出间隔，监测对象的输出可以更频繁，便于保留水位和载荷曲线。</p>
 <h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p>在 Linux 中加载 OpenCFD OpenFOAM <code>v2512</code>，然后进入解压目录：</p>

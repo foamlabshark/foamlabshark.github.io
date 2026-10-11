@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -277,29 +277,33 @@
     <h1>第 19 章　0/ 目录与边界条件参考</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><h2>19.1 场文件的结构</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span> { <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii; <span class="hljs-keyword">class</span> volVectorField; <span class="hljs-keyword">object</span> U; }
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];        <span class="hljs-comment">// 量纲</span>
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);         <span class="hljs-comment">// 内部场初值</span>
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volVectorField;
+    <span class="hljs-keyword">object</span> U;
+}
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]; <span class="hljs-comment">// 量纲</span>
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 内部场初值</span>
 <span class="hljs-keyword">boundaryField</span>
 {
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     }
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
     walls
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">noSlip</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
     }
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }</code></pre></div>
 <p>三条强制规则：① <code>boundaryField</code> 里的 <code>patch</code> 名必须与 <code>constant/polyMesh/boundary</code> 完全对应（可用正则），漏一个就报 <code>Cannot</code> <code>find</code> <code>patchField</code> <code>entry</code> <code>for</code> <code>xxx</code>；② <code>empty</code>、<code>symmetryPlane</code>、<code>wedge</code>、<code>cyclic</code> 这类约束型边界，场里的 <code>type</code> 必须与网格里的 <code>type</code> 一致，否则报错；③ 很多边界条件即使值用不上也要写 <code>value</code> 一行（它是”当前值”的存储位置，重启时要用）。</p>
@@ -338,20 +342,19 @@
 <tr><td><code>timeVaryingMappedFixedValue</code></td><td>从文件读随时间/空间变化的入口</td><td>用实测或前驱算例数据</td></tr>
 <tr><td><code>turbulentDFSEMInlet</code></td><td>合成湍流入口（<code>LES</code> 用）</td><td>生成带脉动的入口</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 典型出口写法：允许流出，万一回流也不会炸</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 典型出口写法：允许流出，万一回流也不会炸</span>
 outlet
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-    inletValue      <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+    inletValue <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
-
 <span class="hljs-comment">// 给定流量入口</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>            flowRateInletVelocity;
-    volumetricFlowRate  <span class="hljs-number">0.001</span>;      <span class="hljs-comment">// m³/s；也可用 massFlowRate</span>
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> flowRateInletVelocity;
+    volumetricFlowRate <span class="hljs-number">0.001</span>; <span class="hljs-comment">// m³/s；也可用 massFlowRate</span>
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }</code></pre></div>
 <h2>19.4 压力 p / p_rgh 的常用边界条件</h2>
 <div class="table-scroll"><table>
@@ -364,19 +367,25 @@ inlet
 <tr><td><code>freestreamPressure</code></td><td>远场</td></tr>
 <tr><td><code>waveTransmissive</code></td><td>无反射出口（可压缩，防激波反射回来）</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 不可压出口</span>
-outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 不可压出口</span>
+outlet
+{
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+}
 <span class="hljs-comment">// 壁面（含浮力/动网格时必须这样写）</span>
-walls  { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }
-
+walls
+{
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedFluxPressure</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+}
 <span class="hljs-comment">// 可压超声速出口，防止反射</span>
 outlet
 {
-    <span class="hljs-keyword">type</span>            waveTransmissive;
-    field           p;
-    gamma           <span class="hljs-number">1.4</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
+    <span class="hljs-keyword">type</span> waveTransmissive;
+    field p;
+    gamma <span class="hljs-number">1.4</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1e5</span>;
 }</code></pre></div>
 <p>压力边界应与离散动量方程和法向通量约束一致。<code>fixedFluxPressure</code> 可在支持该更新流程的求解器中设置与通量相容的压力梯度；含重力或网格运动时尤其需要核对 <code>p</code> 与 <code>p_rgh</code> 的定义。<code>zeroGradient</code> 是否合理，应按具体方程和边界条件判断。</p>
 <p><code>p</code> 和 <code>p_rgh</code> 的区别：多相流和浮力问题里求解的是 <span class="math-formula" data-tex="p_{\mathrm{rgh}}=p-\rho\boldsymbol g\cdot\boldsymbol h"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">g</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>=</mo><mi>p</mi><mo>−</mo><mi>ρ</mi><mi mathvariant="bold-italic">g</mi><mo>⋅</mo><mi mathvariant="bold-italic">h</mi></mrow><annotation encoding="application/x-tex">p_{\mathrm{rgh}}=p-\rho\boldsymbol g\cdot\boldsymbol h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rgh</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.037em;">g</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol">h</span></span></span></span></span></span></span>（扣掉静水压），这样数值上更好解。你在 0/ 里给的是 <code>p_rgh</code>，<code>p</code> 由程序算出。边界条件要给在 <code>p_rgh</code> 上。</p>
@@ -389,23 +398,30 @@ outlet
 <tr><td><code>nut</code></td><td><code>calculated</code></td><td><code>nutkWallFunction</code> 或 <code>nutUSpaldingWallFunction</code></td><td><code>calculated</code></td></tr>
 <tr><td><code>nuTilda</code></td><td><code>fixedValue</code></td><td><code>fixedValue</code> <code>uniform</code> 0</td><td><code>inletOutlet</code></td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/k</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/k</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>        turbulentIntensityKineticEnergyInlet;
-    intensity   <span class="hljs-number">0.05</span>;                 <span class="hljs-comment">// 湍流度 5%</span>
-    <span class="hljs-keyword">value</span>       <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
+    <span class="hljs-keyword">type</span> turbulentIntensityKineticEnergyInlet;
+    intensity <span class="hljs-number">0.05</span>; <span class="hljs-comment">// 湍流度 5%</span>
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
 }
-walls  { <span class="hljs-keyword">type</span> kqRWallFunction; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>; }
-
+walls
+{
+    <span class="hljs-keyword">type</span> kqRWallFunction;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.375</span>;
+}
 <span class="hljs-comment">// 0/epsilon</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>        turbulentMixingLengthDissipationRateInlet;
-    mixingLength <span class="hljs-number">0.007</span>;               <span class="hljs-comment">// 特征长度的 7% 是常用估计</span>
-    <span class="hljs-keyword">value</span>       <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
+    <span class="hljs-keyword">type</span> turbulentMixingLengthDissipationRateInlet;
+    mixingLength <span class="hljs-number">0.007</span>; <span class="hljs-comment">// 特征长度的 7% 是常用估计</span>
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
 }
-walls  { <span class="hljs-keyword">type</span> epsilonWallFunction; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>; }</code></pre></div>
+walls
+{
+    <span class="hljs-keyword">type</span> epsilonWallFunction;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">14.855</span>;
+}</code></pre></div>
 <p>入口湍流量可以根据湍流强度和特征长度估算；下式依赖各向同性及所选湍流模型的常见假设，实验数据可用时应优先核对：</p>
 <p><span class="math-formula" data-tex="k = 1.5 (U\cdot I)^{2}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1.5</mn><mo stretchy="false">(</mo><mi>U</mi><mo>⋅</mo><mi>I</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">k = 1.5 (U\cdot I)^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.5</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>，<code>I</code> 是湍流度（管流取 5%，风洞取 1%）</p>
 <p><span class="math-formula" data-tex="\varepsilon=\frac{C_\mu^{0.75}k^{1.5}}{l}"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>=</mo><mfrac><mrow><msubsup><mi>C</mi><mi>μ</mi><mn>0.75</mn></msubsup><msup><mi>k</mi><mn>1.5</mn></msup></mrow><mi>l</mi></mfrac></mrow><annotation encoding="application/x-tex">\varepsilon=\frac{C_\mu^{0.75}k^{1.5}}{l}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.5763em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2313em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6074em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.214em;margin-left:-0.0715em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">μ</span></span></span><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">0.75</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4249em;"><span></span></span></span></span></span></span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1.5</span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>，<span class="math-formula" data-tex="C_\mu = 0.09"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>μ</mi></msub><mo>=</mo><mn>0.09</mn></mrow><annotation encoding="application/x-tex">C_\mu = 0.09</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">μ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.09</span></span></span></span></span>，<span class="math-formula" data-tex="l \approx  0.07"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mo>≈</mo><mn>0.07</mn></mrow><annotation encoding="application/x-tex">l \approx  0.07</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.07</span></span></span></span></span>× 水力直径</p>
@@ -432,51 +448,74 @@ walls  { <span class="hljs-keyword">type</span> epsilonWallFunction; <span class
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 对流边界：给外界温度和换热系数</span>
 wall
 {
-    <span class="hljs-keyword">type</span>            externalWallHeatFluxTemperature;
-    mode            coefficient;         <span class="hljs-comment">// power / flux / coefficient</span>
-    h               <span class="hljs-keyword">uniform</span> <span class="hljs-number">10</span>;          <span class="hljs-comment">// W/(m²K)</span>
-    Ta              <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;         <span class="hljs-comment">// 环境温度</span>
-    kappaMethod     fluidThermo;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
+    <span class="hljs-keyword">type</span> externalWallHeatFluxTemperature;
+    mode coefficient; <span class="hljs-comment">// power / flux / coefficient</span>
+    h <span class="hljs-keyword">uniform</span> <span class="hljs-number">10</span>; <span class="hljs-comment">// W/(m²K)</span>
+    Ta <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>; <span class="hljs-comment">// 环境温度</span>
+    kappaMethod fluidThermo;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
 }</code></pre></div>
 <h2>19.7 多相流的 alpha</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/alpha.water</span>
-inlet   { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>; }
-outlet  { <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>; inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }
-walls
-{
-    <span class="hljs-keyword">type</span>            constantAlphaContactAngle;   <span class="hljs-comment">// 接触角（毛细现象重要时）</span>
-    theta0          <span class="hljs-number">90</span>;
-    limit           gradient;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-}
-atmosphere { <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>; inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。规定值为 <code>uniform 1</code>，求解中保持该值。</p><p><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>walls</code> 采用 <code>constantAlphaContactAngle</code>，通过固定接触角控制壁面附近的界面法向。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>atmosphere</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
-<h2>19.8 时变与外部数据</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// ① 用表格给随时间变化的值</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">25 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// 0/alpha.water</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>            uniformFixedValue;
-    uniformValue    table ((<span class="hljs-number">0</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)) (<span class="hljs-number">1</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)) (<span class="hljs-number">5</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)));
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
 }
-
+outlet
+{
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+    inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+}
+walls
+{
+    <span class="hljs-keyword">type</span> constantAlphaContactAngle; <span class="hljs-comment">// 接触角（毛细现象重要时）</span>
+    theta0 <span class="hljs-number">90</span>;
+    limit gradient;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+}
+atmosphere
+{
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+    inletValue <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+}</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>fixedValue</code>，边界始终采用给定的 <code>value</code>。规定值为 <code>uniform 1</code>，求解中保持该值。</p><p><code>outlet</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>walls</code> 采用 <code>constantAlphaContactAngle</code>，通过固定接触角控制壁面附近的界面法向。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>atmosphere</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。发生回流时采用 <code>uniform 0</code>。<code>value</code>=<code>uniform 0</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
+<h2>19.8 时变与外部数据</h2>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// ① 用表格给随时间变化的值</span>
+inlet
+{
+    <span class="hljs-keyword">type</span> uniformFixedValue;
+    uniformValue table
+    (
+        (
+            <span class="hljs-number">0</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+        )
+        (
+            <span class="hljs-number">1</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+        )
+        (
+            <span class="hljs-number">5</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+        )
+    );
+}
 <span class="hljs-comment">// ② 从文件读随时间和空间变化的入口（前驱算例 / 实测数据）</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>            timeVaryingMappedFixedValue;
-    offset          (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    setAverage      <span class="hljs-literal">off</span>;
+    <span class="hljs-keyword">type</span> timeVaryingMappedFixedValue;
+    offset (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    setAverage <span class="hljs-literal">off</span>;
 }
 <span class="hljs-comment">// 数据放在 constant/boundaryData/inlet/{points, 0/U, 0.1/U, ...}</span>
-
 <span class="hljs-comment">// ③ 把另一处的场映射过来（回收入口，做周期性湍流入口）</span>
 inlet
 {
-    <span class="hljs-keyword">type</span>            mapped;
-    field           U;
-    setAverage      <span class="hljs-literal">true</span>;
-    average         (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> mapped;
+    field U;
+    setAverage <span class="hljs-literal">true</span>;
+    average (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
     interpolationScheme cell;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }</code></pre></div><!-- example-reading --><p><code>inlet</code> 采用 <code>uniformFixedValue</code>，用时间函数设置整个入口的速度。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><p><code>inlet</code> 采用 <code>timeVaryingMappedFixedValue</code>，将离散位置和时刻给出的边界数据插值到计算边界。<code>value</code>=<code>uniform (10 0 0)</code> 为初始化所用的边界值，后续值按该类型更新。</p><!-- /example-reading -->
 <h2>19.9 边界条件查询方法</h2>
 <div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash">foamHelp boundary -field U | less          <span class="hljs-comment"># 本机所有可用类型</span>

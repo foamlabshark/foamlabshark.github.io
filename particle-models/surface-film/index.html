@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -276,263 +276,216 @@
     <div class="eyebrow">OpenFOAM v2512</div>
     <h1>表面液膜与液滴交换</h1>
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
-    <div class="prose"><p>在壁面上求解薄液膜的质量、动量和能量，并可与液滴沉积、飞溅和蒸发交换。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>壁面液层较薄时，可沿厚度积分，把液体描述为壁面上的膜厚、平均速度和温度。液滴碰壁、蒸发和液膜释放又使液膜与主流交换质量和能量。</p><p>表面液膜模型在壁面区域描述薄液膜流动，并可与主流及颗粒云交换质量、动量和热量。液膜区域与主流区域之间的映射负责传递这些信息。</p><p>先建立液膜网格和区域对应关系，再设置厚度初值、物性、相变及释放模型。运行后应分别检查液膜存量和区域间交换量。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel"><h3>算例问题：flameSpreadWaterSuppressionPanel</h3><p class="reference-case-problem">可燃板表面发生火焰蔓延，同时施加水喷淋以吸收热量并影响火焰发展。算例连接固体热解、气相燃烧、液滴与表面液膜，需按相互作用关系理解各个子模型。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel</code></a>。</p></section><!-- /reference-case-contexts --><p>本页重点配置：<code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>surfaceFilmModel</code></td><td>选择液膜求解模型。</td></tr><tr><td><code>region</code></td><td>液膜所属区域及其与主网格的对应关系。</td></tr><tr><td><code>injectionModels</code></td><td>液膜向颗粒云的释放模型。</td></tr><tr><td><code>phaseChangeModel</code></td><td>液膜蒸发或凝结模型。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/surfaceFilmProperties</code></h3><p>本算例的配套配置，字段和参数见文件正文。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">79 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+    <div class="prose"><p>在壁面上求解薄液膜的质量、动量和能量，并可与液滴沉积、飞溅和蒸发交换。</p><h2 id="brief-introduction">简要介绍</h2><div data-editorial-intro="v3"><p>壁面液层较薄时，可沿厚度积分，把液体描述为壁面上的膜厚、平均速度和温度。液滴碰壁、蒸发和液膜释放又使液膜与主流交换质量和能量。</p><p>表面液膜模型在壁面区域描述薄液膜流动，并可与主流及颗粒云交换质量、动量和热量。液膜区域与主流区域之间的映射负责传递这些信息。</p><p>先建立液膜网格和区域对应关系，再设置厚度初值、物性、相变及释放模型。运行后应分别检查液膜存量和区域间交换量。</p></div><h2>设置位置与参数</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel"><h3>算例问题：flameSpreadWaterSuppressionPanel</h3><p class="reference-case-problem">可燃板表面发生火焰蔓延，同时施加水喷淋以吸收热量并影响火焰发展。算例连接固体热解、气相燃烧、液滴与表面液膜，需按相互作用关系理解各个子模型。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel</code></a>。</p></section><!-- /reference-case-contexts --><p>本页重点配置：<code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties</code>。下表说明各条目的作用。完整算例的网格、初始场和配套模型见后文。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>含义与设置</th></tr></thead><tbody><tr><td><code>surfaceFilmModel</code></td><td>选择液膜求解模型。</td></tr><tr><td><code>region</code></td><td>液膜所属区域及其与主网格的对应关系。</td></tr><tr><td><code>injectionModels</code></td><td>液膜向颗粒云的释放模型。</td></tr><tr><td><code>phaseChangeModel</code></td><td>液膜蒸发或凝结模型。</td></tr></tbody></table></div><h2>官方配置示例</h2><h3><code>constant/surfaceFilmProperties</code></h3><p>本算例的配套配置，字段和参数见文件正文。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">63 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      surfaceFilmProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> surfaceFilmProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-active          <span class="hljs-literal">true</span>;
-
+active <span class="hljs-literal">true</span>;
 surfaceFilmModel thermoSingleLayer;
-
-region          filmRegion;
-
+region filmRegion;
 thermoSingleLayerCoeffs
 {
     filmThermoModel liquid;
     liquidCoeffs
     {
-        useReferenceValues  <span class="hljs-literal">no</span>;
-        liquid          H2O;
+        useReferenceValues <span class="hljs-literal">no</span>;
+        liquid H2O;
     }
-    filmViscosityModel  liquid;
-
-    hydrophilic     <span class="hljs-literal">no</span>;
-    deltaWet        <span class="hljs-number">1e-4</span>;
-
-    turbulence      <span class="hljs-built_in">laminar</span>;
+    filmViscosityModel liquid;
+    hydrophilic <span class="hljs-literal">no</span>;
+    deltaWet <span class="hljs-number">1e-4</span>;
+    turbulence <span class="hljs-built_in">laminar</span>;
     laminarCoeffs
     {
-        Cf              <span class="hljs-number">0.005</span>;
+        Cf <span class="hljs-number">0.005</span>;
     }
-
-    radiationModel  none;
+    radiationModel none;
     standardRadiationCoeffs
     {
-        beta     <span class="hljs-number">0.75</span>;
+        beta <span class="hljs-number">0.75</span>;
         kappaBar <span class="hljs-number">0.25</span>;
     }
-
     upperSurfaceModels
     {
         heatTransferModel constant;
         constantCoeffs
         {
-           c0              <span class="hljs-number">10</span>;
+            c0 <span class="hljs-number">10</span>;
         }
     }
-
     lowerSurfaceModels
     {
         heatTransferModel constant;
         constantCoeffs
         {
-            c0             <span class="hljs-number">100</span>;
+            c0 <span class="hljs-number">100</span>;
         }
     }
-
-    injectionModels
-    ();
-
+    injectionModels ();
     forces
     (
         thermocapillary
     );
-
     phaseChangeModel standardPhaseChange;
-
     standardPhaseChangeCoeffs
     {
-        Tb              <span class="hljs-number">373</span>;
-        deltaMin        <span class="hljs-number">1e-8</span>;
-        L               <span class="hljs-number">1.0</span>;
+        Tb <span class="hljs-number">373</span>;
+        deltaMin <span class="hljs-number">1e-8</span>;
+        L <span class="hljs-number">1.0</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>surfaceFilmModel</code>=<code>thermoSingleLayer</code> 选择液膜模型。当前文件关闭液膜计算，因而不建立有质量和能量输运的活动液膜；启用实际模型时还须建立对应 <code>region</code> 的网格、字段和耦合边界。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/C3H8</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/IDefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/N2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/O2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0.orig/Ydefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/Tf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/Uf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/deltaf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0.orig/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>0.orig/p_rgh</code></td><td>扣除静水压部分的压力，通常为 Pa。</td></tr><tr><td><code>0.orig/ph_rgh</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/pyrolysisRegion/Y0Default</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/char</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>0.orig/pyrolysisRegion/qr</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/wood</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>constant/g</code></td><td>重力向量，m/s²。</td></tr><tr><td><code>constant/pyrolysisRegion/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/filmRegion/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/filmRegion/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr><tr><td><code>system/pyrolysisRegion/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/pyrolysisRegion/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0.orig/C3H8：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/C3H8</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">50 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>surfaceFilmModel</code>=<code>thermoSingleLayer</code> 选择液膜模型。当前文件关闭液膜计算，因而不建立有质量和能量输运的活动液膜；启用实际模型时还须建立对应 <code>region</code> 的网格、字段和耦合边界。</p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/constant/surfaceFilmProperties.txt">下载此配置文件</a></p><h2>配套文件与初始场</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>作用</th></tr></thead><tbody><tr><td><code>0.orig/C3H8</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/IDefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/N2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/O2</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/U</code></td><td>速度向量，m/s。</td></tr><tr><td><code>0.orig/Ydefault</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/alphat</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/Tf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/Uf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/filmRegion/deltaf</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/k</code></td><td>湍动能，m²/s²。</td></tr><tr><td><code>0.orig/nut</code></td><td>模型计算的运动学湍动黏度，m²/s。</td></tr><tr><td><code>0.orig/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>0.orig/p_rgh</code></td><td>扣除静水压部分的压力，通常为 Pa。</td></tr><tr><td><code>0.orig/ph_rgh</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/T</code></td><td>温度，K。</td></tr><tr><td><code>0.orig/pyrolysisRegion/Y0Default</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/char</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/p</code></td><td>压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</td></tr><tr><td><code>0.orig/pyrolysisRegion/qr</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>0.orig/pyrolysisRegion/wood</code></td><td>初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</td></tr><tr><td><code>constant/g</code></td><td>重力向量，m/s²。</td></tr><tr><td><code>constant/pyrolysisRegion/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>热力学组合、状态方程与各物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</td></tr><tr><td><code>system/filmRegion/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/filmRegion/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr><tr><td><code>system/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr><tr><td><code>system/pyrolysisRegion/fvSchemes</code></td><td>每个方程项的空间和时间离散格式。</td></tr><tr><td><code>system/pyrolysisRegion/fvSolution</code></td><td>线性求解器、耦合循环、容差与松弛。</td></tr></tbody></table></div><details><summary>0.orig/C3H8：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/C3H8</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">41 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      C3H8;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> C3H8;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     outlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     ground
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">zeroGradient</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
     }
-
     side
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">inletOutlet</span>;
-        inletValue      <span class="hljs-variable">$internalField</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">inletOutlet</span>;
+        inletValue <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     inlet
     {
-        <span class="hljs-keyword">type</span>                totalFlowRateAdvectiveDiffusive;
-        <span class="hljs-keyword">value</span>               <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">type</span> totalFlowRateAdvectiveDiffusive;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
     }
-
     region0_to_pyrolysisRegion_coupledWall
     {
-        <span class="hljs-keyword">type</span>                totalFlowRateAdvectiveDiffusive;
-        massFluxFraction    <span class="hljs-number">1.0</span>;
-        <span class="hljs-keyword">value</span>               <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> totalFlowRateAdvectiveDiffusive;
+        massFluxFraction <span class="hljs-number">1.0</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/C3H8</code> 设置 <code>C3H8</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>outlet</code>、<code>side</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>$internalField</code>，<code>value</code> <code>$internalField</code>。</li><li><code>ground</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>inlet</code> 采用 <code>totalFlowRateAdvectiveDiffusive</code>。参数为 <code>value</code> <code>uniform 1</code>。</li><li><code>region0_to_pyrolysisRegion_coupledWall</code> 采用 <code>totalFlowRateAdvectiveDiffusive</code>。参数为 <code>massFluxFraction</code> <code>1.0</code>，<code>value</code> <code>$internalField</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8.txt">下载此配置文件</a></p></details><details><summary>0.orig/IDefault：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/IDefault</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">35 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/C3H8</code> 设置 <code>C3H8</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>outlet</code>、<code>side</code> 采用 <code>inletOutlet</code>，出流时外推，回流时采用 <code>inletValue</code>。参数为 <code>inletValue</code> <code>$internalField</code>，<code>value</code> <code>$internalField</code>。</li><li><code>ground</code> 采用 <code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>inlet</code> 采用 <code>totalFlowRateAdvectiveDiffusive</code>。参数为 <code>value</code> <code>uniform 1</code>。</li><li><code>region0_to_pyrolysisRegion_coupledWall</code> 采用 <code>totalFlowRateAdvectiveDiffusive</code>。参数为 <code>massFluxFraction</code> <code>1.0</code>，<code>value</code> <code>$internalField</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/C3H8.txt">下载此配置文件</a></p></details><details><summary>0.orig/IDefault：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/IDefault</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">28 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      IDefault;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> IDefault;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     region0_to_pyrolysisRegion_coupledWall
     {
-        <span class="hljs-keyword">type</span>            greyDiffusiveRadiation;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> greyDiffusiveRadiation;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">cyclic</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">cyclic</span>;
     }
-
     <span class="hljs-string">".*"</span>
     {
-        <span class="hljs-keyword">type</span>            greyDiffusiveRadiation;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> greyDiffusiveRadiation;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/IDefault</code> 设置 <code>IDefault</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 0 -3 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>region0_to_pyrolysisRegion_coupledWall</code>、<code>".*"</code> 采用 <code>greyDiffusiveRadiation</code>，为 fvDOM 的离散方向辐射强度设置灰体漫反射壁面。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>cyclic</code>，与配对周期面交换字段值。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault.txt">下载此配置文件</a></p></details><details><summary>0.orig/N2：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/N2</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">48 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/IDefault</code> 设置 <code>IDefault</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 0 -3 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>region0_to_pyrolysisRegion_coupledWall</code>、<code>".*"</code> 采用 <code>greyDiffusiveRadiation</code>，为 fvDOM 的离散方向辐射强度设置灰体漫反射壁面。参数为 <code>value</code> <code>uniform 0</code>。</li><li><code>frontAndBack</code> 采用 <code>cyclic</code>，与配对周期面交换字段值。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/IDefault.txt">下载此配置文件</a></p></details><details><summary>0.orig/N2：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0.orig/N2</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">39 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      N2;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> N2;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.76699</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.76699</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     outlet
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     ground
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     side
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     inlet
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
     }
-
     region0_to_pyrolysisRegion_coupledWall
     {
-        <span class="hljs-keyword">type</span>            calculated;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> calculated;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/N2</code> 设置 <code>N2</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0.76699</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>outlet</code>、<code>ground</code>、<code>side</code>、<code>region0_to_pyrolysisRegion_coupledWall</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>$internalField</code>。</li><li><code>inlet</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>uniform 0</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2.txt">下载此配置文件</a></p></details><details><summary><code>system/filmRegion/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/filmRegion/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">50 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0.orig/N2</code> 设置 <code>N2</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0.76699</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>outlet</code>、<code>ground</code>、<code>side</code>、<code>region0_to_pyrolysisRegion_coupledWall</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>$internalField</code>。</li><li><code>inlet</code> 采用 <code>calculated</code>，该边界值由其他模型或运算给出。参数为 <code>value</code> <code>uniform 0</code>。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/0.orig/N2.txt">下载此配置文件</a></p></details><details><summary><code>system/filmRegion/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/filmRegion/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution"><code>combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     hf
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">0</span>;
-        relTol          <span class="hljs-number">1e-3</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">0</span>;
+        relTol <span class="hljs-number">1e-3</span>;
     }
-
     <span class="hljs-string">"(Uf|deltaf\*rhof)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-10</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">1e-10</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     deltaf
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-10</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">1e-10</span>;
+        relTol <span class="hljs-number">0</span>;
     }
 }
-
 <span class="hljs-built_in">PISO</span>
 {
     momentumPredictor <span class="hljs-literal">yes</span>;
-    nOuterCorr      <span class="hljs-number">1</span>;
-    nCorr           <span class="hljs-number">1</span>;
-    nNonOrthCorr    <span class="hljs-number">0</span>;
-    dfMin           <span class="hljs-number">1e-10</span>;
+    nOuterCorr <span class="hljs-number">1</span>;
+    nCorr <span class="hljs-number">1</span>;
+    nNonOrthCorr <span class="hljs-number">0</span>;
+    dfMin <span class="hljs-number">1e-10</span>;
 }
-
 relaxationFactors
-{}
-
-
+{
+}
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/filmRegion/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/filmRegion/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>hf</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>0</code>：线性方程绝对残差阈值；<code>relTol</code> <code>1e-3</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(Uf|deltaf\*rhof)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-10</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>deltaf</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-10</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PISO/momentumPredictor</code> = <code>yes</code>：控制是否单独求解动量预测步骤。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel/system/filmRegion/fvSolution.txt">下载此配置文件</a></p></details><h2>复制与运行完整算例</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/combustion/fireFoam/LES/flameSpreadWaterSuppressionPanel"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/flameSpreadWaterSuppressionPanel-reference"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/flameSpreadWaterSuppressionPanel-reference"</span>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -279,34 +279,64 @@
     <div class="prose"><h2>9.1 速度场与压力场</h2>
 <p>下例给出与第 7 章二维通道网格对应的速度和压力场。内部初始速度等于入口速度，壁面采用无滑移条件，出口速度采用零梯度条件。</p>
 <h3>速度场 <code>0/U</code></h3>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volVectorField; <span class="hljs-keyword">object</span> U;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volVectorField;
+    <span class="hljs-keyword">object</span> U;
 }
 <span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
 <span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 <span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }
-    frontAndBack { <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    walls
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
+    }
+    frontAndBack
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
+    }
 }</code></pre></div><!-- example-reading --><p><code>速度场 0/U</code>定义<code>U</code>场。量纲为<code>[0 1 -1 0 0 0 0]</code>，速度，单位 m/s。内部初值为<code>uniform (1 0 0)</code>；<code>uniform</code> 表示所有内部单元采用同一数值。</p><ul><li><code>inlet</code>使用<code>fixedValue</code>，边界始终采用给定的 <code>value</code>。本例填写<code>value</code> <code>uniform (1 0 0)</code>。</li><li><code>outlet</code>使用<code>zeroGradient</code>，沿外法向采用零梯度，边界值由内部场外推。</li><li><code>walls</code>使用<code>noSlip</code>，壁面速度为零。</li><li><code>frontAndBack</code>使用<code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul><!-- /example-reading -->
 <h3>压力场 <code>0/p</code></h3>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> volScalarField; <span class="hljs-keyword">object</span> p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
 <span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    outlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>; }
-    walls { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-    frontAndBack { <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+    }
+    walls
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    frontAndBack
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
+    }
 }</code></pre></div>
 <p>本例 <code>p</code> 为运动学压力，适用于相应的不可压缩求解器。采用绝对压力的可压缩求解器时，<code>dimensions</code> 设为 [1 -1 -2 0 0 0 0]，压力值按状态方程设置，如 101325 Pa。</p>
 <h2>9.2 常用边界条件</h2>
@@ -366,26 +396,40 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
 <p>近壁处理方式应与网格设计一致。采用壁面函数或直接解析近壁区域时，分别据其要求确定第一层网格厚度及目标 <code>y</code>+。</p>
 <h2>9.5 constant/transportProperties</h2>
 <p>不可压缩牛顿流体的配置如下。求解器可直接读取 <code>nu</code>，也可通过 <code>transportModel</code> 创建输运模型，相应条目采用该求解器的配置结构。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> transportProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> transportProperties;
 }
 transportModel Newtonian;
 nu [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1e-6</span>;</code></pre></div>
 <p><code>nu</code> 为运动黏度，<code>mu</code> 为动力黏度，两者满足 <span class="math-formula" data-tex="\mu = \rho*\nu"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>=</mo><mi>ρ</mi><mo>∗</mo><mi>ν</mi></mrow><annotation encoding="application/x-tex">\mu = \rho*\nu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6597em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0637em;">ν</span></span></span></span></span>。powerLaw、BirdCarreau 等非牛顿模型采用各自的系数字典，参数定义见对应模型源码和教程。</p>
 <p>不可压缩 VOF 的两相物性配置如下。</p>
-<div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">phases (water air);
-water { transportModel Newtonian; nu 1e-6; rho 1000; }
-air   { transportModel Newtonian; nu 1.5e-5; rho 1.2; }
-sigma 0.072;</code></pre></div>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">phases (water air);
+water
+{
+    transportModel Newtonian;
+    nu <span class="hljs-number">1e-6</span>;
+    rho <span class="hljs-number">1000</span>;
+}
+air
+{
+    transportModel Newtonian;
+    nu <span class="hljs-number">1.5e-5</span>;
+    rho <span class="hljs-number">1.2</span>;
+}
+sigma <span class="hljs-number">0.072</span>;</code></pre></div>
 <p><code>rho</code> 表示相密度，<code>sigma</code> 表示表面张力系数。示例数值为常温条件下的近似示例。可压缩多相模型通常分别设置各相热物性。</p>
 <h2>9.6 constant/turbulenceProperties</h2>
 <p><code>v2512</code> 常见流体求解器通过 <code>turbulenceProperties</code> 配置湍流，<code>RASModel</code> 和 LESModel 分别指定 <code>RAS</code> 与 <code>LES</code> 模型。Foundation 分支采用的 <code>momentumTransport</code> 属于另一套配置接口。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> turbulenceProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> turbulenceProperties;
 }
 simulationType <span class="hljs-built_in">RAS</span>;
 <span class="hljs-built_in">RAS</span>
@@ -398,10 +442,12 @@ simulationType <span class="hljs-built_in">RAS</span>;
 <p><code>LES</code> 配置还需确定滤波宽度、近壁处理、入口脉动和时间分辨率，并与网格及边界条件配合。</p>
 <h2>9.7 constant/thermophysicalProperties</h2>
 <p>下例采用单相理想气体、常热容和常输运系数，能量变量为显焓。热物性类型和能量形式应与求解器接口对应。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 thermoType
 {
@@ -415,9 +461,20 @@ thermoType
 }
 mixture
 {
-    specie { molWeight <span class="hljs-number">28.96</span>; }
-    thermodynamics { Cp <span class="hljs-number">1005</span>; Hf <span class="hljs-number">0</span>; }
-    transport { mu <span class="hljs-number">1.8e-5</span>; Pr <span class="hljs-number">0.7</span>; }
+    specie
+    {
+        molWeight <span class="hljs-number">28.96</span>;
+    }
+    thermodynamics
+    {
+        Cp <span class="hljs-number">1005</span>;
+        Hf <span class="hljs-number">0</span>;
+    }
+    transport
+    {
+        mu <span class="hljs-number">1.8e-5</span>;
+        Pr <span class="hljs-number">0.7</span>;
+    }
 }</code></pre></div>
 <div class="table-scroll"><table>
 <tbody><tr><th>参数</th><th>作用</th><th>设置方法</th></tr>
@@ -435,21 +492,25 @@ mixture
 </tbody></table></div>
 <p><code>rhoCentralFoam</code> 等采用相应的热物性基类和能量变量。使用显内能的求解器应配置 <code>sensibleInternalEnergy</code>，并保留配套教程中的热物性组合。</p>
 <h2>9.8 重力与压力参考值</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// constant/g 完整示例</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">// constant/g 完整示例</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> uniformDimensionedVectorField; <span class="hljs-keyword">object</span> g;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> uniformDimensionedVectorField;
+    <span class="hljs-keyword">object</span> g;
 }
 <span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
 <span class="hljs-keyword">value</span> (<span class="hljs-number">0</span> <span class="hljs-number">-9.81</span> <span class="hljs-number">0</span>);</code></pre></div>
 <p>g 定义重力矢量，其方向与几何坐标系对应。<code>hRef</code> 定义静水压参考高度，通常采用 uniformDimensionedScalarField 和长度量纲；<code>pRef</code> 按求解器接口设置。<code>fvSolution</code> 中的 <code>pRefCell/pRefValue</code> 用于压力方程参考值，作用不同。</p>
 <h2>9.9 constant/fvOptions</h2>
 <p><code>fvOptions</code> 用于配置源项和约束，文件位置由求解器的读取路径确定，常见于 <code>constant</code> 或 <code>system</code>。下例在指定 <code>cellZone</code> 内施加速度方程源项，采用 sources 条目。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> fvOptions;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvOptions;
 }
 drive
 {
@@ -460,16 +521,21 @@ drive
     volumeMode specific;
     sources
     {
-        U ((<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) <span class="hljs-number">0</span>);
+        U
+        (
+            (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) <span class="hljs-number">0</span>
+        );
     }
 }</code></pre></div>
 <p>半隐式源项写为 Su + Sp*字段，括号内依次给出显式项和隐式系数。<code>specific</code> 按单位体积定义，<code>absolute</code> 按所选体积的总量定义。源项量纲取决于控制方程；速度、动量以及以 <code>h</code>、<code>e</code> 或 <code>T</code> 为变量的能量方程应分别确定量纲和密度因子。</p>
 <p><code>selectionMode</code> 指定作用范围，可选 <code>all</code>、<code>cellZone</code>、<code>cellSet</code> 等；<code>timeStart</code> 和 <code>duration</code> 指定作用时间。常用类型包括 <code>scalarSemiImplicitSource</code>、<code>vectorSemiImplicitSource</code>、<code>meanVelocityForce</code>、<code>explicitPorositySource</code>、scalarFixedValueConstraint、limitTemperature 和 codedSource，其参数按对应模型设置。</p>
 <h2>9.10 constant/MRFProperties 与 SRFProperties</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> MRFProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> MRFProperties;
 }
 rotorZone
 {

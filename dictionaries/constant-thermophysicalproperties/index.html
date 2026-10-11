@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -328,15 +328,15 @@
 <!-- /reference-configuration-supplement -->
 <h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>constant/thermophysicalProperties</code> 定义密度、比热、黏度和能量变量如何计算。它将热力学模型、状态方程和输运模型组合成求解器需要的物性系统。</p>
 <p>下面从 <code>buoyantPimpleFoam/hotRoom</code> 提取理想气体物性配置，放在 <code>FoamFile</code> 文件头之后：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">thermoType
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">thermoType
 {
-    <span class="hljs-keyword">type</span>            heRhoThermo;
-    mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
+    <span class="hljs-keyword">type</span> heRhoThermo;
+    mixture pureMixture;
+    transport const;
+    thermo hConst;
     equationOfState perfectGas;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    specie specie;
+    energy sensibleEnthalpy;
 }
 mixture
 {
@@ -363,7 +363,7 @@ mixture
 <li><code>transport const</code>、<code>mu 1.8e-05</code>、<code>Pr 0.7</code> 使用恒定动力黏度和 Prandtl 数，单位分别为 Pa·s 和无量纲。</li>
 </ul>
 <p>更换气体时同步修改分子量、比热和输运参数；温度跨度较大时可比较温度相关物性模型。</p>
-<p><a href="/assets/examples/v2512/thermophysicalproperties/authored-hotRoom-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties"><code>heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">49 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermophysicalproperties/authored-hotRoom-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties"><code>heatTransfer/buoyantPimpleFoam/hotRoom/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -372,45 +372,40 @@ mixture
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 thermoType
 {
-    <span class="hljs-keyword">type</span>            heRhoThermo;
-    mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
+    <span class="hljs-keyword">type</span> heRhoThermo;
+    mixture pureMixture;
+    transport const;
+    thermo hConst;
     equationOfState perfectGas;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    specie specie;
+    energy sensibleEnthalpy;
 }
-
-pRef            <span class="hljs-number">100000</span>;
-
+pRef <span class="hljs-number">100000</span>;
 mixture
 {
     specie
     {
-        molWeight       <span class="hljs-number">28.9</span>;
+        molWeight <span class="hljs-number">28.9</span>;
     }
     thermodynamics
     {
-        Cp              <span class="hljs-number">1000</span>;
-        Hf              <span class="hljs-number">0</span>;
+        Cp <span class="hljs-number">1000</span>;
+        Hf <span class="hljs-number">0</span>;
     }
     transport
     {
-        mu              <span class="hljs-number">1.8e-05</span>;
-        Pr              <span class="hljs-number">0.7</span>;
+        mu <span class="hljs-number">1.8e-05</span>;
+        Pr <span class="hljs-number">0.7</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · heatTransfer/chtMultiRegionFoam/multiRegionHeater</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionFoam/multiRegionHeater"><h3>算例问题：multiRegionHeater</h3><p class="reference-case-problem">加热器及其周围的固体和流体构成共轭传热问题：热量在固体内传导，再由流体带走。每个区域具有独立的网格、物性与温度场，区域交界面传递热量。该算例通过预处理脚本建立分区并改写边界条件，主要结果是区域温度和界面热流。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater"><code>heatTransfer/chtMultiRegionFoam/multiRegionHeater</code></a>。</p><figure class="reference-case-figure"><img alt="multiRegionHeater 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>multiRegionHeater 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>这个文件属于 multiRegionHeater 的 <code>heater</code> 固体区，控制固体储热与导热，空气区另有自己的物性。</p>
 <ul>
 <li><code>heSolidThermo</code> 与 <code>constIso</code> 选择固体、各向同性恒定导热模型。</li>
@@ -419,7 +414,7 @@ mixture
 <li><code>rhoConst</code> 保持密度不变，<code>sensibleEnthalpy</code> 以显焓表达能量。</li>
 </ul>
 <p>更换加热体材料时成组修改 <code>kappa</code>、<code>Cp</code>、<code>rho</code>；多区域耦合边界仍需在各区温度文件中设置。</p>
-<p><a href="/assets/examples/v2512/thermophysicalproperties/authored-multiRegionHeater-solid-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties"><code>heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">50 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermophysicalproperties/authored-multiRegionHeater-solid-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties"><code>heatTransfer/chtMultiRegionFoam/multiRegionHeater/constant/heater/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">46 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -428,46 +423,42 @@ mixture
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 thermoType
 {
-    <span class="hljs-keyword">type</span>            heSolidThermo;
-    mixture         pureMixture;
-    transport       constIso;
-    thermo          hConst;
+    <span class="hljs-keyword">type</span> heSolidThermo;
+    mixture pureMixture;
+    transport constIso;
+    thermo hConst;
     equationOfState rhoConst;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    specie specie;
+    energy sensibleEnthalpy;
 }
-
 mixture
 {
     specie
     {
-        molWeight   <span class="hljs-number">50</span>;
+        molWeight <span class="hljs-number">50</span>;
     }
     transport
     {
-        kappa   <span class="hljs-number">80</span>;
+        kappa <span class="hljs-number">80</span>;
     }
     thermodynamics
     {
-        Hf      <span class="hljs-number">0</span>;
-        Cp      <span class="hljs-number">450</span>;
+        Hf <span class="hljs-number">0</span>;
+        Cp <span class="hljs-number">450</span>;
     }
     equationOfState
     {
-        rho     <span class="hljs-number">8000</span>;
+        rho <span class="hljs-number">8000</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/interCondensatingEvaporatingFoam/condensatingVessel</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interCondensatingEvaporatingFoam/condensatingVessel"><h3>算例问题：condensatingVessel</h3><p class="reference-case-problem">容器内的蒸气在冷却条件下凝结，气液界面移动并释放潜热。计算需要同时更新两相分布、温度和相变速率，可通过液体量、温度分布与能量收支检查凝结过程。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel"><code>multiphase/interCondensatingEvaporatingFoam/condensatingVessel</code></a>。</p><figure class="reference-case-figure"><img alt="condensatingVessel 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/phase-change.svg" width="720"><figcaption><code>condensatingVessel</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>冷凝容器在此给出固定饱和温度，供相变模型判断温度相对于饱和状态的位置。</p>
 <ul>
 <li><code>TSat 367</code> 表示饱和温度为 367 K。</li>
@@ -475,7 +466,7 @@ mixture
 <li>温度与 <code>TSat</code> 的差值会参与相变源项，因此初始温度和壁温应与之对应。</li>
 </ul>
 <p>改变工况压力或材料后，应检查固定饱和温度假设是否仍适用，并同步调整相变参数。</p>
-<p><a href="/assets/examples/v2512/thermophysicalproperties/1-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties"><code>multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermophysicalproperties/1-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties"><code>multiphase/interCondensatingEvaporatingFoam/condensatingVessel/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -484,16 +475,13 @@ mixture
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-TSat             <span class="hljs-number">367</span>;   <span class="hljs-comment">// saturation temperature</span>
-
-
+TSat <span class="hljs-number">367</span>; <span class="hljs-comment">// saturation temperature</span>
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 4 · <code>multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D"><h3>算例问题：sloshingTank2D</h3><p class="reference-case-problem">容器运动或初始扰动使内部液体晃动，水面倾斜并形成随时间变化的压力。算例用于研究自由液面与容器运动的耦合，主要观察液面高度、壁面载荷及动网格质量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D"><code>multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D</code></a>。</p></section><!-- /reference-case-contexts --><p>可压缩晃荡水箱在这份总配置中列出两相，并给出压力下限和界面张力。</p>
 <ul>
 <li><code>phases (water air)</code> 定义相名称，各相热物性与场名需保持对应。</li>
@@ -501,7 +489,7 @@ TSat             <span class="hljs-number">367</span>;   <span class="hljs-comme
 <li><code>sigma 0</code> 在这个算例中忽略界面张力，主要观察晃荡及可压缩效应。</li>
 </ul>
 <p>研究毛细尺度运动时应恢复合适的 <code>sigma</code>，并检查网格与时间步是否解析界面张力效应。</p>
-<p><a href="/assets/examples/v2512/thermophysicalproperties/2-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties"><code>multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermophysicalproperties/2-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties"><code>multiphase/compressibleInterDyMFoam/laminar/sloshingTank2D/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -510,20 +498,15 @@ TSat             <span class="hljs-number">367</span>;   <span class="hljs-comme
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-phases          (water air);
-
-pMin            <span class="hljs-number">1000</span>;
-
-sigma           <span class="hljs-number">0</span>;
-
-
+phases (water air);
+pMin <span class="hljs-number">1000</span>;
+sigma <span class="hljs-number">0</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 5 · multiphase/compressibleInterFoam/laminar/depthCharge3D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/compressibleInterFoam/laminar/depthCharge3D"><h3>算例问题：depthCharge3D</h3><p class="reference-case-problem">水中设置高压气体区域，释放后的气体膨胀与周围水体相互作用，形成压力波并改变气液界面。算例用于研究可压缩效应与大幅界面运动的耦合，初始高压区的范围和热力学状态是关键条件。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D"><code>multiphase/compressibleInterFoam/laminar/depthCharge3D</code></a>。</p><figure class="reference-case-figure"><img alt="depthCharge3D 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/bubble.svg" width="720"><figcaption>depthCharge3D 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>depthCharge3D 使用水和空气两相描述气体区与周围液体的压力运动。</p>
 <ul>
 <li><code>phases (water air)</code> 规定两相名称。</li>
@@ -531,7 +514,7 @@ sigma           <span class="hljs-number">0</span>;
 <li><code>sigma 0.07</code> 设置界面张力为 0.07 N/m。</li>
 </ul>
 <p>改变初始气体压力或尺寸时，同时检查两相状态方程、压力范围与界面分辨率。</p>
-<p><a href="/assets/examples/v2512/thermophysicalproperties/3-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties"><code>multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/thermophysicalproperties/3-thermophysicalProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties"><code>multiphase/compressibleInterFoam/laminar/depthCharge3D/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -540,20 +523,15 @@ sigma           <span class="hljs-number">0</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-phases          (water air);
-
-pMin            <span class="hljs-number">10000</span>;
-
-sigma           <span class="hljs-number">0.07</span>;
-
-
+phases (water air);
+pMin <span class="hljs-number">10000</span>;
+sigma <span class="hljs-number">0.07</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/rhopimplefoam/">rhoPimpleFoam</a> · <a href="/commands/chtmultiregionfoam/">chtMultiRegionFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

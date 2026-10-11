@@ -25,7 +25,7 @@
   
   <script src="/assets/function-objects.js?v=2d3cba1704ad" defer></script>
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,59 +284,59 @@
 <h2 id="usage">配置方法</h2><p>将下面的对象放入 <code>system/controlDict</code> 的 <code>functions</code> 字典。对象名可以自定；<code>type</code> 选择工具，<code>libs</code> 加载实现它的库。</p><p>配套教程配置：<code>incompressible/pimpleFoam/laminar/cylinder2D/system/DMDs/stdmd01</code>。</p><p>完整的配置放置与运行方法见 <a href="/function-objects/usage/">functionObject 配置说明</a>。</p><h2 id="parameters">参数说明</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>含义与设置</th><th>填写条件</th><th>默认值 / 示例</th></tr></thead><tbody><tr><td><code>type</code></td><td>功能对象的类型名，大小写与工具名称一致。</td><td>必填</td><td><code>DMD</code></td></tr><tr><td><code>libs</code></td><td>加载实现该工具的共享库。</td><td>必填</td><td><code>(fieldFunctionObjects)</code></td></tr><tr><td><code>DMDModel</code></td><td><code>STDMD</code>；以下项与 <code>DMDModel</code> 同级。</td><td>必填</td><td><code>—</code></td></tr><tr><td><code>field</code></td><td>输入场的名称。</td><td>必填</td><td><code>—</code></td></tr><tr><td><code>patch</code></td><td>需要处理的单个边界名称。</td><td>可选</td><td><code>null</code></td></tr><tr><td><code>patches</code></td><td>需要处理的边界名称列表；支持名称匹配表达式。</td><td>可选</td><td><code>null</code></td></tr><tr><td><code>writeToFile</code></td><td>是否保存统计文本文件</td><td>可选</td><td><code>true</code></td></tr><tr><td><code>writePrecision</code></td><td>文本数值的有效位数</td><td>可选</td><td><code>全局写出精度</code></td></tr><tr><td><code>useUserTime</code></td><td>是否采用用户时间单位</td><td>可选</td><td><code>true</code></td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="execution-controls">执行、保存与触发</h2><p>以下参数写在单个功能对象内，与 <code>type</code>、<code>libs</code> 同级。</p><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>enabled</code></td><td>是否启用对象，默认 <code>true</code>。</td></tr><tr><td><code>executeControl</code></td><td>计算或更新的时机，默认 <code>timeStep</code>。可选 <code>none</code>、<code>timeStep</code>、<code>writeTime</code>、<code>runTime</code>、<code>adjustableRunTime</code>、<code>clockTime</code>、<code>cpuTime</code>、<code>onEnd</code>。</td></tr><tr><td><code>executeInterval</code></td><td>执行间隔，默认 1。<code>timeStep</code> 按步数，<code>writeTime</code> 按主输出次数；<code>runTime</code>、<code>adjustableRunTime</code> 按模拟时间；<code>clockTime</code>、<code>cpuTime</code> 按秒。</td></tr><tr><td><code>writeControl</code></td><td>结果写出的时机，默认 <code>timeStep</code>。取值与 <code>executeControl</code> 相同；<code>none</code> 关闭写出，<code>onEnd</code> 在计算结束时写出。</td></tr><tr><td><code>writeInterval</code></td><td>写出间隔，默认 1，单位由 <code>writeControl</code> 决定。例如 <code>writeControl</code> <code>timeStep</code> 配合 <code>writeInterval</code> 10，每十步写出一次。</td></tr><tr><td><code>timeStart / timeEnd</code></td><td>对象生效的模拟时间范围。填写需要限定的起止时刻；省略的一侧沿用求解器的计算范围。</td></tr><tr><td><code>controlMode</code></td><td><code>time</code>（默认）、<code>trigger</code>、<code>timeOrTrigger</code>、<code>timeAndTrigger</code>；按时间、触发索引、二者任一或同时成立启用对象。使用触发模式时填写 <code>triggerStart</code> 或 <code>triggerEnd</code>。</td></tr><tr><td><code>triggerStart / triggerEnd</code></td><td>触发索引的闭区间，配合 <code>runTimeControl</code> 的 <code>satisfiedAction</code> <code>setTrigger</code> 与 <code>trigger</code> 使用。</td></tr><tr><td><code>deltaTCoeff / nStepsToStartTimeChange</code></td><td><code>adjustableRunTime</code> 对齐写出时刻时的时间步变化控制。<code>deltaTCoeff</code> 限定变化倍率；<code>nStepsToStartTimeChange</code> 指定提前调整的步数，默认 3。</td></tr><tr><td><code>useNamePrefix</code></td><td>在支持此前缀规则的输出对象名中加入功能对象名称，默认继承 <code>functions</code> 外层设置。</td></tr><tr><td><code>errors</code></td><td>错误处理方式，继承 <code>functions</code> 外层设置。<code>default</code>：创建失败时警告、运行失败时终止；<code>warn</code>：将可捕获的 FatalError 转为警告；<code>ignore</code>：忽略这类错误；<code>strict</code>：创建或运行失败均终止。非法字典等 FatalIOError 仍会终止计算。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/functionObject/functionObject.H">功能对象参考</a></p><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/OpenFOAM/db/functionObjects/timeControl/timeControlFunctionObject.C">时间与触发控制参考</a></p><h2 id="configuration-details">STDMD 模型控制参数</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>field / patch / patches</code></td><td>输入字段，以及可选的单个边界或边界模式列表；省略边界选择时处理域内场。<code>patches</code> 优先于兼容的 <code>patch</code>。</td></tr><tr><td><code>interval / executeInterval</code></td><td><code>interval</code> 为 <code>DMD</code> 快照间隔，默认等于 <code>executeInterval</code>×当前 <code>deltaT</code>。配置时一并填写正整数 <code>executeInterval</code>，使快照保持等时间间隔。</td></tr><tr><td><code>modeSorter</code></td><td>模式排序方法：<code>firstSnapshot</code>（默认）、kiewat、<code>kouZhang</code>。</td></tr><tr><td><code>nModes / maxRank</code></td><td>最多输出的模态数与累计矩阵最大秩，均为正整数；默认采用 <code>label</code> 的最大值。有限的 <code>maxRank</code> 有助于限制内存消耗。</td></tr><tr><td><code>nGramSchmidt</code></td><td>Gram–Schmidt 正交化迭代次数，默认 5，至少 1。</td></tr><tr><td><code>minBasis / minEVal</code></td><td>基扩展阈值与忽略小特征值的阈值，默认均 1e-8，非负。</td></tr><tr><td><code>fMin / fMax</code></td><td>输出频率范围；<code>v2512</code> 实现以非负整数读取，<code>fMin</code> 默认 0，<code>fMax</code> 至少为 <code>fMin</code>+1。</td></tr><tr><td><code>sortLimiter</code></td><td>kiewat、<code>kouZhang</code> 排序的溢出限制，默认 500，至少 1。</td></tr><tr><td><code>nAgglomerationProcs</code></td><td>构造降阶算子时每个聚合组的进程数，默认 20，至少 1。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/functionObjects/field/DMD/DMDModels/derived/STDMD/STDMD.C">v2512 实现与参数读取</a></p>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p>对连续时刻的场快照进行动态模态分解。<code>DMDModel</code> <code>STDMD</code> 选择流式算法，<code>field</code> <code>U</code> 指定快照变量，<code>executeInterval</code> 决定快照间隔，计算结束时输出模态信息。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">functions</span>
+<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p>对连续时刻的场快照进行动态模态分解。<code>DMDModel</code> <code>STDMD</code> 选择流式算法，<code>field</code> <code>U</code> 指定快照变量，<code>executeInterval</code> 决定快照间隔，计算结束时输出模态信息。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
 {
     stdmd01
     {
-        <span class="hljs-keyword">type</span>                DMD;
-        <span class="hljs-keyword">libs</span>                (fieldFunctionObjects);
-        DMDModel            STDMD;
-        field               U;
-        region          region0;
-        enabled         <span class="hljs-literal">true</span>;
-        log             <span class="hljs-literal">true</span>;
-        timeStart       <span class="hljs-number">10</span>;
-        timeEnd         <span class="hljs-number">1000</span>;
-        executeControl  timeStep;
+        <span class="hljs-keyword">type</span> DMD;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        DMDModel STDMD;
+        field U;
+        region region0;
+        enabled <span class="hljs-literal">true</span>;
+        log <span class="hljs-literal">true</span>;
+        timeStart <span class="hljs-number">10</span>;
+        timeEnd <span class="hljs-number">1000</span>;
+        executeControl timeStep;
         executeInterval <span class="hljs-number">10</span>;
-        writeControl    onEnd;
-        writeInterval   <span class="hljs-number">1</span>;
+        writeControl onEnd;
+        writeInterval <span class="hljs-number">1</span>;
     }
-}</code></pre></div><h3 id="example-2">示例 2 · 提高快照采样频率</h3><p>每个计算步都纳入快照，能够覆盖更高的时间频率，同时增加分解工作量。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">functions</span>
+}</code></pre></div><h3 id="example-2">示例 2 · 提高快照采样频率</h3><p>每个计算步都纳入快照，能够覆盖更高的时间频率，同时增加分解工作量。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
 {
     stdmd01
     {
-        <span class="hljs-keyword">type</span>                DMD;
-        <span class="hljs-keyword">libs</span>                (fieldFunctionObjects);
-        DMDModel            STDMD;
-        field               U;
-        region          region0;
-        enabled         <span class="hljs-literal">true</span>;
-        log             <span class="hljs-literal">true</span>;
-        timeStart       <span class="hljs-number">10</span>;
-        timeEnd         <span class="hljs-number">1000</span>;
-        executeControl  timeStep;
+        <span class="hljs-keyword">type</span> DMD;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        DMDModel STDMD;
+        field U;
+        region region0;
+        enabled <span class="hljs-literal">true</span>;
+        log <span class="hljs-literal">true</span>;
+        timeStart <span class="hljs-number">10</span>;
+        timeEnd <span class="hljs-number">1000</span>;
+        executeControl timeStep;
         executeInterval <span class="hljs-number">1</span>;
-        writeControl    onEnd;
-        writeInterval   <span class="hljs-number">1</span>;
+        writeControl onEnd;
+        writeInterval <span class="hljs-number">1</span>;
     }
-}</code></pre></div><h3 id="example-3">示例 3 · 分析压力模态</h3><p>从速度快照切换到压力快照，查看主要压力变化模式。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">functions</span>
+}</code></pre></div><h3 id="example-3">示例 3 · 分析压力模态</h3><p>从速度快照切换到压力快照，查看主要压力变化模式。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">functions</span>
 {
     stdmd01
     {
-        <span class="hljs-keyword">type</span>                DMD;
-        <span class="hljs-keyword">libs</span>                (fieldFunctionObjects);
-        DMDModel            STDMD;
+        <span class="hljs-keyword">type</span> DMD;
+        <span class="hljs-keyword">libs</span> (fieldFunctionObjects);
+        DMDModel STDMD;
         field p;
-        region          region0;
-        enabled         <span class="hljs-literal">true</span>;
-        log             <span class="hljs-literal">true</span>;
-        timeStart       <span class="hljs-number">10</span>;
-        timeEnd         <span class="hljs-number">1000</span>;
-        executeControl  timeStep;
+        region region0;
+        enabled <span class="hljs-literal">true</span>;
+        log <span class="hljs-literal">true</span>;
+        timeStart <span class="hljs-number">10</span>;
+        timeEnd <span class="hljs-number">1000</span>;
+        executeControl timeStep;
         executeInterval <span class="hljs-number">10</span>;
-        writeControl    onEnd;
-        writeInterval   <span class="hljs-number">1</span>;
+        writeControl onEnd;
+        writeInterval <span class="hljs-number">1</span>;
     }
 }</code></pre></div><h2 id="related">相关工具</h2><p><a href="/function-objects/?category=%E6%B9%8D%E6%B5%81%E4%B8%8E%E5%A3%B0%E5%AD%A6">湍流与声学速查</a> · <a href="/function-objects/">全部 functionObject</a></p><p>延伸阅读：<a href="/read/?slug=function-objects-16">专题课程</a>。</p><p class="source-note">参考：<a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/src/functionObjects/field/DMD/DMD.H">OpenFOAM v2512 · DMD 接口</a>。</p>
 

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -288,10 +288,10 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;          <span class="hljs-comment">// ascii 或 binary</span>
-    <span class="hljs-keyword">class</span>       dictionary;     <span class="hljs-comment">// 这个文件装的是什么类型的数据</span>
-    <span class="hljs-keyword">object</span>      controlDict;    <span class="hljs-comment">// 文件名，必须与实际文件名一致</span>
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii; <span class="hljs-comment">// ascii 或 binary</span>
+    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-comment">// 这个文件装的是什么类型的数据</span>
+    <span class="hljs-keyword">object</span> controlDict; <span class="hljs-comment">// 文件名，必须与实际文件名一致</span>
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span></code></pre></div>
 <p><code>class</code> 常见取值</p>
@@ -321,7 +321,7 @@
    注释 */</code></pre></div>
 <p>三条容易犯的错：① 忘记分号（报错信息通常指向下一行，所以要往上找）；② 子字典 {} 后面不加分号；③ 中文全角符号混进来（从 PDF 复制时常发生），报 <code>ill</code> <code>defined</code> <code>primitiveEntry</code>。</p>
 <h2>11.3 量纲 dimensions</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];      <span class="hljs-comment">// 这是不可压求解器里 p 的量纲：m²/s²</span></code></pre></div>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]; <span class="hljs-comment">// 这是不可压求解器里 p 的量纲：m²/s²</span></code></pre></div>
 <p>七个数字依次是：</p>
 <div class="table-scroll"><table>
 <tbody><tr><th>位置</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
@@ -344,34 +344,50 @@
 </tbody></table></div>
 <p>场运算会检查量纲一致性；压力 Pa 与运动学压力 <span class="math-formula" data-tex="p/\rho"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mi mathvariant="normal">/</mi><mi>ρ</mi></mrow><annotation encoding="application/x-tex">p/\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal">ρ</span></span></span></span></span> 使用不同量纲。出现 <code>incompatible</code> <code>dimensions</code> 时，先确认求解器对 <code>p</code> 的定义，再检查物性、源项与边界中的单位。</p>
 <h2>11.4 场的赋值：uniform / nonuniform</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">10 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);              <span class="hljs-comment">// 全场同一个值</span>
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">nonuniform</span> List&lt;vector&gt;       <span class="hljs-comment">// 逐单元给值（一般由程序生成）</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); <span class="hljs-comment">// 全场同一个值</span>
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">nonuniform</span> List&lt;vector&gt; <span class="hljs-comment">// 逐单元给值（一般由程序生成）</span>
 <span class="hljs-number">400</span>
 (
-(<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-(<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
-...
+    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+    (<span class="hljs-number">0.1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+    ...
 );</code></pre></div>
 <p><code>nonuniform</code> 按网格位置逐项保存场值，适合非均匀初始场和计算结果。批量修改宜使用 <code>setFields</code>、<code>setExprFields</code> 或其他明确的场处理流程，避免改变元素数量或破坏网格编号对应关系。</p>
 <h2>11.5 边界条件块 boundaryField 与正则匹配</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
 {
-    inlet           { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    outlet          { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
-
-    <span class="hljs-string">"(top|bottom)"</span>  { <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>; }        <span class="hljs-comment">// 正则：同时匹配 top 和 bottom</span>
-    <span class="hljs-string">"wall.*"</span>        { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }               <span class="hljs-comment">// 所有以 wall 开头的 patch</span>
-    <span class="hljs-string">".*"</span>            { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }         <span class="hljs-comment">// 兜底：其余全部</span>
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    <span class="hljs-string">"(top|bottom)"</span>
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
+    }
+    <span class="hljs-comment">// 正则：同时匹配 top 和 bottom</span>
+    <span class="hljs-string">"wall.*"</span>
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
+    }
+    <span class="hljs-comment">// 所有以 wall 开头的 patch</span>
+    <span class="hljs-string">".*"</span>
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+    }
+    <span class="hljs-comment">// 兜底：其余全部</span>
 }</code></pre></div>
 <p>正则的两条规则：① 必须用双引号包起来，不然被当作普通名字；② 精确名字优先于正则，多个正则匹配时后面的优先。兜底 ".*" 放最后是个好习惯，可以避免”漏了一个 <code>patch</code> 导致启动失败”。</p>
 <h2>11.6 变量、宏与文件包含（把重复的东西提出来）</h2>
 <p>① 定义与引用变量</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">flowVelocity     (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-pressure         <span class="hljs-number">0</span>;
-
-<span class="hljs-keyword">internalField</span>    <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$flowVelocity</span>;      <span class="hljs-comment">// 用 $ 引用</span></code></pre></div>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">3 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">flowVelocity (<span class="hljs-number">10</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+pressure <span class="hljs-number">0</span>;
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-variable">$flowVelocity</span>; <span class="hljs-comment">// 用 $ 引用</span></code></pre></div>
 <p>② 引用嵌套条目</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">$..solvers/p/tolerance      // .. 表示上一层
 $:solvers.p.tolerance       // 从文件根部开始的绝对路径</code></pre></div>
@@ -388,14 +404,12 @@ turbulentKE         0.375;
 turbulentEpsilon    14.855;</code></pre></div>
 <p>然后 0/U、0/p、0/k、0/epsilon 全都 #<code>include</code> "../initialConditions" 并用 <code>$flowVelocity</code> 这样引用。好处：改工况只改一个文件，不会出现”<code>U</code> 改了 <code>k</code> 忘了改”的错误。做参数扫描时这更是必须的。</p>
 <p>④ 表达式计算</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#include "initialConditions"</span>
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#include "initialConditions"</span>
 <span class="hljs-comment">// 用 #calc 写一段 C++ 表达式（会动态编译）</span>
-nu              <span class="hljs-meta">#calc "1.0/$Re";</span>
-endTime         <span class="hljs-meta">#calc "10.0*$period";</span>
-
+nu <span class="hljs-meta">#calc "1.0/$Re";</span>
+endTime <span class="hljs-meta">#calc "10.0*$period";</span>
 <span class="hljs-comment">// v2012 起也可以用更轻量的 #eval（不需要编译，速度快）</span>
-deltaT          <span class="hljs-meta">#eval "1e-3/2";</span></code></pre></div>
+deltaT <span class="hljs-meta">#eval "1e-3/2";</span></code></pre></div>
 <p>⑤ 删除继承来的条目</p>
 <div class="code-panel" data-language="plaintext"><div class="code-toolbar"><span class="code-language">文本 / 日志</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="文本 / 日志代码"><code class="hljs language-plaintext">#remove         someKeyword;
 #remove         ( key1 key2 );</code></pre></div>

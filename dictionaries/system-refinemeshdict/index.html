@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -283,10 +283,12 @@
 <p>位置：<code>system/refineMeshDict</code></p><h2>参数说明</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>条目</th><th>含义</th></tr></thead><tbody><tr><td><code>type</code></td><td>运行时选择的模型或操作类型，同一个关键字在不同子字典中具有不同注册表。</td></tr><tr><td><code>origin</code></td><td>局部坐标系、旋转或几何操作的参考原点。</td></tr></tbody></table></div><!-- reference-configuration-supplement -->
 <h2 id="nested-configuration">细化方向与坐标系</h2><div class="table-scroll"><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>globalCoeffs.tan1 / tan2</code></td><td><code>global</code> 坐标体系中两根独立切向方向，第三方向由它们构造；<code>directions</code> 用对应方向名选择细化方向。</td></tr><tr><td><code>patchLocalCoeffs.patch</code></td><td><code>patchLocal</code> 坐标系参考的边界名称，需存在于当前网格。</td></tr><tr><td><code>userCoeffs</code></td><td>自定义坐标系，填写 <code>type</code>、<code>origin</code> 及两根独立的局部轴，例如 <code>e1</code>、<code>e3</code>。</td></tr><tr><td><code>useHexTopology / geometricCut</code></td><td>分别控制利用六面体拓扑和几何切割的细化路径；根据原网格类型和细化效果选择。</td></tr><tr><td><code>writeMesh</code></td><td>控制细化过程中的网格写出；不替代命令行对写入时间或覆盖原网格的选择。</td></tr></tbody></table></div>
 <!-- /reference-configuration-supplement -->
-<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+<h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">18 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii;
-    <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> refineMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> refineMeshDict;
 }
 set heaterCells;
 coordinateSystem global;
@@ -299,13 +301,17 @@ directions (tan1 tan2);
 useHexTopology <span class="hljs-literal">true</span>;
 geometricCut <span class="hljs-literal">false</span>;
 writeMesh <span class="hljs-literal">false</span>;</code></pre></div>
-<p><code>set</code> 指定待细化的单元集合，<code>directions</code> 指定细化方向。二维网格仅沿面内方向细化，厚度方向保持 <code>empty</code> 边界要求的单层结构。运行 <code>refineMesh</code> <code>-overwrite</code> 后，检查场、区域和边界与新网格的对应关系。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">set             c0;                 <span class="hljs-comment">// 对哪个 cellSet 加密</span>
+<p><code>set</code> 指定待细化的单元集合，<code>directions</code> 指定细化方向。二维网格仅沿面内方向细化，厚度方向保持 <code>empty</code> 边界要求的单层结构。运行 <code>refineMesh</code> <code>-overwrite</code> 后，检查场、区域和边界与新网格的对应关系。</p><h3 id="example-2">示例 2 · 基本配置</h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">set c0; <span class="hljs-comment">// 对哪个 cellSet 加密</span>
 coordinateSystem global;
-globalCoeffs    { tan1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); tan2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>); }
-directions      ( tan1 tan2 );      <span class="hljs-comment">// 只在这两个方向加密（各向异性）</span>
-useHexTopology  <span class="hljs-literal">yes</span>;
-geometricCut    <span class="hljs-literal">no</span>;
-writeMesh       <span class="hljs-literal">no</span>;
+globalCoeffs
+{
+    tan1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    tan2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+}
+directions ( tan1 tan2 ); <span class="hljs-comment">// 只在这两个方向加密（各向异性）</span>
+useHexTopology <span class="hljs-literal">yes</span>;
+geometricCut <span class="hljs-literal">no</span>;
+writeMesh <span class="hljs-literal">no</span>;
 $ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></pre></div><!-- example-reading --><p>阅读<code>示例 2 · 基本配置</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>globalCoeffs/tan2</code> 设为 <code>(0 1 0)</code>：<code>global</code> 坐标体系中两根独立切向方向，第三方向由它们构造；<code>directions</code> 用对应方向名选择细化方向。</li><li><code>useHexTopology</code> 设为 <code>yes</code>：分别控制利用六面体拓扑和几何切割的细化路径；根据原网格类型和细化效果选择。</li><li><code>geometricCut</code> 设为 <code>no</code>：分别控制利用六面体拓扑和几何切割的细化路径；根据原网格类型和细化效果选择。</li><li><code>writeMesh</code> 设为 <code>no</code>：控制细化过程中的网格写出；不替代命令行对写入时间或覆盖原网格的选择。</li></ul><!-- /example-reading --><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · <code>multiphase/cavitatingFoam/LES/throttle</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/cavitatingFoam/LES/throttle"><h3>算例问题：throttle</h3><p class="reference-case-problem">液体通过节流段时加速并降压，局部压力低于相变条件后产生空化。需要关注节流前后的压差、蒸气体积分数和空泡随时间的变化，入口、出口压力及饱和蒸气压共同决定是否发生空化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle"><code>multiphase/cavitatingFoam/LES/throttle</code></a>。</p><figure class="reference-case-figure"><img alt="throttle 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/throttle.svg" width="720"><figcaption><code>throttle</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>节流空化算例对名为 <code>c0</code> 的单元集合做平面内细化。</p>
 <ul>
 <li><code>set c0</code> 限定需要细化的单元。</li>
@@ -314,7 +320,7 @@ $ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></p
 <li><code>useHexTopology yes</code> 使用六面体拓扑信息，<code>geometricCut no</code> 采用相应拓扑切分路径。</li>
 </ul>
 <p>选择更小的局部区域时先更新 <code>c0</code>；二维算例保持厚度方向的一层结构并重新检查网格。</p>
-<p><a href="/assets/examples/v2512/refinemeshdict/1-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict"><code>multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">36 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/refinemeshdict/1-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict"><code>multiphase/cavitatingFoam/LES/throttle/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -323,32 +329,23 @@ $ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></p
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      refineMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> refineMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-set             c0;
-
+set c0;
 coordinateSystem global;
-
 globalCoeffs
 {
-    tan1            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    tan2            (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+    tan1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    tan2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
 }
-
-directions      ( tan1 tan2 );
-
-useHexTopology  <span class="hljs-literal">yes</span>;
-
-geometricCut    <span class="hljs-literal">no</span>;
-
-writeMesh       <span class="hljs-literal">no</span>;
-
-
+directions ( tan1 tan2 );
+useHexTopology <span class="hljs-literal">yes</span>;
+geometricCut <span class="hljs-literal">no</span>;
+writeMesh <span class="hljs-literal">no</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · mesh/refineMesh/cylinder</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="mesh/refineMesh/cylinder"><h3>算例问题：cylinder</h3><p class="reference-case-problem">在含圆柱几何的网格上选择局部区域细化，比较细化前后的单元尺寸与过渡。该示例侧重网格操作，应检查细化区域、边界保持和网格质量。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder"><code>mesh/refineMesh/cylinder</code></a>。</p><figure class="reference-case-figure"><img alt="cylinder 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/mesh.svg" width="720"><figcaption><code>cylinder</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>圆柱细化示例采用自定义柱坐标系，在局部方向上细化指定单元。</p>
 <ul>
 <li><code>set cellsToRefine</code> 指定单元集合，<code>coordinateSystem user</code> 读取用户坐标定义。</li>
@@ -356,7 +353,7 @@ writeMesh       <span class="hljs-literal">no</span>;
 <li><code>directions (tan1)</code> 只选择一个局部细化方向，<code>useHexTopology true</code> 使用六面体拓扑。</li>
 </ul>
 <p>旋转轴改变时同步修改坐标系，查看实际切分方向后再用于边界层或环向加密。</p>
-<p><a href="/assets/examples/v2512/refinemeshdict/2-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder/system/refineMeshDict"><code>mesh/refineMesh/cylinder/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/refinemeshdict/2-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/mesh/refineMesh/cylinder/system/refineMeshDict"><code>mesh/refineMesh/cylinder/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -365,38 +362,30 @@ writeMesh       <span class="hljs-literal">no</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      refineMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> refineMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 set cellsToRefine;
-
 coordinateSystem user;
-
 userCoeffs
 {
-    <span class="hljs-keyword">type</span>    cylindrical;
-    origin  (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    e1      (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    e3      (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> cylindrical;
+    origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    e1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    e3 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
 }
-
 directions
 (
     <span class="hljs-comment">//normal</span>
     tan1
     <span class="hljs-comment">//tan2</span>
 );
-
-useHexTopology  <span class="hljs-literal">true</span>;
-
-geometricCut    <span class="hljs-literal">false</span>;
-
-writeMesh       <span class="hljs-literal">false</span>;
-
+useHexTopology <span class="hljs-literal">true</span>;
+geometricCut <span class="hljs-literal">false</span>;
+writeMesh <span class="hljs-literal">false</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · <code>multiphase/interFoam/LES/nozzleFlow2D</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/LES/nozzleFlow2D"><h3>算例问题：nozzleFlow2D</h3><p class="reference-case-problem">液体流经喷嘴并与周围气体形成界面，喷口附近的加速和剪切影响液体射流形态。算例主要观察速度、压力与相分数，需同时设置喷嘴入口和外部气相边界。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D"><code>multiphase/interFoam/LES/nozzleFlow2D</code></a>。</p><figure class="reference-case-figure"><img alt="nozzleFlow2D 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/jet.svg" width="720"><figcaption>nozzleFlow2D 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>二维喷嘴流动只在一个全局方向细化 <code>c0</code> 区域，适合控制局部单元形状。</p>
 <ul>
 <li><code>coordinateSystem global</code> 和 <code>tan1 (1 0 0)</code> 确定 <code>x</code> 向细化。</li>
@@ -405,7 +394,7 @@ writeMesh       <span class="hljs-literal">false</span>;
 <li>文件还保留 <code>patchLocalCoeffs</code>，但当前 <code>coordinateSystem</code> 为 <code>global</code>，解释实际设置时以选中的坐标系为准。</li>
 </ul>
 <p>沿壁面局部方向细化时，选用局部坐标系并设置对应系数。</p>
-<p><a href="/assets/examples/v2512/refinemeshdict/3-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict"><code>multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">42 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/refinemeshdict/3-refineMeshDict.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict"><code>multiphase/interFoam/LES/nozzleFlow2D/system/refineMeshDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">32 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -414,38 +403,28 @@ writeMesh       <span class="hljs-literal">false</span>;
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      refineMeshDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> refineMeshDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-set             c0;
-
+set c0;
 coordinateSystem global;
-
 globalCoeffs
 {
-    tan1            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    tan2            (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
+    tan1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    tan2 (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>);
 }
-
 patchLocalCoeffs
 {
-    patch           outside;
-    tan1            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    patch outside;
+    tan1 (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
-
-directions      ( tan1 );
-
-useHexTopology  <span class="hljs-literal">no</span>;
-
-geometricCut    <span class="hljs-literal">yes</span>;
-
-writeMesh       <span class="hljs-literal">no</span>;
-
-
+directions ( tan1 );
+useHexTopology <span class="hljs-literal">no</span>;
+geometricCut <span class="hljs-literal">yes</span>;
+writeMesh <span class="hljs-literal">no</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/refinemesh/">refineMesh</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>边界名称与字段不一致</td><td>修改拓扑后，更新 <code>constant/polyMesh/boundary</code> 和所有 0/ 场文件中的边界配置。</td></tr><tr><td>单位或坐标方向错误</td><td>比较几何包围盒与预期物理尺寸；检查 <code>scale</code>、挤出法向和旋转轴。</td></tr><tr><td>网格生成成功但质量不足</td><td>运行 <code>checkMesh</code> <code>-allTopology</code> <code>-allGeometry</code>，再评估所选离散格式对非正交和扭曲的容忍度。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -291,7 +291,7 @@
 <li><code>XiGModel instabilityG</code> 的 <code>lambdaIn 0.6</code> 带长度量纲，<code>GIn 1.917</code> 带逆时间量纲，用于不稳定性相关的生成模型。</li>
 </ul>
 <p>这些系数与障碍物尺度、燃料及标定条件有关。调整管架几何时先更新几何生成的 PDR 场，再比较压力上升和火焰传播速度。</p>
-<p><a href="/assets/examples/v2512/pdrproperties/1-PDRProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties"><code>preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">99 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/pdrproperties/1-PDRProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties"><code>preProcessing/PDRsetFields/simplePipeCage/constant/PDRProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">79 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -300,95 +300,75 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      PDRProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> PDRProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 PDRDragModel basic;
-
 basicCoeffs
 {
-    drag     <span class="hljs-literal">on</span>;
-    Csu      <span class="hljs-number">0.5</span>;
-    Csk      <span class="hljs-number">0.05</span>;
+    drag <span class="hljs-literal">on</span>;
+    Csu <span class="hljs-number">0.5</span>;
+    Csk <span class="hljs-number">0.05</span>;
 }
-
 XiModel transport;
-
 transportCoeffs
 {
     XiShapeCoef <span class="hljs-number">1</span>;
 }
-
 XiEqModel instability;
-
 instabilityCoeffs
 {
     XiEqIn <span class="hljs-number">2.5</span>;
-
     XiEqModel basicSubGrid;
-
     basicSubGridCoeffs
     {
         XiEqModel SCOPEBlend;
-
         SCOPEBlendCoeffs
         {
             XiEqModelL
             {
-                XiEqModel       Gulder;
-
+                XiEqModel Gulder;
                 GulderCoeffs
                 {
-                    XiEqCoef   <span class="hljs-number">0.62</span>;
-                    uPrimeCoef      <span class="hljs-number">1.0</span>;
+                    XiEqCoef <span class="hljs-number">0.62</span>;
+                    uPrimeCoef <span class="hljs-number">1.0</span>;
                     subGridSchelkin <span class="hljs-literal">true</span>;
                 }
             }
-
             XiEqModelH
             {
-                XiEqModel       SCOPEXiEq;
-
+                XiEqModel SCOPEXiEq;
                 SCOPEXiEqCoeffs
                 {
-                    XiEqCoef   <span class="hljs-number">1.6</span>;
-                    XiEqExp    <span class="hljs-number">0.33333</span>;
-                    lCoef      <span class="hljs-number">0.336</span>;
-                    uPrimeCoef      <span class="hljs-number">1.0</span>;
+                    XiEqCoef <span class="hljs-number">1.6</span>;
+                    XiEqExp <span class="hljs-number">0.33333</span>;
+                    lCoef <span class="hljs-number">0.336</span>;
+                    uPrimeCoef <span class="hljs-number">1.0</span>;
                     subGridSchelkin <span class="hljs-literal">true</span>;
                 }
             }
         }
     }
 }
-
 XiGModel instabilityG;
-
 instabilityGCoeffs
 {
-    lambdaIn        lambdaIn   [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.6</span>;
-    GIn             GIn        [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1.917</span>;
-
+    lambdaIn lambdaIn [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.6</span>;
+    GIn GIn [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1.917</span>;
     XiGModel basicSubGridG;
-
     basicSubGridGCoeffs
     {
         k1 <span class="hljs-number">0.5</span>;
-
         XiGModel KTS;
-
         KTSCoeffs
         {
-             GEtaCoef   <span class="hljs-number">0.28</span>;
+            GEtaCoef <span class="hljs-number">0.28</span>;
         }
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · combustion/PDRFoam/pipeLattice</summary><p>pipeLattice 的预混火焰穿过管阵列。这个较长字典同时保留多种模型的系数，实际使用哪一组由各层模型名称决定。</p>
 <ul>
 <li><code>PDRDragModel basic</code> 选择障碍物阻力，<code>Csu 0.5</code>、<code>Csk 0.05</code> 参与其闭合。</li>
@@ -398,7 +378,7 @@ instabilityGCoeffs
 <li><code>XpEqModel normBasicSubGrid</code> 与 <code>XpGModel normBasicSubGridG</code> 给出另一组亚网格火焰闭合，系数应按所选模型成组理解。</li>
 </ul>
 <p>比较模型时一次更换一个模型选择及其对应系数，并记录相同测点上的火焰到达时间与峰值压力。</p>
-<p><a href="/assets/examples/v2512/pdrproperties/2-PDRProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/constant/PDRProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/constant/PDRProperties"><code>combustion/PDRFoam/pipeLattice/constant/PDRProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">286 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/pdrproperties/2-PDRProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/constant/PDRProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/PDRFoam/pipeLattice/constant/PDRProperties"><code>combustion/PDRFoam/pipeLattice/constant/PDRProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">236 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -407,282 +387,232 @@ instabilityGCoeffs
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      PDRProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> PDRProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-StSmoothCoef    <span class="hljs-number">1000.0</span>;
-
+StSmoothCoef <span class="hljs-number">1000.0</span>;
 <span class="hljs-comment">//No smooth if &gt;100</span>
-
 schelkin
 {
     subGridSchelkin <span class="hljs-literal">true</span>;
-    uPrimeCoef  <span class="hljs-number">1.0</span>;
-    lCoef       <span class="hljs-number">0.336</span>;
-    maxSchFac   <span class="hljs-number">100.0</span>;
-    nrCoef      <span class="hljs-number">0.1</span>;
-    nrExp       <span class="hljs-number">0.0</span>;
-    nrExp2      <span class="hljs-number">0.05</span>;
+    uPrimeCoef <span class="hljs-number">1.0</span>;
+    lCoef <span class="hljs-number">0.336</span>;
+    maxSchFac <span class="hljs-number">100.0</span>;
+    nrCoef <span class="hljs-number">0.1</span>;
+    nrExp <span class="hljs-number">0.0</span>;
+    nrExp2 <span class="hljs-number">0.05</span>;
 }
-
-PDRDragModel    basic;
-
+PDRDragModel basic;
 basicCoeffs
 {
-    drag        <span class="hljs-literal">on</span>;
-    Csu         <span class="hljs-number">0.5</span>;
-    Csk         <span class="hljs-number">0.05</span>;
+    drag <span class="hljs-literal">on</span>;
+    Csu <span class="hljs-number">0.5</span>;
+    Csk <span class="hljs-number">0.05</span>;
 }
-
 basicSchCoeffs
 {
-    drag        <span class="hljs-literal">on</span>;
+    drag <span class="hljs-literal">on</span>;
     <span class="hljs-variable">$schelkin</span>;
-    Csu         <span class="hljs-number">0.0</span>;
-    Csk         <span class="hljs-number">0.0</span>;
+    Csu <span class="hljs-number">0.0</span>;
+    Csk <span class="hljs-number">0.0</span>;
 }
-
-XiModel         transport;
-
+XiModel transport;
 algebraicCoeffs
 {
     XiShapeCoef <span class="hljs-number">1</span>;
     XpShapeCoef <span class="hljs-number">1</span>;
-    CpfiDot     <span class="hljs-number">0.0</span>;
-    CpfiCross   <span class="hljs-number">0.0</span>;
-    GEtaExp     <span class="hljs-number">0.0</span>;
-    LOverCw     <span class="hljs-number">0.01</span>;
+    CpfiDot <span class="hljs-number">0.0</span>;
+    CpfiCross <span class="hljs-number">0.0</span>;
+    GEtaExp <span class="hljs-number">0.0</span>;
+    LOverCw <span class="hljs-number">0.01</span>;
 }
-
 transportTwoEqsCoeffs
 {
     XiShapeCoef <span class="hljs-number">1</span>;
     XpShapeCoef <span class="hljs-number">1</span>;
-    CpfiDot     <span class="hljs-number">0.0</span>;
-    CpfiCross   <span class="hljs-number">0.0</span>;
-    GEtaExp     <span class="hljs-number">0.0</span>;
-    LOverCw     <span class="hljs-number">0.01</span>;
+    CpfiDot <span class="hljs-number">0.0</span>;
+    CpfiCross <span class="hljs-number">0.0</span>;
+    GEtaExp <span class="hljs-number">0.0</span>;
+    LOverCw <span class="hljs-number">0.01</span>;
 }
-
 k3Coeffs
 {
-    k3Obs       <span class="hljs-number">10.0</span>;
-    k3Open      <span class="hljs-number">1.0</span>;
+    k3Obs <span class="hljs-number">10.0</span>;
+    k3Open <span class="hljs-number">1.0</span>;
 }
-
 transportThreeEqsCoeffs
 {
     <span class="hljs-variable">$transportTwoEqsCoeffs</span>;
     <span class="hljs-variable">$k3Coeffs</span>;
 }
-
 transportFourEqsCoeffs
 {
     <span class="hljs-variable">$transportTwoEqsCoeffs</span>;
     <span class="hljs-variable">$k3Coeffs</span>;
 }
-
 transportOneEqObsCoeffs
 {
     XiShapeCoef <span class="hljs-number">1</span>;
-    Cpfi        <span class="hljs-number">0.0</span>;
-    GEtaExp     <span class="hljs-number">0.0</span>;
+    Cpfi <span class="hljs-number">0.0</span>;
+    GEtaExp <span class="hljs-number">0.0</span>;
 }
-
 transportXp
 {
 }
-
 transportCoeffs
 {
     XiShapeCoef <span class="hljs-number">1</span>;
-    GEtaExp     <span class="hljs-number">0.28</span>;
+    GEtaExp <span class="hljs-number">0.28</span>;
 }
-
 fixedCoeffs
 {
 }
-
-
 <span class="hljs-comment">/*---------------------------------------------------------------------------*\
                           XiEqModel : Model for XiEq
 \*---------------------------------------------------------------------------*/</span>
-
-XiEqModel       instability;
-
+XiEqModel instability;
 BLMcoeffs
 {
-    XiEqCoef    <span class="hljs-number">1.0</span>;
-    alphaCoefP  <span class="hljs-number">0.023</span>;
-    alphaCoefN  <span class="hljs-number">0.085</span>;
-    betaCoefP   <span class="hljs-number">-0.0103</span>;
-    betaCoefN   <span class="hljs-number">-0.0075</span>;
-    maLim       <span class="hljs-number">30.0</span>;
-    maLim1      <span class="hljs-number">7.0</span>;
-    quenchCoef  <span class="hljs-number">34.0</span>;
-    quenchExp   <span class="hljs-number">-1.8</span>;
-    quenchM     <span class="hljs-number">-4.0</span>;
+    XiEqCoef <span class="hljs-number">1.0</span>;
+    alphaCoefP <span class="hljs-number">0.023</span>;
+    alphaCoefN <span class="hljs-number">0.085</span>;
+    betaCoefP <span class="hljs-number">-0.0103</span>;
+    betaCoefN <span class="hljs-number">-0.0075</span>;
+    maLim <span class="hljs-number">30.0</span>;
+    maLim1 <span class="hljs-number">7.0</span>;
+    quenchCoef <span class="hljs-number">34.0</span>;
+    quenchExp <span class="hljs-number">-1.8</span>;
+    quenchM <span class="hljs-number">-4.0</span>;
     quenchRate1 <span class="hljs-number">0.6</span>;
     quenchRate2 <span class="hljs-number">0.14</span>;
 }
-
 instability2XiEqCoeffs
 {
-    defaultCIn  <span class="hljs-number">12.6</span>;
-    XiEqInFade  <span class="hljs-number">1.0</span>;
-
-    XiEqModel   BLMgMaXiEq;
-
+    defaultCIn <span class="hljs-number">12.6</span>;
+    XiEqInFade <span class="hljs-number">1.0</span>;
+    XiEqModel BLMgMaXiEq;
     BLMgMaXiEqCoeffs
     {
         <span class="hljs-variable">$schelkin</span>;
-        gulderCoef  <span class="hljs-number">1.0</span>; <span class="hljs-comment">//this value is not usssed 1.0.</span>
-        kaCoef      <span class="hljs-number">0.25</span>;
-        lowK0       <span class="hljs-number">0.1</span>;
-        lowKg       <span class="hljs-number">0.0</span>;
-        gMaCoef     <span class="hljs-number">0.032</span>; <span class="hljs-comment">//not used</span>
-        gMaCoef1    <span class="hljs-number">0.0</span>;  <span class="hljs-comment">// not used</span>
+        gulderCoef <span class="hljs-number">1.0</span>; <span class="hljs-comment">//this value is not usssed 1.0.</span>
+        kaCoef <span class="hljs-number">0.25</span>;
+        lowK0 <span class="hljs-number">0.1</span>;
+        lowKg <span class="hljs-number">0.0</span>;
+        gMaCoef <span class="hljs-number">0.032</span>; <span class="hljs-comment">//not used</span>
+        gMaCoef1 <span class="hljs-number">0.0</span>; <span class="hljs-comment">// not used</span>
         <span class="hljs-variable">$BLMcoeffs</span>;
     }
-
     BLMXiEqCoeffs
     {
         <span class="hljs-variable">$schelkin</span>;
-        gulderCoef  <span class="hljs-number">0.31</span>;
-        kaCoef      <span class="hljs-number">0.25</span>;
-        lowK1       <span class="hljs-number">0.02</span>;
-        lowK2       <span class="hljs-number">0.05</span>;
+        gulderCoef <span class="hljs-number">0.31</span>;
+        kaCoef <span class="hljs-number">0.25</span>;
+        lowK1 <span class="hljs-number">0.02</span>;
+        lowK2 <span class="hljs-number">0.05</span>;
         <span class="hljs-variable">$BLMcoeffs</span>;
-     }
+    }
 }
-
 instabilityCoeffs
 {
-
-    XiEqIn      <span class="hljs-number">2.5</span>;
-    XiEqModel   Gulder;
+    XiEqIn <span class="hljs-number">2.5</span>;
+    XiEqModel Gulder;
     GulderCoeffs
     {
-        uPrimeCoef      <span class="hljs-number">1.0</span>;
+        uPrimeCoef <span class="hljs-number">1.0</span>;
         subGridSchelkin <span class="hljs-literal">true</span>;
-        XiEqCoef        <span class="hljs-number">0.62</span>;
+        XiEqCoef <span class="hljs-number">0.62</span>;
     }
-
     SCOPEBlendCoeffs
     {
         XiEqModelL
         {
-            XiEqModel   Gulder;
-
+            XiEqModel Gulder;
             GulderCoeffs
             {
                 <span class="hljs-variable">$schelkin</span>;
-                XiEqCoef    <span class="hljs-number">0.62</span>;
+                XiEqCoef <span class="hljs-number">0.62</span>;
             }
         }
-
         XiEqModelH
         {
-            XiEqModel       SCOPEXiEq;
-
+            XiEqModel SCOPEXiEq;
             SCOPEXiEqCoeffs
             {
                 <span class="hljs-variable">$schelkin</span>;
-                XiEqCoef    <span class="hljs-number">1.6</span>;
-                XiEqExp     <span class="hljs-number">0.33333</span>;
+                XiEqCoef <span class="hljs-number">1.6</span>;
+                XiEqExp <span class="hljs-number">0.33333</span>;
             }
         }
     }
 }
-
-
 <span class="hljs-comment">/*---------------------------------------------------------------------------*\
                      XiGModel : Model for generation of Xi
 \*---------------------------------------------------------------------------*/</span>
-
-XiGModel            instabilityG;
-
+XiGModel instabilityG;
 instability2GCoeffs
 {
-    lambdaIn        <span class="hljs-number">0.0001</span>;
-    defaultCIn      <span class="hljs-number">10.0</span>;
-    GInMult         <span class="hljs-number">5.0</span>;
-    GInFade         <span class="hljs-number">4.0</span>;
-
+    lambdaIn <span class="hljs-number">0.0001</span>;
+    defaultCIn <span class="hljs-number">10.0</span>;
+    GInMult <span class="hljs-number">5.0</span>;
+    GInFade <span class="hljs-number">4.0</span>;
     XiGModel KTS;
-
     KTSCoeffs
     {
-        GEtaCoef    <span class="hljs-number">0.28</span>;
+        GEtaCoef <span class="hljs-number">0.28</span>;
     }
 }
-
 instabilityGCoeffs
 {
-    lambdaIn        <span class="hljs-number">4.5e-3</span>;
-    GIn             <span class="hljs-number">1.917</span>;
-
-    XiGModel        KTS;
+    lambdaIn <span class="hljs-number">4.5e-3</span>;
+    GIn <span class="hljs-number">1.917</span>;
+    XiGModel KTS;
     KTSCoeffs
     {
-         GEtaCoef   <span class="hljs-number">0.28</span>;
+        GEtaCoef <span class="hljs-number">0.28</span>;
     }
 }
-
-
 <span class="hljs-comment">/*---------------------------------------------------------------------------*\
                           XpEqGModel : Model for XpEq
 \*---------------------------------------------------------------------------*/</span>
-
-XpEqModel       normBasicSubGrid;
-
+XpEqModel normBasicSubGrid;
 normBasicSubGridCoeffs
 {
-    Cxpe1       <span class="hljs-number">800.0</span>;
-    Cxpe2       <span class="hljs-number">40.0</span>;
-    Cxpe3       <span class="hljs-number">400.0</span>;
-    Cxpe4       <span class="hljs-number">1.0</span>;
+    Cxpe1 <span class="hljs-number">800.0</span>;
+    Cxpe2 <span class="hljs-number">40.0</span>;
+    Cxpe3 <span class="hljs-number">400.0</span>;
+    Cxpe4 <span class="hljs-number">1.0</span>;
 }
-
 basicSubGridCoeffs
 {
 }
-
-
 <span class="hljs-comment">/*---------------------------------------------------------------------------*\
                      XpGModel : Model for generation of Xp
 \*---------------------------------------------------------------------------*/</span>
-
-XpGModel        normBasicSubGridG;
-
+XpGModel normBasicSubGridG;
 normBasicSubGridGCoeffs
 {
-    k1          <span class="hljs-number">0.0</span>;
-    kb1         <span class="hljs-number">14.0</span>;
-    kbe         <span class="hljs-number">1.5</span>;
-    kbx         <span class="hljs-number">0.4</span>;
-    k2          <span class="hljs-number">1.0</span>;
-    LOverCw     <span class="hljs-number">0.01</span>;
-    Cxpe1       <span class="hljs-number">800.0</span>;
-    Cxpe2       <span class="hljs-number">40.0</span>;
-    Cxpe3       <span class="hljs-number">400.0</span>;
-    Cxpe4       <span class="hljs-number">1.0</span>;
+    k1 <span class="hljs-number">0.0</span>;
+    kb1 <span class="hljs-number">14.0</span>;
+    kbe <span class="hljs-number">1.5</span>;
+    kbx <span class="hljs-number">0.4</span>;
+    k2 <span class="hljs-number">1.0</span>;
+    LOverCw <span class="hljs-number">0.01</span>;
+    Cxpe1 <span class="hljs-number">800.0</span>;
+    Cxpe2 <span class="hljs-number">40.0</span>;
+    Cxpe3 <span class="hljs-number">400.0</span>;
+    Cxpe4 <span class="hljs-number">1.0</span>;
 }
-
 basicSubGridGCoeffs
 {
-    XpGModel    KTS;
+    XpGModel KTS;
     KTSCoeffs
     {
-        GEtaCoef    <span class="hljs-number">0.28</span>;
+        GEtaCoef <span class="hljs-number">0.28</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/pdrfoam/">PDRFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

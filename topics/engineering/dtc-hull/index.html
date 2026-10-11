@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -422,39 +422,33 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-航速与流向"><a href="#1-航速与流向" class="headerlink" title="1. 航速与流向"></a>1. 航速与流向</h3><p>文件：<code>0.orig/U</code>。本段设置航速与流向。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">24 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">Umean <span class="hljs-number">1.668</span>;
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">Umean <span class="hljs-number">1.668</span>;
 mUmean <span class="hljs-number">-1.668</span>;
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-variable">$mUmean</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-variable">$mUmean</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 <span class="hljs-keyword">boundaryField</span>
 {
     <span class="hljs-meta">#includeEtc "caseDicts/setConstraintTypes"</span>
-
     inlet
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
-
     outlet
     {
-        <span class="hljs-keyword">type</span>            outletPhaseMeanVelocity;
-        alpha           alpha.water;
-        Umean           <span class="hljs-variable">$Umean</span>;
-        <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
+        <span class="hljs-keyword">type</span> outletPhaseMeanVelocity;
+        alpha alpha.water;
+        Umean <span class="hljs-variable">$Umean</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
     }
 </code></pre></div>
 <p>来流沿负 <code>x</code>，速度为 1.668 m/s，出口根据水相平均速度控制流出。分析 <code>x</code> 向船体力时，以来流方向明确阻力符号。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h3 id="2-初始水位"><a href="#2-初始水位" class="headerlink" title="2. 初始水位"></a>2. 初始水位</h3><p>文件：<code>system/setFieldsDict</code>。本段设置初始水位。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">23 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">defaultFieldValues
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">defaultFieldValues
 (
     volScalarFieldValue alpha.water <span class="hljs-number">0</span>
 );
-
 regions
 (
     <span class="hljs-comment">// Set cell values</span>
@@ -462,13 +456,11 @@ regions
     boxToCell
     {
         box (<span class="hljs-number">-999</span> <span class="hljs-number">-999</span> <span class="hljs-number">-999</span>) (<span class="hljs-number">999</span> <span class="hljs-number">999</span> <span class="hljs-number">0.244</span>);
-
         fieldValues
         (
             volScalarFieldValue alpha.water <span class="hljs-number">1</span>
         );
     }
-
     <span class="hljs-comment">// Set patch values (using ==)</span>
     boxToFace
     {
@@ -477,16 +469,16 @@ regions
 <p>初始化先将计算域设为空气，再将指定液位以下单元设为水。该液位与船体曲面共同决定吃水，改变液位后重新执行相分数初始化。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/RAS/DTCHull/system/setFieldsDict">查看该配置的官方原文件</a>。</p>
 <h3 id="3-船体水动力积分"><a href="#3-船体水动力积分" class="headerlink" title="3. 船体水动力积分"></a>3. 船体水动力积分</h3><p>文件：<code>system/controlDict</code>。本段设置船体水动力积分。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">forces
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">forces
 {
-    <span class="hljs-keyword">type</span>            forces;
-    <span class="hljs-keyword">libs</span>            (forces);
-    patches         (hull);
-    rhoInf          <span class="hljs-number">998.8</span>;
-    log             <span class="hljs-literal">on</span>;
-    writeControl    timeStep;
-    writeInterval   <span class="hljs-number">1</span>;
-    CofR            (<span class="hljs-number">2.929541</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
+    <span class="hljs-keyword">type</span> forces;
+    <span class="hljs-keyword">libs</span> (forces);
+    patches (hull);
+    rhoInf <span class="hljs-number">998.8</span>;
+    log <span class="hljs-literal">on</span>;
+    writeControl timeStep;
+    writeInterval <span class="hljs-number">1</span>;
+    CofR (<span class="hljs-number">2.929541</span> <span class="hljs-number">0</span> <span class="hljs-number">0.2</span>);
 }
 </code></pre></div>
 <p><code>hull</code> 限定船体受力表面，<code>CofR</code> 定义力矩参考点。修改参考点会改变力矩分量，合力保持相同。</p>

@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -283,7 +283,7 @@
 <p>位置：<code>system/fvSolution</code></p><figure class="wolf-figure"><img alt="PIMPLE 外校正与 PISO 内校正" loading="lazy" src="/assets/wolf/wolf-pimple-pressure-coupling.png"><figcaption><strong><code>PIMPLE</code> 外校正与 <code>PISO</code> 内校正</strong><small class="figure-source">来源：Joel Guerrero / <a href="https://www.wolfdynamics.com/tutorials.html?id=181&amp;layout=edit">Wolf Dynamics</a> · module6.pdf，p. 96</small></figcaption></figure><h2>配置方法</h2><h3>每次线性求解何时结束</h3><p><code>solver</code> 选择算法，<code>preconditioner</code> 选择预条件器，<code>smoother</code> 选择平滑方法。<code>PCG</code> 适用于相应的对称正定系统；有对流项的非对称系统可使用 <code>PBiCGStab</code> 等算法。</p>
 <p><code>tolerance</code> 是归一化残差的绝对阈值，<code>relTol</code> 是相对本次初始残差的比例。初始残差为 0.01 时，<code>relTol 0.05</code> 对应 0.0005。满足相应停止条件后，本次线性求解结束；还可用 <code>maxIter</code> 限制最大迭代次数。</p>
 <p><code>pFinal</code> 先通过 <code>$p;</code> 继承压力配置，再关闭相对提前停止条件。最终校正采用更严格的压力求解，前面的校正可以较快完成。它使用同一个压力场。</p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>system/fvSolution</code> 主要包含三类内容：各场的线性求解器、压力—速度耦合算法，以及需要时使用的松弛因子。下面是一份适用于 <code>icoFoam</code> 方腔的主体配置，放在 <code>FoamFile</code> 文件头之后：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solvers
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solvers
 {
     p
     {
@@ -314,7 +314,7 @@
 }
 </code></pre></div><h3 id="example-2">示例 2 · 校正次数怎么理解</h3><p><code>nCorrectors 2</code> 表示每步做两次压力校正。<code>nNonOrthogonalCorrectors 0</code> 表示每次压力校正只做基础求解；取 1 则再增加一次非正交修正。封闭方腔需要压力基准，<code>pRefCell</code> 与 <code>pRefValue</code> 给出参考单元和参考压力。</p>
 <p>对于 <code>simpleFoam</code>，使用 <code>SIMPLE</code> 子字典；对于 <code>pimpleFoam</code>，使用 <code>PIMPLE</code>。以下片段替换算法控制部分，用在完整 <code>pimpleFoam</code> 算例中：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-built_in">PIMPLE</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-built_in">PIMPLE</span>
 {
     momentumPredictor <span class="hljs-literal">yes</span>;
     nOuterCorrectors <span class="hljs-number">3</span>;
@@ -323,7 +323,7 @@
 }
 </code></pre></div>
 <p>每个时间步做三轮外校正，每轮做两次压力校正。外循环允许动量系数与模型重复更新，适合需要更充分非线性耦合的情况。</p><h3 id="example-3">示例 3 · 稳态松弛</h3><p>稳态 <code>SIMPLE</code> 算例常在文件末尾加入：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">relaxationFactors
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">relaxationFactors
 {
     fields
     {
@@ -346,7 +346,7 @@
 <li>方腔压力边界均为梯度条件，<code>pRefCell 0</code>、<code>pRefValue 0</code> 固定一个压力参考，消除任意常数。</li>
 </ul>
 <p>网格改变后先检查非正交性，再决定额外校正次数。<code>tolerance</code> 是线性残差的停止阈值，<code>writePrecision</code> 是文件输出位数，二者由不同字典管理。</p>
-<p><a href="/assets/examples/v2512/fvsolution/1-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSolution"><code>incompressible/icoFoam/cavity/cavity/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">51 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvsolution/1-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/icoFoam/cavity/cavity/system/fvSolution"><code>incompressible/icoFoam/cavity/cavity/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -355,47 +355,41 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     p
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
-        preconditioner  DIC;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0.05</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
+        preconditioner DIC;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0.05</span>;
     }
-
     pFinal
     {
         <span class="hljs-variable">$p</span>;
-        relTol          <span class="hljs-number">0</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     U
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        symGaussSeidel;
-        tolerance       <span class="hljs-number">1e-05</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-05</span>;
+        relTol <span class="hljs-number">0</span>;
     }
 }
-
 <span class="hljs-built_in">PISO</span>
 {
-    nCorrectors     <span class="hljs-number">2</span>;
+    nCorrectors <span class="hljs-number">2</span>;
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    pRefCell        <span class="hljs-number">0</span>;
-    pRefValue       <span class="hljs-number">0</span>;
+    pRefCell <span class="hljs-number">0</span>;
+    pRefValue <span class="hljs-number">0</span>;
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · incompressible/simpleFoam/pitzDaily</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/pitzDaily"><h3>算例问题：pitzDaily</h3><p class="reference-case-problem">流体通过后向台阶通道，截面突然扩大后形成分离和回流，再在下游重新附着。入口速度与湍流条件影响回流区长度和壁面受力，主要检查速度剖面、压力分布及再附着位置。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily"><code>incompressible/simpleFoam/pitzDaily</code></a>。</p><figure class="reference-case-figure"><img alt="pitzDaily 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/backward-step.svg" width="720"><figcaption><code>pitzDaily</code> 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>后台阶算例用 <code>SIMPLE</code> 外迭代求稳态流动；每轮外迭代内部还要求解压力、速度和湍流方程。</p>
 <ul>
 <li>压力使用 <code>GAMG</code> 多重网格求解，<code>tolerance 1e-6</code>、<code>relTol 0.1</code>，允许单轮线性求解先降到初始残差的十分之一。</li>
@@ -405,7 +399,7 @@ solvers
 <li><code>relaxationFactors/equations</code> 中 <code>U 0.9</code> 和 <code>".*" 0.9</code> 对方程进行欠松弛，减缓相邻外迭代的变化。</li>
 </ul>
 <p>如果回流区随迭代持续变化，可减小松弛系数并检查边界和网格。达到残差停止条件后，还应看回流长度、压降等目标量是否稳定，以决定阈值是否足够。</p>
-<p><a href="/assets/examples/v2512/fvsolution/2-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution"><code>incompressible/simpleFoam/pitzDaily/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">59 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvsolution/2-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/pitzDaily/system/fvSolution"><code>incompressible/simpleFoam/pitzDaily/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -414,55 +408,48 @@ solvers
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     p
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">GAMG</span>;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0.1</span>;
-        smoother        GaussSeidel;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">GAMG</span>;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0.1</span>;
+        smoother GaussSeidel;
     }
-
     <span class="hljs-string">"(U|k|epsilon|omega|f|v2)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        symGaussSeidel;
-        tolerance       <span class="hljs-number">1e-05</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-05</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
 }
-
 <span class="hljs-built_in">SIMPLE</span>
 {
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
-    consistent      <span class="hljs-literal">yes</span>;
-
+    consistent <span class="hljs-literal">yes</span>;
     residualControl
     {
-        p               <span class="hljs-number">1e-2</span>;
-        U               <span class="hljs-number">1e-3</span>;
+        p <span class="hljs-number">1e-2</span>;
+        U <span class="hljs-number">1e-3</span>;
         <span class="hljs-string">"(k|epsilon|omega|f|v2)"</span> <span class="hljs-number">1e-3</span>;
     }
 }
-
 relaxationFactors
 {
     equations
     {
-        U               <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
-        <span class="hljs-string">".*"</span>            <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
+        U <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
+        <span class="hljs-string">".*"</span> <span class="hljs-number">0.9</span>; <span class="hljs-comment">// 0.9 is more stable but 0.95 more convergent</span>
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · multiphase/interFoam/laminar/damBreak/damBreak</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="multiphase/interFoam/laminar/damBreak/damBreak"><h3>算例问题：damBreak</h3><p class="reference-case-problem">水与空气最初分居容器中的不同区域，水柱随后在重力作用下坍塌、铺展并撞击侧壁。入口流速不驱动这一过程，关键输入是初始水柱、重力、两相物性和固壁条件；主要结果是水面形状、速度及壁面压力随时间的变化。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak"><code>multiphase/interFoam/laminar/damBreak/damBreak</code></a>。</p><figure class="reference-case-figure"><img alt="damBreak 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/dam-break.svg" width="720"><figcaption>damBreak 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>水柱塌落时需要同时更新体积分数、压力和速度。这个 <code>fvSolution</code> 使用一轮 <code>PIMPLE</code> 外校正，并在其中安排界面与压力校正。</p>
 <ul>
 <li><code>"alpha.water.*"</code> 匹配水体积分数相关求解条目。<code>nAlphaCorr 2</code> 执行两次相分数校正，<code>nAlphaSubCycles 1</code> 表示不把主时间步再拆成多个相分数子步。</li>
@@ -472,7 +459,7 @@ relaxationFactors
 <li><code>momentumPredictor no</code> 跳过单独的动量预测求解步骤，速度仍在压力速度耦合过程中更新。<code>relaxationFactors/equations/".*" 1</code> 不再通过小于 1 的系数增强欠松弛；方程松弛仍会检查和修正对角占优性。</li>
 </ul>
 <p>时间步增大后，可比较增加外校正次数对耦合误差的影响；相分数子循环主要细化界面输运时间步。改变这些设置时，同时比较水体积、前沿位置与每步成本。</p>
-<p><a href="/assets/examples/v2512/fvsolution/3-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution"><code>multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">82 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/fvsolution/3-fvSolution.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution"><code>multiphase/interFoam/laminar/damBreak/damBreak/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">71 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -481,69 +468,60 @@ relaxationFactors
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     <span class="hljs-string">"alpha.water.*"</span>
     {
-        nAlphaCorr      <span class="hljs-number">2</span>;
+        nAlphaCorr <span class="hljs-number">2</span>;
         nAlphaSubCycles <span class="hljs-number">1</span>;
-        cAlpha          <span class="hljs-number">1</span>;
-
-        MULESCorr       <span class="hljs-literal">yes</span>;
-        nLimiterIter    <span class="hljs-number">5</span>;
-
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        symGaussSeidel;
-        tolerance       <span class="hljs-number">1e-8</span>;
-        relTol          <span class="hljs-number">0</span>;
+        cAlpha <span class="hljs-number">1</span>;
+        MULESCorr <span class="hljs-literal">yes</span>;
+        nLimiterIter <span class="hljs-number">5</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-8</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     <span class="hljs-string">"pcorr.*"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
-        preconditioner  DIC;
-        tolerance       <span class="hljs-number">1e-5</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
+        preconditioner DIC;
+        tolerance <span class="hljs-number">1e-5</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     p_rgh
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
-        preconditioner  DIC;
-        tolerance       <span class="hljs-number">1e-07</span>;
-        relTol          <span class="hljs-number">0.05</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
+        preconditioner DIC;
+        tolerance <span class="hljs-number">1e-07</span>;
+        relTol <span class="hljs-number">0.05</span>;
     }
-
     p_rghFinal
     {
         <span class="hljs-variable">$p_rgh</span>;
-        relTol          <span class="hljs-number">0</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     U
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">smoothSolver</span>;
-        smoother        symGaussSeidel;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">smoothSolver</span>;
+        smoother symGaussSeidel;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0</span>;
     }
 }
-
 <span class="hljs-built_in">PIMPLE</span>
 {
-    momentumPredictor   <span class="hljs-literal">no</span>;
-    nOuterCorrectors    <span class="hljs-number">1</span>;
-    nCorrectors         <span class="hljs-number">3</span>;
+    momentumPredictor <span class="hljs-literal">no</span>;
+    nOuterCorrectors <span class="hljs-number">1</span>;
+    nCorrectors <span class="hljs-number">3</span>;
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
 }
-
 relaxationFactors
 {
     equations
@@ -551,8 +529,6 @@ relaxationFactors
         <span class="hljs-string">".*"</span> <span class="hljs-number">1</span>;
     }
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/icofoam/">icoFoam</a> · <a href="/commands/interfoam/">interFoam</a> · <a href="/commands/simplefoam/">simpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>找不到离散项或场求解器</td><td>把错误中的完整键名与 <code>fvSchemes</code> / <code>fvSolution</code> 对照，注意 <code>div</code>(<code>phi</code>,<code>U</code>) 等键的精确拼写。</td></tr><tr><td>残差下降但目标量漂移</td><td>同时监测守恒误差、力或流量，并分别检查时间步与网格敏感性。</td></tr><tr><td>非正交修正导致成本增加</td><td>优先改善网格；增加修正次数其作用随网格质量和解的光滑程度变化，可通过细化对比评估。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

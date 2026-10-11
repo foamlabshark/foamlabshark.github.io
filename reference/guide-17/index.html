@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -296,11 +296,25 @@ manualCoeffs    { dataFile "decompositionData"; }</code></pre></div>
 <tr><td><code>manual</code></td><td>读文件指定每个单元归谁</td><td>特殊需求</td></tr>
 </tbody></table></div>
 <p>约束条件（保证某些面不被切开）：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">constraints
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">constraints
 {
-    baffles       { <span class="hljs-keyword">type</span> preserveBaffles; }
-    cyclics       { <span class="hljs-keyword">type</span> preservePatches; patches (cyc1 cyc2); }
-    faces         { <span class="hljs-keyword">type</span> singleProcessorFaceSets; sets ((f0 <span class="hljs-number">-1</span>)); }
+    baffles
+    {
+        <span class="hljs-keyword">type</span> preserveBaffles;
+    }
+    cyclics
+    {
+        <span class="hljs-keyword">type</span> preservePatches;
+        patches (cyc1 cyc2);
+    }
+    faces
+    {
+        <span class="hljs-keyword">type</span> singleProcessorFaceSets;
+        sets
+        (
+            (f0 <span class="hljs-number">-1</span>)
+        );
+    }
 }</code></pre></div>
 <p><code>n</code> (2 2 2) 的乘积必须等于 <code>numberOfSubdomains</code>，写不一致会直接报错。</p>
 <h2>17.2 setFieldsDict（区域初始化）</h2>
@@ -336,18 +350,18 @@ regions                          // 再覆盖指定区域
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">actions
 (
     {
-        <span class="hljs-keyword">name</span>    c0;
-        <span class="hljs-keyword">type</span>    cellSet;        <span class="hljs-comment">// cellSet / faceSet / pointSet / cellZoneSet / faceZoneSet</span>
-        action  new;            <span class="hljs-comment">// new / add / subtract / subset / invert / clear / remove</span>
-        source  boxToCell;
-        box     (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>);
+        <span class="hljs-keyword">name</span> c0;
+        <span class="hljs-keyword">type</span> cellSet; <span class="hljs-comment">// cellSet / faceSet / pointSet / cellZoneSet / faceZoneSet</span>
+        action new; <span class="hljs-comment">// new / add / subtract / subset / invert / clear / remove</span>
+        source boxToCell;
+        box (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>);
     }
     {
-        <span class="hljs-keyword">name</span>    porous;
-        <span class="hljs-keyword">type</span>    cellZoneSet;
-        action  new;
-        source  setToCellZone;
-        set     c0;
+        <span class="hljs-keyword">name</span> porous;
+        <span class="hljs-keyword">type</span> cellZoneSet;
+        action new;
+        source setToCellZone;
+        set c0;
     }
 );</code></pre></div>
 <p>常用 <code>source</code> 一览</p>
@@ -368,58 +382,65 @@ regions                          // 再覆盖指定区域
 <p>Set 与 Zone 的区别（重要）：Set 是临时选择结果，写在 constant/polyMesh/sets/；Zone 是网格的正式组成部分，写进 cellZones/faceZones。求解器里的多孔介质、<code>MRF</code>、<code>fvOptions</code>、动网格全都认 Zone 不认 Set，所以典型流程是”先 xxxToCell 造 Set，再 <code>setToCellZone</code> 转 Zone”。</p>
 <h2>17.4 fvOptions（源项与区域模型）</h2>
 <p>放在 <code>system/fvOptions</code>（或 <code>constant/fvOptions</code>）。它让你不改求解器就能加源项。</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">40 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">momentumSource
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">44 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">momentumSource
 {
-    <span class="hljs-keyword">type</span>            meanVelocityForce;      <span class="hljs-comment">// 恒定流量驱动（周期性槽道流必用）</span>
-    active          <span class="hljs-literal">yes</span>;
-    selectionMode   all;
-    fields          (U);
-    Ubar            (<span class="hljs-number">0.1335</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">type</span> meanVelocityForce; <span class="hljs-comment">// 恒定流量驱动（周期性槽道流必用）</span>
+    active <span class="hljs-literal">yes</span>;
+    selectionMode all;
+    fields (U);
+    Ubar (<span class="hljs-number">0.1335</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 }
-
 heatSource
 {
-    <span class="hljs-keyword">type</span>            scalarSemiImplicitSource;
-    active          <span class="hljs-literal">yes</span>;
-    selectionMode   cellZone;
-    cellZone        heater;
-    volumeMode      absolute;               <span class="hljs-comment">// absolute / specific</span>
-    sources         { h (<span class="hljs-number">500</span> <span class="hljs-number">0</span>); }          <span class="hljs-comment">// (显式部分 隐式部分)</span>
+    <span class="hljs-keyword">type</span> scalarSemiImplicitSource;
+    active <span class="hljs-literal">yes</span>;
+    selectionMode cellZone;
+    cellZone heater;
+    volumeMode absolute; <span class="hljs-comment">// absolute / specific</span>
+    sources
+    {
+        h (<span class="hljs-number">500</span> <span class="hljs-number">0</span>);
+    }
+    <span class="hljs-comment">// (显式部分 隐式部分)</span>
 }
-
 porous
 {
-    <span class="hljs-keyword">type</span>            explicitPorositySource;
-    active          <span class="hljs-literal">yes</span>;
-    selectionMode   cellZone;
-    cellZone        porousZone;
-    <span class="hljs-keyword">type</span>            DarcyForchheimer;
-    d   (<span class="hljs-number">5e7</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
-    f   (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    coordinateSystem { ... }
+    <span class="hljs-keyword">type</span> explicitPorositySource;
+    active <span class="hljs-literal">yes</span>;
+    selectionMode cellZone;
+    cellZone porousZone;
+    <span class="hljs-keyword">type</span> DarcyForchheimer;
+    d (<span class="hljs-number">5e7</span> <span class="hljs-number">-1000</span> <span class="hljs-number">-1000</span>);
+    f (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    coordinateSystem
+    {
+        ...
+    }
 }
-
 MRF1
 {
-    <span class="hljs-keyword">type</span>            MRFSource;             <span class="hljs-comment">// 旋转参考系（风机、搅拌器）</span>
-    selectionMode   cellZone;
-    cellZone        rotor;
-    origin          (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    axis            (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    omega           constant <span class="hljs-number">104.72</span>;       <span class="hljs-comment">// rad/s</span>
+    <span class="hljs-keyword">type</span> MRFSource; <span class="hljs-comment">// 旋转参考系（风机、搅拌器）</span>
+    selectionMode cellZone;
+    cellZone rotor;
+    origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+    omega constant <span class="hljs-number">104.72</span>; <span class="hljs-comment">// rad/s</span>
 }</code></pre></div>
 <p>常用类型还有：limitTemperature（限温，防发散）、limitVelocity、fixedTemperatureConstraint、buoyancyEnergy、<code>radiation</code>、solidificationMeltingSource（相变）、atmAmbientTurbSource（大气边界层）。</p>
 <p><code>fvOptions</code> 提供了许多区域源项、约束和修正模型。是否需要改写求解器，取决于已有模型是否覆盖目标方程和耦合方式；先检查求解器是否构造并使用 <code>fvOptions</code>，再选择合适的模型。</p>
 <h2>17.5 createPatchDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">pointSync <span class="hljs-literal">false</span>;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">pointSync <span class="hljs-literal">false</span>;
 patches
 (
     {
-        <span class="hljs-keyword">name</span>            cyclicLeft;
-        patchInfo       { <span class="hljs-keyword">type</span> <span class="hljs-built_in">cyclic</span>; neighbourPatch cyclicRight; }
-        constructFrom   patches;
-        patches         (left);
+        <span class="hljs-keyword">name</span> cyclicLeft;
+        patchInfo
+        {
+            <span class="hljs-keyword">type</span> <span class="hljs-built_in">cyclic</span>;
+            neighbourPatch cyclicRight;
+        }
+        constructFrom patches;
+        patches (left);
     }
 );</code></pre></div>
 <p>用途：把网格转换器生成的一堆零散 <code>patch</code> 合并；把两个面配成周期边界；改 <code>patch</code> 类型。</p>
@@ -460,31 +481,37 @@ topoSet &amp;&amp; refineMesh -overwrite -dict system/refineMeshDict</code></pre
 cuttingPatches  ( outlet );         // 被切开的 patch（源网格不覆盖的部分）</code></pre></div>
 <p>网格边界一致时可以完全不用这个文件，直接 <code>mapFields</code> ../src <code>-consistent</code>。</p>
 <h2>17.10 changeDictionaryDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dictionaryReplacement
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">20 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">dictionaryReplacement
 {
     boundary
     {
-        minZ { <span class="hljs-keyword">type</span> wall; }
+        minZ
+        {
+            <span class="hljs-keyword">type</span> wall;
+        }
     }
     U
     {
         <span class="hljs-keyword">boundaryField</span>
         {
-            <span class="hljs-string">"(inlet|outlet)"</span> { <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>; }
+            <span class="hljs-string">"(inlet|outlet)"</span>
+            {
+                <span class="hljs-keyword">type</span> <span class="hljs-built_in">zeroGradient</span>;
+            }
         }
     }
 }</code></pre></div>
 <p>多区域算例（<code>chtMultiRegionFoam</code>）里，每个 <code>region</code> 一份，放在 system/&lt;<code>region</code>&gt;/changeDictionaryDict。</p>
 <h2>17.11 meshQualityDict</h2>
 <div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">2 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-meta">#includeEtc "caseDicts/meshQualityDict"     // 直接用官方默认阈值</span>
-maxNonOrtho <span class="hljs-number">65</span>;                             <span class="hljs-comment">// 再局部覆盖</span></code></pre></div>
+maxNonOrtho <span class="hljs-number">65</span>; <span class="hljs-comment">// 再局部覆盖</span></code></pre></div>
 <p>供 <code>checkMesh</code> <code>-meshQuality</code> 与 <code>snappyHexMesh</code> 共用。</p>
 <h2>17.12 setAlphaFieldDict</h2>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">field       alpha.water;
-<span class="hljs-keyword">type</span>        sphere;            <span class="hljs-comment">// sphere / plane / cylinder / sin</span>
-origin      (<span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span>);
-radius      <span class="hljs-number">0.15</span>;
-direction   (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);</code></pre></div>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">field alpha.water;
+<span class="hljs-keyword">type</span> sphere; <span class="hljs-comment">// sphere / plane / cylinder / sin</span>
+origin (<span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span>);
+radius <span class="hljs-number">0.15</span>;
+direction (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);</code></pre></div>
 <p>在界面穿过的单元中计算部分体积分数，用于初始化清晰界面和进行界面收敛性验证。</p>
 
 </div>

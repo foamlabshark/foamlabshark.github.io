@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -284,7 +284,7 @@
 <p>可在文件中添加多个类似 <code>MRF1</code> 的对象，分别指定单元区、转轴和角速度。区域定义和物理分区应一致，避免同一单元被不合理地重复赋予不同旋转状态。</p><h3>什么时候改用动网格</h3><p><code>MRF</code> 适合在固定相对位置上估计平均流动、压升或扭矩。若需要计算叶片通过频率、转子与定子相对位置变化或运动引起的瞬态作用，可使用实际旋转网格和 AMI 接口，相关运动写在 <code>dynamicMeshDict</code> 中。</p>
 <p><code>v2512</code> 的 <code>simpleFoam/mixerVessel2D</code> 提供 <code>MRF</code> 示例。比较不同转速时，同时记录流量、压差和力矩，比只观察速度云图更便于理解运行特性。</p><h2 id="examples">配置示例</h2><h3 id="example-1">示例 1 · 基本配置</h3><p><code>MRF</code>（Multiple Reference Frame）在指定体积区域中采用旋转参考系处理动量方程，常用于搅拌器和旋转机械的稳态近似。网格几何在计算中保持静止，区域内的旋转效应通过方程和通量处理体现。</p>
 <p>以下配置主体放在 <code>constant/MRFProperties</code> 的文件头之后：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">MRF1
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">MRF1
 {
     cellZone rotor;
     active <span class="hljs-literal">yes</span>;
@@ -296,7 +296,7 @@
 </code></pre></div>
 <p><code>MRF1</code> 是区域名称，可以自定；<code>rotor</code> 必须是已有 <code>cellZone</code>。<code>origin</code> 定义转轴经过的点，单位为 m；<code>axis</code> 给出轴方向；<code>omega</code> 是角速度，单位为 rad/s，正方向按右手定则。</p>
 <p>转速与角速度满足 <span class="math-formula" data-tex="\omega=2\pi n/60"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>n</mi><mi mathvariant="normal">/</mi><mn>60</mn></mrow><annotation encoding="application/x-tex">\omega=2\pi n/60</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal">n</span><span class="mord">/60</span></span></span></span></span>。1000 r/min 对应约 104.72 rad/s。将转速数值 1000 直接填进 <code>omega</code> 会改变实际转速。</p><h3 id="example-2">示例 2 · nonRotatingPatches 怎么填</h3><p><code>MRF</code> 区域中的边界通常按区域旋转处理。若固定外壁也落在旋转单元区域的边界上，需要把对应 <code>patch</code> 名加入 <code>nonRotatingPatches</code>，例如：</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">nonRotatingPatches (stationaryWall);
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">nonRotatingPatches (stationaryWall);
 </code></pre></div>
 <p>名称与网格 <code>boundary</code> 文件一致。叶轮壁面随参考系旋转，固定机壳保持绝对静止；这一区分决定壁面速度与流体相对运动。若固定壁面在旋转区之外，则由其所在区域的普通边界设置处理。</p><h3>配套案例文件</h3><p>下载配置后，可从案例目录取得配套网格、初始场和 <code>include</code> 文件。</p><details class="reference-example" open=""><summary>案例文件 1 · incompressible/simpleFoam/rotatingCylinders</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/rotatingCylinders"><h3>算例问题：rotatingCylinders</h3><p class="reference-case-problem">多个旋转圆柱通过壁面运动驱动周围流体，圆柱间隙内形成明显剪切。算例用于研究旋转壁面与压力、速度场的配合，主要观察间隙流动和圆柱载荷。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders"><code>incompressible/simpleFoam/rotatingCylinders</code></a>。</p></section><!-- /reference-case-contexts --><p>rotatingCylinders 采用 <code>MRF</code> 旋转参考系处理转动区域，网格点保持原位。</p>
 <ul>
@@ -306,7 +306,7 @@
 <li><code>nonRotatingPatches (outerWall)</code> 指明外壁不随该参考系转动。</li>
 </ul>
 <p>改变转速时修改 <code>omega</code>；外壁和内壁的实际运动还需与速度边界条件一起核对。</p>
-<p><a href="/assets/examples/v2512/mrfproperties/1-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties"><code>incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">30 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mrfproperties/1-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties"><code>incompressible/simpleFoam/rotatingCylinders/constant/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -315,26 +315,22 @@
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">location</span>    <span class="hljs-string">"constant"</span>;
-    <span class="hljs-keyword">object</span>      MRFProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">location</span> <span class="hljs-string">"constant"</span>;
+    <span class="hljs-keyword">object</span> MRFProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 MRF1
 {
-    cellZone    all;
-    active      <span class="hljs-literal">yes</span>;
-
+    cellZone all;
+    active <span class="hljs-literal">yes</span>;
     nonRotatingPatches (outerWall);
-
-    origin    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    axis      (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    omega     <span class="hljs-number">100</span>;
+    origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+    omega <span class="hljs-number">100</span>;
 }
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 2 · <code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><h3>算例问题：cpuCabinet</h3><p class="reference-case-problem">机箱内的电子器件向周围空气放热，空气流动将热量带出机箱。固体器件、空气和可能的隔板分别设置区域，计算关注器件最高温度、空气流路和散热能力，不能只配置空气区域的温度场。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet</code></a>。</p><figure class="reference-case-figure"><img alt="cpuCabinet 算例的物理问题示意" decoding="async" height="390" loading="lazy" src="/assets/reference-case-figures/conjugate.svg" width="720"><figcaption>cpuCabinet 的物理问题示意；用于说明计算对象与主要物理过程，不代表计算结果。</figcaption></figure></section><!-- /reference-case-contexts --><p>cpuCabinet 在 <code>domain0</code> 流体区内用 <code>MRF</code> 近似风扇区域的转动。</p>
 <ul>
 <li><code>cellZone v_MRF</code> 指定局部旋转区，<code>active true</code> 启用。</li>
@@ -343,7 +339,7 @@ MRF1
 <li><code>nonRotatingPatches ()</code> 未另外列出保持静止的边界。</li>
 </ul>
 <p>移动风扇位置时同步更新 <code>cellZone</code> 和轴心；转速变化后比较流量、压降与散热效果。</p>
-<p><a href="/assets/examples/v2512/mrfproperties/2-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">29 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mrfproperties/2-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties"><code>heatTransfer/chtMultiRegionSimpleFoam/cpuCabinet/constant/domain0/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -352,25 +348,22 @@ MRF1
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">location</span>    <span class="hljs-string">"constant"</span>;
-    <span class="hljs-keyword">object</span>      MRFProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">location</span> <span class="hljs-string">"constant"</span>;
+    <span class="hljs-keyword">object</span> MRFProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 VC_1
 {
-    cellZone        v_MRF;
-    active          <span class="hljs-literal">true</span>;
+    cellZone v_MRF;
+    active <span class="hljs-literal">true</span>;
     nonRotatingPatches ();
-    origin          (<span class="hljs-number">-0.01</span> <span class="hljs-number">0.04</span> <span class="hljs-number">-0.06</span>);
-    axis            (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    omega           <span class="hljs-number">209.44</span>;
+    origin (<span class="hljs-number">-0.01</span> <span class="hljs-number">0.04</span> <span class="hljs-number">-0.06</span>);
+    axis (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    omega <span class="hljs-number">209.44</span>;
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><details class="reference-example"><summary>案例文件 3 · incompressible/simpleFoam/mixerVessel2D</summary><!-- reference-case-contexts --><section class="reference-case-context" data-case="incompressible/simpleFoam/mixerVessel2D"><h3>算例问题：mixerVessel2D</h3><p class="reference-case-problem">叶轮带动容器内流体旋转并形成循环流动。叶轮区与静止容器之间需要正确处理相对运动，具体版本采用旋转参考系、AMI 或动网格；主要观察速度分布、叶轮载荷和混合区。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D"><code>incompressible/simpleFoam/mixerVessel2D</code></a>。</p></section><!-- /reference-case-contexts --><p><code>mixerVessel2D</code> 使用 <code>MRF</code> 近似搅拌转子对流体的作用。</p>
 <ul>
 <li><code>cellZone rotor</code> 选择旋转单元区。</li>
@@ -379,7 +372,7 @@ VC_1
 <li><code>nonRotatingPatches ()</code> 没有附加静止边界清单。</li>
 </ul>
 <p>需要解析转子相位随时间的变化时，应评估真实动网格方案；<code>MRF</code> 参数变化主要改变参考系中的旋转作用。</p>
-<p><a href="/assets/examples/v2512/mrfproperties/3-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties"><code>incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">31 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
+<p><a href="/assets/examples/v2512/mrfproperties/3-MRFProperties.txt">下载配置</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties">源码</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D">案例目录</a></p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties"><code>incompressible/simpleFoam/mixerVessel2D/constant/MRFProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">26 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-comment">/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2512                                 |
@@ -388,27 +381,22 @@ VC_1
 \*---------------------------------------------------------------------------*/</span>
 <span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      MRFProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> MRFProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 MRF1
 {
-    cellZone    rotor;
-    active      <span class="hljs-literal">yes</span>;
-
+    cellZone rotor;
+    active <span class="hljs-literal">yes</span>;
     <span class="hljs-comment">// Fixed patches (by default they 'move' with the MRF zone)</span>
     nonRotatingPatches ();
-
-    origin    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-    axis      (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
-    omega     <span class="hljs-number">104.72</span>;
+    origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    axis (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>);
+    omega <span class="hljs-number">104.72</span>;
 }
-
-
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div></details><h2>相关命令</h2><p><a href="/commands/simplefoam/">simpleFoam</a> · <a href="/commands/pimplefoam/">pimpleFoam</a></p><h2>常见问题</h2><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><thead><tr><th>现象</th><th>检查方法</th></tr></thead><tbody><tr><td>模型或类型名称未识别：<code>Unknown model / Unknown type</code></td><td>核对模型名、求解器所构建的模型类别和 <code>libs</code>；同名模型可能属于不同注册表。</td></tr><tr><td>量纲不一致或压力基准错误</td><td>按场的 <code>dimensions</code> 和模型要求填写物性与压力单位：运动学压力为 p/ρ，热力学压力以 Pa 表示。</td></tr><tr><td>计算收敛但物理结果不合理</td><td>用质量、能量、相分数范围和极限工况检查模型，同时比较流量、压降等目标量与参考数据。</td></tr></tbody></table></div><p class="figure-source">配置来源：<a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials">OpenFOAM v2512 教程</a> · <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/COPYING">GPL-3.0-or-later</a>。</p>
 
 </div>

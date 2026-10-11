@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -278,51 +278,63 @@
     <div class="article-cms-loading" role="status"><span>正在打开最新内容…</span><i></i><i></i><i></i></div>
     <div class="prose"><h2>15.1 完整结构与一个可运行的例子</h2>
 <p>下面是标准方腔算例（cavity）的字典，每一行都加了注释：</p>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span> { <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>; <span class="hljs-keyword">format</span> ascii; <span class="hljs-keyword">class</span> dictionary; <span class="hljs-keyword">object</span> blockMeshDict; }
-
-scale   <span class="hljs-number">0.1</span>;              <span class="hljs-comment">// 所有坐标乘这个系数（旧版叫 convertToMeters）</span>
-
-vertices                  <span class="hljs-comment">// ① 顶点表，编号从 0 开始，顺序很重要</span>
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">57 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
+{
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> blockMeshDict;
+}
+scale <span class="hljs-number">0.1</span>; <span class="hljs-comment">// 所有坐标乘这个系数（旧版叫 convertToMeters）</span>
+vertices <span class="hljs-comment">// ① 顶点表，编号从 0 开始，顺序很重要</span>
 (
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)      <span class="hljs-comment">// 0</span>
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)      <span class="hljs-comment">// 1</span>
-    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>)      <span class="hljs-comment">// 2</span>
-    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>)      <span class="hljs-comment">// 3</span>
-    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>)    <span class="hljs-comment">// 4</span>
-    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>)    <span class="hljs-comment">// 5</span>
-    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>)    <span class="hljs-comment">// 6</span>
-    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>)    <span class="hljs-comment">// 7</span>
+    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) <span class="hljs-comment">// 0</span>
+    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>) <span class="hljs-comment">// 1</span>
+    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>) <span class="hljs-comment">// 2</span>
+    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>) <span class="hljs-comment">// 3</span>
+    (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>) <span class="hljs-comment">// 4</span>
+    (<span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>) <span class="hljs-comment">// 5</span>
+    (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>) <span class="hljs-comment">// 6</span>
+    (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0.1</span>) <span class="hljs-comment">// 7</span>
 );
-
-blocks                    <span class="hljs-comment">// ② 块定义</span>
+blocks <span class="hljs-comment">// ② 块定义</span>
 (
-    hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>)   <span class="hljs-comment">// 8 个顶点，顺序见下文</span>
-    (<span class="hljs-number">20</span> <span class="hljs-number">20</span> <span class="hljs-number">1</span>)               <span class="hljs-comment">// x、y、z 三个方向的网格数</span>
-    simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>)   <span class="hljs-comment">// 三个方向的加密比</span>
+    hex (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) <span class="hljs-comment">// 8 个顶点，顺序见下文</span>
+    (<span class="hljs-number">20</span> <span class="hljs-number">20</span> <span class="hljs-number">1</span>) <span class="hljs-comment">// x、y、z 三个方向的网格数</span>
+    simpleGrading (<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span>) <span class="hljs-comment">// 三个方向的加密比</span>
 );
-
-edges ( );                <span class="hljs-comment">// ③ 曲边（不写就是直线）</span>
-
-boundary                  <span class="hljs-comment">// ④ 边界定义</span>
+edges ( ); <span class="hljs-comment">// ③ 曲边（不写就是直线）</span>
+boundary <span class="hljs-comment">// ④ 边界定义</span>
 (
     movingWall
     {
-        <span class="hljs-keyword">type</span>            wall;
-        faces           ( (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>) );
+        <span class="hljs-keyword">type</span> wall;
+        faces
+        (
+            (<span class="hljs-number">3</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">2</span>)
+        );
     }
     fixedWalls
     {
-        <span class="hljs-keyword">type</span>            wall;
-        faces           ( (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>) (<span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span> <span class="hljs-number">1</span>) (<span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span> <span class="hljs-number">0</span>) );
+        <span class="hljs-keyword">type</span> wall;
+        faces
+        (
+            (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>)
+            (<span class="hljs-number">2</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span> <span class="hljs-number">1</span>)
+            (<span class="hljs-number">1</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span> <span class="hljs-number">0</span>)
+        );
     }
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;          <span class="hljs-comment">// 二维算例的前后面</span>
-        faces           ( (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>) (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>) );
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>; <span class="hljs-comment">// 二维算例的前后面</span>
+        faces
+        (
+            (<span class="hljs-number">0</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span>)
+            (<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span> <span class="hljs-number">7</span>)
+        );
     }
 );
-
-mergePatchPairs ( );      <span class="hljs-comment">// ⑤ 需要缝合的 patch 对</span></code></pre></div>
+mergePatchPairs ( ); <span class="hljs-comment">// ⑤ 需要缝合的 patch 对</span></code></pre></div>
 <h2>15.2 顶点顺序的规则（最容易错的地方）</h2>
 <p><code>hex</code> (v0 <code>v1</code> <code>v2</code> v3 v4 v5 v6 v7) 的顺序不是随便写的：</p>
 <p>先给块建立一个局部坐标系 <span class="math-formula" data-tex="(x_{1}, x_{2}, x_{3})"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>3</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x_{1}, x_{2}, x_{3})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span>；</p>
@@ -375,16 +387,19 @@ simpleGrading (1 0.1 1)     // 反过来（往上密）</code></pre></div>
 <tr><td><code>cyclicAMI</code></td><td>非匹配周期（旋转机械）</td><td></td></tr>
 <tr><td><code>processor</code></td><td>并行内部边界</td><td>由 <code>decomposePar</code> 自动生成</td></tr>
 </tbody></table></div>
-<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">14 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            patch;
-    faces           ( (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>) );
+    <span class="hljs-keyword">type</span> patch;
+    faces
+    (
+        (<span class="hljs-number">0</span> <span class="hljs-number">4</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>)
+    );
 }
 left
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">cyclic</span>;
-    neighbourPatch  right;         <span class="hljs-comment">// 成对出现，互相指认</span>
-    faces           ( ... );
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">cyclic</span>;
+    neighbourPatch right; <span class="hljs-comment">// 成对出现，互相指认</span>
+    faces ( ... );
 }</code></pre></div>
 <p>壁面距离计算和壁面函数使用网格类型 <code>wall</code>；对应场文件中再选择具体边界条件。<code>forces</code> 按 <code>patches</code> 列表选取积分边界。</p>
 <h2>15.6 多块与 mergePatchPairs</h2>

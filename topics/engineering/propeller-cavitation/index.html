@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -367,7 +367,7 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-转速随时间变化"><a href="#1-转速随时间变化" class="headerlink" title="1. 转速随时间变化"></a>1. 转速随时间变化</h3><p>文件：<code>constant/dynamicMeshDict</code>。本段设置转速随时间变化。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">omega       table
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">omega table
 (
     (<span class="hljs-number">0</span>    <span class="hljs-number">0</span>)
     (<span class="hljs-number">0.01</span>  <span class="hljs-number">628</span>)
@@ -379,38 +379,40 @@ bash Allmesh
 <p>角速度表按秒给定启动和降速过程，数值单位为 rad/s。转速变化同时改变进速系数，比较空化状态时需列出对应来流速度与转速。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/dynamicMeshDict">查看该配置的官方原文件</a>。</p>
 <h3 id="2-液汽相变"><a href="#2-液汽相变" class="headerlink" title="2. 液汽相变"></a>2. 液汽相变</h3><p>文件：<code>constant/transportProperties</code>。本段设置液汽相变。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">19 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">phaseChangeTwoPhaseMixture SchnerrSauer;
-
-pSat            <span class="hljs-number">2300</span>;   <span class="hljs-comment">// Saturation pressure</span>
-
-sigma           <span class="hljs-number">0.07</span>;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">15 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">phaseChangeTwoPhaseMixture SchnerrSauer;
+pSat <span class="hljs-number">2300</span>; <span class="hljs-comment">// Saturation pressure</span>
+sigma <span class="hljs-number">0.07</span>;
 water
 {
-    transportModel  Newtonian;
-    nu              <span class="hljs-number">9e-07</span>;
-    rho             <span class="hljs-number">1000</span>;
+    transportModel Newtonian;
+    nu <span class="hljs-number">9e-07</span>;
+    rho <span class="hljs-number">1000</span>;
 }
-
 vapour
 {
     transportModel Newtonian;
-    nu              <span class="hljs-number">4.273e-04</span>;
-    rho             <span class="hljs-number">0.02308</span>;
+    nu <span class="hljs-number">4.273e-04</span>;
+    rho <span class="hljs-number">0.02308</span>;
 }
 </code></pre></div>
 <p><code>pSat</code> 给出汽化压力基准，各相密度和黏度规定混合物性质。<code>SchnerrSauerCoeffs</code> 中的气核参数参与汽化与凝结速率计算，影响空化起始和增长。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/multiphase/interPhaseChangeDyMFoam/propeller/constant/transportProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-来流加载与桨叶速度"><a href="#3-来流加载与桨叶速度" class="headerlink" title="3. 来流加载与桨叶速度"></a>3. 来流加载与桨叶速度</h3><p>文件：<code>0.orig/U</code>。本段设置来流加载与桨叶速度。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">11 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inlet
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">17 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inlet
 {
-    <span class="hljs-keyword">type</span>            uniformFixedValue;
-    <span class="hljs-keyword">value</span>           <span class="hljs-variable">$internalField</span>;
-    uniformValue    table
+    <span class="hljs-keyword">type</span> uniformFixedValue;
+    <span class="hljs-keyword">value</span> <span class="hljs-variable">$internalField</span>;
+    uniformValue table
     (
-        (<span class="hljs-number">0</span>     (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>))
-        (<span class="hljs-number">0.01</span>  (<span class="hljs-number">0</span> <span class="hljs-number">-15</span> <span class="hljs-number">0</span>))
-        (<span class="hljs-number">100</span>   (<span class="hljs-number">0</span> <span class="hljs-number">-15</span> <span class="hljs-number">0</span>))
+        (
+            <span class="hljs-number">0</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>)
+        )
+        (
+            <span class="hljs-number">0.01</span> (<span class="hljs-number">0</span> <span class="hljs-number">-15</span> <span class="hljs-number">0</span>)
+        )
+        (
+            <span class="hljs-number">100</span> (<span class="hljs-number">0</span> <span class="hljs-number">-15</span> <span class="hljs-number">0</span>)
+        )
     );
 }
 </code></pre></div>

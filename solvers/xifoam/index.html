@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -279,700 +279,572 @@
     <div class="prose"><p>用 <code>b</code>–Xi 火焰褶皱模型模拟可压缩预混燃烧。</p><div data-solver-guide="v1"><section data-solver-stage="intro"><h2 id="solver-intro">简要介绍</h2><p>预混燃烧中，燃料与氧化剂在火焰到达前已经混合。火焰把未燃混合物转化为已燃气体，流动和湍流改变火焰的位置与面积。可用未燃比例 <code>b</code> 表示燃烧状态：</p><p><span class="math-formula math-display" data-tex="0\leq b\leq1,\qquad S_T=\Xi S_u"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>0</mn><mo>≤</mo><mi>b</mi><mo>≤</mo><mn>1</mn><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi>S</mi><mi>T</mi></msub><mo>=</mo><mi mathvariant="normal">Ξ</mi><msub><mi>S</mi><mi>u</mi></msub></mrow><annotation encoding="application/x-tex">0\leq b\leq1,\qquad S_T=\Xi S_u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord">Ξ</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></span></p><p><span class="math-formula" data-tex="b=1"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">b=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span> 对应未燃状态，<span class="math-formula" data-tex="b=0"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">b=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span> 对应已燃状态；<span class="math-formula" data-tex="S_u"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>u</mi></msub></mrow><annotation encoding="application/x-tex">S_u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> 为层流燃烧速度，Ξ 表示火焰褶皱使传播速度增大的因子。程序将火焰传播与流动、能量及热物性耦合，计算火焰推进和压升。混合物配比、初始热状态、点火区域和湍流条件共同决定传播过程。</p><p><code>XiFoam</code> 用 <code>b</code> 与 Xi 描述预混或部分预混火焰传播，并与可压缩流动耦合。层流燃烧速度、褶皱模型和湍流闭合对应同一混合物与火焰状态，是这一传播模型的适用前提。</p></section><section data-solver-stage="case"><h2 id="solver-case">1. 了解算例问题</h2><!-- reference-case-contexts --><section class="reference-case-context" data-case="combustion/XiFoam/RAS/moriyoshiHomogeneous"><h3>算例问题：moriyoshiHomogeneous</h3><p class="reference-case-problem">发动机或燃烧室中的预混气体被点燃后，火焰在流动和湍流作用下传播。算例需要设置混合物初态、点火区域和火焰传播模型，主要结果为燃烧进度、压力、温度及火焰发展。</p><p class="reference-case-source">算例出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/tree/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous</code></a>。</p></section><!-- /reference-case-contexts --></section><section data-solver-stage="run"><h2 id="solver-run">2. 运行与准备</h2><p>加载 OpenFOAM <code>v2512</code> 环境后，将完整教程复制到新的工作目录。以下命令调用官方脚本，按算例顺序建立网格、初始化并求解。</p><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">4 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>"</span>
 <span class="hljs-built_in">cp</span> -r <span class="hljs-string">"<span class="hljs-variable">$FOAM_TUTORIALS</span>/combustion/XiFoam/RAS"</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/RAS-reference"</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">$FOAM_RUN</span>/RAS-reference"</span>
-./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p></section><section data-solver-stage="setup"><h2 id="solver-setup">3. 修改配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>先修改什么</th></tr></thead><tbody><tr><td><code>0/U</code></td><td>流体速度向量；修改入口速度或壁面运动时从此字段入手。</td></tr><tr><td><code>0/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr><tr><td><code>0/T</code></td><td>温度，单位 K；入口温度、加热壁面和绝热壁面在此分别设置。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties.hydrogen</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr><tr><td><code>0/Su</code></td><td>层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</td></tr></tbody></table></div><p>本例时间格式为 <code>Euler</code>，时间步与该格式共同决定非定常过程的时间分辨率。</p><p><code>system/controlDict</code> 设置为：结束时刻 <code>endTime 0.005</code>；初始时间步 <code>deltaT 5e-06</code>；输出依据 <code>writeControl timeStep</code>；输出间隔 <code>writeInterval 20</code>。非定常计算中还应结合 Courant 数检查时间步。</p><p><code>system/fvSolution</code> 的 <code>PIMPLE</code> 设置为 <code>nOuterCorrectors 2</code>、<code>nCorrectors 1</code>、<code>nNonOrthogonalCorrectors 0</code>。各校正步骤及线性方程容差的完整解读列在下方。</p><p>当前启用 <code>LaunderSharmaKE</code>，需检查 模型要求的输运场 及其壁面条件。目录中保留的其他模型字段仅在切换到相应模型时使用。</p><p>表中列出本例首先需要检查的文件。其余字段、数值字典和完整解读见下方“完整配置与逐项解读”。</p></section><section data-solver-stage="results"><h2 id="solver-results">4. 检查计算结果</h2><p>同时观察温度、主要组分、燃料消耗和热释放。检查组分质量分数范围，并结合质量、元素和能量收支判断反应过程。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p></section><section data-solver-stage="files"><h2 id="solver-files">完整配置与逐项解读</h2><details class="solver-file-reference"><summary>展开完整字段、字典及逐项说明</summary><h3>初始场与边界条件</h3><p>下表列出本算例提供的初始字段。带 <code>0.orig</code> 的路径是初始化模板，<code>Allrun</code> 通常先将其恢复为 <code>0</code>；若脚本随后执行 <code>setFields</code>，实际初始分布以初始化后的文件为准。</p><div class="table-scroll"><table><thead><tr><th>文件</th><th>设置内容</th></tr></thead><tbody><tr><td><code>0/Su</code></td><td>层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</td></tr><tr><td><code>0/T</code></td><td>温度，单位 K；入口温度、加热壁面和绝热壁面在此分别设置。</td></tr><tr><td><code>0/Tu</code></td><td>本模型的初始字段。<code>internalField</code> 设置内部初值，<code>boundaryField</code> 为每个网格边界分别设置条件。</td></tr><tr><td><code>0/U</code></td><td>流体速度向量；修改入口速度或壁面运动时从此字段入手。</td></tr><tr><td><code>0/Xi</code></td><td>火焰褶皱因子；配合层流火焰速度确定湍流燃烧传播。</td></tr><tr><td><code>0/alphat</code></td><td>湍流热扩散相关字段；可压缩模型常采用 kg/(m·s)，以文件量纲为准。</td></tr><tr><td><code>0/b</code></td><td>未燃混合气比例或燃烧进度相关变量，含义按预混燃烧模型定义。</td></tr><tr><td><code>0/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0/ft</code></td><td>无量纲输运量或组分质量分数；与该模型的字段名称及边界逐一对应。</td></tr><tr><td><code>0/fu</code></td><td>无量纲输运量或组分质量分数；与该模型的字段名称及边界逐一对应。</td></tr><tr><td><code>0/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr><tr><td><code>0/nut</code></td><td>运动学湍动黏度，m²/s；通常由模型计算，壁面仍需选择相应的边界条件。</td></tr><tr><td><code>0/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr></tbody></table></div><details><summary>0/Su：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Su</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+./Allrun</code></pre></div><p>命令依次创建工作目录、复制教程并进入副本；./Allrun 执行该副本中的计算流程。</p></section><section data-solver-stage="setup"><h2 id="solver-setup">3. 修改配置</h2><div class="table-scroll"><table><thead><tr><th>文件</th><th>先修改什么</th></tr></thead><tbody><tr><td><code>0/U</code></td><td>流体速度向量；修改入口速度或壁面运动时从此字段入手。</td></tr><tr><td><code>0/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr><tr><td><code>0/T</code></td><td>温度，单位 K；入口温度、加热壁面和绝热壁面在此分别设置。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties.hydrogen</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr><tr><td><code>0/Su</code></td><td>层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</td></tr></tbody></table></div><p>本例时间格式为 <code>Euler</code>，时间步与该格式共同决定非定常过程的时间分辨率。</p><p><code>system/controlDict</code> 设置为：结束时刻 <code>endTime 0.005</code>；初始时间步 <code>deltaT 5e-06</code>；输出依据 <code>writeControl timeStep</code>；输出间隔 <code>writeInterval 20</code>。非定常计算中还应结合 Courant 数检查时间步。</p><p><code>system/fvSolution</code> 的 <code>PIMPLE</code> 设置为 <code>nOuterCorrectors 2</code>、<code>nCorrectors 1</code>、<code>nNonOrthogonalCorrectors 0</code>。各校正步骤及线性方程容差的完整解读列在下方。</p><p>当前启用 <code>LaunderSharmaKE</code>，需检查 模型要求的输运场 及其壁面条件。目录中保留的其他模型字段仅在切换到相应模型时使用。</p><p>表中列出本例首先需要检查的文件。其余字段、数值字典和完整解读见下方“完整配置与逐项解读”。</p></section><section data-solver-stage="results"><h2 id="solver-results">4. 检查计算结果</h2><p>同时观察温度、主要组分、燃料消耗和热释放。检查组分质量分数范围，并结合质量、元素和能量收支判断反应过程。</p><p>按 <code>controlDict</code> 的写出设置打开结果目录。若 <code>functions</code> 或 <code>Allrun</code> 配置了采样、积分或统计，继续查看 <code>postProcessing</code> 及相应日志；没有启用的后处理不会自动产生。</p></section><section data-solver-stage="files"><h2 id="solver-files">完整配置与逐项解读</h2><details class="solver-file-reference"><summary>展开完整字段、字典及逐项说明</summary><h3>初始场与边界条件</h3><p>下表列出本算例提供的初始字段。带 <code>0.orig</code> 的路径是初始化模板，<code>Allrun</code> 通常先将其恢复为 <code>0</code>；若脚本随后执行 <code>setFields</code>，实际初始分布以初始化后的文件为准。</p><div class="table-scroll"><table><thead><tr><th>文件</th><th>设置内容</th></tr></thead><tbody><tr><td><code>0/Su</code></td><td>层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</td></tr><tr><td><code>0/T</code></td><td>温度，单位 K；入口温度、加热壁面和绝热壁面在此分别设置。</td></tr><tr><td><code>0/Tu</code></td><td>本模型的初始字段。<code>internalField</code> 设置内部初值，<code>boundaryField</code> 为每个网格边界分别设置条件。</td></tr><tr><td><code>0/U</code></td><td>流体速度向量；修改入口速度或壁面运动时从此字段入手。</td></tr><tr><td><code>0/Xi</code></td><td>火焰褶皱因子；配合层流火焰速度确定湍流燃烧传播。</td></tr><tr><td><code>0/alphat</code></td><td>湍流热扩散相关字段；可压缩模型常采用 kg/(m·s)，以文件量纲为准。</td></tr><tr><td><code>0/b</code></td><td>未燃混合气比例或燃烧进度相关变量，含义按预混燃烧模型定义。</td></tr><tr><td><code>0/epsilon</code></td><td>湍动能耗散率，m²/s³；与 <code>k</code> 及入口湍流长度尺度配套。</td></tr><tr><td><code>0/ft</code></td><td>无量纲输运量或组分质量分数；与该模型的字段名称及边界逐一对应。</td></tr><tr><td><code>0/fu</code></td><td>无量纲输运量或组分质量分数；与该模型的字段名称及边界逐一对应。</td></tr><tr><td><code>0/k</code></td><td>湍动能，m²/s²；入口可由平均速度和湍流强度估计。</td></tr><tr><td><code>0/nut</code></td><td>运动学湍动黏度，m²/s；通常由模型计算，壁面仍需选择相应的边界条件。</td></tr><tr><td><code>0/p</code></td><td>压力场；<code>dimensions</code> 为 [0 2 -2 0 0 0 0] 时是 p/ρ，不能直接填入以 Pa 表示的压力。</td></tr></tbody></table></div><details><summary>0/Su：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Su</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      Su;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> Su;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.434</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.434</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Su</code> 设置 <code>Su</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform 0.434</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su.txt">下载此配置文件</a></p></details><details><summary>0/T：温度，K。</summary><h3><code>0/T</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Su</code> 设置 <code>Su</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform 0.434</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Su.txt">下载此配置文件</a></p></details><details><summary>0/T：温度，K。</summary><h3><code>0/T</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      T;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> T;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/T</code> 设置 <code>T</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform 300</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T.txt">下载此配置文件</a></p></details><details><summary>0/Tu：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Tu</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/T</code> 设置 <code>T</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform 300</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/T.txt">下载此配置文件</a></p></details><details><summary>0/Tu：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Tu</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      Tu;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> Tu;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">300</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Tu</code> 设置 <code>Tu</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform 300</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu.txt">下载此配置文件</a></p></details><details><summary>0/U：速度向量，m/s。</summary><h3><code>0/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Tu</code> 设置 <code>Tu</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 1 0 0 0]</code>，单位为 K。<code>internalField</code> 为 <code>uniform 300</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Tu.txt">下载此配置文件</a></p></details><details><summary>0/U：速度向量，m/s。</summary><h3><code>0/U</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volVectorField;
-    <span class="hljs-keyword">object</span>      U;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volVectorField;
+    <span class="hljs-keyword">object</span> U;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U.txt">下载此配置文件</a></p></details><details><summary>0/Xi：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Xi</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/U</code> 设置 <code>U</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 1 -1 0 0 0 0]</code>，单位为 m/s。<code>internalField</code> 为 <code>uniform (0 0 0)</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/U.txt">下载此配置文件</a></p></details><details><summary>0/Xi：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/Xi</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      Xi;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> Xi;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Xi</code> 设置 <code>Xi</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi.txt">下载此配置文件</a></p></details><details><summary>0/alphat：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/alphat</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/Xi</code> 设置 <code>Xi</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/Xi.txt">下载此配置文件</a></p></details><details><summary>0/alphat：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/alphat</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      alphat;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> alphat;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/alphat</code> 设置 <code>alphat</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 -1 -1 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat.txt">下载此配置文件</a></p></details><details><summary>0/b：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/b</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/alphat</code> 设置 <code>alphat</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 -1 -1 0 0 0 0]</code>。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/alphat.txt">下载此配置文件</a></p></details><details><summary>0/b：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/b</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      b;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> b;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/b</code> 设置 <code>b</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b.txt">下载此配置文件</a></p></details><details><summary>0/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/b</code> 设置 <code>b</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 1</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/b.txt">下载此配置文件</a></p></details><details><summary>0/epsilon：湍动能耗散率，m²/s³。</summary><h3><code>0/epsilon</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      epsilon;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> epsilon;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">375</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-3</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">375</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 375</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon.txt">下载此配置文件</a></p></details><details><summary>0/ft：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/ft</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/epsilon</code> 设置 <code>epsilon</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -3 0 0 0 0]</code>，单位为 m²/s³。<code>internalField</code> 为 <code>uniform 375</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/epsilon.txt">下载此配置文件</a></p></details><details><summary>0/ft：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/ft</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      ft;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> ft;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.06</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0.06</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/ft</code> 设置 <code>ft</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0.06</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft.txt">下载此配置文件</a></p></details><details><summary>0/fu：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/fu</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/ft</code> 设置 <code>ft</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0.06</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/ft.txt">下载此配置文件</a></p></details><details><summary>0/fu：初始场及其边界条件；量纲见 <code>dimensions</code>，场名见 <code>object</code>。</summary><h3><code>0/fu</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      fu;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> fu;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/fu</code> 设置 <code>fu</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu.txt">下载此配置文件</a></p></details><details><summary>0/k：湍动能，m²/s²。</summary><h3><code>0/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/fu</code> 设置 <code>fu</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 0 0 0 0 0 0]</code>，为无量纲量。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/fu.txt">下载此配置文件</a></p></details><details><summary>0/k：湍动能，m²/s²。</summary><h3><code>0/k</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      k;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> k;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">1.5</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1.5</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 1.5</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k.txt">下载此配置文件</a></p></details><details><summary>0/nut：模型计算的运动学湍动黏度，m²/s。</summary><h3><code>0/nut</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/k</code> 设置 <code>k</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -2 0 0 0 0]</code>，湍动能的单位为 m²/s²。<code>internalField</code> 为 <code>uniform 1.5</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/k.txt">下载此配置文件</a></p></details><details><summary>0/nut：模型计算的运动学湍动黏度，m²/s。</summary><h3><code>0/nut</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      nut;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> nut;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">0</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/nut</code> 设置 <code>nut</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -1 0 0 0 0]</code>，单位为 m²/s。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut.txt">下载此配置文件</a></p></details><details><summary>0/p：压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</summary><h3><code>0/p</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">43 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/nut</code> 设置 <code>nut</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[0 2 -1 0 0 0 0]</code>，单位为 m²/s。<code>internalField</code> 为 <code>uniform 0</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/nut.txt">下载此配置文件</a></p></details><details><summary>0/p：压力；按 <code>dimensions</code> 区分 Pa 与运动学压力 m²/s²。</summary><h3><code>0/p</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">34 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       volScalarField;
-    <span class="hljs-keyword">object</span>      p;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> volScalarField;
+    <span class="hljs-keyword">object</span> p;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">dimensions</span>      [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
-
-<span class="hljs-keyword">internalField</span>   <span class="hljs-keyword">uniform</span> <span class="hljs-number">118000</span>;
-
+<span class="hljs-keyword">dimensions</span> [<span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">-2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];
+<span class="hljs-keyword">internalField</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">118000</span>;
 <span class="hljs-keyword">boundaryField</span>
 {
     left
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     right
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     top
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     bottom
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">symmetryPlane</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">symmetryPlane</span>;
     }
-
     frontAndBack
     {
-        <span class="hljs-keyword">type</span>            <span class="hljs-built_in">empty</span>;
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">empty</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/p</code> 设置 <code>p</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 -1 -2 0 0 0 0]</code>，单位为 Pa。<code>internalField</code> 为 <code>uniform 118000</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p.txt">下载此配置文件</a></p></details><h3>物性与模型配置</h3><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/combustionProperties</code></td><td>燃烧闭合模型；反应速率如何进入流动和能量方程由此确定。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties.hydrogen</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr></tbody></table></div><details><summary><code>constant/combustionProperties</code>：燃烧闭合及模型系数。</summary><h3><code>constant/combustionProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">115 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>0/p</code> 设置 <code>p</code> 的内部初值和边界条件。<code>dimensions</code> 为 <code>[1 -1 -2 0 0 0 0]</code>，单位为 Pa。<code>internalField</code> 为 <code>uniform 118000</code>；<code>uniform</code> 表示所有内部单元采用相同初值。</p><ul><li><code>left</code>、<code>right</code>、<code>top</code>、<code>bottom</code> 采用 <code>symmetryPlane</code>，对整个平面对称面施加对称约束。</li><li><code>frontAndBack</code> 采用 <code>empty</code>，该方向不参与空间变化，需与二维网格的 <code>empty</code> 面配套。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/0/p.txt">下载此配置文件</a></p></details><h3>物性与模型配置</h3><div class="table-scroll"><table><thead><tr><th>文件</th><th>修改方法</th></tr></thead><tbody><tr><td><code>constant/combustionProperties</code></td><td>燃烧闭合模型；反应速率如何进入流动和能量方程由此确定。</td></tr><tr><td><code>constant/thermophysicalProperties</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/thermophysicalProperties.hydrogen</code></td><td>状态方程、热容、输运模型与组分物性。先确定 <code>thermoType</code> 组合，再填入物性系数。</td></tr><tr><td><code>constant/turbulenceProperties</code></td><td>层流、<code>RAS</code> 或 <code>LES</code> 的选择及模型系数。切换模型后同步补齐其输运字段和数值设置。</td></tr></tbody></table></div><details><summary><code>constant/combustionProperties</code>：燃烧闭合及模型系数。</summary><h3><code>constant/combustionProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">107 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      combustionProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> combustionProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 laminarFlameSpeedCorrelation Gulders;
-
-fuel            Propane;
-
-Su              Su [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.434</span>;
-
-SuModel         unstrained;
-
+fuel Propane;
+Su Su [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.434</span>;
+SuModel unstrained;
 equivalenceRatio equivalenceRatio [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
-
-sigmaExt        sigmaExt [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">100000</span>;
-
-XiModel         transport;
-
-XiCoef          XiCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.62</span>;
-
-XiShapeCoef     XiShapeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
-
-uPrimeCoef      uPrimeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
-
+sigmaExt sigmaExt [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">100000</span>;
+XiModel transport;
+XiCoef XiCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.62</span>;
+XiShapeCoef XiShapeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
+uPrimeCoef uPrimeCoef [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">1</span>;
 GuldersCoeffs
 {
     Methane
     {
-        W               <span class="hljs-number">0.422</span>;
-        eta             <span class="hljs-number">0.15</span>;
-        xi              <span class="hljs-number">5.18</span>;
-        alpha           <span class="hljs-number">2</span>;
-        beta            <span class="hljs-number">-0.5</span>;
-        f               <span class="hljs-number">2.3</span>;
+        W <span class="hljs-number">0.422</span>;
+        eta <span class="hljs-number">0.15</span>;
+        xi <span class="hljs-number">5.18</span>;
+        alpha <span class="hljs-number">2</span>;
+        beta <span class="hljs-number">-0.5</span>;
+        f <span class="hljs-number">2.3</span>;
     }
-
     Propane
     {
-        W               <span class="hljs-number">0.446</span>;
-        eta             <span class="hljs-number">0.12</span>;
-        xi              <span class="hljs-number">4.95</span>;
-        alpha           <span class="hljs-number">1.77</span>;
-        beta            <span class="hljs-number">-0.2</span>;
-        f               <span class="hljs-number">2.3</span>;
+        W <span class="hljs-number">0.446</span>;
+        eta <span class="hljs-number">0.12</span>;
+        xi <span class="hljs-number">4.95</span>;
+        alpha <span class="hljs-number">1.77</span>;
+        beta <span class="hljs-number">-0.2</span>;
+        f <span class="hljs-number">2.3</span>;
     }
-
     IsoOctane
     {
-        W               <span class="hljs-number">0.4658</span>;
-        eta             <span class="hljs-number">-0.326</span>;
-        xi              <span class="hljs-number">4.48</span>;
-        alpha           <span class="hljs-number">1.56</span>;
-        beta            <span class="hljs-number">-0.22</span>;
-        f               <span class="hljs-number">2.3</span>;
+        W <span class="hljs-number">0.4658</span>;
+        eta <span class="hljs-number">-0.326</span>;
+        xi <span class="hljs-number">4.48</span>;
+        alpha <span class="hljs-number">1.56</span>;
+        beta <span class="hljs-number">-0.22</span>;
+        f <span class="hljs-number">2.3</span>;
     }
 }
-
 RaviPetersenCoeffs
 {
     HydrogenInAir
     {
-        TRef            <span class="hljs-number">320</span>;
-        pPoints         ( <span class="hljs-number">1.0e05</span> <span class="hljs-number">5.0e05</span> <span class="hljs-number">1.0e06</span> <span class="hljs-number">2.0e06</span> <span class="hljs-number">3.0e06</span> );
-        EqRPoints       (<span class="hljs-number">0.5</span> <span class="hljs-number">2.0</span> <span class="hljs-number">5.0</span>);
-        alpha           ( ( (<span class="hljs-number">-0.03</span>   <span class="hljs-number">-2.347</span>  <span class="hljs-number">9.984</span>  <span class="hljs-number">-6.734</span>  <span class="hljs-number">1.361</span>)
-                            ( <span class="hljs-number">1.61</span>   <span class="hljs-number">-9.708</span> <span class="hljs-number">19.026</span> <span class="hljs-number">-11.117</span>  <span class="hljs-number">2.098</span>)
-                            ( <span class="hljs-number">2.329</span> <span class="hljs-number">-12.287</span> <span class="hljs-number">21.317</span> <span class="hljs-number">-11.973</span>  <span class="hljs-number">2.207</span>)
-                            ( <span class="hljs-number">2.593</span> <span class="hljs-number">-12.813</span> <span class="hljs-number">20.815</span> <span class="hljs-number">-11.471</span>  <span class="hljs-number">2.095</span>)
-                            ( <span class="hljs-number">2.728</span> <span class="hljs-number">-13.164</span> <span class="hljs-number">20.794</span> <span class="hljs-number">-11.418</span>  <span class="hljs-number">2.086</span>) )
-                          ( ( <span class="hljs-number">3.558</span>   <span class="hljs-number">0.162</span> <span class="hljs-number">-0.247</span>   <span class="hljs-number">0.0253</span> <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">4.818</span>  <span class="hljs-number">-0.872</span> <span class="hljs-number">-0.053</span>   <span class="hljs-number">0.0138</span> <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">3.789</span>  <span class="hljs-number">-0.312</span> <span class="hljs-number">-0.208</span>   <span class="hljs-number">0.028</span>  <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">4.925</span>  <span class="hljs-number">-1.841</span>  <span class="hljs-number">0.211</span>  <span class="hljs-number">-0.0059</span> <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">4.505</span>  <span class="hljs-number">-1.906</span>  <span class="hljs-number">0.259</span>  <span class="hljs-number">-0.0105</span> <span class="hljs-number">0</span>    ) ) );
-        beta            ( ( ( <span class="hljs-number">5.07</span>  <span class="hljs-number">-6.42</span>  <span class="hljs-number">3.87</span>  <span class="hljs-number">-0.767</span>)
-                            ( <span class="hljs-number">5.52</span>  <span class="hljs-number">-6.73</span>  <span class="hljs-number">3.88</span>  <span class="hljs-number">-0.728</span>)
-                            ( <span class="hljs-number">5.76</span>  <span class="hljs-number">-6.92</span>  <span class="hljs-number">3.92</span>  <span class="hljs-number">-0.715</span>)
-                            ( <span class="hljs-number">6.02</span>  <span class="hljs-number">-7.44</span>  <span class="hljs-number">4.37</span>  <span class="hljs-number">-0.825</span>)
-                            ( <span class="hljs-number">7.84</span> <span class="hljs-number">-11.55</span>  <span class="hljs-number">7.14</span>  <span class="hljs-number">-1.399</span>) )
-                          ( ( <span class="hljs-number">1.405</span>  <span class="hljs-number">0.053</span> <span class="hljs-number">0.022</span>  <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">1.091</span>  <span class="hljs-number">0.317</span> <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">1.64</span>  <span class="hljs-number">-0.03</span>  <span class="hljs-number">0.07</span>   <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">0.84</span>   <span class="hljs-number">0.56</span>  <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    )
-                            ( <span class="hljs-number">0.81</span>   <span class="hljs-number">0.64</span>  <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    ) ) );
+        TRef <span class="hljs-number">320</span>;
+        pPoints ( <span class="hljs-number">1.0e05</span> <span class="hljs-number">5.0e05</span> <span class="hljs-number">1.0e06</span> <span class="hljs-number">2.0e06</span> <span class="hljs-number">3.0e06</span> );
+        EqRPoints (<span class="hljs-number">0.5</span> <span class="hljs-number">2.0</span> <span class="hljs-number">5.0</span>);
+        alpha
+        (
+            (
+                (<span class="hljs-number">-0.03</span>   <span class="hljs-number">-2.347</span>  <span class="hljs-number">9.984</span>  <span class="hljs-number">-6.734</span>  <span class="hljs-number">1.361</span>)
+                ( <span class="hljs-number">1.61</span>   <span class="hljs-number">-9.708</span> <span class="hljs-number">19.026</span> <span class="hljs-number">-11.117</span>  <span class="hljs-number">2.098</span>)
+                ( <span class="hljs-number">2.329</span> <span class="hljs-number">-12.287</span> <span class="hljs-number">21.317</span> <span class="hljs-number">-11.973</span>  <span class="hljs-number">2.207</span>)
+                ( <span class="hljs-number">2.593</span> <span class="hljs-number">-12.813</span> <span class="hljs-number">20.815</span> <span class="hljs-number">-11.471</span>  <span class="hljs-number">2.095</span>)
+                ( <span class="hljs-number">2.728</span> <span class="hljs-number">-13.164</span> <span class="hljs-number">20.794</span> <span class="hljs-number">-11.418</span>  <span class="hljs-number">2.086</span>)
+            )
+            (
+                ( <span class="hljs-number">3.558</span>   <span class="hljs-number">0.162</span> <span class="hljs-number">-0.247</span>   <span class="hljs-number">0.0253</span> <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">4.818</span>  <span class="hljs-number">-0.872</span> <span class="hljs-number">-0.053</span>   <span class="hljs-number">0.0138</span> <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">3.789</span>  <span class="hljs-number">-0.312</span> <span class="hljs-number">-0.208</span>   <span class="hljs-number">0.028</span>  <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">4.925</span>  <span class="hljs-number">-1.841</span>  <span class="hljs-number">0.211</span>  <span class="hljs-number">-0.0059</span> <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">4.505</span>  <span class="hljs-number">-1.906</span>  <span class="hljs-number">0.259</span>  <span class="hljs-number">-0.0105</span> <span class="hljs-number">0</span>    )
+            )
+        );
+        beta
+        (
+            (
+                ( <span class="hljs-number">5.07</span>  <span class="hljs-number">-6.42</span>  <span class="hljs-number">3.87</span>  <span class="hljs-number">-0.767</span>)
+                ( <span class="hljs-number">5.52</span>  <span class="hljs-number">-6.73</span>  <span class="hljs-number">3.88</span>  <span class="hljs-number">-0.728</span>)
+                ( <span class="hljs-number">5.76</span>  <span class="hljs-number">-6.92</span>  <span class="hljs-number">3.92</span>  <span class="hljs-number">-0.715</span>)
+                ( <span class="hljs-number">6.02</span>  <span class="hljs-number">-7.44</span>  <span class="hljs-number">4.37</span>  <span class="hljs-number">-0.825</span>)
+                ( <span class="hljs-number">7.84</span> <span class="hljs-number">-11.55</span>  <span class="hljs-number">7.14</span>  <span class="hljs-number">-1.399</span>)
+            )
+            (
+                ( <span class="hljs-number">1.405</span>  <span class="hljs-number">0.053</span> <span class="hljs-number">0.022</span>  <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">1.091</span>  <span class="hljs-number">0.317</span> <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">1.64</span>  <span class="hljs-number">-0.03</span>  <span class="hljs-number">0.07</span>   <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">0.84</span>   <span class="hljs-number">0.56</span>  <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    )
+                ( <span class="hljs-number">0.81</span>   <span class="hljs-number">0.64</span>  <span class="hljs-number">0</span>      <span class="hljs-number">0</span>    )
+            )
+        );
     }
 }
-
-ignite          <span class="hljs-literal">yes</span>;
-
+ignite <span class="hljs-literal">yes</span>;
 ignitionSites
 (
     {
-        <span class="hljs-keyword">location</span>        (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.0005</span>);
-        diameter        <span class="hljs-number">0.003</span>;
-        start           <span class="hljs-number">0</span>;
-        duration        <span class="hljs-number">0.003</span>;
-        strength        <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">location</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0.0005</span>);
+        diameter <span class="hljs-number">0.003</span>;
+        start <span class="hljs-number">0</span>;
+        duration <span class="hljs-number">0.003</span>;
+        strength <span class="hljs-number">2</span>;
     }
 );
-
 ignitionSphereFraction <span class="hljs-number">1</span>;
-
 ignitionThickness ignitionThickness [<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.001</span>;
-
 ignitionCircleFraction <span class="hljs-number">0.5</span>;
-
 ignitionKernelArea ignitionKernelArea [<span class="hljs-number">0</span> <span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">0.001</span>;
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/combustionProperties</code> 中各项设置的作用如下。</p><ul><li><code>Su</code> 设为 <code>Su [0 1 -1 0 0 0 0] 0.434</code>：层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</li><li><code>ignitionSites/条目/duration</code> 设为 <code>0.003</code>：给定注入持续时间。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">89 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/combustionProperties</code> 中各项设置的作用如下。</p><ul><li><code>Su</code> 设为 <code>Su [0 1 -1 0 0 0 0] 0.434</code>：层流火焰速度，m/s；与所用混合物和火焰速度模型一致。</li><li><code>ignitionSites/条目/duration</code> 设为 <code>0.003</code>：给定注入持续时间。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/combustionProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">81 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 thermoType
 {
-    <span class="hljs-keyword">type</span>            heheuPsiThermo;
-    mixture         homogeneousMixture;
-    transport       const;
-    thermo          janaf;
+    <span class="hljs-keyword">type</span> heheuPsiThermo;
+    mixture homogeneousMixture;
+    transport const;
+    thermo janaf;
     equationOfState perfectGas;
-    specie          specie;
-    energy          absoluteEnthalpy;
+    specie specie;
+    energy absoluteEnthalpy;
 }
-
 stoichiometricAirFuelMassRatio
-    stoichiometricAirFuelMassRatio [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">15.675</span>;
-
+stoichiometricAirFuelMassRatio [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">15.675</span>;
 reactants
 {
     specie
     {
-        molWeight       <span class="hljs-number">29.4649</span>;
+        molWeight <span class="hljs-number">29.4649</span>;
     }
     thermodynamics
     {
-        Tlow            <span class="hljs-number">200</span>;
-        Thigh           <span class="hljs-number">6000</span>;
-        Tcommon         <span class="hljs-number">1000</span>;
+        Tlow <span class="hljs-number">200</span>;
+        Thigh <span class="hljs-number">6000</span>;
+        Tcommon <span class="hljs-number">1000</span>;
         highCpCoeffs
         (
             <span class="hljs-number">3.24515</span> <span class="hljs-number">0.00202212</span> <span class="hljs-number">-6.98806e-07</span> <span class="hljs-number">1.11477e-10</span>
@@ -986,25 +858,23 @@ reactants
     }
     transport
     {
-        mu              <span class="hljs-number">1e-5</span>;
-        Pr              <span class="hljs-number">1</span>;
-
-        As              <span class="hljs-number">1.67212e-06</span>;
-        Ts              <span class="hljs-number">170.672</span>;
+        mu <span class="hljs-number">1e-5</span>;
+        Pr <span class="hljs-number">1</span>;
+        As <span class="hljs-number">1.67212e-06</span>;
+        Ts <span class="hljs-number">170.672</span>;
     }
 }
-
 products
 {
     specie
     {
-        molWeight       <span class="hljs-number">28.3233</span>;
+        molWeight <span class="hljs-number">28.3233</span>;
     }
     thermodynamics
     {
-        Tlow            <span class="hljs-number">200</span>;
-        Thigh           <span class="hljs-number">6000</span>;
-        Tcommon         <span class="hljs-number">1000</span>;
+        Tlow <span class="hljs-number">200</span>;
+        Thigh <span class="hljs-number">6000</span>;
+        Tcommon <span class="hljs-number">1000</span>;
         highCpCoeffs
         (
             <span class="hljs-number">3.10561</span> <span class="hljs-number">0.00179748</span> <span class="hljs-number">-5.94701e-07</span> <span class="hljs-number">9.05612e-11</span>
@@ -1018,262 +888,210 @@ products
     }
     transport
     {
-        mu              <span class="hljs-number">1e-5</span>;
-        Pr              <span class="hljs-number">1</span>;
-
-        As              <span class="hljs-number">1.67212e-06</span>;
-        Ts              <span class="hljs-number">170.672</span>;
+        mu <span class="hljs-number">1e-5</span>;
+        Pr <span class="hljs-number">1</span>;
+        As <span class="hljs-number">1.67212e-06</span>;
+        Ts <span class="hljs-number">170.672</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heheuPsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>homogeneousMixture</code>：规定纯物质或组分混合方式。</li><li><code>transport</code> = <code>const</code>：确定黏度及导热的物性关系，采用常输运系数。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>absoluteEnthalpy</code>：选择能量变量。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>reactants/specie/molWeight</code> 设为 <code>29.4649</code>：摩尔质量，单位 kg/kmol。</li><li><code>reactants/transport/mu</code> 设为 <code>1e-5</code>：动力黏度，单位 Pa·s。</li><li><code>reactants/transport/Pr</code> 设为 <code>1</code>：分子 Prandtl 数。</li><li><code>products/specie/molWeight</code> 设为 <code>28.3233</code>：摩尔质量，单位 kg/kmol。</li><li><code>products/transport/mu</code> 设为 <code>1e-5</code>：动力黏度，单位 Pa·s。</li><li><code>products/transport/Pr</code> 设为 <code>1</code>：分子 Prandtl 数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties.hydrogen</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties.hydrogen</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heheuPsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>homogeneousMixture</code>：规定纯物质或组分混合方式。</li><li><code>transport</code> = <code>const</code>：确定黏度及导热的物性关系，采用常输运系数。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>absoluteEnthalpy</code>：选择能量变量。</li></ul><p>阅读<code>constant/thermophysicalProperties</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>reactants/specie/molWeight</code> 设为 <code>29.4649</code>：摩尔质量，单位 kg/kmol。</li><li><code>reactants/transport/mu</code> 设为 <code>1e-5</code>：动力黏度，单位 Pa·s。</li><li><code>reactants/transport/Pr</code> 设为 <code>1</code>：分子 Prandtl 数。</li><li><code>products/specie/molWeight</code> 设为 <code>28.3233</code>：摩尔质量，单位 kg/kmol。</li><li><code>products/transport/mu</code> 设为 <code>1e-5</code>：动力黏度，单位 Pa·s。</li><li><code>products/transport/Pr</code> 设为 <code>1</code>：分子 Prandtl 数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.txt">下载此配置文件</a></p></details><details><summary><code>constant/thermophysicalProperties.hydrogen</code>：热力学组合、状态方程与各物性系数。</summary><h3><code>constant/thermophysicalProperties.hydrogen</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">60 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      thermophysicalProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> thermophysicalProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 thermoType
 {
-    <span class="hljs-keyword">type</span>            heheuPsiThermo;
-    mixture         homogeneousMixture;
-    transport       sutherland;
-    thermo          janaf;
+    <span class="hljs-keyword">type</span> heheuPsiThermo;
+    mixture homogeneousMixture;
+    transport sutherland;
+    thermo janaf;
     equationOfState perfectGas;
-    specie          specie;
-    energy          absoluteEnthalpy;
+    specie specie;
+    energy absoluteEnthalpy;
 }
-
 stoichiometricAirFuelMassRatio stoichiometricAirFuelMassRatio [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>] <span class="hljs-number">34.074</span>;
-
 reactants
 {
     specie
     {
-        molWeight       <span class="hljs-number">16.0243</span>;
+        molWeight <span class="hljs-number">16.0243</span>;
     }
     thermodynamics
     {
-        Tlow            <span class="hljs-number">200</span>;
-        Thigh           <span class="hljs-number">5000</span>;
-        Tcommon         <span class="hljs-number">1000</span>;
-        highCpCoeffs    ( <span class="hljs-number">3.02082</span> <span class="hljs-number">0.00104314</span> <span class="hljs-number">-2.88613e-07</span> <span class="hljs-number">4.20369e-11</span> <span class="hljs-number">-2.37182e-15</span> <span class="hljs-number">-902.964</span> <span class="hljs-number">2.3064</span> );
-        lowCpCoeffs     ( <span class="hljs-number">2.99138</span> <span class="hljs-number">0.00343493</span> <span class="hljs-number">-8.43792e-06</span> <span class="hljs-number">9.57755e-09</span> <span class="hljs-number">-3.75097e-12</span> <span class="hljs-number">-987.16</span> <span class="hljs-number">1.95123</span> );
+        Tlow <span class="hljs-number">200</span>;
+        Thigh <span class="hljs-number">5000</span>;
+        Tcommon <span class="hljs-number">1000</span>;
+        highCpCoeffs ( <span class="hljs-number">3.02082</span> <span class="hljs-number">0.00104314</span> <span class="hljs-number">-2.88613e-07</span> <span class="hljs-number">4.20369e-11</span> <span class="hljs-number">-2.37182e-15</span> <span class="hljs-number">-902.964</span> <span class="hljs-number">2.3064</span> );
+        lowCpCoeffs ( <span class="hljs-number">2.99138</span> <span class="hljs-number">0.00343493</span> <span class="hljs-number">-8.43792e-06</span> <span class="hljs-number">9.57755e-09</span> <span class="hljs-number">-3.75097e-12</span> <span class="hljs-number">-987.16</span> <span class="hljs-number">1.95123</span> );
     }
     transport
     {
-        As              <span class="hljs-number">1.67212e-06</span>;
-        Ts              <span class="hljs-number">170.672</span>;
+        As <span class="hljs-number">1.67212e-06</span>;
+        Ts <span class="hljs-number">170.672</span>;
     }
 }
-
 products
 {
     specie
     {
-        molWeight       <span class="hljs-number">17.9973</span>;
+        molWeight <span class="hljs-number">17.9973</span>;
     }
     thermodynamics
     {
-        Tlow            <span class="hljs-number">200</span>;
-        Thigh           <span class="hljs-number">5000</span>;
-        Tcommon         <span class="hljs-number">1000</span>;
-        highCpCoeffs    ( <span class="hljs-number">2.879</span> <span class="hljs-number">0.00161934</span> <span class="hljs-number">-4.61257e-07</span> <span class="hljs-number">6.41382e-11</span> <span class="hljs-number">-3.3855e-15</span> <span class="hljs-number">-8023.54</span> <span class="hljs-number">4.11691</span> );
-        lowCpCoeffs     ( <span class="hljs-number">3.3506</span> <span class="hljs-number">0.00176018</span> <span class="hljs-number">-4.28718e-06</span> <span class="hljs-number">5.63372e-09</span> <span class="hljs-number">-2.35948e-12</span> <span class="hljs-number">-8211.42</span> <span class="hljs-number">1.36387</span> );
+        Tlow <span class="hljs-number">200</span>;
+        Thigh <span class="hljs-number">5000</span>;
+        Tcommon <span class="hljs-number">1000</span>;
+        highCpCoeffs ( <span class="hljs-number">2.879</span> <span class="hljs-number">0.00161934</span> <span class="hljs-number">-4.61257e-07</span> <span class="hljs-number">6.41382e-11</span> <span class="hljs-number">-3.3855e-15</span> <span class="hljs-number">-8023.54</span> <span class="hljs-number">4.11691</span> );
+        lowCpCoeffs ( <span class="hljs-number">3.3506</span> <span class="hljs-number">0.00176018</span> <span class="hljs-number">-4.28718e-06</span> <span class="hljs-number">5.63372e-09</span> <span class="hljs-number">-2.35948e-12</span> <span class="hljs-number">-8211.42</span> <span class="hljs-number">1.36387</span> );
     }
     transport
     {
-        As              <span class="hljs-number">1.67212e-06</span>;
-        Ts              <span class="hljs-number">170.672</span>;
+        As <span class="hljs-number">1.67212e-06</span>;
+        Ts <span class="hljs-number">170.672</span>;
     }
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties.hydrogen</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heheuPsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>homogeneousMixture</code>：规定纯物质或组分混合方式。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>absoluteEnthalpy</code>：选择能量变量。</li></ul><p>阅读<code>constant/thermophysicalProperties.hydrogen</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>reactants/specie/molWeight</code> 设为 <code>16.0243</code>：摩尔质量，单位 kg/kmol。</li><li><code>products/specie/molWeight</code> 设为 <code>17.9973</code>：摩尔质量，单位 kg/kmol。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>constant/thermophysicalProperties.hydrogen</code>中的 <code>thermoType</code>将不同物性关系组合成所需的热力学模型。</p><ul><li><code>type</code> = <code>heheuPsiThermo</code>：创建热力学对象。</li><li><code>mixture</code> = <code>homogeneousMixture</code>：规定纯物质或组分混合方式。</li><li><code>transport</code> = <code>sutherland</code>：确定黏度及导热的物性关系，黏度随温度按 Sutherland 关系变化。</li><li><code>thermo</code> = <code>janaf</code>：确定比热、焓等热力学函数，采用分段热化学多项式。</li><li><code>equationOfState</code> = <code>perfectGas</code>：给出压力、温度与密度之间的关系，采用理想气体状态方程。</li><li><code>specie</code> = <code>specie</code>：提供组分的基本物性。</li><li><code>energy</code> = <code>absoluteEnthalpy</code>：选择能量变量。</li></ul><p>阅读<code>constant/thermophysicalProperties.hydrogen</code>时，可先对照以下设置及其在本例中的取值。</p><ul><li><code>reactants/specie/molWeight</code> 设为 <code>16.0243</code>：摩尔质量，单位 kg/kmol。</li><li><code>products/specie/molWeight</code> 设为 <code>17.9973</code>：摩尔质量，单位 kg/kmol。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/thermophysicalProperties.hydrogen.txt">下载此配置文件</a></p></details><details><summary><code>constant/turbulenceProperties</code>：层流、<code>RAS</code> 或 <code>LES</code> 及具体湍流模型。</summary><h3><code>constant/turbulenceProperties</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">16 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      turbulenceProperties;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> turbulenceProperties;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-simulationType      <span class="hljs-built_in">RAS</span>;
-
+simulationType <span class="hljs-built_in">RAS</span>;
 <span class="hljs-built_in">RAS</span>
 {
-    RASModel        LaunderSharmaKE;
-
-    turbulence      <span class="hljs-literal">on</span>;
-
-    printCoeffs     <span class="hljs-literal">on</span>;
+    RASModel LaunderSharmaKE;
+    turbulence <span class="hljs-literal">on</span>;
+    printCoeffs <span class="hljs-literal">on</span>;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/turbulenceProperties</code> 中各项设置的作用如下。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>LaunderSharmaKE</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h3>离散格式与方程求解</h3><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">65 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>constant/turbulenceProperties</code> 中各项设置的作用如下。</p><ul><li><code>simulationType</code> 设为 <code>RAS</code>：选择层流、<code>RAS</code> 或 <code>LES</code> 框架。</li><li><code>RAS/RASModel</code> 设为 <code>LaunderSharmaKE</code>：选择 Reynolds 平均湍流模型。</li><li><code>RAS/turbulence</code> 设为 <code>on</code>：控制湍流模型是否启用。</li><li><code>RAS/printCoeffs</code> 设为 <code>on</code>：决定是否在日志中列出实际模型系数。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/constant/turbulenceProperties.txt">下载此配置文件</a></p></details><h3>离散格式与方程求解</h3><details><summary><code>system/fvSchemes</code>：每个方程项的空间和时间离散格式。</summary><h3><code>system/fvSchemes</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">55 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSchemes;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSchemes;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 ddtSchemes
 {
-    default         <span class="hljs-built_in">Euler</span>;
+    default <span class="hljs-built_in">Euler</span>;
 }
-
 gradSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 divSchemes
 {
-    default         none;
-
-    div(phi,U)      <span class="hljs-built_in">Gauss</span> limitedLinearV <span class="hljs-number">1</span>;
-
-    div(phid,p)     <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phi,K)      <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phi,k)      <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    default none;
+    div(phi,U) <span class="hljs-built_in">Gauss</span> limitedLinearV <span class="hljs-number">1</span>;
+    div(phid,p) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phi,K) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phi,k) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
     div(phi,epsilon) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phi,R)      <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(R)          <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
-    div(phiXi,Xi)   <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phiXi,Su)   <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
-    div(phiSt,b)    <span class="hljs-built_in">Gauss</span> limitedLinear01 <span class="hljs-number">1</span>;
+    div(phi,R) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(R) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    div(phiXi,Xi) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phiXi,Su) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+    div(phiSt,b) <span class="hljs-built_in">Gauss</span> limitedLinear01 <span class="hljs-number">1</span>;
     div(phi,ft_b_ha_hau) <span class="hljs-built_in">Gauss</span> multivariateSelection
     {
-        fu  limitedLinear01 <span class="hljs-number">1</span>;
-        ft  limitedLinear01 <span class="hljs-number">1</span>;
-        b   limitedLinear01 <span class="hljs-number">1</span>;
-        ha  <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
+        fu limitedLinear01 <span class="hljs-number">1</span>;
+        ft limitedLinear01 <span class="hljs-number">1</span>;
+        b limitedLinear01 <span class="hljs-number">1</span>;
+        ha <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
         hau <span class="hljs-built_in">limitedLinear</span> <span class="hljs-number">1</span>;
     };
-    div(U)          <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
+    div(U) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
     div((Su*n)) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
     div((U+((Su*Xi)*n))) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
     div(((rho*nuEff)*dev2(T(grad(U))))) <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span>;
 }
-
 laplacianSchemes
 {
-    default         <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
+    default <span class="hljs-built_in">Gauss</span> <span class="hljs-built_in">linear</span> corrected;
 }
-
 interpolationSchemes
 {
-    default         <span class="hljs-built_in">linear</span>;
+    default <span class="hljs-built_in">linear</span>;
 }
-
 snGradSchemes
 {
-    default         corrected;
+    default corrected;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,U)</code></td><td><code>Gauss limitedLinearV 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phid,p)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,K)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,R)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(R)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(phiXi,Xi)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phiXi,Su)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phiSt,b)</code></td><td><code>Gauss limitedLinear01 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/fu</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ft</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/b</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ha</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/hau</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(U)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((Su*n))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((U+((Su*Xi)*n)))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(((rho*nuEff)*dev2(T(grad(U)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">52 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSchemes</code>按算子名称选择离散格式。求解器调用的算子名称需要与这里的键相符。</p><div class="table-scroll"><table><thead><tr><th>条目</th><th>本例设置</th><th>解读</th></tr></thead><tbody><tr><td><code>ddtSchemes/default</code></td><td><code>Euler</code></td><td>时间导数的默认设置，采用一阶隐式时间离散。</td></tr><tr><td><code>gradSchemes/default</code></td><td><code>Gauss linear</code></td><td>空间梯度的默认设置。</td></tr><tr><td><code>divSchemes/default</code></td><td><code>none</code></td><td>散度及对流项的默认设置，不提供默认格式，所需算子应单独列出。</td></tr><tr><td><code>divSchemes/div(phi,U)</code></td><td><code>Gauss limitedLinearV 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phid,p)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,K)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,k)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,epsilon)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,R)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(R)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(phiXi,Xi)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phiXi,Su)</code></td><td><code>Gauss limitedLinear 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phiSt,b)</code></td><td><code>Gauss limitedLinear01 1</code></td><td>散度及对流项；括号内给出通量与所输运的量；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/fu</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ft</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/b</code></td><td><code>limitedLinear01 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/ha</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(phi,ft_b_ha_hau)/Gauss multivariateSelection/hau</code></td><td><code>limitedLinear 1</code></td><td>散度及对流项；通过限制器控制高阶插值引起的振荡。</td></tr><tr><td><code>divSchemes/div(U)</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((Su*n))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div((U+((Su*Xi)*n)))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>divSchemes/div(((rho*nuEff)*dev2(T(grad(U)))))</code></td><td><code>Gauss linear</code></td><td>散度及对流项；括号内给出通量与所输运的量。</td></tr><tr><td><code>laplacianSchemes/default</code></td><td><code>Gauss linear corrected</code></td><td>扩散项的默认设置；包含非正交网格修正。</td></tr><tr><td><code>interpolationSchemes/default</code></td><td><code>linear</code></td><td>单元中心到面的插值的默认设置。</td></tr><tr><td><code>snGradSchemes/default</code></td><td><code>corrected</code></td><td>面法向梯度的默认设置；包含非正交网格修正。</td></tr></tbody></table></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSchemes.txt">下载此配置文件</a></p></details><details><summary><code>system/fvSolution</code>：线性求解器、耦合循环、容差与松弛。</summary><h3><code>system/fvSolution</code></h3><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">45 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      fvSolution;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> fvSolution;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
 solvers
 {
     <span class="hljs-string">"(p|rho)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PCG</span>;
-        preconditioner  DIC;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PCG</span>;
+        preconditioner DIC;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     <span class="hljs-string">"(p|rho)Final"</span>
     {
         <span class="hljs-variable">$p</span>;
-        tolerance       <span class="hljs-number">1e-06</span>;
-        relTol          <span class="hljs-number">0</span>;
+        tolerance <span class="hljs-number">1e-06</span>;
+        relTol <span class="hljs-number">0</span>;
     }
-
     <span class="hljs-string">"(U|b|Su|Xi|ha|hau|k|epsilon)"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-05</span>;
-        relTol          <span class="hljs-number">0.1</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">1e-05</span>;
+        relTol <span class="hljs-number">0.1</span>;
     }
-
     <span class="hljs-string">"(U|b|Su|Xi|ha|hau|k|epsilon)Final"</span>
     {
-        <span class="hljs-keyword">solver</span>          <span class="hljs-built_in">PBiCGStab</span>;
-        preconditioner  DILU;
-        tolerance       <span class="hljs-number">1e-05</span>;
-        relTol          <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">solver</span> <span class="hljs-built_in">PBiCGStab</span>;
+        preconditioner DILU;
+        tolerance <span class="hljs-number">1e-05</span>;
+        relTol <span class="hljs-number">0</span>;
     }
 }
-
 <span class="hljs-built_in">PIMPLE</span>
 {
     nOuterCorrectors <span class="hljs-number">2</span>;
-    nCorrectors     <span class="hljs-number">1</span>;
+    nCorrectors <span class="hljs-number">1</span>;
     nNonOrthogonalCorrectors <span class="hljs-number">0</span>;
 }
-
-
-<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>"(p|rho)"</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(p|rho)Final"</code></td><td><code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|b|Su|Xi|ha|hau|k|epsilon)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|b|Su|Xi|ha|hau|k|epsilon)Final"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/nOuterCorrectors</code> = <code>2</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>1</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution.txt">下载此配置文件</a></p></details><h3>时间、迭代与输出设置</h3><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">47 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">FoamFile</span>
+<span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><p><code>system/fvSolution</code>分别控制单个线性方程的求解和各物理场之间的耦合。带引号的字段名可使用正则表达式，一组设置因而可以覆盖多个字段。</p><div class="table-scroll"><table><caption><code>system/fvSolution</code> 的线性求解设置</caption><thead><tr><th>字段或匹配规则</th><th>本例设置的作用</th></tr></thead><tbody><tr><td><code>"(p|rho)"</code></td><td><code>solver</code> <code>PCG</code>：线性方程采用 <code>PCG</code> 方法；<code>preconditioner</code> <code>DIC</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(p|rho)Final"</code></td><td><code>tolerance</code> <code>1e-06</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|b|Su|Xi|ha|hau|k|epsilon)"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0.1</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr><tr><td><code>"(U|b|Su|Xi|ha|hau|k|epsilon)Final"</code></td><td><code>solver</code> <code>PBiCGStab</code>：线性方程采用 <code>PBiCGStab</code> 方法；<code>preconditioner</code> <code>DILU</code>：选择线性方程的预条件方法；<code>tolerance</code> <code>1e-05</code>：线性方程绝对残差阈值；<code>relTol</code> <code>0</code>：相对初始残差的降低比例；0 表示仅按绝对阈值判断。</td></tr></tbody></table></div><ul><li><code>PIMPLE/nOuterCorrectors</code> = <code>2</code>：每个时间步的外耦合迭代次数。</li><li><code>PIMPLE/nCorrectors</code> = <code>1</code>：每轮压力速度耦合中的压力校正次数。</li><li><code>PIMPLE/nNonOrthogonalCorrectors</code> = <code>0</code>：压力或扩散方程的非正交校正次数。</li></ul><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/fvSolution.txt">下载此配置文件</a></p></details><h3>时间、迭代与输出设置</h3><h3><code>system/controlDict</code></h3><p>程序名称、时间步、终止时刻与写出控制。</p><p class="reference-code-source">配置出处：OpenCFD OpenFOAM <code>v2512</code> 官方教程 <a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict"><code>combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict</code></a>（原文件）。</p><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">27 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">FoamFile</span>
 {
-    <span class="hljs-keyword">version</span>     <span class="hljs-number">2.0</span>;
-    <span class="hljs-keyword">format</span>      ascii;
-    <span class="hljs-keyword">class</span>       dictionary;
-    <span class="hljs-keyword">object</span>      controlDict;
+    <span class="hljs-keyword">version</span> <span class="hljs-number">2.0</span>;
+    <span class="hljs-keyword">format</span> ascii;
+    <span class="hljs-keyword">class</span> dictionary;
+    <span class="hljs-keyword">object</span> controlDict;
 }
 <span class="hljs-comment">// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //</span>
-
-<span class="hljs-keyword">application</span>     XiFoam;
-
-startFrom       latestTime;
-
-startTime       <span class="hljs-number">0</span>;
-
-stopAt          endTime;
-
-endTime         <span class="hljs-number">0.005</span>;
-
-deltaT          <span class="hljs-number">5e-06</span>;
-
-writeControl    timeStep;
-
-writeInterval   <span class="hljs-number">20</span>;
-
-purgeWrite      <span class="hljs-number">0</span>;
-
-writeFormat     ascii;
-
-writePrecision  <span class="hljs-number">6</span>;
-
+<span class="hljs-keyword">application</span> XiFoam;
+startFrom latestTime;
+startTime <span class="hljs-number">0</span>;
+stopAt endTime;
+endTime <span class="hljs-number">0.005</span>;
+deltaT <span class="hljs-number">5e-06</span>;
+writeControl timeStep;
+writeInterval <span class="hljs-number">20</span>;
+purgeWrite <span class="hljs-number">0</span>;
+writeFormat ascii;
+writePrecision <span class="hljs-number">6</span>;
 writeCompression <span class="hljs-literal">off</span>;
-
-timeFormat      general;
-
-timePrecision   <span class="hljs-number">6</span>;
-
+timeFormat general;
+timePrecision <span class="hljs-number">6</span>;
 runTimeModifiable <span class="hljs-literal">true</span>;
-
-adjustTimeStep  <span class="hljs-literal">no</span>;
-
-maxCo           <span class="hljs-number">0.2</span>;
-
-maxDeltaT       <span class="hljs-number">1</span>;
-
-
+adjustTimeStep <span class="hljs-literal">no</span>;
+maxCo <span class="hljs-number">0.2</span>;
+maxDeltaT <span class="hljs-number">1</span>;
 <span class="hljs-comment">// ************************************************************************* //</span></code></pre></div><div data-reference-reading="v2"><p><code>system/controlDict</code> 中各项设置的作用如下。</p><ul><li><code>application</code> 设为 <code>XiFoam</code>：指定由 <code>Allrun</code> 等脚本调用的应用程序。</li><li><code>startFrom</code> 设为 <code>latestTime</code>：决定从给定起始时刻还是已有结果继续计算。</li><li><code>startTime</code> 设为 <code>0</code>：给定起始时刻。</li><li><code>endTime</code> 设为 <code>0.005</code>：规定计算结束的时间或稳态迭代终点。</li><li><code>deltaT</code> 设为 <code>5e-06</code>：设置时间步；启用自动调步后它用于起步。</li><li><code>writeControl</code> 设为 <code>timeStep</code>：选择按时间步、模拟时间等事件写出结果。</li><li><code>writeInterval</code> 设为 <code>20</code>：给出与 <code>writeControl</code> 配套的写出间隔。</li><li><code>purgeWrite</code> 设为 <code>0</code>：控制保留多少个结果时间目录；0 表示不自动清除。</li><li><code>runTimeModifiable</code> 设为 <code>true</code>：决定运行中是否重新读取可修改的字典。</li><li><code>adjustTimeStep</code> 设为 <code>no</code>：控制是否根据 Courant 数自动调整时间步。</li><li><code>maxCo</code> 设为 <code>0.2</code>：限制流动 Courant 数。</li><li><code>maxDeltaT</code> 设为 <code>1</code>：限定自动时间步的上限。</li></ul></div><p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict">查看官方原文件</a> · <a href="/downloads/reference-v2512/combustion/XiFoam/RAS/moriyoshiHomogeneous/system/controlDict.txt">下载此配置文件</a></p><p>瞬态计算应同时检查时间步与写出间隔：前者影响时间离散和稳定性，后者只决定保存结果的频率。仅缩小 <code>writeInterval</code> 不会提高计算本身的时间分辨率。</p><details><summary><code>Allrun</code>：官方预处理、求解和后处理执行顺序。</summary><h3><code>Allrun</code></h3><div class="code-panel" data-language="bash"><div class="code-toolbar"><span class="code-language">Bash / 终端</span><span class="code-lines">66 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="Bash / 终端代码"><code class="hljs language-bash"><span class="hljs-meta">#!/bin/sh</span>
 <span class="hljs-built_in">cd</span> <span class="hljs-string">"<span class="hljs-variable">${0%/*}</span>"</span> || <span class="hljs-built_in">exit</span>                                <span class="hljs-comment"># Run from this directory</span>
 . <span class="hljs-variable">${WM_PROJECT_DIR:?}</span>/bin/tools/RunFunctions        <span class="hljs-comment"># Tutorial run functions</span>

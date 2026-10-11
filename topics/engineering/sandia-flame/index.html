@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -356,19 +356,17 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-三路入口的速度分配"><a href="#1-三路入口的速度分配" class="headerlink" title="1. 三路入口的速度分配"></a>1. 三路入口的速度分配</h3><p>文件：<code>0.orig/U</code>。本段设置三路入口的速度分配。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inletPilot
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inletPilot
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">11.4</span>);
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">11.4</span>);
 }
 </code></pre></div>
 <p>主射流、引燃环和外侧伴流的速度分别为 49.6、11.4、0.9 m/s。三者之间的速度差形成剪切层，决定卷吸与混合的发展位置，因此需要保留三个独立入口。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS/0.orig/U">查看该配置的官方原文件</a>。</p>
 <h3 id="2-湍流燃烧与化学机理"><a href="#2-湍流燃烧与化学机理" class="headerlink" title="2. 湍流燃烧与化学机理"></a>2. 湍流燃烧与化学机理</h3><p>文件：<code>constant/combustionProperties</code>。本段设置湍流燃烧与化学机理。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">8 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">combustionModel  EDC;
-
-active  <span class="hljs-literal">true</span>;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">6 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">combustionModel EDC;
+active <span class="hljs-literal">true</span>;
 EDCCoeffs
 {
     <span class="hljs-keyword">version</span> v2005;
@@ -377,10 +375,10 @@ EDCCoeffs
 <p>燃烧模型根据湍流混合与化学反应计算反应源。完整机理由 CHEMKIN 文件转换生成；机理中的物种名称同时用于组分初始场、热物性和输运数据。更换燃料时，这些文件共同确定新的反应体系。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/combustion/reactingFoam/RAS/SandiaD_LTS/constant/combustionProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-引燃环的热边界"><a href="#3-引燃环的热边界" class="headerlink" title="3. 引燃环的热边界"></a>3. 引燃环的热边界</h3><p>文件：<code>0.orig/T</code>。本段设置引燃环的热边界。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">inletPilot
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">inletPilot
 {
-    <span class="hljs-keyword">type</span>            <span class="hljs-built_in">fixedValue</span>;
-    <span class="hljs-keyword">value</span>           <span class="hljs-keyword">uniform</span> <span class="hljs-number">1880</span>;
+    <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+    <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> <span class="hljs-number">1880</span>;
 }
 </code></pre></div>
 <p>引燃环维持 1880 K，持续向中央射流边缘供热；主射流温度为 294 K。这一温度分布使火焰在喷口附近得到稳定，是基准燃烧条件的一部分。</p>

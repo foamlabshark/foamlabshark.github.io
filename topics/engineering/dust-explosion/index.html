@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -346,55 +346,51 @@ bash Allmesh
 </tbody></table></div>
 <p>首次生成网格前，在 <code>0.orig/</code> 修改初始场与边界；<code>Allmesh</code> 会把它们复制到 <code>0/</code>。网格生成后继续调整边界，应修改 <code>0/</code> 中的对应文件。 修改几何或网格字典时，在新目录重新解压并生成网格；保留已有结果目录，便于对比前后工况。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><h3 id="1-气相燃烧闭合"><a href="#1-气相燃烧闭合" class="headerlink" title="1. 气相燃烧闭合"></a>1. 气相燃烧闭合</h3><p>文件：<code>constant/combustionProperties</code>。本段设置气相燃烧闭合。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">combustionModel  PaSR;
-
-active  <span class="hljs-literal">true</span>;
-
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">5 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">combustionModel PaSR;
+active <span class="hljs-literal">true</span>;
 PaSRCoeffs
 {
-    Cmix                <span class="hljs-number">1.0</span>;
+    Cmix <span class="hljs-number">1.0</span>;
 </code></pre></div>
 <p>PaSR 将湍流混合时间与化学反应时间结合，计算气相反应速率。颗粒内部转化由煤粒模型完成，二者通过气相组分和能量源耦合。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/combustionProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="2-煤颗粒热物性"><a href="#2-煤颗粒热物性" class="headerlink" title="2. 煤颗粒热物性"></a>2. 煤颗粒热物性</h3><p>文件：<code>constant/thermophysicalProperties</code>。本段设置煤颗粒热物性。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">13 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">solids
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">12 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">solids
 {
     C
     {
-        rho             <span class="hljs-number">2010</span>;
-        Cp              <span class="hljs-number">710</span>;
-        kappa           <span class="hljs-number">0.04</span>;
-        Hf              <span class="hljs-number">0</span>;
-        emissivity      <span class="hljs-number">1.0</span>;
+        rho <span class="hljs-number">2010</span>;
+        Cp <span class="hljs-number">710</span>;
+        kappa <span class="hljs-number">0.04</span>;
+        Hf <span class="hljs-number">0</span>;
+        emissivity <span class="hljs-number">1.0</span>;
     }
-
     ash;
 }
 </code></pre></div>
 <p>固体密度、比热和导热系数决定颗粒受热响应，生成焓参与反应能量计算。释放到气相的物种通过同名热物性和反应数据继续参与燃烧。</p>
 <p><a href="https://gitlab.com/openfoam/core/openfoam/-/blob/OpenFOAM-v2512/tutorials/lagrangian/coalChemistryFoam/simplifiedSiwek/constant/thermophysicalProperties">查看该配置的官方原文件</a>。</p>
 <h3 id="3-颗粒受热与转化"><a href="#3-颗粒受热与转化" class="headerlink" title="3. 颗粒受热与转化"></a>3. 颗粒受热与转化</h3><p>文件：<code>constant/coalCloud1Properties</code>。本段设置颗粒受热与转化。</p>
-<div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">22 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">subModels
+<div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">subModels
 {
     particleForces
     {
         sphereDrag;
         gravity;
     }
-
     injectionModels
     {
         model1
         {
-            <span class="hljs-keyword">type</span>            manualInjection;
-            massTotal       <span class="hljs-number">0.0001</span>;
+            <span class="hljs-keyword">type</span> manualInjection;
+            massTotal <span class="hljs-number">0.0001</span>;
             parcelBasisType mass;
-            SOI             <span class="hljs-number">0</span>;
-            positionsFile   <span class="hljs-string">"coalCloud1Positions"</span>;
-            U0              (<span class="hljs-number">0</span> <span class="hljs-number">-10</span> <span class="hljs-number">0</span>);
+            SOI <span class="hljs-number">0</span>;
+            positionsFile <span class="hljs-string">"coalCloud1Positions"</span>;
+            U0 (<span class="hljs-number">0</span> <span class="hljs-number">-10</span> <span class="hljs-number">0</span>);
             sizeDistribution
             {
-                <span class="hljs-keyword">type</span>        RosinRammler;
+                <span class="hljs-keyword">type</span> RosinRammler;
                 RosinRammlerDistribution
 </code></pre></div>
 <p><code>subModels</code> 按受力、注入、换热、挥发及表面反应组织颗粒过程。沿这些模型核对质量去向，可将煤粒减少量与气相产物和灰分联系起来。</p>

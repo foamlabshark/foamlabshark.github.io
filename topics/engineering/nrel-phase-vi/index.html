@@ -25,7 +25,7 @@
   
   
   
-  <script src="/assets/runtime-content.js?v=41dbef2e2f8a" defer></script>
+  <script src="/assets/runtime-content.js?v=a9aa759d14d0" defer></script>
   <link rel="stylesheet" href="/assets/community-likes.css?v=8763851fe4f3">
   <script src="/assets/community-likes.js?v=2279580e4f78" defer></script>
   <script src="/assets/runtime-ui.js?v=d6cf94587e46" defer></script>
@@ -369,19 +369,47 @@ surfaceCheck geometry/blade2.stl
 <p><code>Allmesh</code> 先建立背景网格，再用 <code>snappyHexMesh</code> 捕捉叶片并进行距离加密，随后建立 <code>rotating</code> 单元区。检查日志中 <code>blade1</code>、<code>blade2</code> 的边界面数，确认两片叶片均进入体积网格。叶片最细表面单元尺度约 0.039 m，基准网格用于启动和网格比较；载荷比较需继续加密前缘、后缘及近壁方向，并通过 <code>y</code>⁺ 选择相应壁面分辨率。</p>
 <p>本例计算孤立风轮的平均载荷。与风洞记录比较时，继续建立 24.4 m×36.6 m 试验段边界及相应塔架，分别评价来流、壁面约束和塔架的影响。</p>
 <h2 id="关键配置与解读"><a href="#关键配置与解读" class="headerlink" title="关键配置与解读"></a>关键配置与解读</h2><p>以下配置来自下载包的同名文件。</p>
-<h3 id="constant-MRFProperties"><a href="#constant-MRFProperties" class="headerlink" title="constant/MRFProperties"></a><code>constant/MRFProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">rotor { active <span class="hljs-literal">true</span>; cellZone rotating; origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); axis (<span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); omega <span class="hljs-number">7.501076059</span>; nonRotatingPatches (inlet outlet farfield); }
+<h3 id="constant-MRFProperties"><a href="#constant-MRFProperties" class="headerlink" title="constant/MRFProperties"></a><code>constant/MRFProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">9 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">rotor
+{
+    active <span class="hljs-literal">true</span>;
+    cellZone rotating;
+    origin (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    axis (<span class="hljs-number">-1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    omega <span class="hljs-number">7.501076059</span>;
+    nonRotatingPatches (inlet outlet farfield);
+}
 </code></pre></div>
 <p><code>rotating</code> 与 <code>topoSet</code> 建立的单元区一致，<code>axis (-1 0 0)</code> 同时定义主轴方向和正旋转方向。两片叶片位于旋转区内，远场边界保持静止。</p>
-<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam"><span class="hljs-keyword">boundaryField</span>
+<h3 id="0-orig-U"><a href="#0-orig-U" class="headerlink" title="0.orig/U"></a><code>0.orig/U</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">21 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam"><span class="hljs-keyword">boundaryField</span>
 {
-    inlet { <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">7</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    outlet { <span class="hljs-keyword">type</span> pressureInletOutletVelocity; <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>); }
-    farfield { <span class="hljs-keyword">type</span> slip; }
-    <span class="hljs-string">"blade.*"</span> { <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>; }
+    inlet
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">fixedValue</span>;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">7</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    outlet
+    {
+        <span class="hljs-keyword">type</span> pressureInletOutletVelocity;
+        <span class="hljs-keyword">value</span> <span class="hljs-keyword">uniform</span> (<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>);
+    }
+    farfield
+    {
+        <span class="hljs-keyword">type</span> slip;
+    }
+    <span class="hljs-string">"blade.*"</span>
+    {
+        <span class="hljs-keyword">type</span> <span class="hljs-built_in">noSlip</span>;
+    }
 }
 </code></pre></div>
 <p>入口速度为 7 m/s，侧边界采用滑移条件。叶片壁面由 <code>MRF</code> 处理旋转速度，不能再将整个流场叠加一次刚体旋转速度。改变风速后同步核对入口湍流量。</p>
-<h3 id="constant-turbulenceProperties"><a href="#constant-turbulenceProperties" class="headerlink" title="constant/turbulenceProperties"></a><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="foam"><div class="code-toolbar"><span class="code-language">foam</span><span class="code-lines">1 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="foam代码"><code class="hljs language-foam">simulationType <span class="hljs-built_in">RAS</span>; <span class="hljs-built_in">RAS</span> { RASModel kOmegaSST; turbulence <span class="hljs-literal">on</span>; printCoeffs <span class="hljs-literal">on</span>; }
+<h3 id="constant-turbulenceProperties"><a href="#constant-turbulenceProperties" class="headerlink" title="constant/turbulenceProperties"></a><code>constant/turbulenceProperties</code></h3><div class="code-panel" data-language="openfoam"><div class="code-toolbar"><span class="code-language">OpenFOAM 字典</span><span class="code-lines">7 行</span><button type="button" class="code-wrap" aria-pressed="false">自动换行</button><button type="button" class="copy-code" aria-label="复制代码">复制</button></div><pre tabindex="0" aria-label="OpenFOAM 字典代码"><code class="hljs language-openfoam">simulationType <span class="hljs-built_in">RAS</span>;
+<span class="hljs-built_in">RAS</span>
+{
+    RASModel kOmegaSST;
+    turbulence <span class="hljs-literal">on</span>;
+    printCoeffs <span class="hljs-literal">on</span>;
+}
 </code></pre></div>
 <p>SST 模型通过 <code>k</code> 和 <code>omega</code> 描述湍动能与时间尺度。随包初始场使用 1% 入口湍流强度对应的 <code>k</code>，具体试验对比应按该组风洞记录设置入口湍流。</p>
 <h2 id="运行与计算检查"><a href="#运行与计算检查" class="headerlink" title="运行与计算检查"></a>运行与计算检查</h2><p><a href="/downloads/engineering/nrel-phase-vi.zip">下载完整算例与配置代码</a>，解压后进入 <code>nrel-phase-vi</code> 目录：</p>
