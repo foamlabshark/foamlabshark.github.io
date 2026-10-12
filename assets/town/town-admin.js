@@ -9,7 +9,7 @@ window.FoamCMSTown=async function(api){
  let provinces;
  const pname=id=>provinces.find(p=>p.id===id)?.name||id;
  function shell(){el.innerHTML=`<h2>熊猫小镇</h2><nav class="town-admin-tabs" aria-label="小镇管理">${Object.entries(labels).filter(([key])=>admin||key!=='settings').map(([key,label])=>btn(label,'tab',`data-type="${key}" aria-pressed="${key===type}"`)).join('')}</nav><div id="town-admin-body"></div>`;el.querySelectorAll('[data-town-admin=tab]').forEach(b=>b.onclick=()=>api.run(async()=>{if(!await api.discardChanges())return;type=b.dataset.type;page=0;query='';status=type==='reports'?'open':'';await render();}));}
- async function render(){shell();const body=el.querySelector('#town-admin-body');
+ async function render(){await api.releaseEditor?.();shell();const body=el.querySelector('#town-admin-body');
   if(type==='content')return api.renderContent();
   if(type==='comments')return window.FoamCMSModeration({...api,panel:body,mode:'comments',discussion:true,title:'小镇内容评论',contentScope:UI.isTownContent});
   if(!provinces)provinces=await fetch('/assets/town/provinces.json').then(r=>{if(!r.ok)throw Error('无法读取省份信息，请重试。');return r.json();});

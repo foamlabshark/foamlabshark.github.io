@@ -33,8 +33,8 @@
  }
  function readCourseFields(form){const downloads=[];for(const row of form.querySelectorAll('.cms-download-row')){const label=row.querySelector('.course-file-label').value.trim(),url=row.querySelector('.course-file-url').value.trim(),description=row.querySelector('.course-file-description').value.trim(),verification=row.querySelector('.course-file-verification').value.trim();if(!label&&!url&&!description&&!verification)continue;const safe=L.safeURL(url);if(!safe||(new URL(safe).protocol!=='https:'&&new URL(safe).origin!==location.origin))throw Error('案例下载需要有效的站内路径或 HTTPS 地址。');const original=row._original||{},unchanged=L.safeURL(original.url)===safe;downloads.push({...(unchanged?original:{kind:'case'}),label:label||'配套案例',url,description,verification});}return {downloads,topics:[...form.querySelectorAll('[data-course-topic]:checked')].map(x=>x.dataset.courseTopic)};}
  function shell(){
-  const primary=[['content',editor?'内容管理':'实践与分享'],...(editor?[['sharing','实践与分享'],['assignments','作业与实践']]:[]),['questions','讨论中心'],...(moderator?[['town','熊猫小镇']]:[]),...(editor?[['files','资料中心']]:[]),...(admin?[['roles','成员管理'],['stats','访问统计']]:[])];
-  const secondary=admin?[['settings','站点设置'],['backup','维护与备份']]:[];
+  const primary=[['content',editor?'内容管理':'实践与分享'],...(editor?[['sharing','实践与分享'],['assignments','作业与实践']]:[]),['questions','讨论中心'],...(moderator?[['town','熊猫小镇']]:[]),...(editor?[['files','资料中心']]:[]),...(admin?[['roles','成员管理'],['stats','访问统计'],['operations','维护日志']]:[])];
+ const secondary=admin?[['settings','站点设置'],['backup','维护与备份']]:[];
   const tab=([id,label])=>'<button type="button" data-cms-tab="'+id+'" class="'+(id===active?'selected':'')+'">'+label+'</button>';
   root.innerHTML='<div id="cms-notice" class="lab-evidence" role="status" hidden></div><div class="cms-shell"><nav class="cms-nav" aria-label="管理功能">'+primary.map(tab).join('')+(secondary.length?'<details id="cms-more"><summary>更多管理</summary><div>'+secondary.map(tab).join('')+'</div></details>':'')+'</nav><div id="cms-panel"></div></div>';
   window.FoamCMSNavigation({host:root.querySelector('.cms-nav'),items:[...primary,...secondary],primary:primary.map(([id])=>id),active:()=>active,userId:L.user.id,area:location.pathname==='/studio/'?'studio':'admin',UI,esc,notice,run,select:id=>{if(busy)return;run(async()=>{if(!await discardChanges())return;active=id;current=null;baseline='';if($('#cms-more'))$('#cms-more').open=false;await renderTab();});}});
@@ -43,17 +43,19 @@
  const fingerprint=f=>JSON.stringify([...f.querySelectorAll('input:not(.cms-location-search),textarea,select')].map(e=>[e.name||e.className,e.type==='checkbox'?e.checked:e.value]));
  const isDirty=()=>questionWorkspace?.isDirty()||(!!$('#cms-edit-form')&&baseline!==fingerprint($('#cms-edit-form')));
  async function discardChanges(){return !isDirty()||await UI.confirmAction({title:'放弃尚未保存的修改？',message:current?.title||'新文章',details:['已保存的版本会保留。'],action:'放弃修改'});}
- async function closeEditor(){current=null;baseline='';if(editorReturn==='files'){active='files';editorReturn='content';await renderTab();return;}$('#cms-editor').hidden=true;$('#cms-editor').replaceChildren();$('.cms-content-list').hidden=false;const tree=$('.cms-directory-workspace');if(tree)tree.hidden=false;$('#cms-new').focus();}
+ const editLease=window.FoamCMSEditLease(L);
+ async function closeEditor(){await editLease.release();current=null;baseline='';if(editorReturn==='files'){active='files';editorReturn='content';await renderTab();return;}$('#cms-editor').hidden=true;$('#cms-editor').replaceChildren();$('.cms-content-list').hidden=false;const tree=$('.cms-directory-workspace');if(tree)tree.hidden=false;$('#cms-new').focus();}
  window.addEventListener('beforeunload',e=>{if(isDirty()){e.preventDefault();e.returnValue='';}});
  async function renderTab(){
+  await editLease.release();
   notice('');questionWorkspace=null;$('#cms-panel').onclick=null;root.querySelectorAll('[data-cms-tab]').forEach(b=>{b.classList.toggle('selected',b.dataset.cmsTab===active);b.setAttribute('aria-current',b.dataset.cmsTab===active?'page':'false');});
   if(['content','sharing','assignments'].includes(active)){contentFilter=contentFilters[active];await load();renderContent();}
   
-  const api={L,root,run,notice,all,UI,admin,editor,moderator,load,discardChanges,getRows:()=>rowsScope==='all'?rows:[],renderContent:()=>renderContent(),openItem:async(id,seed)=>{editorReturn=active;active='content';await renderTab();await edit(id,seed);}};
+  const api={L,root,run,notice,all,UI,admin,editor,moderator,load,discardChanges,releaseEditor:()=>editLease.release(),getRows:()=>rowsScope==='all'?rows:[],renderContent:()=>renderContent(),openItem:async(id,seed)=>{editorReturn=active;active='content';await renderTab();await edit(id,seed);}};
   if(active==='questions')questionWorkspace=await window.FoamCMSDiscussion(api);
   if(active==='files')await window.FoamCMSResources(api);
   if(active==='town'){contentFilter=contentFilters.town;await load();await window.FoamCMSTown(api);}
-  if(active==='roles')await window.FoamCMSMembers(api);if(active==='stats')await window.FoamCMSStats(api);if(active==='settings')await settings();if(active==='backup')backup();
+  if(active==='roles')await window.FoamCMSMembers(api);if(active==='stats')await window.FoamCMSStats(api);if(active==='operations')await window.FoamCMSOperations(api);if(active==='settings')await settings();if(active==='backup')backup();
  }
  function locationOptions(value,allOption=false){if(editor&&D.available){const view=contentView(),node=view&&D.nodes.find(n=>n.key===view.key),ids=new Set(node?D.descendants(node.id):D.nodes.map(n=>n.id));return '<option value="">全部目录</option><option value="unassigned" '+(value==='unassigned'?'selected':'')+'>未归类</option>'+D.nodes.filter(n=>ids.has(n.id)&&(!view||active==='town'||UI.managementTarget(n.id)!=='town')).map(n=>'<option value="'+n.id+'" '+(n.id===value?'selected':'')+'>'+esc(D.path(n.id))+'</option>').join('');}return (allOption?'<option value="">全部栏目</option>':'')+UI.placements.filter(p=>editor||['article'].includes(p.id)).map(p=>'<option value="'+p.id+'" '+(p.id===value?'selected':'')+'>'+esc(p.label)+'</option>').join('');}
  function renderContent(){
@@ -83,13 +85,13 @@
   }
   table();
  }
- async function updateContent(row,values){const changed=check(await L.client.from('foamlab_content').update(values).eq('id',row.id).eq('revision',row.revision).select());if(!changed.length)throw Error('此内容已被其他编辑更新。当前修改仍保留，请重新载入后比较。');return changed[0];}
+ async function updateContent(row,values){const changed=check(await editLease.headers(L.client.from('foamlab_content').update(values).eq('id',row.id).eq('revision',row.revision).select()));if(!changed.length)throw Error('此内容已被其他编辑更新。当前修改仍保留，请重新载入后比较。');return changed[0];}
  async function changeContentState(row,operation){
   const permanent=operation==='permanent',restore=operation==='restore';
   if(!await UI.confirmAction({title:permanent?'永久删除这篇内容？':restore?'恢复为草稿？':'移入回收站？',message:row.title,details:[UI.locationLabel(row),permanent?'正文、评论和历史版本将被删除，无法恢复。':restore?'恢复后可以继续编辑，发布后重新对读者展示。':'公开页面会停止展示，可以从回收站恢复。'],action:permanent?'永久删除':restore?'恢复草稿':'确认删除',danger:!restore}))return;
-  if(permanent){if(!admin)throw Error('永久删除需要管理员权限。');const changed=check(await L.client.from('foamlab_content').delete().eq('id',row.id).eq('status','trash').eq('revision',row.revision).select('id'));if(!changed.length)throw Error('内容状态已变化，请刷新后重试。');}
+  if(permanent){if(!admin)throw Error('永久删除需要管理员权限。');const changed=check(await editLease.headers(L.client.from('foamlab_content').delete().eq('id',row.id).eq('status','trash').eq('revision',row.revision).select('id')));if(!changed.length)throw Error('内容状态已变化，请刷新后重试。');}
   else await updateContent(row,{status:restore?'draft':'trash'});
-  baseline='';await load();renderContent();notice(permanent?'内容已永久删除。':restore?'已恢复为草稿。':'已移入回收站，可随时恢复。');
+  await editLease.release();baseline='';await load();renderContent();notice(permanent?'内容已永久删除。':restore?'已恢复为草稿。':'已移入回收站，可随时恢复。');
  }
  async function moveContent(row){
   if(D.available){
@@ -111,7 +113,8 @@
   await updateContent(row,values);await load();renderContent();notice('已移动到 '+UI.locationLabel(next)+'。');
  }
  async function edit(id,seed={}){
-  current=id?check(await (editor?L.client.from('foamlab_content').select('*').eq('id',id):L.client.from('foamlab_content').select('*').eq('id',id).eq('author_id',L.user.id).eq('kind','article')).single()):null;
+  if(admin&&id)await editLease.open(id);else await editLease.release();
+  try{current=id?check(await (editor?L.client.from('foamlab_content').select('*').eq('id',id):L.client.from('foamlab_content').select('*').eq('id',id).eq('author_id',L.user.id).eq('kind','article')).single()):null;}catch(e){await editLease.release();throw e;}
   if(current&&!editor&&(current.author_id!==L.user.id||!['draft','published'].includes(current.status)||!['article'].includes(current.kind)))throw Error('可以编辑自己的草稿和已发布文章。');
   const v=current||{kind:'article',title:'',slug:'article-'+crypto.randomUUID().slice(0,12),summary:'',body:'',track:'',series:'',author_name:window.foamAuth.profile?.display_name||'FoamLab',sort_order:0,comments_enabled:true,cover_url:'',status:'draft',metadata:{},...seed};
   const view=contentView(),noun=view?.kind==='assignment'?'作业':view?.kind==='article'?'文章':'内容';const internal=UI.key(v)==='internal',fixed=UI.placement(v)?.fixed,location=UI.key(v),p=$('#cms-editor');$('.cms-content-list').hidden=true;const tree=$('.cms-directory-workspace');if(tree)tree.hidden=true;p.hidden=false;
@@ -128,6 +131,7 @@
    f.querySelector('.cms-topic-options').hidden=true;
   }
   baseline=fingerprint(f);
+  if(admin&&id)editLease.bind(f);
   f.addEventListener('input',()=>$('#cms-draft-state').textContent=isDirty()?'有未保存修改':'已保存');
   $('#cms-close').onclick=$('#cms-cancel').onclick=()=>run(async()=>{if(await discardChanges())await closeEditor();});
   p.querySelector('[data-trash]')?.addEventListener('click',()=>run(()=>changeContentState(current,'trash')));
@@ -148,6 +152,7 @@
   if(editor&&D.available)v.section_ids=D.readPicker(f);if(D.available&&current?.metadata?.topic_key)v.metadata.topic_key=current.metadata.topic_key;
   const changes=[];if(current){if(UI.locationLabel(current)!==UI.locationLabel({...current,...v}))changes.push('位置：'+UI.locationLabel(current)+' → '+UI.locationLabel({...current,...v}));if(current.slug!==v.slug)changes.push('文章地址：'+current.slug+' → '+v.slug);if(current.status==='published'&&v.status!=='published')changes.push('状态：已发布 → '+statuses[v.status]);}
   if(changes.length&&!await UI.confirmAction({title:'确认更改文章位置或状态？',message:v.title,details:changes,action:'确认保存'}))return;
+  if(admin&&current)await editLease.ensure(current.id);
   const result=current?await updateContent(current,v):check(await L.client.from('foamlab_content').insert({...v,author_id:L.user.id}).select().single());
   baseline='';await load();renderContent();await edit(result.id);notice(v.status==='published'?'已发布。文章已在网站更新。':'已保存为'+statuses[v.status]+'。');
  }
@@ -161,5 +166,5 @@
  }
 
  function backup(){$('#cms-panel').innerHTML='<h2>导出与网站维护</h2><p>日常课程、文章、公告和资料在这里管理，保存后直接更新。Hexo 负责网站外观、命令参考与静态资源；布局修改通过源代码仓库发布。</p><div class="admin-actions"><button class="button" id="cms-export">导出可访问的内容与设置</button>'+(editor?'<a class="button secondary" href="/admin/maintenance/">维护手册</a>':'')+'</div><div class="quick-links"><a target="_blank" rel="noopener" href="https://github.com/foamlabshark/foamlab-source/tree/foamlab-source">Hexo 源文件 ↗</a><a target="_blank" rel="noopener" href="https://github.com/foamlabshark/foamlabshark.github.io/actions">部署历史与构建日志 ↗</a><a target="_blank" rel="noopener" href="https://supabase.com/dashboard/project/nmkforbzmbstasnjxlid">认证、数据库与存储 ↗</a></div><p class="lab-evidence">导出包含正文和附件地址，不包含存储文件本身、GitHub 密钥或用户私有资料。文件备份请同时下载附件；数据库完整备份由 Supabase 管理。</p>';$('#cms-export').onclick=()=>run(async()=>{const content=await all('foamlab_content');const settings=await all('foamlab_settings');download('foamlab-content-'+new Date().toISOString().slice(0,10)+'.json',{schema:2,exported_at:new Date().toISOString(),content,settings,sections:D.nodes});notice('内容导出已生成。');});}
- (async()=>{try{await L.ready;await D.ready;const isStudio=location.pathname==='/studio/';admin=L.role==='admin'&&!isStudio;editor=admin;moderator=admin;if(!L.user){root.innerHTML='<div class="lab-empty"><h2>使用 GitHub 登录</h2><p>登录后可以在作者工作台提出问题、发布文章；网站其他模块由管理员维护。</p><button class="button" data-lab-login>使用 GitHub 登录</button></div>';return;}if(L.role==='blocked'){root.innerHTML='<p class="lab-empty">此账号的投稿与管理权限已停用。</p>';return;}if(!editor&&!moderator&&!isStudio){root.innerHTML='<div class="lab-empty"><h2>此账号没有站点管理权限</h2><p>你仍可参与讨论，或在作者工作台撰写文章。</p><a class="button" href="/studio/">进入作者工作台</a></div>';return;}if($('#cms-role-label'))$('#cms-role-label').textContent=admin?'管理员':'作者';if(admin){const requested=new URLSearchParams(location.search).get('tab');if(requested==='members')active='roles';else if(requested==='moderation'){active='questions';window.FoamCMSDiscussionState={mode:'comments'};}else if(['stats','sharing','assignments','files','questions','town','content'].includes(requested))active=requested;}if(new URLSearchParams(location.search).get('tab')==='discussion')active='questions';shell();await renderTab();}catch(e){L.error(root,e);}})();
+ (async()=>{try{await L.ready;await D.ready;const isStudio=location.pathname==='/studio/';admin=L.role==='admin'&&!isStudio;editor=admin;moderator=admin;if(!L.user){root.innerHTML='<div class="lab-empty"><h2>使用 GitHub 登录</h2><p>登录后可以在作者工作台提出问题、发布文章；网站其他模块由管理员维护。</p><button class="button" data-lab-login>使用 GitHub 登录</button></div>';return;}if(L.role==='blocked'){root.innerHTML='<p class="lab-empty">此账号的投稿与管理权限已停用。</p>';return;}if(!editor&&!moderator&&!isStudio){root.innerHTML='<div class="lab-empty"><h2>此账号没有站点管理权限</h2><p>你仍可参与讨论，或在作者工作台撰写文章。</p><a class="button" href="/studio/">进入作者工作台</a></div>';return;}if($('#cms-role-label'))$('#cms-role-label').textContent=admin?'管理员':'作者';if(admin){const requested=new URLSearchParams(location.search).get('tab');if(requested==='members')active='roles';else if(requested==='moderation'){active='questions';window.FoamCMSDiscussionState={mode:'comments'};}else if(['stats','operations','sharing','assignments','files','questions','town','content'].includes(requested))active=requested;}if(new URLSearchParams(location.search).get('tab')==='discussion')active='questions';shell();await renderTab();}catch(e){L.error(root,e);}})();
 })();

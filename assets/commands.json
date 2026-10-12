@@ -52,7 +52,8 @@
         "code": "cp caseA/system/decomposeParDict caseA/system/decomposeParDict.before\nfoamGetDict -force -case caseA decomposeParDict",
         "explanation": "先备份再使用 -force 允许覆盖，新的分区设置仍需按算例填写。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamHelp",
@@ -124,7 +125,8 @@
         "code": "foamHelp solver -read",
         "explanation": "从 system/controlDict 读取 application，再查询对应求解器文档；先确认该条目已设置为所用求解器。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamDictionary",
@@ -208,7 +210,8 @@
         "code": "foamDictionary system/controlDict -expand > controlDict.expanded\nfoamDictionary system/controlDict -diff system/controlDict.original",
         "explanation": "先生成展开宏和包含后的文本，再与事先保存的原字典比较。展开文件另存，不覆盖工作字典。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamSearch",
@@ -266,7 +269,8 @@
         "code": "for field in p U k omega; do\n    printf '\\n--- %s ---\\n' \"$field\"\n    foamSearch -count \"$FOAM_TUTORIALS/incompressible\" \\\n        \"solvers.${field}.solver\" fvSolution\ndone",
         "explanation": "循环依次把 `field` 替换成四个字段名。双引号让变量展开后仍作为完整条目路径传入。输出按字段分组，可比较压力方程与速度、湍流方程的线性求解器选择。若某个查询没有结果，进入对应教程查看 `solvers` 中实际使用的字段名、正则表达式或引用关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamEtcFile",
@@ -337,7 +341,8 @@
         "code": "foamEtcFile -show-api",
         "explanation": "从 META-INFO 获取 API 数字，v2512 对应 2512。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamInstallationTest",
@@ -383,7 +388,8 @@
         "code": "(source \"$WM_PROJECT_DIR/etc/bashrc\" WM_COMPILE_OPTION=Debug; foamInstallationTest)",
         "explanation": "检查 Debug 环境对应的程序、库或工具路径，适用于准备调试构建时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamSystemCheck",
@@ -429,7 +435,8 @@
         "code": "(source \"$WM_PROJECT_DIR/etc/bashrc\" WM_COMPILE_OPTION=Debug; foamSystemCheck)",
         "explanation": "检查 Debug 环境对应的程序、库或工具路径，适用于准备调试构建时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCloneCase",
@@ -479,7 +486,8 @@
         "code": "for re in 100 400 1000; do foamCloneCase caseA \"Re-$re\" || break; done",
         "explanation": "为三个参数点创建独立副本，之后逐个编辑物性或入口。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCopySettings",
@@ -525,7 +533,8 @@
         "code": "foamCopySettings caseA caseB\ndiff -ru caseA/system caseB/system",
         "explanation": "比较结果可定位保留或覆盖的差异；rsync 未使用 --delete，目标独有文件仍可能存在。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamNewCase",
@@ -578,7 +587,8 @@
         "code": "for tag in coarse medium fine; do foamNewCase -app cavityStarter -case \"grid-$tag\"; done",
         "explanation": "从同一模板建立不同网格试验，后续分别调整 blockMeshDict。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamRunTutorials",
@@ -637,7 +647,8 @@
         "code": "foamRunTutorials -self -case tutorial-study",
         "explanation": "-self 跳过起点自己的 Allrun，防止外层脚本再次调用自身。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamTestTutorial",
@@ -691,7 +702,8 @@
         "code": "mkdir -p tests-serial\nfoamTestTutorial -serial -full -output=tests-serial incompressible/icoFoam/cavity/cavity",
         "explanation": "优先使用 Allrun-serial；不存在时回退到教程默认流程。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamNew",
@@ -745,7 +757,8 @@
         "code": "foamNew source App -preview",
         "explanation": "类名以短横线开头时仅输出原始模板，便于先阅读应用入口结构。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamNewApp",
@@ -791,7 +804,8 @@
         "code": "for appName in pressureSummary velocitySummary; do foamNewApp \"$appName\"; done",
         "explanation": "每个原型拥有独立 Make 配置，便于分别扩展标量与矢量处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamNewBC",
@@ -851,7 +865,8 @@
         "code": "foamNewBC mixed vector vectorRobin\nwmake libso vectorRobin",
         "explanation": "生成并编译共享库，目标由 Make/files 的 LIB 指定。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamNewFunctionObject",
@@ -897,7 +912,8 @@
         "code": "mkdir -p \"$WM_PROJECT_USER_DIR/src/functionObjects\"\ncd \"$WM_PROJECT_USER_DIR/src/functionObjects\"\nfoamNewFunctionObject volumeAudit",
         "explanation": "以用户库形式组织项目，避免与官方源码混放。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCalc",
@@ -945,7 +961,8 @@
         "code": "foamCalc -precision 12 '0.1*(1 + 0.5*sin(6.283185307179586*0.25))'",
         "explanation": "对应平均速度 0.1、振幅系数 0.5、频率 1 Hz，在 t=0.25 s 时得到 0.15。sin 的参数使用弧度，可据此核对时变边界的数值。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamExprParserInfo",
@@ -993,7 +1010,8 @@
         "code": "foamExprParserInfo -all -tokens -rules > expression-parsers.txt",
         "explanation": "把全部解析器的符号和规则集中保存，用于比较同一函数或运算在不同上下文中的支持情况。大写名称通常是终结符，小写名称通常是非终结符。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCleanPath",
@@ -1051,7 +1069,8 @@
         "code": "export MY_TOOL_PATH=\"/usr/bin:/tmp/tools:/usr/bin\"\ncleaned=$(foamCleanPath -env=MY_TOOL_PATH) && export MY_TOOL_PATH=\"$cleaned\"",
         "explanation": "先捕获成功结果再更新变量，避免清理失败时覆盖旧值。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamHasLibrary",
@@ -1116,7 +1135,8 @@
         "code": "if foamHasLibrary libfoamLabPulsedInlet.so; then icoFoam; fi",
         "explanation": "在已配置该边界的算例中，仅在库加载成功后启动求解器。该检查关注装载，边界参数由求解器继续读取。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamListRegions",
@@ -1183,7 +1203,8 @@
         "code": "foamListRegions -case ../candidateCase -optional -verbose",
         "explanation": "显式选择算例并显示读取细节；缺少 regionProperties 时允许继续，适合批量检查不同算例。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamUpgradeFiniteArea",
@@ -1238,7 +1259,8 @@
         "code": "foamUpgradeFiniteArea -git -case caseA\ngit -C caseA diff --stat",
         "explanation": "算例须在 Git 工作树中，-git 使用 git mv，随后查看变更范围。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamUpgradeCyclics",
@@ -1316,7 +1338,8 @@
         "code": "foamUpgradeCyclics -enableFunctionEntries -time '0:0.5'",
         "explanation": "允许展开可信算例中的 include 等指令，并选择0至0.5范围的时间；转换后对照展开后的边界名称。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "checkFaMesh",
@@ -1394,7 +1417,8 @@
         "code": "mpirun -np 4 checkFaMesh -parallel -area-region film",
         "explanation": "前提是4个分区中已有匹配的面积网格；检查并行分区及耦合边连接。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeFaMesh",
@@ -1477,7 +1501,8 @@
         "code": "mpirun -np 4 makeFaMesh -parallel -area-region film -no-fields",
         "explanation": "4个体网格分区已经存在；生成面积网格及分区寻址，-no-fields暂不分解面积场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "PDRblockMesh",
@@ -1546,7 +1571,8 @@
         "code": "PDRblockMesh -no-outer\ncheckMesh -constant",
         "explanation": "字典另含外部扩展区域时跳过外部区域，随后检查主体网格尺寸、边界与质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "blockMesh",
@@ -1623,7 +1649,8 @@
         "code": "blockMesh -region fluid -dict system/fluid/blockMeshDict -sets",
         "explanation": "为fluid区域生成网格；字典中命名的cellZones同时写成cellSets，便于后续集合操作。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "extrudeMesh",
@@ -1701,7 +1728,8 @@
         "code": "extrudeMesh -region solid -dict system/extrudeMeshDict.solid",
         "explanation": "已准备solid区域及相应源patch的字典时，选择该源区域进行拉伸，核对输出区域连接与边界。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "extrudeToRegionMesh",
@@ -1775,7 +1803,8 @@
         "code": "extrudeToRegionMesh\ncheckMesh -region panelRegion",
         "explanation": "字典中的region必须为panelRegion；检查生成区域的单元体积、厚度及耦合面，确认它可供后续区域求解。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "extrude2DMesh",
@@ -1847,7 +1876,8 @@
         "code": "foamDictionary system/extrude2DMeshDict -entry nLayers -set 5\nextrude2DMesh polyMesh2D\ncheckMesh -latestTime",
         "explanation": "把厚度方向改成5层后检查新网格；用于三维计算时，前后边界应采用相应物理类型。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cellSizeAndAlignmentGrid",
@@ -1895,7 +1925,8 @@
         "code": "cellSizeAndAlignmentGrid\nfoamyHexMesh",
         "explanation": "先查看导出的控制场覆盖了几何细节，再用同一字典生成体网格；前者输出控制数据，后者生成实际单元。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamyHexMesh",
@@ -1968,7 +1999,8 @@
         "code": "mpirun -np 4 foamyHexMesh -parallel",
         "explanation": "按算例的并行准备流程设置4个分区及decomposeParDict，再并行运行，检查各进程分配与最终网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamyHexMeshBackgroundMesh",
@@ -2016,7 +2048,8 @@
         "code": "foamyHexMeshBackgroundMesh -case ../geometryStudy -writeMesh",
         "explanation": "geometryStudy中使用另一组geometry或局部尺度，输出其背景网格，供不同几何方案对照。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamyHexMeshSurfaceSimplify",
@@ -2064,7 +2097,8 @@
         "code": "foamyHexMeshSurfaceSimplify '(80 80 80)' rebuilt.stl\nsurfaceCheck constant/triSurface/rebuilt.stl",
         "explanation": "重建后检查闭合性、面数和包围盒，再决定是否用于后续网格生成。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamyQuadMesh",
@@ -2129,7 +2163,8 @@
         "code": "foamyQuadMesh\nextrude2DMesh polyMesh2D",
         "explanation": "前提已准备对应extrude2DMeshDict且前一步输出可用二维网格；第二步按厚度、层数生成求解用体网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "snappyHexMesh",
@@ -2218,7 +2253,8 @@
         "code": "decomposePar\nmpirun -np 4 snappyHexMesh -parallel\nmpirun -np 4 checkMesh -parallel -latestTime",
         "explanation": "decomposeParDict的numberOfSubdomains设为4；在各分区生成最新网格，再检查并行网格质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "checkMesh",
@@ -2312,7 +2348,8 @@
         "code": "mpirun -np 4 checkMesh -parallel -allRegions",
         "explanation": "前提4个分区及regionProperties完整；分别检查流体、固体区域和分区耦合关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceAdd",
@@ -2379,7 +2416,8 @@
         "code": "surfaceAdd a.stl b.stl combined.stl\nsurfaceCheck -checkSelfIntersection combined.stl",
         "explanation": "合并前两表面已在同一坐标系。第二步检查交叉三角形；surfaceAdd本身做组合与点合并，不执行实体布尔裁切。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceBooleanFeatures",
@@ -2449,7 +2487,8 @@
         "code": "surfaceBooleanFeatures -trim '((clip.stl inside))' union body.stl boss.stl",
         "explanation": "clip.stl为额外闭合选择表面，仅保留位于其内部的交线段，适合局部特征提取。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceCheck",
@@ -2518,7 +2557,8 @@
         "code": "surfaceCheck -splitNonManifold -writeSets vtk body.stl",
         "explanation": "针对多重连接边检查并分开相应表面连接，查看分割结果后再确定所需几何拓扑。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceClean",
@@ -2585,7 +2625,8 @@
         "code": "surfaceClean raw.stl 1e-6 0.01 clean.stl\nsurfaceCheck -checkSelfIntersection clean.stl",
         "explanation": "检查输出的开边、自相交与包围盒，确认清理后的表面仍符合预期几何。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceCoarsen",
@@ -2649,7 +2690,8 @@
         "code": "surfaceCoarsen fine.stl 0.5 coarse.stl\nsurfaceCheck coarse.stl",
         "explanation": "比较输入输出面数、开边及包围盒；factor控制顶点目标，三角面数随重建结果变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceConvert",
@@ -2720,7 +2762,8 @@
         "code": "surfaceConvert -precision 12 body.obj precise.stl",
         "explanation": "用12位写出精度保存转换结果，适合小尺寸细节或后续格式往返对照。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceFeatureConvert",
@@ -2786,7 +2829,8 @@
         "code": "surfaceFeatureConvert -write-format obj body.eMesh edgePreview\nsurfaceFeatureConvert -read-format obj edgePreview checked.eMesh",
         "explanation": "先输出无扩展名OBJ线，再读回eMesh；比较边数及坐标，检查格式转换是否保留连接。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceFeatureExtract",
@@ -2855,7 +2899,8 @@
         "code": "surfaceFeatureExtract\nsnappyHexMesh",
         "explanation": "snappyHexMeshDict已引用本次生成的eMesh及细化等级；先生成特征，再进行体网格细化与贴合。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceFind",
@@ -2921,7 +2966,8 @@
         "code": "surfaceFind -x 0.1 -y 0.025 -z 0.01 raw.stl\nsurfaceFind -x 0.1 -y 0.025 -z 0.01 repaired.stl",
         "explanation": "对同一个查询点比较两份表面，观察最近点距离及所在面是否随修补发生明显改变。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceHookUp",
@@ -2986,7 +3032,8 @@
         "code": "surfaceHookUp 1e-5\nsurfaceCheck constant/triSurface/hookedSurface_surface1.stl",
         "explanation": "字典包含surface1.stl时检查其新文件，核对开边、交叉及区域，确认连接是否达到预期。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceInertia",
@@ -3052,7 +3099,8 @@
         "code": "surfaceInertia -density 7850 -referencePoint '(0 0 0)' body.stl",
         "explanation": "输出相对于原点的惯量，用于与刚体运动中指定参考点的惯量配置对应。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceInflate",
@@ -3119,7 +3167,8 @@
         "code": "surfaceInflate -checkSelfIntersection body.stl 0.002 1.2",
         "explanation": "狭窄间隙或凹角处启用自相交检查，检查偏移是否导致表面互相穿过。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceLambdaMuSmooth",
@@ -3175,7 +3224,8 @@
         "code": "surfaceLambdaMuSmooth raw.stl 0.3 0.31 10 smooth.stl\nsurfaceCheck -checkSelfIntersection smooth.stl",
         "explanation": "查看自相交、开边和包围盒，判断平滑是否改善局部三角形而保留所需几何。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceMeshConvert",
@@ -3249,7 +3299,8 @@
         "code": "surfaceMeshConvert body.data body.export -read-format obj -write-format stl -write-scale 1000",
         "explanation": "为没有标准扩展名的文件明确指定格式。输出坐标乘 1000，可将米制模型交给使用毫米坐标的工具。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceMeshExport",
@@ -3322,7 +3373,8 @@
         "code": "surfaceMeshExport -case ../surfaceCase body.data -name blade -write-format obj",
         "explanation": "从 ../surfaceCase 读取 blade 表面，并将结果写为 OBJ 内容。输出路径 body.data 相对当前工作目录，使用绝对路径可明确存放位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceMeshExtract",
@@ -3406,7 +3458,8 @@
         "code": "surfaceMeshExtract moved.obj -latestTime -patches '(movingWall)'",
         "explanation": "读取最新时间对应的网格位置，导出 movingWall。与初始位置的表面对比，可检查动网格位移方向和量级。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceMeshImport",
@@ -3479,7 +3532,8 @@
         "code": "surfaceMeshImport blade.obj -case ../surfaceCase -name blade -from local",
         "explanation": "从指定案例的坐标系字典读取 local，将局部几何变换到案例坐标。导出检查叶片原点及轴向是否符合装配位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceMeshInfo",
@@ -3545,7 +3599,8 @@
         "code": "surfaceMeshInfo body-original.stl -areas -xml > original.xml\nsurfaceMeshInfo body-clean.stl -areas -xml > clean.xml",
         "explanation": "分别记录原始与清理后表面的面面积。比较面数和面积分布，可发现修复时是否丢失了较大的实体面。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceOrient",
@@ -3611,7 +3666,8 @@
         "code": "surfaceOrient closed.stl '(10 10 10)' oriented.stl\nsurfaceInertia oriented.stl",
         "explanation": "先统一闭合外表面的方向，再计算体积、质心和惯性参数。查看结果体积与尺寸是否一致，可帮助发现几何朝向问题。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfacePatch",
@@ -3675,7 +3731,8 @@
         "code": "surfacePatch -dict system/surfacePatch-cut.dict",
         "explanation": "该字典在 geometry 声明 box，在目标 surfaces 条目设置 type cut; cutters (box);。输出表面按与 box 的几何关系形成分区，便于划定局部边界区域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfacePointMerge",
@@ -3739,7 +3796,8 @@
         "code": "surfacePointMerge body.stl 1e-8 body-joined.stl\nsurfaceCheck body-joined.stl",
         "explanation": "检查合并结果的连通性后，将 body-joined.stl 放到 constant/triSurface，并在 surfaceFeatureExtractDict 指向该文件。这样特征提取使用的是修复后的接缝。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceRedistributePar",
@@ -3811,7 +3869,8 @@
         "code": "mpirun -np 2 surfaceRedistributePar body.stl follow -parallel -case ../redistributedCase",
         "explanation": "目标案例需已经完成体网格重新分区。工具可读取已有分区表面，并使其分布跟随新网格，供后续并行几何查询使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceRefineRedGreen",
@@ -3875,7 +3934,8 @@
         "code": "surfaceRefineRedGreen faceted.stl dense.stl -steps 1\nsurfaceLambdaMuSmooth dense.stl 0.5 0.53 5 smooth.stl",
         "explanation": "先增加离散点，再做五轮 λ–μ 平滑。结果会改变几何形状，应对照原始轮廓和关键尺寸选择平滑强度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceSplitByPatch",
@@ -3941,7 +4001,8 @@
         "code": "surfaceSplitByPatch assembly.stl -patches '(\"wall.*\")' -exclude-patches '(wallTemporary)'",
         "explanation": "导出 wall 开头的目标表面并排除临时壁面。对生成文件逐个运行 surfaceCheck，可单独定位某一区域的开放边。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceSplitByTopology",
@@ -3996,7 +4057,8 @@
         "code": "surfaceSplitByTopology model.stl model-zones.stl\nsurfaceCheck model.stl\nsurfaceCheck model-zones.stl",
         "explanation": "核对面数与连接统计，并在可视化中按区域着色。分区结果用于选择区域；是否需要真正断开共享点，可继续评估 surfaceSplitNonManifolds。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceSplitNonManifolds",
@@ -4060,7 +4122,8 @@
         "code": "surfaceSplitNonManifolds closed-parts.stl split-parts.stl\nsurfaceOrient split-parts.stl '(10 10 10)' oriented-parts.stl",
         "explanation": "适用于分离后由多个闭合零件组成的输入；选取明确位于所有零件外部的点统一方向。随后检查各零件的闭合性和法向。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceSubset",
@@ -4123,7 +4186,8 @@
         "code": "foamDictionary subsetDict -entry invertSelection -set false\nfoamDictionary subsetDict -entry addFaceNeighbours -set false\nfoamDictionary subsetDict -entry zone -set '()'\nfoamDictionary subsetDict -entry localPoints -set '(0 1)'\nsurfaceSubset subsetDict body.stl near-points.stl",
         "explanation": "保留 faces 为空，并按局部点 0、1 选取相关面。适合检查某一接缝端点周围的三角形连接。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceToPatch",
@@ -4188,7 +4252,8 @@
         "code": "surfaceToPatch -case ../patchTest ../patchTest/constant/triSurface/body.stl -tol 0.001\ncheckMesh -case ../patchTest -latestTime",
         "explanation": "将试验限制在 patchTest 副本。工具有边界变更时把新网格写到后续时间，因此检查最新网格；核对边界名称、网格连接并配置相应场文件后再继续求解。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfaceTransformPoints",
@@ -4268,7 +4333,8 @@
         "code": "surfaceTransformPoints body-mm.stl aligned.stl -read-scale 0.001 -rotate '((1 0 0) (0 0 1))'",
         "explanation": "先转换长度单位，再将原 x 方向转到 z 方向。组合变换后检查包围盒和关键定位点，供后续网格划分使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ansysToFoam",
@@ -4332,7 +4398,8 @@
         "code": "ansysToFoam mesh.ans -scale 0.001\ncheckMesh -constant -allTopology -allGeometry\nrenumberMesh -overwrite",
         "explanation": "先对转换结果做较全面的几何和拓扑检查，再重新编号以改善矩阵带宽。重新编号改变网格索引，已有按编号创建的集合应重新核对。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ccmToFoam",
@@ -4380,7 +4447,8 @@
         "code": "ccmToFoam mesh-mm.ccm -scale 0.001 -ascii -numbered",
         "explanation": "输入毫米坐标换算为米，网格以 ASCII 保存，并使用编号式 patch/zone 名称。适合原始名称需要统一处理的导入流程，后续按日志建立名称对应关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToCcm",
@@ -4428,7 +4496,8 @@
         "code": "foamToCcm -latestTime -remap constant/remapping -name mappedCase",
         "explanation": "按准备好的 remapping 文件进行区域映射后导出。适合需要保持与外部软件区域命名约定一致的交换流程。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cfx4ToFoam",
@@ -4492,7 +4561,8 @@
         "code": "cfx4ToFoam mesh.geo -scale 0.001\nfoamToSurface cfx-boundary.stl -constant",
         "explanation": "把导入网格外边界写成 STL，便于与原始几何叠加检查。主要核对单位、朝向、孔洞以及入口出口的位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "datToFoam",
@@ -4555,7 +4625,8 @@
         "code": "blockMesh\ndatToFoam biconic.dat\nfoamToSurface biconic-boundary.obj -constant",
         "explanation": "导出最终外表面，检查双锥轮廓、轴线和楔形两侧。程序按源码中固定的 0.1° 角构造两侧坐标，几何检查应与该设置一致。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ensightToFoam",
@@ -4621,7 +4692,8 @@
         "code": "ensightToFoam /data/mesh.geo -case ../ensightCase -scale 0.001 -mergeTol 1e-7\ncheckMesh -case ../ensightCase -constant -allTopology",
         "explanation": "在独立案例内同时处理单位和小接缝。通过连接检查确认各部分构成预期流体域，再继续设置边界条件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "fireToFoam",
@@ -4687,7 +4759,8 @@
         "code": "fireToFoam /data/mesh.fpma -case ../fireCase -ascii -check\ncheckMesh -case ../fireCase -constant -allGeometry -allTopology",
         "explanation": "将转换和检查集中到 fireCase。查看负体积、面连接和边界分区，确认网格可用于后续求解。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "fluent3DMeshToFoam",
@@ -4754,7 +4827,8 @@
         "code": "fluent3DMeshToFoam mesh.msh -ignoreFaceGroups '(auxFaces)' -case ../fluentTest\ncheckMesh -case ../fluentTest -constant -allTopology",
         "explanation": "适用于已确认 auxFaces 属于可忽略辅助数据的输入。检查真实外边界是否仍完整，保留求解所需的面分区。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "fluentMeshToFoam",
@@ -4820,7 +4894,8 @@
         "code": "fluentMeshToFoam mesh.msh -writeZones -writeSets\ncheckMesh -constant",
         "explanation": "额外将区域和边界信息写为集合，便于 topoSet、局部网格修改等工具使用。集合内容应与转换日志中的分组一致。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamMeshToFluent",
@@ -4883,7 +4958,8 @@
         "code": "renumberMesh -overwrite\ncheckMesh -constant\nfoamMeshToFluent",
         "explanation": "在案例副本中重新编号，再导出通过检查的网格。几何形状保持不变，输出连接编号随之更新，适合比较外部软件读取与计算效率。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToFireMesh",
@@ -4952,7 +5028,8 @@
         "code": "foamToFireMesh -time '0.1:0.5' -ascii",
         "explanation": "遍历所选范围内已有的时间目录，导出相关网格。核对每个输出对应的时间，避免把静态网格重复文件误认为不同形状。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToStarMesh",
@@ -5021,7 +5098,8 @@
         "code": "foamToStarMesh -time '0.2,0.5,1' -scale 1000",
         "explanation": "选择已有的 0.2、0.5 和 1 时间目录。比较输出几何可以分析位移过程；所有输出采用相同的毫米坐标尺度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToSurface",
@@ -5090,7 +5168,8 @@
         "code": "foamToSurface moved.stl -latestTime",
         "explanation": "提取最新时间对应的网格边界。与初始输出叠加，可检查动网格位移和变形范围。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "gambitToFoam",
@@ -5154,7 +5233,8 @@
         "code": "gambitToFoam mesh.neu -scale 0.001\nsurfaceMeshExtract ports.obj -patches '(inlet outlet)' -constant",
         "explanation": "输入需包含 inlet 和 outlet 分组。单独导出两个端面，检查法向、面积和间距是否符合实际流动通道。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "gmshToFoam",
@@ -5219,7 +5299,8 @@
         "code": "gmshToFoam mesh-mm.msh\ntransformPoints -scale '(0.001 0.001 0.001)'\ncheckMesh -constant -allGeometry",
         "explanation": "转换器通过输入坐标建立网格；第二步统一缩放为米。检查单元质量和尺寸，再配置求解器物性。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ideasUnvToFoam",
@@ -5283,7 +5364,8 @@
         "code": "ideasUnvToFoam mesh.unv\ncreatePatch -overwrite\nfoamToSurface unv-boundary.obj -constant",
         "explanation": "先依据导入名称编写 createPatchDict，再整理边界并导出外表面。对照原始几何检查入口、出口和壁面归属。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "kivaToFoam",
@@ -5349,7 +5431,8 @@
         "code": "kivaToFoam -file engine.otape17 -zHeadMin 0.1\ncheckMesh -constant",
         "explanation": "按 z 高度阈值把相应缸套面转入缸盖分组；0.1 应按输入几何坐标确定。检查转换后的缸盖范围和网格质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mshToFoam",
@@ -5413,7 +5496,8 @@
         "code": "mshToFoam mesh.msh\nautoPatch 45 -overwrite\ncheckMesh -constant",
         "explanation": "根据 45° 特征角对边界进一步分区，适用于输入未提供所需物理边界名称的模型。分区后按几何位置命名并设置边界条件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "netgenNeutralToFoam",
@@ -5484,7 +5568,8 @@
         "code": "netgenNeutralToFoam /data/mesh.neu -case ../netgenCase\nfoamToSurface netgen-boundary.obj -case ../netgenCase -constant",
         "explanation": "将网格转换到 netgenCase，并导出边界用于与 NETGEN 原模型对比。检查孔洞、几何尺度及各边界的位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "plot3dToFoam",
@@ -5550,7 +5635,8 @@
         "code": "plot3dToFoam single-mm.xyz -singleBlock -noBlank -scale 0.001\ncheckMesh -constant",
         "explanation": "读取单块、无 iblank 的毫米制输入，转换为米并检查网格。二维厚度如另行指定，也会随 -scale 一起缩放。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "star4ToFoam",
@@ -5616,7 +5702,8 @@
         "code": "star4ToFoam /data/engine -case ../starCase -scale 0.001 -ascii -solids\ncheckMesh -case ../starCase -constant -allTopology",
         "explanation": "从绝对前缀路径读取网格，保留全部目标区域并检查连接。核对区域之间的界面和外边界，作为后续多区域配置的依据。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "tetgenToFoam",
@@ -5688,7 +5775,8 @@
         "code": "tetgenToFoam mesh.1 -noFaceFile\nautoPatch 45 -overwrite",
         "explanation": "根据外表面的折角建立边界分区。之后在可视化中确认各区位置，再使用 createPatchDict 整理为入口、出口和壁面。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "vtkUnstructuredToFoam",
@@ -5752,7 +5840,8 @@
         "code": "vtkUnstructuredToFoam /data/mesh.vtk -case ../vtkCase\nfoamToSurface vtk-boundary.obj -case ../vtkCase -constant",
         "explanation": "将转换结果放入 vtkCase，并导出外表面。与原 VTK 数据叠加查看，检查几何位置、尺度和边界是否完整。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "writeMeshObj",
@@ -5835,7 +5924,8 @@
         "code": "writeMeshObj -patchFaces -patchEdges -latestTime",
         "explanation": "将最新网格的 patch 面和边写为 OBJ。适合查看动网格最终边界形状以及各 patch 的连接情况。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "PDRMesh",
@@ -5907,7 +5997,8 @@
         "code": "mpirun -np 4 PDRMesh -parallel -overwrite\nmpirun -np 4 checkMesh -parallel",
         "explanation": "前提是网格、集合及 PDR 设置已一致分解为四个子域。并行处理后检查跨处理器连接以及新生成边界。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "collapseEdges",
@@ -5986,7 +6077,8 @@
         "code": "collapseEdges -collapseFaceSet targetFaces -overwrite\ncheckMesh -constant -allGeometry",
         "explanation": "使用已有 targetFaces 指定需要处理的面集合，并把结果写回原实例。-collapseFaceSet 与 -collapseFaces 是两种互斥的面处理方式；短边过滤仍会先进行，完成后检查集合邻域及网格质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "combinePatchFaces",
@@ -6060,7 +6152,8 @@
         "code": "mpirun -np 4 combinePatchFaces 10 -parallel -overwrite\nmpirun -np 4 checkMesh -parallel",
         "explanation": "四个子域均使用同一角度设置，直接更新分区网格。完成后检查处理器边界和新面质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "modifyMesh",
@@ -6133,7 +6226,8 @@
         "code": "modifyMesh -dict system/modifyMesh-testDict\ncheckMesh -latestTime -allGeometry -allTopology",
         "explanation": "在该字典中明确选择一种修改操作，默认写到新的时间实例。对最新网格检查几何和拓扑，再决定是否把方案用于正式案例。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "refineHexMesh",
@@ -6207,7 +6301,8 @@
         "code": "mpirun -np 4 refineHexMesh refineCells -parallel -overwrite\nmpirun -np 4 checkMesh -parallel",
         "explanation": "前提是网格与 refineCells 已分解到四个子域。并行细化后检查子域连接和各进程单元数量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "refineWallLayer",
@@ -6280,7 +6375,8 @@
         "code": "refineWallLayer '(walls)' 0.2 -overwrite\ncheckMesh -constant -allGeometry",
         "explanation": "更新原网格后检查近壁单元的长宽比、体积与非正交性。第一层高度仍需结合雷诺数、壁面模型及目标 y⁺ 估算。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "refinementLevel",
@@ -6352,7 +6448,8 @@
         "code": "mpirun -np 4 refinementLevel -parallel",
         "explanation": "在已分解的未贴体网格上运行，写出各子域的级别信息。比较各进程报告，检查局部细化分布及跨子域的过渡区域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "removeFaces",
@@ -6424,7 +6521,8 @@
         "code": "mpirun -np 4 removeFaces internalFaces -parallel -overwrite\nmpirun -np 4 checkMesh -parallel",
         "explanation": "网格和面集需已一致分解到四个子域。并行运行后检查处理器界面，确认跨分区连接保持一致。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "selectCells",
@@ -6487,7 +6585,8 @@
         "code": "foamDictionary ../selectionTest/system/selectCellsDict -entry nearDistance -set 0.001\nselectCells -case ../selectionTest",
         "explanation": "将近表面距离设为 0.001 个网格长度单位，再比较 selected 与原方案。该参数影响近表面处理，需结合局部单元尺寸解释选区变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "snappyRefineMesh",
@@ -6550,7 +6649,8 @@
         "code": "foamDictionary system/snappyRefineMeshDict -entry writeMesh -set true\nsnappyRefineMesh\ncheckMesh -latestTime",
         "explanation": "把中间细化阶段的网格也写到时间目录，便于逐步观察细化区域变化。最终用 checkMesh 检查最新网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "splitCells",
@@ -6617,7 +6717,8 @@
         "code": "splitCells 180 -set targetCells -overwrite\ncheckMesh -constant -allGeometry -allTopology",
         "explanation": "将已确认的局部分裂方案写回原网格实例。检查单元体积、内部连接和边界面，随后核对场数据与网格的一致性。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "attachMesh",
@@ -6681,7 +6782,8 @@
         "code": "attachMesh -overwrite\nrenumberMesh -overwrite\ncheckMesh -constant",
         "explanation": "先形成连续的网格连接，再优化单元编号。检查连接和几何保持一致，供后续线性方程求解使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "autoPatch",
@@ -6745,7 +6847,8 @@
         "code": "autoPatch 45 -overwrite\ncreatePatch -overwrite",
         "explanation": "先按几何分区，再根据实际结果编写 createPatchDict，把相关 patch 合并或命名为 inlet、outlet、walls。两步之间需检查自动生成的名称和空间位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createBaffles",
@@ -6824,7 +6927,8 @@
         "code": "createBaffles -overwrite\nmergeOrSplitBaffles -split -overwrite\ncheckMesh",
         "explanation": "第一步创建面，第二步复制挡板两侧需要独立的顶点，适用于随后要让两侧独立运动的网格。最终检查拆分后的连通关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createPatch",
@@ -6906,7 +7010,8 @@
         "code": "createPatch -allRegions -overwrite\ncheckMesh -allRegions",
         "explanation": "regionProperties 已列出各区域且相应字典已准备好；-allRegions 对所有区域执行重组，再逐区域检查结果。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "deformedGeom",
@@ -6977,7 +7082,8 @@
         "code": "deformedGeom 5\ncheckMesh -latestTime",
         "explanation": "先生成五倍位移几何，再检查最后时刻的体积和质量指标；局部负体积能指出放大后发生穿越的位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "flattenMesh",
@@ -7048,7 +7154,8 @@
         "code": "flattenMesh\nfoamToVTK -no-fields -name VTK-flat",
         "explanation": "将校正后的网格导出到 VTK-flat，关闭场输出；可在 ParaView 中检查前后平面和薄层厚度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "insideCells",
@@ -7119,7 +7226,8 @@
         "code": "insideCells -case ./fineMesh ./geometry/body.stl bodyCells",
         "explanation": "fineMesh 是已有细网格案例；曲面路径按当前工作目录提供，-case 指定 cellSet 写入的目标案例，用于网格细化后的同一几何选区。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mergeMeshes",
@@ -7194,7 +7302,8 @@
         "code": "mergeMeshes baseCase extensionCase -overwrite\nstitchMesh -case baseCase -perfect interfaceA interfaceB -overwrite\ncheckMesh -case baseCase",
         "explanation": "两个网格有完全吻合的 interfaceA/interfaceB 时，合并后将这对边界缝合成内部面，形成连通计算域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mergeOrSplitBaffles",
@@ -7270,7 +7379,8 @@
         "code": "mergeOrSplitBaffles -region fluid -split -overwrite\ncheckMesh -region fluid",
         "explanation": "多区域案例仅修改 fluid，检查该区域拆分后的边界、单元闭合和连通关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mirrorMesh",
@@ -7343,7 +7453,8 @@
         "code": "mirrorMesh -overwrite\ncreatePatch -dict system/createPatch-cyclicDict -overwrite",
         "explanation": "输入网格带 cyclic 边界时，镜像可能改变面的对应顺序；替代 createPatchDict 重新建立周期配对，再用于后续计算。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "moveDynamicMesh",
@@ -7417,7 +7528,8 @@
         "code": "decomposePar\nmpirun -np 4 moveDynamicMesh -parallel -checkAMI",
         "explanation": "decomposeParDict 设置 4 个子域；运动在分区网格上执行，检查并行边界和 AMI 随运动的变化，结果写入 processor 目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "moveEngineMesh",
@@ -7488,7 +7600,8 @@
         "code": "moveEngineMesh\ncheckMesh -latestTime",
         "explanation": "先完成运动，再检查最后保存状态的体积和质量，适合检查接近上止点的狭小空间。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "moveMesh",
@@ -7561,7 +7674,8 @@
         "code": "decomposePar\nmpirun -np 4 moveMesh -parallel -deltaT 0.001 -endTime 0.1",
         "explanation": "已有4分区设置，运动求解在各分区执行并交换边界数据，输出 processor 目录下的运动网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "objToVTK",
@@ -7624,7 +7738,8 @@
         "code": "createPatch -writeObj\nfor f in final_*_match.obj; do\n    objToVTK \"$f\" \"${f%.obj}.vtk\"\ndone",
         "explanation": "createPatchDict 已配置 cyclic 配对，-writeObj 会生成 final_<两侧patch名>_match.obj。这些折线连接配对面中心；转换成 VTK 后可检查配对方向与距离。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "orientFaceZone",
@@ -7696,7 +7811,8 @@
         "code": "mpirun -np 4 orientFaceZone -parallel shellFaces '(10 0 0)'",
         "explanation": "已有4分区且耦合面两侧都进入zone；并行交换定向信息，使跨处理器的 flipMap 一致。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "polyDualMesh",
@@ -7763,7 +7879,8 @@
         "code": "polyDualMesh 30 -doNotPreserveFaceZones -overwrite\ncheckMesh",
         "explanation": "关闭默认的 faceZone 特殊保留策略，写回当前网格；用于不需要原面区约束的转换流程，随后检查网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "refineMesh",
@@ -7843,7 +7960,8 @@
         "code": "refineMesh -all -overwrite\nrefineMesh -all -overwrite\ncheckMesh",
         "explanation": "第二次读取第一次细化后的网格，获得两级细化结果；单元数和所需内存会随细化明显增加，最终检查质量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "renumberMesh",
@@ -7937,7 +8055,8 @@
         "code": "renumberMesh -latestTime -overwrite -write-maps",
         "explanation": "读取最后保存状态的网格和场，重排并输出映射；后续重启使用这一时间的匹配数据。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rotateMesh",
@@ -8016,7 +8135,8 @@
         "code": "rotateMesh '(1 0 0)' '(0 1 0)' -allRegions -constant",
         "explanation": "regionProperties 已登记各区域；所有区域按同一旋转变换处理，并将 constant 纳入选择，保持相对空间位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setSet",
@@ -8096,7 +8216,8 @@
         "code": "setSet -batch select.setSet -loop -time '0.1:0.5'",
         "explanation": "-loop 对选中的每个已有时间执行批指令；几何运动时，盒内单元集合会随各时刻位置更新。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setsToZones",
@@ -8173,7 +8294,8 @@
         "code": "topoSet -region fluid -dict system/topoSet-heaterDict\nsetsToZones -region fluid -noFlipMap",
         "explanation": "先在 fluid 中生成 heater 等cellSet，再转为同名cellZone，供该区域体积源模型使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "singleCellMesh",
@@ -8248,7 +8370,8 @@
         "code": "singleCellMesh -latestTime\nfoamToVTK -region singleCell -latestTime -name VTK-singleCell",
         "explanation": "先创建最后状态的简化区域，再导出该区域到独立VTK目录，用于边界数据可视化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "splitMesh",
@@ -8312,7 +8435,8 @@
         "code": "splitMesh interfaceFaces sideA sideB -overwrite\npatchSummary -time 0 -expand",
         "explanation": "0时刻场已补充新patch条目后，用 patchSummary 展开每个边界，检查拆分两侧的边界条件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "splitMeshRegions",
@@ -8403,7 +8527,8 @@
         "code": "splitMeshRegions -blockedFaces separatorFaces -useFaceZones -overwrite",
         "explanation": "separatorFaces 阻止连通搜索跨过指定面；已有faceZone用于给区域间界面分组，输出更明确的耦合边界。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "stitchMesh",
@@ -8474,7 +8599,8 @@
         "code": "stitchMesh -integral interfaceA interfaceB -intermediate -toleranceDict system/stitchTolerances",
         "explanation": "已有容差字典时，采用指定几何容差并保存中间阶段网格，便于定位小缝隙或错配面。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "subsetMesh",
@@ -8552,7 +8678,8 @@
         "code": "subsetMesh coreCells -patches '(inlet outlet walls)' -exclude-patches outlet -overwrite",
         "explanation": "已有这些patch时，在候选边界中按最近位置分配暴露面，并排除outlet，减少手工整理切割面的工作。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "topoSet",
@@ -8635,7 +8762,8 @@
         "code": "mpirun -np 4 topoSet -parallel -region fluid -dict system/topoSet-fluidDict",
         "explanation": "已有4分区fluid网格；每个进程执行选择并同步耦合边界信息，生成分区一致的集合。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "transformPoints",
@@ -8725,7 +8853,8 @@
         "code": "transformPoints -allRegions -translate '(0 0 1)' -scale 0.001",
         "explanation": "对regionProperties中的全部区域使用同一变换；先平移，再按工具变换顺序缩放，适合多部件坐标统一，需按原坐标单位给出平移量。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "zipUpMesh",
@@ -8797,7 +8926,8 @@
         "code": "zipUpMesh\nfoamToVTK -no-fields -name VTK-zipped",
         "explanation": "修补后仅转换网格几何，在ParaView中检查原先悬挂顶点附近的面是否闭合。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "PDRsetFields",
@@ -8864,7 +8994,8 @@
         "code": "PDRsetFields -legacy -dict system/PDRsetFields-legacyDict -dry-run",
         "explanation": "输入确为legacy表时用-legacy强制该读取方式；先用VTK确认解析出的障碍物。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "applyBoundaryLayer",
@@ -8940,7 +9071,8 @@
         "code": "applyBoundaryLayer -region fluid -ybl 0.005 -writeTurbulenceFields",
         "explanation": "多区域中只修改fluid的近壁场，适合流固传热案例的流体初始状态准备。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "boxTurb",
@@ -9003,7 +9135,8 @@
         "code": "blockMesh -case ./turbFine\nboxTurb -case ./turbFine\nfoamToVTK -case ./turbFine -time 0 -fields '(U)'",
         "explanation": "turbFine已配置更细的规则网格和相同物理谱参数；生成后导出U，比较可表达的小尺度结构。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "changeDictionary",
@@ -9090,7 +9223,8 @@
         "code": "changeDictionary -subDict restartReplacements -dict system/changeDictionary-allDict -time 2",
         "explanation": "替代字典中已有restartReplacements子字典时，仅应用该组规则到时间2，便于集中维护多个修改方案。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createBoxTurb",
@@ -9162,7 +9296,8 @@
         "code": "foamDictionary constant/createBoxTurbDict -entry N -set '(64 64 64)'\ncreateBoxTurb -createBlockMesh\ncreateBoxTurb",
         "explanation": "在独立副本上改为64立方网格，重新生成网格和场；更小单元允许更高的离散最大波数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createExternalCoupledPatchGeometry",
@@ -9236,7 +9371,8 @@
         "code": "mpirun -np 4 createExternalCoupledPatchGeometry coupledWalls -parallel -commsDir exchange",
         "explanation": "已有4分区网格和一致组名；按并行案例的接口布局生成几何，供外部耦合按相同面组织交换数据。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createViewFactors",
@@ -9308,7 +9444,8 @@
         "code": "blockMesh -case ./enclosure-wide\nfaceAgglomerate -case ./enclosure-wide\ncreateViewFactors -case ./enclosure-wide",
         "explanation": "enclosure-wide是改变腔体宽度后的独立案例；重建网格、聚合和因子，使结果反映新的可见关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createZeroDirectory",
@@ -9380,7 +9517,8 @@
         "code": "createZeroDirectory -case ./heatExchanger",
         "explanation": "heatExchanger的求解器模板支持多区域，regionProperties及各区域caseProperties已配置；程序按区域分别生成流体和固体初始场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "dsmcInitialise",
@@ -9451,7 +9589,8 @@
         "code": "decomposePar\nmpirun -np 4 dsmcInitialise -parallel",
         "explanation": "已有4分区设置；各进程生成本地粒子，日志汇总全域数量，供随后并行dsmcFoam读取。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "engineSwirl",
@@ -9522,7 +9661,8 @@
         "code": "engineSwirl\nfoamToVTK -time 0 -fields '(U)' -name VTK-swirl",
         "explanation": "初始时间为0时生成并导出U；用箭头或截面查看旋向、旋流中心和缸壁附近速度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "faceAgglomerate",
@@ -9595,7 +9735,8 @@
         "code": "faceAgglomerate\nviewFactorsGen",
         "explanation": "使用viewFactorsGen流程的案例先创建finalAgglom，再计算粗面之间的辐射交换关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mapFields",
@@ -9673,7 +9814,8 @@
         "code": "mapFields ../sourceCase -parallelSource -sourceTime latestTime",
         "explanation": "源结果位于processor目录时启用-parallelSource；工具从分区源数据读取，写目标案例字段。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mapFieldsPar",
@@ -9760,7 +9902,8 @@
         "code": "mpirun -np 4 mapFieldsPar ../sourceCase -parallel -fields '(U p T)' -no-lagrangian",
         "explanation": "目标已有4分区；并行映射所选欧拉场，-no-lagrangian跳过粒子位置和粒子属性。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mdInitialise",
@@ -9831,7 +9974,8 @@
         "code": "mdInitialise\nmdEquilibrationFoam",
         "explanation": "案例已配置mdEquilibrationFoam及温控参数；先建分子初态，再让系统按势函数松弛到目标状态。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "writeMorpherCPs",
@@ -9902,7 +10046,8 @@
         "code": "writeMorpherCPs\nfoamToVTK -no-fields -no-internal -name VTK-designBoundary",
         "explanation": "导出控制点后，另外导出边界网格，在同一视图检查控制点密度与边界曲率、局部细节的对应。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setAlphaField",
@@ -9984,7 +10129,8 @@
         "code": "setAlphaField -region fluid -time 0\nfoamToVTK -region fluid -time 0 -fields '(alpha.water)'",
         "explanation": "fluid区域已有alpha.water时，初始化后导出该场，检查界面位置和过渡单元分布。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setExprBoundaryFields",
@@ -10066,7 +10212,8 @@
         "code": "setExprBoundaryFields -time '0.1:0.5' -ascii",
         "explanation": "对已有时间区间逐次求值，并强制ASCII写出，方便检查每个时刻边界值的变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setExprFields",
@@ -10162,7 +10309,8 @@
         "code": "setExprFields -dict system/setExprFields-initialDict -dry-run -time 0\nsetExprFields -dict system/setExprFields-initialDict -time 0",
         "explanation": "字典已配置多项场表达式时，先求值检查，再正式写入，适合同时构造速度、标量或几何指示场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setFields",
@@ -10252,7 +10400,8 @@
         "code": "setFields -area-region film -dict system/setFields-filmDict -time 0",
         "explanation": "已存在film有限面积网格及其场时，按专用字典设置表面初值，适用于薄膜或壳面计算。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "setTurbulenceFields",
@@ -10325,7 +10474,8 @@
         "code": "setTurbulenceFields -region fluid -dict system/setTurbulenceFields-fluidDict",
         "explanation": "在多区域fluid内使用专用参数初始化；检查输出字段与该区域选择的湍流模型匹配。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "smoothSurfaceData",
@@ -10401,7 +10551,8 @@
         "code": "smoothSurfaceData surface.case -read-format ensight -field T -radius 0.002 -sweeps 2 -verbose",
         "explanation": "显式选择EnSight读取器，执行两遍过滤并显示更多处理信息，便于核对字段和邻域构建。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "viewFactorsGen",
@@ -10473,7 +10624,8 @@
         "code": "mpirun -np 4 faceAgglomerate -parallel\nmpirun -np 4 viewFactorsGen -parallel",
         "explanation": "网格已有4分区且viewFactorsDict一致；先聚合再计算，输出与各分区对应的交换数据。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wallFunctionTable",
@@ -10544,7 +10696,8 @@
         "code": "foamDictionary constant/wallFunctionDict -entry SpaldingsLawCoeffs/kappa -set 0.40\nwallFunctionTable",
         "explanation": "在独立参数方案中把kappa改为0.40，比较相同Re位置的u+；其余系数与坐标设置保持一致。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamJob",
@@ -10606,7 +10759,8 @@
         "code": "foamJob -parallel -case caseA icoFoam",
         "explanation": "通过 MPI 启动，读取算例分区设置，结果写入相应子域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamEndJob",
@@ -10657,7 +10811,8 @@
         "code": "foamEndJob -clear -case caseA",
         "explanation": "清理该算例已有的 foamEndJob 等待状态；用于取消此前请求，字典恢复行为由脚本备份状态决定。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCheckJobs",
@@ -10703,7 +10858,8 @@
         "code": "snapshot=\"jobs-$(date +%Y%m%d-%H%M%S).state\"\nfoamCheckJobs \"$snapshot\"\nfoamPrintJobs \"$snapshot\" > \"$snapshot.txt\"",
         "explanation": "保存独立快照或表格，便于比较多个检查时刻；写文件不会发起新的求解。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamPrintJobs",
@@ -10749,7 +10905,8 @@
         "code": "foamPrintJobs jobs.state > \"jobs-table-$(date +%Y%m%d-%H%M%S).txt\"",
         "explanation": "保存独立快照或表格，便于比较多个检查时刻；写文件不会发起新的求解。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mpirunDebug",
@@ -10812,7 +10969,8 @@
         "code": "cd caseA\nmpirunDebug -valgrind -quick -np 2 icoFoam -parallel",
         "explanation": "-quick 使用摘要级内存检查并限制 core 文件，适用于先定位明显内存问题。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "decomposePar",
@@ -10906,7 +11064,8 @@
         "code": "decomposePar -allRegions -cellDist",
         "explanation": "regionProperties已有各区域，按相应分区设置生成区域网格及cellDist，检查流体与固体的工作量分布。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reconstructPar",
@@ -10988,7 +11147,8 @@
         "code": "reconstructPar -allRegions -withZero",
         "explanation": "包括0时刻，并对regionProperties中的全部区域处理，适合多区域案例完整交付。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reconstructParMesh",
@@ -11070,7 +11230,8 @@
         "code": "reconstructParMesh -latestTime -addressing-only\nreconstructPar -latestTime",
         "explanation": "完整网格已存在且与分区几何一致时，只建立procAddressing而保留网格，再利用寻址重构字段。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "redistributePar",
@@ -11162,7 +11323,8 @@
         "code": "mpirun -np 8 redistributePar -parallel -allRegions -latestTime -overwrite",
         "explanation": "目标多区域分区设置已准备；同一流程处理流体和固体区域，输出可继续并行计算的区域场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "postProcess",
@@ -11286,7 +11448,8 @@
         "code": "postProcess -region fluid -func 'mag(U)' -latestTime",
         "explanation": "只读取fluid的U与网格，生成该区域速度大小，适合多区域案例。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "paraFoam",
@@ -11350,7 +11513,8 @@
         "code": "paraFoam -vtk -touch-proc -case caseA",
         "explanation": "为分区算例创建各 processor 阅读器文件，用于单独检查子域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamLog",
@@ -11403,7 +11567,8 @@
         "code": "cd caseA\ncp \"$WM_PROJECT_DIR/bin/tools/foamLog.db\" foamLog.db\nfoamLog -local log.icoFoam",
         "explanation": "将数据库复制到当前目录，可按“名称/行匹配/取值前缀”规则增加提取项；-local 只用本地数据库。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamMonitor",
@@ -11457,7 +11622,8 @@
         "code": "foamMonitor -idle 600 -refresh 10 -logscale caseA/postProcessing/residuals/0/residuals.dat",
         "explanation": "文件连续 600 秒无变化才停止，避免长时间步被默认超时中断。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamSolverSweeps",
@@ -11503,7 +11669,8 @@
         "code": "cat log.part1 log.part2 > log.combined\nprintf '%s\\n' log.combined | foamSolverSweeps",
         "explanation": "按时间顺序合并两段互不重复的日志，得到全过程累计统计。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToVTK",
@@ -11612,7 +11779,8 @@
         "code": "foamToVTK -latestTime -legacy -ascii -no-lagrangian -name VTK-ascii",
         "explanation": "使用legacy ASCII格式并跳过粒子数据，方便检查文本内容或对接只支持旧格式的工具。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToEnsight",
@@ -11716,7 +11884,8 @@
         "code": "foamToEnsight -time '2:3' -ascii -index 0 -width 6 -no-lagrangian -name EnSight-ascii",
         "explanation": "输出 2 至 3 秒的已有结果；-ascii 便于读取文本，-index 0 从 0 开始连续编号，-width 6 使用六位数据目录名，-no-lagrangian 跳过粒子数据。结果写入独立 EnSight-ascii 目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToGMV",
@@ -11787,7 +11956,8 @@
         "code": "foamToGMV\nhead -n 8 plotGMV.1",
         "explanation": "转换后查看首个实际生成文件的头部；如编号不同，使用日志中的文件名。应能看到gmvinput和nodes等记录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamDataToFluent",
@@ -11853,7 +12023,8 @@
         "code": "reconstructPar -latestTime\nfoamDataToFluent -latestTime",
         "explanation": "先把processor场重构成完整场，再按Fluent映射规则导出，保证字段对应完整网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamToTetDualMesh",
@@ -11929,7 +12100,8 @@
         "code": "checkMesh -region tetDualMesh -constant\nfoamToTetDualMesh -time 0.5\nfoamDictionary 0.5/tetDualMesh/p -entry FoamFile/class -value",
         "explanation": "此例的两套网格保存在 constant，且 0.5/p 已存在。先检查目标区域网格，再映射压力；最后应读到 pointScalarField，可继续检查点数和映射表是否一致。转换程序读取目标网格，仅写转换后的场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "smapToFoam",
@@ -11992,7 +12164,8 @@
         "code": "smapToFoam results.smap\nfoamToVTK -time 0 -fields '(U p T)' -name VTK-smap",
         "explanation": "本案例当前实例为0并已有U、p、T；导出导入后的字段，检查空间分布、速度方向和数量级。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "patchSummary",
@@ -12069,7 +12242,8 @@
         "code": "patchSummary -region fluid -latestTime -expand",
         "explanation": "仅查看fluid的最新场，便于把流固界面、入口和壁面条件分开核对。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamListTimes",
@@ -12140,7 +12314,8 @@
         "code": "foamListTimes -processor -latestTime",
         "explanation": "从processor0读取时间列表，确定并行计算已写出的最新时刻，再决定是否重构。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamFormatConvert",
@@ -12218,7 +12393,8 @@
         "code": "mpirun -np 4 foamFormatConvert -parallel -latestTime",
         "explanation": "已有4分区，分别重写各processor的最新场，适合直接改变并行重启数据格式。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamRestoreFields",
@@ -12301,7 +12477,8 @@
         "code": "foamRestoreFields -method mean -processor -latestTime U p",
         "explanation": "串行调用但扫描processor目录，在各子域最新时间进行相同字段切换，适合并行结果的统一整理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamSequenceVTKFiles",
@@ -12355,7 +12532,8 @@
         "code": "foamSequenceVTKFiles -case caseA -dir postProcessing/planeA -out sequence-planeA --\nfoamSequenceVTKFiles -case caseA -dir postProcessing/planeB -out sequence-planeB --",
         "explanation": "分别生成两组独立链接序列。末尾 -- 用于兼容此版本 -out 分支的额外 shift；各输出目录专门用于本工具，原有内容会先被清理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCreateVideo",
@@ -12411,7 +12589,8 @@
         "code": "foamCreateVideo -tool=avconv -dir frames -start 100 -out late-stage",
         "explanation": "需要 avconv。v2512 脚本仅把 -start 传给 avconv 分支；从编号 100 起读取连续 PNG，生成 late-stage.mp4。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCleanPolyMesh",
@@ -12463,7 +12642,8 @@
         "code": "cp -a caseA region-reset-copy\nfoamCleanPolyMesh -region fluid -case region-reset-copy",
         "explanation": "只清理选定区域，其他区域网格保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCleanFaMesh",
@@ -12515,7 +12695,8 @@
         "code": "cp -a caseA region-reset-copy\nfoamCleanFaMesh -area-region film -case region-reset-copy",
         "explanation": "只清理选定区域，其他区域网格保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCleanTutorials",
@@ -12567,7 +12748,8 @@
         "code": "foamCleanTutorials -self -case tutorial-clean-demo",
         "explanation": "避免再次调用起点自己的 Allclean，防止脚本递归调用自身。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "addr2line",
@@ -12629,7 +12811,8 @@
         "code": "addr2line -C -f -i -p -e \"$FOAM_USER_APPBIN/mySolver\" 0x1234",
         "explanation": "-i展开内联函数，-p用更紧凑的单行形式输出；适合优化编译后一个地址对应多层内联代码的情况。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "particleTracks",
@@ -12710,7 +12893,8 @@
         "code": "particleTracks -dict constant/particleTrackProperties-spray -region gas -time '0.1:1'",
         "explanation": "替代字典指定喷雾云；从gas区域读取粒子，生成该云在指定时段内的轨迹。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "steadyParticleTracks",
@@ -12780,7 +12964,8 @@
         "code": "steadyParticleTracks -region gas -latestTime -verbose",
         "explanation": "从gas区域读取云，并显示更详细的读取和写出信息，便于核对轨迹数量与输出位置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "lumpedPointForces",
@@ -12857,7 +13042,8 @@
         "code": "mpirun -np 4 lumpedPointForces -parallel -latestTime -vtk",
         "explanation": "已有4分区且lumped-point设置一致；归集各分区压力贡献，得到全局控制区合力和力矩。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "lumpedPointMovement",
@@ -12935,7 +13121,8 @@
         "code": "lumpedPointMovement response.dat -scale 0.5 -visual-length 0.1",
         "explanation": "相对初始状态把运动幅度缩到一半，同时设控制平面显示长度0.1，便于分辨运动方向与局部转角。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "lumpedPointZones",
@@ -13011,7 +13198,8 @@
         "code": "lumpedPointZones -region fluid -verbose",
         "explanation": "只处理fluid耦合边界，输出更详细的区域和控制点信息，便于核对多区域设置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createROMfields",
@@ -13085,7 +13273,8 @@
         "code": "createROMfields -region fluid -latestTime\nfoamToVTK -region fluid -latestTime -fields '(U p)' -name VTK-ROM",
         "explanation": "ROM模型配置为重建U、p时，先生成fluid区域场，再导出检查模态重建的空间结构。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "engineCompRatio",
@@ -13156,7 +13345,8 @@
         "code": "moveEngineMesh -case ./engine-preview\nengineCompRatio -case ./engine-reference",
         "explanation": "两个独立案例使用相同初始几何；前者查看运动全过程，后者由原始参考网格计算止点体积，便于核对活塞运动模型。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pdfPlot",
@@ -13227,7 +13417,8 @@
         "code": "foamDictionary constant/pdfDict -entry uniformDistribution/maxValue -set 1e-4\npdfPlot",
         "explanation": "上界改为100微米，重新采样并比较均值和宽度，适合检查粒径分布参数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "postChannel",
@@ -13294,7 +13485,8 @@
         "code": "reconstructPar -latestTime -fields '(UMean UPrime2Mean pPrime2Mean)'\npostChannel -latestTime",
         "explanation": "postChannel为串行工具；先从分区结果重构它实际需要的三个统计场，再生成全通道曲线。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "profilingSummary",
@@ -13362,7 +13554,8 @@
         "code": "profilingSummary -case ./run-16cores -latestTime",
         "explanation": "run-16cores已保存16核案例的profiling数据；与其他规模的摘要比较最大、平均、最小耗时，检查负载差异。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "temporalInterpolate",
@@ -13441,7 +13634,8 @@
         "code": "temporalInterpolate -region fluid -time '0.1:0.5' -fields '(U)' -divisions 4",
         "explanation": "只给fluid速度添加时间帧，再用相同区域导出动画，保持其他区域数据不变。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "noise",
@@ -13518,7 +13712,8 @@
         "code": "foamDictionary system/noiseDict -entry SPLweighting -set dBA\nnoise",
         "explanation": "在其他设置不变时采用A计权，得到按听觉频率响应加权的声压级，适合与未计权dB结果比较。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "computeSensitivities",
@@ -13589,7 +13784,8 @@
         "code": "computeSensitivities -case ./dragObjective\ncomputeSensitivities -case ./pressureLossObjective",
         "explanation": "两案例各自已有对应目标的伴随解和配置；分别输出阻力目标与压降目标的灵敏度，比较设计区域的贡献差异。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cumulativeDisplacement",
@@ -13665,7 +13861,8 @@
         "code": "cumulativeDisplacement -latestTime\nfoamToVTK -latestTime -fields '(displacement normalDisplacement)' -name VTK-displacement",
         "explanation": "将生成的点场与网格一起导出，用法向位移检查表面局部鼓起或收缩，用向量场查看整体方向。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "adiabaticFlameT",
@@ -13728,7 +13925,8 @@
         "code": "for tempK in 300 450 600; do\n    cp flame-300K.in \"flame-${tempK}K.in\"\n    foamDictionary \"flame-${tempK}K.in\" -entry T0 -set \"$tempK\"\n    adiabaticFlameT \"flame-${tempK}K.in\" > \"flame-${tempK}K.out\"\ndone",
         "explanation": "建立三份独立输入并各自扫描当量比，输出可用于绘制Tad–phi曲线族，比较预热对整个燃烧范围的影响。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chemkinToFoam",
@@ -13792,7 +13990,8 @@
         "code": "mkdir -p converted/detailed converted/reduced\nchemkinToFoam detailed/chem.inp detailed/therm.dat detailed/tran.dat converted/detailed/reactions converted/detailed/thermo\nchemkinToFoam reduced/chem.inp reduced/therm.dat reduced/tran.dat converted/reduced/reactions converted/reduced/thermo",
         "explanation": "两套机理各用自身配套热物性、输运文件，输出分开保存，再比较物种数、反应数和目标工况的计算成本。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "equilibriumCO",
@@ -13855,7 +14054,8 @@
         "code": "sed -i '/for (const thermo& react : EQreactions)/i\\    EQreactions.emplace_back((H2 + 0.5*O2 == H2O));' equilibriumCOStudy-src/equilibriumCO.C\n(cd equilibriumCOStudy-src && wmake)\nequilibriumCOStudy -case coCase",
         "explanation": "在循环前增加水生成反应，输出变为5个Kc；新增反应与原第三条互为逆反应，可检查相同温压下平衡常数的倒数关系。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "equilibriumFlameT",
@@ -13918,7 +14118,8 @@
         "code": "for pressurePa in 100000 500000 1000000; do\n    cp equilibrium-methane.in \"equilibrium-${pressurePa}.in\"\n    foamDictionary \"equilibrium-${pressurePa}.in\" -entry P -set \"$pressurePa\"\n    equilibriumFlameT \"equilibrium-${pressurePa}.in\" > \"equilibrium-${pressurePa}.out\"\ndone",
         "explanation": "保持同一燃料和源码扫描范围，在1、5、10bar分别输出完整表，便于比较压力与解离影响。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mixtureAdiabaticFlameT",
@@ -13981,7 +14182,8 @@
         "code": "for pressurePa in 100000 500000; do\n    for tempK in 300 600; do\n        cp mixture.in \"mix-${pressurePa}-${tempK}.in\"\n        foamDictionary \"mix-${pressurePa}-${tempK}.in\" -entry P -set \"$pressurePa\"\n        foamDictionary \"mix-${pressurePa}-${tempK}.in\" -entry T0 -set \"$tempK\"\n        mixtureAdiabaticFlameT \"mix-${pressurePa}-${tempK}.in\"\n    done\ndone",
         "explanation": "对同一给定组成计算四个温压组合，输出可整理为温度响应表；组成由输入指定，扩展时应同步维护反应物与产物配比。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamVersion",
@@ -14024,7 +14226,8 @@
         "code": "(foamVersion v2512 && checkMesh -case \"$HOME/foam-command-lab/caseA\")",
         "explanation": "子 shell 切换环境并检查网格，退出后外层环境保持原样。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmake",
@@ -14120,7 +14323,8 @@
         "code": "wmake -all \"$WM_PROJECT_USER_DIR/applications\"",
         "explanation": "递归处理子目录；遇到 Allwmake 时按其流程构建。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wclean",
@@ -14173,7 +14377,8 @@
         "code": "wclean empty myUtility",
         "explanation": "清理空子目录，适用于移动或移除源文件后的目录整理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "Allwmake",
@@ -14219,7 +14424,8 @@
         "code": "cd \"$WM_PROJECT_DIR\"\n./Allwmake -j 4 -prefix=none",
         "explanation": "将模块前缀设为 none，使核心库和应用构建后跳过附加 modules。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "Allrun",
@@ -14270,7 +14476,8 @@
         "code": "cd tutorial-suite\n./Allrun -no-collect -test\n./Allrun -collect",
         "explanation": "将执行与日志汇总分开，便于在不同阶段检查结果。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "Allclean",
@@ -14316,7 +14523,8 @@
         "code": "cd tutorial-clean-demo\n./Allclean\n./Allrun -test",
         "explanation": "清理后由测试运行脚本重新生成网格、初始场及结果。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "tut",
@@ -14359,7 +14567,8 @@
         "code": "tut\nfind heatTransfer -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "run",
@@ -14402,7 +14611,8 @@
         "code": "run\nfind . -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sol",
@@ -14445,7 +14655,8 @@
         "code": "sol\nfind heatTransfer -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foam",
@@ -14488,7 +14699,8 @@
         "code": "foam\nfind META-INFO -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "src",
@@ -14531,7 +14743,8 @@
         "code": "src\nfind functionObjects -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamExec",
@@ -14579,7 +14792,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamExec\" bash -c 'printf \"%s\\n\" \"$WM_OPTIONS\" \"$FOAM_APPBIN\"'",
         "explanation": "单引号让变量在加载环境后的子 shell 展开。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "source",
@@ -14621,7 +14835,8 @@
         "code": "(source /usr/lib/openfoam/openfoam2512/etc/bashrc; blockMesh -case caseA)",
         "explanation": "圆括号建立子 shell；网格写入 caseA，外层终端环境保持原值。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pwd",
@@ -14663,7 +14878,8 @@
         "code": "{ pwd; date; checkMesh -case caseA; } > mesh-report.txt 2>&1",
         "explanation": "报告先记录执行目录和日期，再保存网格检查输出。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ls",
@@ -14705,7 +14921,8 @@
         "code": "ls -d caseA/processor*/",
         "explanation": "-d 仅显示目录名。未合并存储时可看到各 processor 子域。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cd",
@@ -14747,7 +14964,8 @@
         "code": "(cd caseA && blockMesh)\npwd",
         "explanation": "&& 使切换失败时不运行网格程序；子 shell 结束后仍在原目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mkdir",
@@ -14789,7 +15007,8 @@
         "code": "for re in 100 400 1000; do mkdir -p \"runs/Re-$re\"; done",
         "explanation": "为三个雷诺数生成独立目录，以目录名区分参数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cp",
@@ -14831,7 +15050,8 @@
         "code": "mkdir -p report-logs\ncp caseA/log.blockMesh caseA/log.checkMesh report-logs/",
         "explanation": "最后一个参数是目标目录，复制两份日志用于分享。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mv",
@@ -14873,7 +15093,8 @@
         "code": "mkdir -p old-logs\nfor f in log.*; do [ -f \"$f\" ] && mv -i -- \"$f\" old-logs/; done",
         "explanation": "只处理匹配的普通文件；-- 结束选项解析，-i 保护同名目标。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rm",
@@ -14915,7 +15136,8 @@
         "code": "mkdir -p disposable\ntouch disposable/a.tmp disposable/keep.txt\nfind disposable -type f -name '*.tmp' -exec rm -i -- {} \\;",
         "explanation": "只匹配 .tmp 文件，逐个确认；keep.txt 保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cat",
@@ -14957,7 +15179,8 @@
         "code": "cat -A caseA/Allrun",
         "explanation": "-A 显示行末和制表符，Windows 回车会显示为 ^M。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "less",
@@ -14999,7 +15222,8 @@
         "code": "git diff --color=always -- caseA/system/fvSchemes | less -R",
         "explanation": "在 Git 项目中执行；-R 保留颜色，突出设置变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "head",
@@ -15041,7 +15265,8 @@
         "code": "head -n 100 measurements.csv > measurements-small.csv",
         "explanation": "取原文件前 100 行，保留首行标题。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "tail",
@@ -15083,7 +15308,8 @@
         "code": "tail -n +2 measurements.csv > measurements-data.csv",
         "explanation": "+2 从第 2 行输出到末尾。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "grep",
@@ -15125,7 +15351,8 @@
         "code": "grep -c 'Solving for p,' caseA/log.icoFoam",
         "explanation": "-c 返回匹配行数；一次时间步可能含多次压力校正。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "find",
@@ -15167,7 +15394,8 @@
         "code": "find runs -type f -path '*/system/controlDict' -exec foamDictionary {} -entry application -value \\;",
         "explanation": "runs 中先准备多个算例；{} 替换为每个找到的文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "diff",
@@ -15209,7 +15437,8 @@
         "code": "diff -rq caseA/constant caseB/constant",
         "explanation": "-q 不展开差异内容，先定位物性和网格变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "du",
@@ -15251,7 +15480,8 @@
         "code": "du -sb caseA",
         "explanation": "-b 统计 apparent size；稀疏文件逻辑尺寸可大于磁盘实际占用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "df",
@@ -15293,7 +15523,8 @@
         "code": "df -hT \"$HOME\" /tmp",
         "explanation": "-T 显示文件系统类型，可判断两个目录的存储来源。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ps",
@@ -15335,7 +15566,8 @@
         "code": "ps -u \"$USER\" -o pid,rss,args --sort=-rss",
         "explanation": "rss 以 KiB 表示常驻内存，降序排列。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "top",
@@ -15377,7 +15609,8 @@
         "code": "top -b -d 5 -n 12 > resources-minute.txt",
         "explanation": "每 5 秒刷新，共 12 次，记录负载变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "nohup",
@@ -15419,7 +15652,8 @@
         "code": "nohup icoFoam -case caseA > caseA/log.job 2>&1 &\nprintf '%s\\n' \"$!\" > caseA/solver.pid\nps -p \"$(cat caseA/solver.pid)\" -o pid,etime,args",
         "explanation": "PID 文件供稍后检查。进程退出后 ps 不会列出它。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "tmux",
@@ -15461,7 +15695,8 @@
         "code": "tmux list-sessions\ntmux attach-session -t foam",
         "explanation": "列出会话名称和窗口数量，再连接目标会话。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ssh",
@@ -15503,7 +15738,8 @@
         "code": "ssh student@compute.example.org 'bash -lc \"source /usr/lib/openfoam/openfoam2512/etc/bashrc && foamInstallationTest\"'",
         "explanation": "显式加载远端环境后运行安装检查，路径按服务器实际安装位置调整。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "scp",
@@ -15545,7 +15781,8 @@
         "code": "scp student@compute.example.org:~/cases/caseA/log.blockMesh student@compute.example.org:~/cases/caseA/log.checkMesh ./",
         "explanation": "多个源文件后跟一个目标目录，复制两份独立日志。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "tar",
@@ -15587,7 +15824,8 @@
         "code": "tar -czf caseA-share.tar.gz --exclude='caseA/log*' --exclude='caseA/processor*' caseA",
         "explanation": "模式由 tar 处理，其他时间结果仍会被收录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chmod",
@@ -15629,7 +15867,8 @@
         "code": "mkdir -p shared-results\nchmod 755 shared-results",
         "explanation": "所有者可写，其他用户可列出和进入；各文件权限单独管理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "command",
@@ -15671,7 +15910,8 @@
         "code": "meshProgram=$(command -v blockMesh) || exit 1\n\"$meshProgram\" -case caseA",
         "explanation": "用于脚本，查找失败立即退出；成功后按绝对路径生成网格。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "type",
@@ -15713,7 +15953,8 @@
         "code": "type -P cp",
         "explanation": "按 PATH 返回可执行文件路径，即使存在同名函数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "echo",
@@ -15755,7 +15996,8 @@
         "code": "checkMesh -case caseA > check.log 2>&1\nstatus=$?\necho \"checkMesh exit: $status\"",
         "explanation": "紧接运行保存 $?；具体网格质量从 check.log 阅读。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "dnsFoam",
@@ -15846,7 +16088,8 @@
         "code": "foamCloneCase baseCase forcing-study\nfoamDictionary forcing-study/system/controlDict -entry startFrom -set startTime\nfoamDictionary forcing-study/system/controlDict -entry startTime -set 0\nfoamDictionary forcing-study/constant/turbulenceProperties -entry UOsigma -set 0.0451475\ndnsFoam -case forcing-study > forcing-study/log.dnsFoam 2>&1",
         "explanation": "UOsigma 乘在 UO 随机过程的增量幅度上，这里取原值 0.090295 的一半。保持 UOalpha=0.81532 和波数范围 7<|K|<10，比较动能与能谱对驱动强度的响应。波数范围由 UOKlower、UOKupper 控制，可在下一组独立试验中改变，以研究驱动尺度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "acousticFoam",
@@ -15940,7 +16183,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 acousticFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "laplacianFoam",
@@ -16034,7 +16278,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 laplacianFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overLaplacianDyMFoam",
@@ -16125,7 +16370,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overLaplacianDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "potentialFoam",
@@ -16224,7 +16470,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 potentialFoam -case parallel-study -parallel -writePhi -writephi > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -time \"$t0\"",
         "explanation": "先按初始时刻分解完整的势流输入，再由两个进程完成初始化。`-writePhi -writephi` 让分区目录同时保存势与通量，最后重建相应场供检查或后续计算使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overPotentialFoam",
@@ -16323,7 +16570,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overPotentialFoam -case parallel-study -parallel -writePhi -writephi > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -time \"$t0\"",
         "explanation": "先按初始时刻分解完整的势流输入，再由两个进程完成初始化。`-writePhi -writephi` 让分区目录同时保存势与通量，最后重建相应场供检查或后续计算使用。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "scalarTransportFoam",
@@ -16416,7 +16664,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 scalarTransportFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "PDRFoam",
@@ -16511,7 +16760,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 PDRFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "XiFoam",
@@ -16606,7 +16856,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 XiFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "XiDyMFoam",
@@ -16699,7 +16950,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 XiDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "XiEngineFoam",
@@ -16792,7 +17044,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 XiEngineFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chemFoam",
@@ -16875,7 +17128,8 @@
         "code": "for temperature in 1000 1100 1200; do\n    caseDir=\"chem-${temperature}K\"\n    foamCloneCase baseCase \"$caseDir\"\n    foamDictionary \"$caseDir/constant/initialConditions\" -entry T -set \"$temperature\"\n    chemFoam -case \"$caseDir\" > \"$caseDir/log.chemFoam\" 2>&1\ndone",
         "explanation": "循环创建三个独立算例，分别在 1000、1100、1200 K 下求解。每个目录各有一份 `chemFoam.out`，可把曲线画在同一坐标系，并按统一的温升或升温速率标准提取点火延迟。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "coldEngineFoam",
@@ -16968,7 +17222,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 coldEngineFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "fireFoam",
@@ -17063,7 +17318,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 fireFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reactingFoam",
@@ -17158,7 +17414,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 reactingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoReactingBuoyantFoam",
@@ -17253,7 +17510,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoReactingBuoyantFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoReactingFoam",
@@ -17348,7 +17606,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoReactingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoCentralFoam",
@@ -17442,7 +17701,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoCentralFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoPimpleAdiabaticFoam",
@@ -17537,7 +17797,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoPimpleAdiabaticFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoPimpleFoam",
@@ -17632,7 +17893,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoPimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overRhoPimpleDyMFoam",
@@ -17724,7 +17986,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overRhoPimpleDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoSimpleFoam",
@@ -17819,7 +18082,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overRhoSimpleFoam",
@@ -17912,7 +18176,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overRhoSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "rhoPorousSimpleFoam",
@@ -18007,7 +18272,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 rhoPorousSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sonicFoam",
@@ -18102,7 +18368,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sonicFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sonicDyMFoam",
@@ -18195,7 +18462,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sonicDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sonicLiquidFoam",
@@ -18288,7 +18556,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sonicLiquidFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "dsmcFoam",
@@ -18381,7 +18650,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 dsmcFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mdEquilibrationFoam",
@@ -18473,7 +18743,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 mdEquilibrationFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mdFoam",
@@ -18564,7 +18835,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 mdFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "electrostaticFoam",
@@ -18656,7 +18928,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 electrostaticFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "magneticFoam",
@@ -18751,7 +19024,8 @@
         "code": "magneticFoam -case baseCase -noH -noB -HdotGradH",
         "explanation": "三个选项组合后，程序仍在内存中计算构造梯度项所需的 `H`，最终只写磁势和 `HdotGradH`。适合只需要后者进行进一步受力计算的工作流程。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "mhdFoam",
@@ -18844,7 +19118,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 mhdFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "financialFoam",
@@ -18937,7 +19212,8 @@
         "code": "for sigma in 0.1 0.2 0.3; do\n    caseDir=\"sigma-${sigma}\"\n    foamCloneCase baseCase \"$caseDir\"\n    foamDictionary \"$caseDir/constant/financialProperties\" -entry sigma \\\n        -set \"[0 0 -0.5 0 0 0 0] $sigma\"\n    financialFoam -case \"$caseDir\" > \"$caseDir/log.financialFoam\" 2>&1\ndone",
         "explanation": "三个新目录使用同一网格、执行价和利率，只改变波动率。在同一输出时刻比较 `V` 和 `delta`，就能把波动率变化与价格、敏感度的变化联系起来。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "liquidFilmFoam",
@@ -19027,7 +19303,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 liquidFilmFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `decomposePar` 同时分解体网格和有限面积数据，保留其默认的有限面积处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sphereSurfactantFoam",
@@ -19117,7 +19394,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sphereSurfactantFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `decomposePar` 同时分解体网格和有限面积数据，保留其默认的有限面积处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "surfactantFoam",
@@ -19207,7 +19485,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 surfactantFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `decomposePar` 同时分解体网格和有限面积数据，保留其默认的有限面积处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "buoyantBoussinesqPimpleFoam",
@@ -19302,7 +19581,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 buoyantBoussinesqPimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "buoyantBoussinesqSimpleFoam",
@@ -19397,7 +19677,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 buoyantBoussinesqSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "buoyantPimpleFoam",
@@ -19492,7 +19773,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 buoyantPimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overBuoyantPimpleDyMFoam",
@@ -19587,7 +19869,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overBuoyantPimpleDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "buoyantSimpleFoam",
@@ -19682,7 +19965,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 buoyantSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chtMultiRegionFoam",
@@ -19777,7 +20061,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\" -allRegions\nmpirun -np 2 chtMultiRegionFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime -allRegions",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `-allRegions` 同时处理流体和固体区域；各区域应使用相同的子域数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chtMultiRegionSimpleFoam",
@@ -19872,7 +20157,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\" -allRegions\nmpirun -np 2 chtMultiRegionSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime -allRegions",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `-allRegions` 同时处理流体和固体区域；各区域应使用相同的子域数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "chtMultiRegionTwoPhaseEulerFoam",
@@ -19959,7 +20245,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\" -allRegions\nmpirun -np 2 chtMultiRegionTwoPhaseEulerFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime -allRegions",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 `-allRegions` 同时处理流体和固体区域；各区域应使用相同的子域数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "solidFoam",
@@ -20053,7 +20340,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 solidFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "thermoFoam",
@@ -20148,7 +20436,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 thermoFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "adjointOptimisationFoam",
@@ -20233,7 +20522,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 adjointOptimisationFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "先将同一优化算例分为两个子域，再使用 `-parallel` 运行原始和伴随求解过程。分区后保留优化器的配置及设计变量定义，对比串行与并行的最终目标值和耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "adjointShapeOptimizationFoam",
@@ -20328,7 +20618,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 adjointShapeOptimizationFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "boundaryFoam",
@@ -20414,7 +20705,8 @@
         "code": "foamCloneCase baseCase faster-study\nfoamDictionary faster-study/constant/transportProperties -entry Ubar -set \"[0 1 -1 0 0 0 0] (20 0 0)\"\nboundaryFoam -case faster-study > faster-study/log.boundaryFoam 2>&1",
         "explanation": "本例用于沿 x 方向流动、原平均速度低于 20 m/s 的教程。`Ubar` 是带量纲的目标平均速度。改变它后，比较壁面剪切、湍流剖面和日志中驱动压力梯度的变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "icoFoam",
@@ -20512,7 +20804,8 @@
         "code": "foamCloneCase baseCase half-step-study\nfoamDictionary half-step-study/system/controlDict -entry startFrom -set startTime\nfoamDictionary half-step-study/system/controlDict -entry endTime -set 0.5\nfoamDictionary half-step-study/system/controlDict -entry deltaT -set 0.0025\nfoamDictionary half-step-study/system/controlDict -entry writeControl -set timeStep\nfoamDictionary half-step-study/system/controlDict -entry writeInterval -set 40\nicoFoam -case half-step-study > half-step-study/log.icoFoam 2>&1",
         "explanation": "将 0.005 s 减半为 0.0025 s，同时把保存间隔改为 40 步，使两次计算都在 0.1、0.2、…、0.5 s 输出。这样可在同一物理时刻比较中心线速度和涡心位置，观察时间步变化对解的影响。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "nonNewtonianIcoFoam",
@@ -20605,7 +20898,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 nonNewtonianIcoFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pimpleFoam",
@@ -20700,7 +20994,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 pimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "SRFPimpleFoam",
@@ -20795,7 +21090,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 SRFPimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overPimpleDyMFoam",
@@ -20888,7 +21184,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overPimpleDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pisoFoam",
@@ -20983,7 +21280,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 pisoFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "shallowWaterFoam",
@@ -21076,7 +21374,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 shallowWaterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "simpleFoam",
@@ -21171,7 +21470,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 simpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "SRFSimpleFoam",
@@ -21266,7 +21566,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 SRFSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overSimpleFoam",
@@ -21359,7 +21660,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "porousSimpleFoam",
@@ -21454,7 +21756,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 porousSimpleFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "MPPICDyMFoam",
@@ -21546,7 +21849,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 MPPICDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "DPMDyMFoam",
@@ -21638,7 +21942,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 DPMDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "MPPICFoam",
@@ -21732,7 +22037,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 MPPICFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "DPMFoam",
@@ -21826,7 +22132,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 DPMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "coalChemistryFoam",
@@ -21921,7 +22228,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 coalChemistryFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "icoUncoupledKinematicParcelFoam",
@@ -22016,7 +22324,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 icoUncoupledKinematicParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "icoUncoupledKinematicParcelDyMFoam",
@@ -22109,7 +22418,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 icoUncoupledKinematicParcelDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "kinematicParcelFoam",
@@ -22204,7 +22514,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 kinematicParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reactingParcelFoam",
@@ -22299,7 +22610,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 reactingParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reactingHeterogenousParcelFoam",
@@ -22394,7 +22706,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 reactingHeterogenousParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "simpleReactingParcelFoam",
@@ -22489,7 +22802,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 simpleReactingParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "simpleCoalParcelFoam",
@@ -22584,7 +22898,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 simpleCoalParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sprayFoam",
@@ -22679,7 +22994,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sprayFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "engineFoam",
@@ -22772,7 +23088,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 engineFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "simpleSprayFoam",
@@ -22867,7 +23184,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 simpleSprayFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "sprayDyMFoam",
@@ -22960,7 +23278,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 sprayDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "uncoupledKinematicParcelFoam",
@@ -23055,7 +23374,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 uncoupledKinematicParcelFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "uncoupledKinematicParcelDyMFoam",
@@ -23148,7 +23468,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 uncoupledKinematicParcelDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "MPPICInterFoam",
@@ -23242,7 +23563,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 MPPICInterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cavitatingFoam",
@@ -23336,7 +23658,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 cavitatingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cavitatingDyMFoam",
@@ -23428,7 +23751,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 cavitatingDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compressibleInterFoam",
@@ -23523,7 +23847,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 compressibleInterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compressibleInterDyMFoam",
@@ -23616,7 +23941,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 compressibleInterDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compressibleInterFilmFoam",
@@ -23711,7 +24037,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 compressibleInterFilmFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compressibleInterIsoFoam",
@@ -23804,7 +24131,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 compressibleInterIsoFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overCompressibleInterDyMFoam",
@@ -23899,7 +24227,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overCompressibleInterDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compressibleMultiphaseInterFoam",
@@ -23993,7 +24322,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 compressibleMultiphaseInterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "driftFluxFoam",
@@ -24087,7 +24417,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 driftFluxFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "icoReactingMultiphaseInterFoam",
@@ -24180,7 +24511,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 icoReactingMultiphaseInterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interCondensatingEvaporatingFoam",
@@ -24275,7 +24607,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interCondensatingEvaporatingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interFoam",
@@ -24370,7 +24703,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interMixingFoam",
@@ -24465,7 +24799,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interMixingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overInterDyMFoam",
@@ -24558,7 +24893,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overInterDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interIsoFoam",
@@ -24653,7 +24989,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interIsoFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interPhaseChangeFoam",
@@ -24748,7 +25085,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interPhaseChangeFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "interPhaseChangeDyMFoam",
@@ -24841,7 +25179,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 interPhaseChangeDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "overInterPhaseChangeDyMFoam",
@@ -24934,7 +25273,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 overInterPhaseChangeDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。 分区过程中保留原算例的 overset 库、边界和 `zoneID` 场。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "multiphaseEulerFoam",
@@ -25028,7 +25368,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 multiphaseEulerFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "multiphaseInterFoam",
@@ -25123,7 +25464,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 multiphaseInterFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "potentialFreeSurfaceFoam",
@@ -25218,7 +25560,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 potentialFreeSurfaceFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "potentialFreeSurfaceDyMFoam",
@@ -25311,7 +25654,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 potentialFreeSurfaceDyMFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reactingMultiphaseEulerFoam",
@@ -25398,7 +25742,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 reactingMultiphaseEulerFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "reactingTwoPhaseEulerFoam",
@@ -25492,7 +25837,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 reactingTwoPhaseEulerFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "twoLiquidMixingFoam",
@@ -25586,7 +25932,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 twoLiquidMixingFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "twoPhaseEulerFoam",
@@ -25680,7 +26027,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 twoPhaseEulerFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "solidDisplacementFoam",
@@ -25773,7 +26121,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 solidDisplacementFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "solidEquilibriumDisplacementFoam",
@@ -25866,7 +26215,8 @@
         "code": "foamCloneCase baseCase parallel-study\nfoamDictionary parallel-study/system/controlDict -entry startFrom -set startTime\nfoamGetDict -case parallel-study -force decomposeParDict\nfoamDictionary parallel-study/system/decomposeParDict -entry numberOfSubdomains -set 2\nfoamDictionary parallel-study/system/decomposeParDict -entry method -set scotch\nt0=$(foamDictionary parallel-study/system/controlDict -entry startTime -value)\ndecomposePar -case parallel-study -time \"$t0\"\nmpirun -np 2 solidEquilibriumDisplacementFoam -case parallel-study -parallel > parallel-study/log.parallel 2>&1\nreconstructPar -case parallel-study -latestTime",
         "explanation": "在新副本中用官方模板替换分区字典，将网格分成两个子域；`-np 2` 与 `numberOfSubdomains 2` 保持一致。求解器的 `-parallel` 选项使每个进程读取自己的子域数据，最后合并最新场。可在相同网格和计算区间内比较串行与并行耗时。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "create-mpi-config",
@@ -25920,7 +26270,8 @@
         "code": "FOAM_MPI=sys-openmpi MPI_ARCH_PATH=/opt/mpi \"$WM_PROJECT_DIR/bin/tools/create-mpi-config\" -dry-run -write",
         "explanation": "/opt/mpi 应替换为实际目标安装路径；输出固定前缀的候选文件内容。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createMingwRuntime",
@@ -25980,7 +26331,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/createMingwRuntime\" -no-compress -output=packages -name=foam-uncompressed",
         "explanation": "跳过压缩步骤，适合随后由其他打包流程压缩。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "doxyFilter",
@@ -26026,7 +26378,8 @@
         "code": "printf 'INPUT_FILTER = \"%s/bin/tools/doxyFilter\"\\n' \"$WM_PROJECT_DIR\" > Doxyfile.filter",
         "explanation": "生成供 Doxyfile 合并使用的设置行；完整 Doxyfile 仍需指定 INPUT、输出目录等。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "findEmptyMake",
@@ -26072,7 +26425,8 @@
         "code": "mkdir -p make-demo/Make\ntouch make-demo/Make/files\n\"$WM_PROJECT_DIR/bin/tools/findEmptyMake\" make-demo",
         "explanation": "只有 files、缺 options 的示例应被报告，便于理解检测标准。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamConfigurePaths",
@@ -26179,7 +26533,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamConfigurePaths\" -etc=\"$configCopy\" -paraview-path /opt/ParaView",
         "explanation": "替换为真实可用安装路径，改变副本中的 ParaView_DIR 配置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCreateCompletionCache",
@@ -26231,7 +26586,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamCreateCompletionCache\" -dir \"$FOAM_USER_APPBIN\" -no-header -output completion-user",
         "explanation": "限定输入目录并省略文件头，便于与其他缓存拼接。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCreateManpage",
@@ -26284,7 +26640,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamCreateManpage\" -pdf -output=manuals-pdf checkMesh",
         "explanation": "把 man 内容经排版工具转换成 PDF，输出到独立目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamCreateModuleInclude",
@@ -26341,7 +26698,8 @@
         "code": "mkdir -p module-tmp\n\"$WM_PROJECT_DIR/bin/tools/foamCreateModuleInclude\" -tmpdir=\"$PWD/module-tmp\" -debug -output=ModuleDebug.tcl \"$WM_PROJECT_DIR\"",
         "explanation": "使用独立临时目录，-debug 保留中间文件供比较环境变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamGrepExeTargets",
@@ -26391,7 +26749,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamGrepExeTargets\" -no-git | grep -i mesh",
         "explanation": "按名称筛选包含 mesh 的目标，辅助查找相关源码编译单元。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamGrepLibTargets",
@@ -26442,7 +26801,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamGrepLibTargets\" -src -no-git | grep finiteVolume",
         "explanation": "按路径筛选，输出可直接进入阅读的源码目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamPackRelease",
@@ -26512,7 +26872,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/foamPackRelease\" -gitbase=\"$HOME/src/OpenFOAM-v2512\" -name=source-copy HEAD > pack-copy.sh\nbash pack-copy.sh",
         "explanation": "输入目录必须是真实 Git 仓库；审核脚本后执行，生成该提交的源码包。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamUpdateCaseFileHeader",
@@ -26561,7 +26922,8 @@
         "code": "cp caseA/system/controlDict controlDict.before\n\"$WM_PROJECT_DIR/bin/tools/foamUpdateCaseFileHeader\" caseA/system/controlDict\ndiff -u controlDict.before caseA/system/controlDict",
         "explanation": "比较头部与空行变化，便于在版本库提交前阅读。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "git-find-non-ascii",
@@ -26607,7 +26969,8 @@
         "code": "${EDITOR:-vi} myModel.C\ngit add myModel.C\n./git-find-non-ascii",
         "explanation": "修正文本后重新暂存，否则脚本仍读取旧暂存版本。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "git-find-trailingspace",
@@ -26653,7 +27016,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/git-find-trailingspace\" '*/Make/files' '*/Make/options'",
         "explanation": "同时检查源码清单和编译选项文件，输出每个问题文件的计数。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "help-filter",
@@ -26699,7 +27063,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/help-filter\" < saved-help-full.txt",
         "explanation": "saved-help-full.txt 须为此前完整帮助输出，适合构建离线命令索引。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "install-dirs",
@@ -26762,7 +27127,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/install-dirs\" -common -devel -prefix=\"$HOME/foam-package-new\"",
         "explanation": "确认新目录用途后省略 dry-run，实际复制公共和开发文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "install-platform",
@@ -26826,7 +27192,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/install-platform\" -dry-run -bindir=\"$HOME/package/bin\" -libdir=\"$HOME/package/lib\" -mpi-libdir=\"$HOME/package/lib/mpi\"",
         "explanation": "分别指定三类目标目录，便于制作其他布局的发行包。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "lib-dir",
@@ -26879,7 +27246,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/lib-dir\" -sh-verbose \"$PWD/dependency\" > dependency-env.sh",
         "explanation": "标准输出保存赋值，详细信息写到标准错误，可阅读脚本后再选择是否加载。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pre-commit-hook",
@@ -26925,7 +27293,8 @@
         "code": "${EDITOR:-vi} myModel.C\ngit add myModel.C\n\"$WM_PROJECT_DIR/bin/tools/pre-commit-hook\" myModel.C",
         "explanation": "修正并重新暂存后重跑，避免一直检查旧暂存内容。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "pre-receive-hook",
@@ -26971,7 +27340,8 @@
         "code": "printf '%s %s %s\\n' \"$(git rev-parse HEAD~1)\" \"$(git rev-parse HEAD)\" refs/heads/main > receive-check.txt\n\"$WM_PROJECT_DIR/bin/tools/pre-receive-hook\" < receive-check.txt",
         "explanation": "保存的清单使之后的检查指向同一提交范围，输出问题文件及行号。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "query-detect",
@@ -27021,7 +27391,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/query-detect\" -mode=ugo scotch > detection-all.txt\n\"$WM_PROJECT_DIR/bin/tools/query-detect\" -mode=o scotch > detection-install.txt\ndiff -u detection-install.txt detection-all.txt",
         "explanation": "对比用户/站点覆盖是否改变依赖检测结果。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "query-versions",
@@ -27072,7 +27443,8 @@
         "code": "\"$WM_PROJECT_DIR/bin/tools/query-versions\" -gcc\ncompiler=$(wmake -show-path-cxx)\n\"$compiler\" --version",
         "explanation": "前者显示打包/构建配置，后者由实际选中的编译器报告版本。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "vscode-settings",
@@ -27120,7 +27492,8 @@
         "code": "wmake -with-bear -bear-output-dir=\"$PWD/compile-db\" myUtility\n\"$WM_PROJECT_DIR/bin/tools/vscode-settings\" > utility-review.code-workspace",
         "explanation": "先生成 compile_commands.json，再把模板中语言服务器的数据库路径改为该真实文件或目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "dirToString",
@@ -27170,7 +27543,8 @@
         "code": "for path in models/transport models/turbulence fields/volume; do name=$(\"$WM_PROJECT_DIR/wmake/scripts/dirToString\" \"$path\"); printf '%s = %s\\n' \"$name\" \"$path\"; done",
         "explanation": "输出变量名与原路径映射，便于理解 makeFiles 自动生成的清单。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeDepend",
@@ -27216,7 +27590,8 @@
         "code": "for src in main.C model.C; do \"$WM_PROJECT_DIR/wmake/scripts/makeDepend\" -Iinclude \"$src\" > \"${src%.C}.dep\" || break; done",
         "explanation": "先准备 model.C；每个源文件得到独立依赖文件，失败时结束循环。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeFiles",
@@ -27262,7 +27637,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-make-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p user-target\n    touch user-target/main.C\n    cd user-target\n    \"$WM_PROJECT_DIR/wmake/scripts/makeFiles\"\n    sed -i 's/FOAM_APPBIN/FOAM_USER_APPBIN/g' Make/files\n    cat Make/files\n)",
         "explanation": "生成后把 EXE 输出路径改为 FOAM_USER_APPBIN，适合个人开发。 末行显示实际生成内容。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeOptions",
@@ -27308,7 +27684,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-make-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p user-target\n    touch user-target/main.C\n    cd user-target\n    \"$WM_PROJECT_DIR/wmake/scripts/makeOptions\"\n    cat Make/options\n)",
         "explanation": "生成的 EXE_LIBS 提供基础库，可在此后添加自编库。 末行显示实际生成内容。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeParser",
@@ -27366,7 +27743,8 @@
         "code": "cp toy.lyy demo-toy.lyy\n\"$WM_PROJECT_DIR/wmake/scripts/makeParser\" -prefix=demo- -parser=toy.lyy -code",
         "explanation": "实际输入由 prefix 与 parser 拼接，读取 demo-toy.lyy。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "makeTargetDir",
@@ -27412,7 +27790,8 @@
         "code": "\"$WM_PROJECT_DIR/wmake/scripts/makeTargetDir\" exports/0/U.csv exports/0.5/U.csv exports/1/U.csv",
         "explanation": "虽然通常用于构建，该脚本同样可准备后处理导出的目录树。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wcleanObjects",
@@ -27464,7 +27843,8 @@
         "code": "tool=\"$WM_PROJECT_DIR/wmake/scripts/wcleanObjects\"\ndemoProject=$(mktemp -d \"$HOME/foam-clean-build.XXXXXX\")\nmkdir -p \"$demoProject/build/configA\"\n(cd \"$demoProject\" && WM_PROJECT_DIR=\"$demoProject\" \"$tool\" all)",
         "explanation": "直接调用 wcleanObjects 默认目标是 build；all 移除整个演示 build。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmake-build-info",
@@ -27529,7 +27909,8 @@
         "code": "printf 'api=@API@ build=@BUILD@\\n' > build-template.txt\n\"$WM_PROJECT_DIR/wmake/scripts/wmake-build-info\" -filter build-template.txt",
         "explanation": "读取模板并替换构建标记，输出过滤内容用于发行说明。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmake-check-dir",
@@ -27578,7 +27959,8 @@
         "code": "\"$WM_PROJECT_DIR/wmake/scripts/wmake-check-dir\" \"$WM_PROJECT_DIR\" || exit 1\n./Allwmake -j 2",
         "explanation": "用于项目根目录的构建脚本；目录不匹配时在编译前退出。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmake-with-bear",
@@ -27628,7 +28010,8 @@
         "code": "wclean myUtility\n\"$WM_PROJECT_DIR/wmake/scripts/wmake-with-bear\" -bear-output-dir=\"$PWD/db-fresh\" myUtility",
         "explanation": "在个人副本中清理后重编，使所有编译单元被 Bear 捕获。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmakeFilesAndOptions",
@@ -27674,7 +28057,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-make-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p user-target\n    touch user-target/main.C\n    cd user-target\n    \"$WM_PROJECT_DIR/wmake/scripts/wmakeFilesAndOptions\"\n    sed -i 's/FOAM_APPBIN/FOAM_USER_APPBIN/g' Make/files\n    cat Make/files Make/options\n)",
         "explanation": "生成后把 EXE 输出路径改为 FOAM_USER_APPBIN，适合个人开发。 末行显示实际生成内容。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmakeWindowsDlOpenLibs",
@@ -27720,7 +28104,8 @@
         "code": "printf 'EXE_LIBS = -lFoamDemoMissingLibrary\\n' > options.missing\n\"$WM_PROJECT_DIR/wmake/scripts/wmakeWindowsDlOpenLibs\" options.missing",
         "explanation": "找不到对应 DLL 时不输出加载宏，便于核对打包遗漏。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wrap-bison",
@@ -27772,7 +28157,8 @@
         "code": "\"$WM_PROJECT_DIR/wmake/scripts/wrap-bison\" -no-tmp -output=generated/parser.tab.cc parser.yy-m4",
         "explanation": "生成代码并移除展开后的临时 .yy 文件，输出文件保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wrap-lemon",
@@ -27829,7 +28215,8 @@
         "code": "\"$WM_PROJECT_DIR/wmake/scripts/wrap-lemon\" -no-tmp -ecc toy.lyy-m4",
         "explanation": "使用 m4 语法生成解析器，并移除该步骤的临时展开文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "Allmake",
@@ -27875,7 +28262,8 @@
         "code": "WMAKE_BIN=\"$PWD/tools-bin-secondary\" bash tools-src/Allmake all",
         "explanation": "在另一输出位置生成相同工具，适合比较工具链或打包布局。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "createCode",
@@ -27921,7 +28309,8 @@
         "code": "bash scanner-demo/createCode\nWMAKE_BIN=\"$PWD/scanner-tools-bin\" bash scanner-demo/Allmake",
         "explanation": "刷新扫描器后构建 wmake 工具，输出位于独立个人目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wcleanLnIncludeAll",
@@ -27969,7 +28358,8 @@
         "code": "wcleanLnIncludeAll user-libraries\nwmakeLnIncludeAll user-libraries",
         "explanation": "删除旧索引后按当前源码位置重建，实际头文件保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wdep",
@@ -28015,7 +28405,8 @@
         "code": "cd myUtility\nwmake dep\nwdep myUtility.C",
         "explanation": "先创建依赖信息，再定位文件，适用于首次构建前检查。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmakeCollect",
@@ -28065,7 +28456,8 @@
         "code": "cd user-project\nwmakeLnIncludeAll\nwmake -queue",
         "explanation": "预先建立头文件链接，再由 wmake 自己生成正确依赖与编译命令，适用于多编译单元项目。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmakeLnInclude",
@@ -28119,7 +28511,8 @@
         "code": "wmakeLnInclude -update libraryA libraryB",
         "explanation": "为两个独立编译单元各自更新索引。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmakeLnIncludeAll",
@@ -28173,7 +28566,8 @@
         "code": "wmakeLnIncludeAll -update user-models user-boundaries",
         "explanation": "分别扫描两个树，避免扫描整套官方源码。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wrmdep",
@@ -28219,7 +28613,8 @@
         "code": "wrmdep -old myUtility",
         "explanation": "查找没有对应源文件的依赖项；用于源码搬迁后的整理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wrmo",
@@ -28268,7 +28663,8 @@
         "code": "cd myLibrary\nwrmo myModel.C\nwmake libso",
         "explanation": "重编译该源文件并链接共享库，适用于重新核查编译选项的影响。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "canCompile",
@@ -28311,7 +28707,8 @@
         "code": "if canCompile; then for appDir in fieldStats meshReport; do wmake \"$appDir\" || break; done; fi",
         "explanation": "先准备两个完整源码目录，统一检查后按顺序构建；任一失败时结束循环。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cloneCase",
@@ -28354,7 +28751,8 @@
         "code": "for re in 100 400 1000; do cloneCase caseA \"Re-$re\" || break; done",
         "explanation": "三个新目录起点一致，随后分别编辑黏度或边界速度。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cloneParallelCase",
@@ -28397,7 +28795,8 @@
         "code": "mkdir -p restart-study\ncloneParallelCase caseA restart-study/base 1\ncloneParallelCase caseA restart-study/variant 1",
         "explanation": "从同一已写出时刻生成两份分区算例，用于修改后续运行设置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "compileApplication",
@@ -28440,7 +28839,8 @@
         "code": "compileApplication fieldStats && fieldStats -case caseA",
         "explanation": "工具参数以其实现为准；仅在编译成功后运行，避免误用旧二进制。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "getApplication",
@@ -28483,7 +28883,8 @@
         "code": "cd caseA\nfoamDictionary system/controlDict -entry application -set icoFoam\ngetApplication",
         "explanation": "仅对为 icoFoam 准备的算例执行；输出应变为 icoFoam，其他物性和场仍需匹配该求解器。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "getNumberOfPatchFaces",
@@ -28526,7 +28927,8 @@
         "code": "for c in caseA caseB; do (cd \"$c\" && getNumberOfPatchFaces inlet); done",
         "explanation": "在具有同名 inlet 的两组网格中输出边界面数，观察加密后面数变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "getNumberOfProcessors",
@@ -28569,7 +28971,8 @@
         "code": "cd caseA\nfor dict in system/decomposeParDict.*; do printf '%s: ' \"$dict\"; getNumberOfProcessors \"$dict\"; done",
         "explanation": "为每份匹配字典输出分区数；适用于并行规模试验前整理配置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "isParallel",
@@ -28612,7 +29015,8 @@
         "code": "if isParallel -parallel; then runParallel checkMesh; else runApplication checkMesh; fi",
         "explanation": "在已准备的算例目录执行；并行分支需先分区。测试分支只做网格检查，普通分支可运行求解器。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "isTest",
@@ -28655,7 +29059,8 @@
         "code": "if isTest -test; then runApplication checkMesh; else runApplication \"$(getApplication)\"; fi",
         "explanation": "在已准备的算例目录执行；并行分支需先分区。测试分支只做网格检查，普通分支可运行求解器。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "isTrue",
@@ -28698,7 +29103,8 @@
         "code": "printf 'doPostProcess yes;\\n' > workflowDict\nif isTrue -dict workflowDict -entry doPostProcess; then checkMesh -case caseA; fi",
         "explanation": "创建自己的工作流程开关，yes 使网格检查分支执行；no 会跳过该步骤。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "notTest",
@@ -28741,7 +29147,8 @@
         "code": "if notTest -test; then runApplication \"$(getApplication)\"; else runApplication checkMesh; fi",
         "explanation": "在已准备的算例目录执行；并行分支需先分区。测试分支只做网格检查，普通分支可运行求解器。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "remove0DirFields",
@@ -28784,7 +29191,8 @@
         "code": "for region in fluid1 fluid2; do remove0DirFields -region \"$region\" k omega; done",
         "explanation": "两个流体区域分别处理相同字段，其他区域与文件保留。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "restore0Dir",
@@ -28827,7 +29235,8 @@
         "code": "restore0Dir\nfoamDictionary 0/U -entry internalField -set \"uniform (1 0 0)\"",
         "explanation": "对有 U 字段的算例，从一致模板开始改内部初值；入口等边界项仍按实际模型另行设置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "runApplication",
@@ -28875,7 +29284,8 @@
         "code": "runApplication -a checkMesh",
         "explanation": "-a 无论日志是否存在都执行，并把输出追加到 log.checkMesh。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "runParallel",
@@ -28923,7 +29333,8 @@
         "code": "mkdir -p parallel-logs\nrunParallel -d parallel-logs -o checkMesh",
         "explanation": "输出写入 parallel-logs/log.checkMesh，-o 重新执行并覆盖同名日志。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanAdiosOutput",
@@ -28966,7 +29377,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'caseA/system' 'caseA/adiosData' 'caseB/system' 'caseB/adiosData'\n    touch 'caseA/adiosData/a' 'caseB/adiosData/b'\n    cd caseA\n    cleanAdiosOutput\n    find . -type f\n)",
         "explanation": "进入 caseA 后仅清理其 ADIOS 输出，caseB 保留。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanApplication",
@@ -29009,7 +29421,8 @@
         "code": "cd myBoundary\ncleanApplication\nwmake libso",
         "explanation": "清理库源码后重新构建共享库，输出位置由 Make/files 的 LIB 决定。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanAuxiliary",
@@ -29052,7 +29465,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'system'\n    touch 'log-mesh' 'logSummary.run' 'system/controlDict'\n    cleanAuxiliary\n    find . -type f\n)",
         "explanation": "处理 log-* 和 logSummary.*；不修改 controlDict。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanCase",
@@ -29095,7 +29509,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'system' 'constant/triSurface' 'constant/polyMesh' '0.orig'\n    touch 'system/controlDict' 'constant/triSurface/body.stl' 'constant/polyMesh/points' '0.orig/U'\n    cleanCase\n    find . -type f\n)",
         "explanation": "删除 constant/polyMesh 中的网格，保留 constant/triSurface/body.stl、0.orig/U 和 system/controlDict。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanCase0",
@@ -29138,7 +29553,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'system' 'constant/triSurface' 'constant/polyMesh' '0.orig'\n    touch 'system/controlDict' 'constant/triSurface/body.stl' 'constant/polyMesh/points' '0.orig/U'\n    cleanCase0\n    find . -type f\n)",
         "explanation": "删除 constant/polyMesh 中的网格，保留 constant/triSurface/body.stl、0.orig/U 和 system/controlDict。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanDynamicCode",
@@ -29181,7 +29597,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'caseA/system' 'caseA/dynamicCode' 'caseB/dynamicCode'\n    touch 'caseA/dynamicCode/a' 'caseB/dynamicCode/b'\n    cd caseA\n    cleanDynamicCode\n    find . -type f\n)",
         "explanation": "通过工作目录限定缓存所属算例。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanFaMesh",
@@ -29224,7 +29641,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'constant/finite-area/film/faMesh' 'constant/finite-area/regionB/faMesh'\n    touch 'constant/finite-area/film/faMesh/faceLabels' 'constant/finite-area/regionB/faMesh/faceLabels'\n    cleanFaMesh -region film\n    cleanFaMesh -region regionB\n    find . -type f\n)",
         "explanation": "逐个指定区域，避免把多区域网格误当成默认区域处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanOptimisation",
@@ -29267,7 +29685,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'designA/optimisation' 'designB/optimisation'\n    touch 'designA/optimisation/data' 'designB/optimisation/data'\n    cd designA\n    cleanOptimisation\n    find . -type f\n)",
         "explanation": "只进入 designA 清理，另一方案的数据保留。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanPolyMesh",
@@ -29310,7 +29729,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'constant/fluid/polyMesh' 'constant/regionB/polyMesh'\n    touch 'constant/fluid/polyMesh/points' 'constant/regionB/polyMesh/points'\n    cleanPolyMesh -region fluid\n    cleanPolyMesh -region regionB\n    find . -type f\n)",
         "explanation": "逐个指定区域，避免把多区域网格误当成默认区域处理。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanPostProcessing",
@@ -29353,7 +29773,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'postProcessing-old' 'postProcessing-new' 'system'\n    touch 'postProcessing-old/a' 'postProcessing-new/b' 'system/controlDict'\n    cleanPostProcessing\n    find . -type f\n)",
         "explanation": "postProcessing-* 也匹配，所有这些批次将被清除。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanSamples",
@@ -29396,7 +29817,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'sets' 'postProcessing'\n    touch 'sets/p.xy' 'postProcessing/p.dat'\n    cleanSamples\n    find . -type f\n)",
         "explanation": "本函数只清理旧式采样目录，postProcessing 保留。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanSnappyFiles",
@@ -29439,7 +29861,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'constant/triSurface' 'constant/polyMesh'\n    touch 'constant/triSurface/body.stl' 'constant/polyMesh/surfaceIndex'\n    cleanSnappyFiles\n    find . -type f\n)",
         "explanation": "移除 surfaceIndex，STL 表面保留以供重新划分。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanTimeDirectories",
@@ -29482,7 +29905,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p '123-notes' 'system'\n    touch '123-notes/readme' 'system/controlDict'\n    cleanTimeDirectories\n    find . -type f\n)",
         "explanation": "源码按数字前缀通配，因此 123-notes 也会移除；演示说明清理目录需只存算例数据。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "cleanUcomponents",
@@ -29525,7 +29949,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-clean-demo.XXXXXX\")\n(\n    cd \"$demoDir\" || exit 1\n    mkdir -p 'processor0/0'\n    touch 'processor0/0/Ux' 'processor0/0/U'\n    cd processor0\n    cleanUcomponents\n    find . -type f\n)",
         "explanation": "进入子域目录后调用，删除该子域 0/Ux，保留 U。 末行列出剩余文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "removeCase",
@@ -29568,7 +29993,8 @@
         "code": "demoDir=$(mktemp -d \"$HOME/foam-remove.XXXXXX\")\nmkdir -p \"$demoDir\"/{trial1,trial2}\nfor name in trial1 trial2; do removeCase \"$demoDir/$name\"; done",
         "explanation": "函数每次只使用第一个位置参数，因此用循环分别移除两项。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "app",
@@ -29611,7 +30037,8 @@
         "code": "app\nfind utilities/mesh -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamPV",
@@ -29654,7 +30081,8 @@
         "code": "foamPV \"$pvVersion\"\nparaFoam -vtk -case \"$FOAM_RUN/caseA\"",
         "explanation": "环境设置后启动 ParaView 内置阅读器；-case 指向已有算例。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "foamPwd",
@@ -29697,7 +30125,8 @@
         "code": "pwd -P\nfoamPwd",
         "explanation": "前者解析符号链接为真实路径，后者按当前逻辑工作目录生成简写。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "lib",
@@ -29740,7 +30169,8 @@
         "code": "lib\nls -lh libOpenFOAM.so libfiniteVolume.so\ncd -",
         "explanation": "显示当前配置下库的大小与时间，然后返回原目录。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "uapp",
@@ -29783,7 +30213,8 @@
         "code": "uapp\nfind . -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "ufoam",
@@ -29826,7 +30257,8 @@
         "code": "ufoam\nfind . -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "usol",
@@ -29869,7 +30301,8 @@
         "code": "usol\nfind . -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "util",
@@ -29912,7 +30345,8 @@
         "code": "util\nfind miscellaneous -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "uutil",
@@ -29955,7 +30389,8 @@
         "code": "uutil\nfind . -maxdepth 2 -type d\ncd -",
         "explanation": "查看目录树后用 cd - 返回前一个工作目录，适合从算例跳到源码再返回。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmDP",
@@ -29998,7 +30433,8 @@
         "code": "wmDP\ncheckMesh -case \"$FOAM_RUN/caseA\" > \"$FOAM_RUN/caseA/log.checkMesh.DP\" 2>&1",
         "explanation": "对已有算例执行网格检查，并以配置名保存日志。切换环境本身不转换已有场文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmInt32",
@@ -30041,7 +30477,8 @@
         "code": "wmInt32\ncheckMesh -case \"$FOAM_RUN/caseA\" > \"$FOAM_RUN/caseA/log.checkMesh.32\" 2>&1",
         "explanation": "对已有算例执行网格检查，并以配置名保存日志。切换环境本身不转换已有场文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmInt64",
@@ -30084,7 +30521,8 @@
         "code": "wmInt64\ncheckMesh -case \"$FOAM_RUN/caseA\" > \"$FOAM_RUN/caseA/log.checkMesh.64\" 2>&1",
         "explanation": "对已有算例执行网格检查，并以配置名保存日志。切换环境本身不转换已有场文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmRefresh",
@@ -30127,7 +30565,8 @@
         "code": "before=$WM_OPTIONS\nwmRefresh\nprintf 'before=%s\\nafter=%s\\n' \"$before\" \"$WM_OPTIONS\"",
         "explanation": "设置未改变时两项应相同；偏好改变时可直接看到构建组合变化。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmSP",
@@ -30170,7 +30609,8 @@
         "code": "wmSP\ncheckMesh -case \"$FOAM_RUN/caseA\" > \"$FOAM_RUN/caseA/log.checkMesh.SP\" 2>&1",
         "explanation": "对已有算例执行网格检查，并以配置名保存日志。切换环境本身不转换已有场文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmSPDP",
@@ -30213,7 +30653,8 @@
         "code": "wmSPDP\ncheckMesh -case \"$FOAM_RUN/caseA\" > \"$FOAM_RUN/caseA/log.checkMesh.SPDP\" 2>&1",
         "explanation": "对已有算例执行网格检查，并以配置名保存日志。切换环境本身不转换已有场文件。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmSet",
@@ -30256,7 +30697,8 @@
         "code": "wmSet WM_COMPILER=Gcc WM_PRECISION_OPTION=DP WM_LABEL_SIZE=32 WM_COMPILE_OPTION=Opt\necho \"$WM_OPTIONS\"",
         "explanation": "一次显式选定四个参数，回到常见 GccDPInt32Opt 配置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   },
   {
     "name": "wmUnset",
@@ -30299,6 +30741,7 @@
         "code": "(wmUnset; printf '%s\\n' \"${WM_OPTIONS-unset}\")\necho \"$WM_OPTIONS\"",
         "explanation": "交互式终端已定义 alias 后执行；子 shell 显示 unset，外层仍保留原配置。"
       }
-    ]
+    ],
+    "cms_status": "published"
   }
 ]
