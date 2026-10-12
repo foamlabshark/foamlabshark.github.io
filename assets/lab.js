@@ -17,6 +17,7 @@
  lab.headingTitle=item=>String(item.slug||'').startsWith('command-')?item.title.split(' · ')[0]:item.title;
  lab.updateBreadcrumb=item=>{let parent={url:'/',label:'学习概览'};const track=String(item.track||''),canonical=String(item.metadata?.canonical_path||'');
   if(item.metadata?.admin_only)parent={url:'/admin/',label:'管理平台'};
+  else if(item.metadata?.fvm_book)parent={url:'/fvm/',label:'OpenFOAM中的有限体积法'};
   else if(canonical==='/start/')parent={url:'/',label:'学习概览'};
   else if(canonical.startsWith('/dictionaries/')||String(item.slug).startsWith('dictionary-'))parent={url:'/dictionaries/',label:'配置与字典速查'};
   else if(String(item.slug).startsWith('command-'))parent={url:'/commands/',label:'命令速查'};
