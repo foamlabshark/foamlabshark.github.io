@@ -27,7 +27,7 @@
   panel.dataset.authState=auth.loading?'loading':signed?'authenticated':'anonymous';
   $('#account-panel-member').hidden=!signed;$('#account-panel-guest').hidden=signed||auth.loading;$('#account-panel-badge').hidden=!signed;
   put('#account-panel-name',signed?String(name):'个人中心');if(window.FoamAvatar)window.FoamAvatar.render();else put('#account-panel-avatar',signed?String(name).slice(0,1).toUpperCase():'F');
-  put('#account-panel-status',auth.loading?'正在恢复登录…':signed?'GitHub 账号已登录':'尚未登录');
+  put('#account-panel-status',auth.loading?'正在恢复登录…':signed?((window.FoamLab?.role==='supporter'?'充电会员 · ':'')+'GitHub 账号已登录'):'尚未登录');
   const pet=cached.pet||auth.pet;
   if(signed&&pet&&Number.isFinite(pet.level)&&Number.isFinite(pet.xp)&&Number.isFinite(pet.next_level_xp)){
    put('#account-panel-level','Lv.'+pet.level);

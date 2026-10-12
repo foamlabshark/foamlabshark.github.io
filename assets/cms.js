@@ -39,7 +39,7 @@
   root.innerHTML='<div id="cms-notice" class="lab-evidence" role="status" hidden></div><div class="cms-shell"><nav class="cms-nav" aria-label="管理功能">'+primary.map(tab).join('')+(secondary.length?'<details id="cms-more"><summary>更多管理</summary><div>'+secondary.map(tab).join('')+'</div></details>':'')+'</nav><div id="cms-panel"></div></div>';
   window.FoamCMSNavigation({host:root.querySelector('.cms-nav'),items:[...primary,...secondary],primary:primary.map(([id])=>id),active:()=>active,userId:L.user.id,area:location.pathname==='/studio/'?'studio':'admin',UI,esc,notice,run,select:id=>{if(busy)return;run(async()=>{if(!await discardChanges())return;active=id;current=null;baseline='';if($('#cms-more'))$('#cms-more').open=false;await renderTab();});}});
  }
- async function load(){const cols='id,slug,kind,title,summary,track,series,status,author_id,author_name,sort_order,revision,updated_at,created_at,metadata,section_ids,pinned';rows=[];const kind=editor?contentView()?.kind:'article';rowsScope=kind||'all';if(editor&&!kind)rows=await all('foamlab_content',cols);else for(let start=0;;start+=500){let query=L.client.from('foamlab_content').select(cols).eq('kind',kind);if(!editor)query=query.eq('author_id',L.user.id);const batch=check(await query.order('id').range(start,start+499));rows.push(...batch);if(batch.length<500)break;}rows.sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));}
+ async function load(){const cols='id,slug,kind,title,summary,track,series,status,author_id,author_name,sort_order,revision,updated_at,created_at,metadata,section_ids,pinned,read_access';rows=[];const kind=editor?contentView()?.kind:'article';rowsScope=kind||'all';if(editor&&!kind)rows=await all('foamlab_content',cols);else for(let start=0;;start+=500){let query=L.client.from('foamlab_content').select(cols).eq('kind',kind);if(!editor)query=query.eq('author_id',L.user.id);const batch=check(await query.order('id').range(start,start+499));rows.push(...batch);if(batch.length<500)break;}rows.sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));}
  const fingerprint=f=>JSON.stringify([...f.querySelectorAll('input:not(.cms-location-search),textarea,select')].map(e=>[e.name||e.className,e.type==='checkbox'?e.checked:e.value]));
  const isDirty=()=>questionWorkspace?.isDirty()||(!!$('#cms-edit-form')&&baseline!==fingerprint($('#cms-edit-form')));
  async function discardChanges(){return !isDirty()||await UI.confirmAction({title:'放弃尚未保存的修改？',message:current?.title||'新文章',details:['已保存的版本会保留。'],action:'放弃修改'});}
@@ -130,6 +130,7 @@
    const updatePaths=()=>$('#cms-position-label').textContent=editor?UI.locationLabel({section_ids:D.readPicker(picker)}):'实践与分享';picker.addEventListener('change',updatePaths);updatePaths();
    f.querySelector('.cms-topic-options').hidden=true;
   }
+  if(admin)window.FoamCMSReadAccess.mountArticle(f,v);
   baseline=fingerprint(f);
   if(admin&&id)editLease.bind(f);
   f.addEventListener('input',()=>$('#cms-draft-state').textContent=isDirty()?'有未保存修改':'已保存');
@@ -150,6 +151,7 @@
   if(UI.key(current||v)==='internal'){if(current)v.slug=current.slug;v.status='draft';v.comments_enabled=false;v.metadata.admin_only=true;}
   if(new Blob([v.body]).size>1000000)throw Error('单篇正文上限为 1 MB。');if(v.cover_url&&!L.safeURL(v.cover_url))throw Error('请填写有效的图片地址。');
   if(editor&&D.available)v.section_ids=D.readPicker(f);if(D.available&&current?.metadata?.topic_key)v.metadata.topic_key=current.metadata.topic_key;
+  if(admin)v.read_access=f.elements.read_access.value;
   const changes=[];if(current){if(UI.locationLabel(current)!==UI.locationLabel({...current,...v}))changes.push('位置：'+UI.locationLabel(current)+' → '+UI.locationLabel({...current,...v}));if(current.slug!==v.slug)changes.push('文章地址：'+current.slug+' → '+v.slug);if(current.status==='published'&&v.status!=='published')changes.push('状态：已发布 → '+statuses[v.status]);}
   if(changes.length&&!await UI.confirmAction({title:'确认更改文章位置或状态？',message:v.title,details:changes,action:'确认保存'}))return;
   if(admin&&current)await editLease.ensure(current.id);

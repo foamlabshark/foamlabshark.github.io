@@ -2653,12 +2653,32 @@ if(__exports != exports)module.exports = exports;return module.exports}));
  function render(){const words=(search?.value||'').toLowerCase().split(/\s+/).filter(Boolean);const shown=rows.filter(r=>(!kind||r.kind===kind)&&(track==='全部'||r.track===track)&&words.every(w=>[r.title,r.summary,r.track,r.series].join(' ').toLowerCase().includes(w)));if(window.FoamResourcesHub?.render({listing,rows:shown,words,filtered:shown.length!==rows.length,mode,D}))return;listing.innerHTML=window.FoamPagination.slice(listing,shown,render,12).map(lab.card).join('')||'<div class="lab-empty">目前没有符合条件的内容。</div>';if($('#catalog-count'))$('#catalog-count').textContent=shown.length+' 项内容';}
  search?.addEventListener('input',()=>{window.foamListState?.write({q:search.value,track,...(kindFilters?{kind}:{})});render();});window.addEventListener('popstate',()=>{restoreFilters();render();});render();void catalogAuthors.then(()=>{if(!listing.isConnected)return;const byId=new Map(rows.map(row=>[row.id,row]));for(const byline of listing.querySelectorAll('[data-author-content]')){const row=byId.get(byline.dataset.authorContent);if(row)byline.innerHTML=lab.authorMeta(row);}});
  }catch(e){lab.error(listing,e);}finally{lab.reveal(listing);}})();
- // Article bodies are fetched only with a signed-in session; generated pages
+ // The server resolves article and module reading permissions; generated pages
  // contain an empty reader shell instead of a publicly readable fallback.
  let articleEpoch=0;
- lab.lockArticle=host=>{delete host.dataset.cmsSuspended;host.dataset.cmsState='locked';host.innerHTML='<div class="article-login"><div class="eyebrow">FOAMLAB · 学习资料</div><h1>登录后阅读文章</h1><p>登录后即可查看完整正文、配置示例与文章讨论。</p><button class="button" type="button" data-lab-login>使用 GitHub 登录</button><a class="text-link" href="/courses/">浏览学习目录 →</a></div>';host.closest('.article-shell')?.querySelectorAll('.article-toc').forEach(e=>e.replaceChildren());window.foamCurrentContent=null;document.dispatchEvent(new Event('foamlab:article-locked'));};
+ lab.lockArticle=(host,access='member')=>{
+  const title={member:'登录后阅读文章',supporter:'充电会员专享',admin:'仅管理员可阅读'}[access]||'登录后阅读文章';
+  const description={member:'登录后即可查看完整正文、配置示例与文章讨论。',supporter:'本篇文章向充电会员和管理员开放。',admin:'本篇文章仅供管理员查看。'}[access]||'';
+  delete host.dataset.cmsSuspended;host.dataset.cmsState='locked';host.dataset.readAccess=access;
+  host.innerHTML='<div class="article-login"><div class="eyebrow">FOAMLAB · 学习资料</div><h1>'+title+'</h1><p>'+description+'</p>'+(!window.foamAuth.user||window.foamAuth.user.is_anonymous?'<button class="button" type="button" data-lab-login>使用 GitHub 登录</button>':'<a class="button secondary" href="/account/">个人中心</a>')+'<a class="text-link" href="/courses/">浏览学习目录 →</a></div>';
+  host.closest('.article-shell')?.querySelectorAll('.article-toc').forEach(e=>e.replaceChildren());window.foamCurrentContent=null;document.dispatchEvent(new Event('foamlab:article-locked'));
+ };
  lab.suspendArticle=host=>{host.dataset.cmsSuspended='true';host.dataset.cmsState='loading';host.innerHTML='<div class="article-cms-loading" role="status"><span>正在打开文章…</span><i></i><i></i><i></i></div>';host.closest('.article-shell')?.querySelectorAll('.article-toc').forEach(e=>e.replaceChildren());window.foamCurrentContent=null;document.dispatchEvent(new Event('foamlab:article-locked'));};
- lab.readArticle=async(host,slug)=>{const epoch=articleEpoch;await lab.contentReady;if(epoch!==articleEpoch)return {locked:true};const user=window.foamAuth.user;if(!user||user.is_anonymous){lab.lockArticle(host);return {locked:true};}const result=await lab.client.from('foamlab_content').select('*').eq('slug',slug).eq('status','published').maybeSingle();if(epoch!==articleEpoch)return {locked:true};if(window.foamAuth.user?.id!==user.id){if(window.foamAuth.user&&!window.foamAuth.user.is_anonymous)lab.suspendArticle(host);else lab.lockArticle(host);return {locked:true};}if(result.error){host.dataset.cmsState='error';throw Error('正文暂时无法读取，请刷新重试。');}return {item:lab.check(result)};};
+ lab.readArticle=async(host,slug)=>{
+  const epoch=articleEpoch;await lab.contentReady;if(epoch!==articleEpoch)return {locked:true};
+  const user=window.foamAuth.user,userId=user?.id||null;
+  const stale=()=>{if(epoch!==articleEpoch)return true;if((window.foamAuth.user?.id||null)!==userId){if(window.foamAuth.user&&!window.foamAuth.user.is_anonymous)lab.suspendArticle(host);else lab.lockArticle(host);return true;}return false;};
+  if(user&&!user.is_anonymous){
+   const result=await lab.client.from('foamlab_content').select('*').eq('slug',slug).eq('status','published').maybeSingle();
+   if(stale())return {locked:true};if(result.error){host.dataset.cmsState='error';throw Error('正文暂时无法读取，请刷新重试。');}
+   if(result.data)return {item:result.data};
+  }
+  const result=await lab.client.rpc('foamlab_read_article',{p_slug:slug});
+  if(stale())return {locked:true};if(result.error||!result.data){host.dataset.cmsState='error';throw Error('正文暂时无法读取，请刷新重试。');}
+  const response=result.data;
+  if(!response.allowed){lab.lockArticle(host,response.access);return {locked:true};}
+  return {item:response.item};
+ };
  const articleHosts=()=>document.querySelectorAll('.article[data-cms-slug]:not([data-cms-slug=""]),#live-article');
  // Clear cached article bodies without treating a page transition as sign-out.
  window.addEventListener('pagehide',()=>{articleEpoch++;articleHosts().forEach(lab.suspendArticle);});

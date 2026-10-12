@@ -140,7 +140,7 @@
   panel.dataset.authState=auth.loading?'loading':signed?'authenticated':'anonymous';
   $('#account-panel-member').hidden=!signed;$('#account-panel-guest').hidden=signed||auth.loading;$('#account-panel-badge').hidden=!signed;
   put('#account-panel-name',signed?String(name):'个人中心');if(window.FoamAvatar)window.FoamAvatar.render();else put('#account-panel-avatar',signed?String(name).slice(0,1).toUpperCase():'F');
-  put('#account-panel-status',auth.loading?'正在恢复登录…':signed?'GitHub 账号已登录':'尚未登录');
+  put('#account-panel-status',auth.loading?'正在恢复登录…':signed?((window.FoamLab?.role==='supporter'?'充电会员 · ':'')+'GitHub 账号已登录'):'尚未登录');
   const pet=cached.pet||auth.pet;
   if(signed&&pet&&Number.isFinite(pet.level)&&Number.isFinite(pet.xp)&&Number.isFinite(pet.next_level_xp)){
    put('#account-panel-level','Lv.'+pet.level);
@@ -433,7 +433,7 @@
   if(home)home.innerHTML=collection();if(!hub)return;
   if(node.id===root.id){hub.querySelector('h1').textContent=root.name;hub.querySelector('.page-content-loading')?.remove();const grid=document.createElement('div');grid.className='topic-collection-grid';grid.innerHTML=collection();hub.append(grid);return;}
   const ids=D.descendants(node.id),items=all.filter(r=>r.section_ids?.some(id=>ids.includes(id))),intro=ownIntro(items,node),selected=items.filter(r=>r.id!==intro?.id&&r.kind!=='module'&&(!intro?.metadata?.curriculum_series||r.series===intro.metadata.curriculum_series)),subtopics=D.children(node.id).filter(D.isVisible);
-  let introduction='';if(intro&&L.user&&!L.user.is_anonymous){const userId=L.user.id,record=L.check(await L.client.from('foamlab_content').select('body').eq('id',intro.id).single());if(window.foamAuth.user?.id===userId)introduction=L.markdown(record.body);}
+  let introduction='';if(intro){const userId=window.foamAuth.user?.id||null,record=L.check(await L.client.rpc('foamlab_read_article',{p_slug:intro.slug}));if((window.foamAuth.user?.id||null)===userId&&record.allowed&&record.item)introduction=L.markdown(record.item.body);}
   const crumbs=D.ancestors(node.id).map(n=>n.id===node.id?'<span aria-current="page">'+esc(n.name)+'</span>':'<a href="'+esc(D.url(n))+'">'+esc(n.name)+'</a>').join('<span aria-hidden="true">/</span>');
   document.title=node.name+' · FoamLab';hub.innerHTML='<nav class="topic-breadcrumbs" aria-label="专题导航">'+crumbs+'</nav><header class="topic-detail-header"><div><h1>'+esc(node.name)+'</h1><p>'+esc(node.description||intro?.summary||'')+'</p><nav class="topic-section-links" aria-label="专题内容"><a href="#topic-courses">内容目录 · '+selected.length+' 篇 ↓</a></nav></div>'+(intro?figure(intro):'')+'</header>'+(introduction?'<section class="topic-introduction"><div class="prose">'+introduction+'</div></section>':'')+(subtopics.length?'<section id="topic-branches"><h2>'+ (node.key==='topic-meshes'?'选择网格主题':'子专题') +'</h2><div class="topic-collection-grid">'+collection(subtopics)+'</div></section>':'')+'<section id="topic-courses"><h2>'+'内容目录'+'</h2><div class="lab-card-grid"></div></section>';
   const grid=hub.querySelector('.lab-card-grid');window.foamListState.remember(grid);await L.names(selected.filter(r=>['article','log'].includes(r.kind)).map(r=>r.author_id));
