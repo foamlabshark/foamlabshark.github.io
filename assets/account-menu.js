@@ -37,7 +37,7 @@
   }else{put('#account-panel-level',auth.petError?'等级暂未读取':'等级读取中…');put('#account-panel-xp',auth.petError?'可前往“我的熊猫”重试':'正在读取成长记录');$('#account-panel-xp-bar').style.width='0%';}
   panel.querySelectorAll('[data-account-sign-out]').forEach(b=>{b.disabled=auth.signingOut;b.textContent=auth.signingOut?'正在退出…':'退出登录';});
   $('#account-panel-sign-in').disabled=auth.loading||!auth.configured;
-  panel.querySelectorAll('[data-management-link]').forEach(a=>a.hidden=!['admin','editor','moderator'].includes(window.FoamLab?.role));
+  panel.querySelectorAll('[data-management-link]').forEach(a=>a.hidden=window.FoamLab?.role!=='admin');
  }
  function position(){
   const r=trigger.getBoundingClientRect(),width=Math.min(340,innerWidth-24);

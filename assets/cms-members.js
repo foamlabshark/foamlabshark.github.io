@@ -1,13 +1,13 @@
 'use strict';
 (() => {
- const roles={member:'普通会员',editor:'普通作者（原编辑）',moderator:'普通作者（原版主）',admin:'管理员',blocked:'禁止发言与投稿'};
- const abilities={member:'发布自己的文章，参与讨论和评论。',editor:'仅管理自己的问题与分享文章，不具备站点管理权限。',moderator:'仅管理自己的问题与分享文章，不具备站点管理权限。',admin:'管理全站内容、成员权限和网站设置。',blocked:'暂停发表文章、讨论、回复和评论。'};
+ const roles={member:'普通会员',editor:'普通作者',admin:'管理员',blocked:'禁止发言与投稿'};
+ const abilities={member:'发布自己的文章，参与讨论和评论。',editor:'发布和管理自己的文章、问题、回复与评论。',admin:'管理全站内容、成员权限和网站设置。',blocked:'暂停发表文章、讨论、回复和评论。'};
  let savedState=null;
  window.FoamCMSMembers=async C=>{
   if(!C.admin)throw Error('成员管理需要管理员权限。');
   const {L,UI,run,notice}=C,esc=L.esc,panel=document.querySelector('#cms-panel');
   if(savedState?.user!==L.user.id)savedState={user:L.user.id,q:'',role:'',sort:'registered_at',direction:'desc',page:1,size:25};
-  const state=savedState;let members=[],request=0,timer;
+  const state=savedState;if(state.role==='moderator')state.role='editor';let members=[],request=0,timer;
   const opts=(items,selected)=>Object.entries(items).map(([v,label])=>'<option value="'+esc(v)+'" '+(String(selected)===v?'selected':'')+'>'+esc(label)+'</option>').join('');
   panel.innerHTML='<section class="cms-members"><div class="cms-toolbar"><div><h2>成员管理</h2><p>查看全部注册用户，在列表中调整成员权限。</p></div><button type="button" class="button secondary" data-members-refresh>刷新列表</button></div><div class="cms-member-filters"><label class="cms-member-search"><span>搜索成员</span><input type="search" data-member-filter="q" maxlength="200" placeholder="昵称、GitHub 用户名、邮箱或用户 ID" value="'+esc(state.q)+'"></label><label><span>权限筛选</span><select data-member-filter="role">'+opts({'':'全部权限',...roles},state.role)+'</select></label><label><span>排序依据</span><select data-member-filter="sort">'+opts({registered_at:'注册时间',last_sign_in_at:'最近登录',username:'用户名',level:'等级'},state.sort)+'</select></label><label><span>排序方向</span><select data-member-filter="direction">'+opts({desc:'降序',asc:'升序'},state.direction)+'</select></label><label><span>每页显示</span><select data-member-filter="size">'+opts({25:'25 人',50:'50 人',100:'100 人'},state.size)+'</select></label><button type="button" class="text-button" data-members-reset>重置筛选</button></div><details class="cms-member-help"><summary>各类权限可以做什么</summary><dl>'+Object.entries(roles).map(([key,label])=>'<div><dt>'+label+'</dt><dd>'+abilities[key]+'</dd></div>').join('')+'</dl></details><p class="cms-member-status" role="status" aria-live="polite">正在读取注册成员…</p><div class="cms-member-results"></div><div class="cms-member-pager"></div></section>';
   const view=panel.querySelector('.cms-members'),results=view.querySelector('.cms-member-results'),pager=view.querySelector('.cms-member-pager'),status=view.querySelector('.cms-member-status');
@@ -23,7 +23,7 @@
     if(id!==request||!view.isConnected)return;
     const data=L.check(await L.client.rpc('foamlab_admin_members',{p_query:state.q.trim(),p_role:state.role,p_sort:state.sort,p_direction:state.direction,p_page:state.page,p_size:Number(state.size)}));
     if(id!==request||!view.isConnected)return;
-    members=data.items;state.page=data.page;table();pager.innerHTML=UI.pager(state.page,data.total,Number(state.size));
+    members=data.items.map(m=>({...m,role:m.role==='moderator'?'editor':m.role}));state.page=data.page;table();pager.innerHTML=UI.pager(state.page,data.total,Number(state.size));
     status.textContent='共 '+data.total+' 位成员'+(state.q.trim()||state.role?' · 已应用筛选':'')+' · 最近登录按已登录状态下的访问时间记录；时间按当前设备时区显示';
    }catch(e){
     if(id!==request||!view.isConnected)return;
