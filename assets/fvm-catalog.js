@@ -29,7 +29,8 @@
     const part=rows.filter(x=>x.metadata.fvm_book.part===i+1),chapters=[...new Set(part.map(x=>x.metadata.fvm_book.chapter))];
     return `<section class="fvm-part" id="part-${i+1}"><h2>${i<4?'第'+['一','二','三','四'][i]+'部分 · ':''}${name}</h2>${chapters.map(ch=>{
      const items=part.filter(x=>x.metadata.fvm_book.chapter===ch),m=items[0].metadata.fvm_book;
-     return `<details class="fvm-chapter" id="chapter-${ch}" ${ch===1?'open':''}><summary>${ch===21?'附录':'第 '+ch+' 章'}　${esc(m.chapter_title)}<small>${items.length} 节</small></summary><ol>${items.map(x=>`<li><a href="/read/?slug=${encodeURIComponent(x.slug)}">${esc(x.title)}</a><p>${esc(x.summary)}</p></li>`).join('')}</ol></details>`;
+     const heading=ch===21?'附录 · '+m.chapter_title.replace(/^\s*附录\s*[:：·]?\s*/,''):'第 '+ch+' 章　'+m.chapter_title;
+     return `<details class="fvm-chapter" id="chapter-${ch}" ${ch===1?'open':''}><summary>${esc(heading)}<small>${items.length} 节</small></summary><ol>${items.map(x=>`<li><a href="/read/?slug=${encodeURIComponent(x.slug)}">${esc(x.title)}</a><p>${esc(x.summary)}</p></li>`).join('')}</ol></details>`;
     }).join('')}</section>`;
    }).join('');
    document.getElementById('fvm-count').textContent=`20 章及附录 · ${rows.length} 节课程`;
