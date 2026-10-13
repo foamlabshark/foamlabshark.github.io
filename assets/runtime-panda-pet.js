@@ -87,7 +87,7 @@
  let tab="outfit",userId=null,revision=0,state=null,busy=false,refreshTimer,lastFetch=0,lastTap=0,lastTapPoint=null;
  let tipIndex=read('foamlab-panda-tip',Math.floor(Math.random()*tips.length)),clickTimer,bubbleTimer,travelFrame=0,drag=null,suppressClick=false,openOnClick=false;
  const pet=document.createElement('aside');pet.id='panda-pet';pet.className='panda-pet';pet.hidden=true;pet.setAttribute('aria-label','熊猫学习伙伴');
- pet.innerHTML=`<div class="panda-bubble" hidden role="status"><button class="panda-bubble-close" aria-label="关闭熊猫提示" type="button">×</button><strong>熊猫说</strong><p></p><button type="button" class="panda-tip-search">查找相关内容 →</button></div><button type="button" class="panda-grab" aria-label="熊猫：单击听小技巧，双击搜索；方向键移动" title="单击：小技巧 · 双击：搜索 · 拖动：移动">${art(false,'熊猫学习伙伴')}</button><a class="panda-nameplate" href="/account/#my-panda"><span></span><b></b></a><div class="panda-tools"><button type="button" data-pet-menu aria-label="熊猫动作" title="选个动作" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button><button type="button" data-pet-search aria-label="站内搜索" title="搜索站内内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" data-pet-checkin aria-label="每日签到" title="每日签到"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></button><button type="button" data-pet-hide aria-label="收起熊猫" title="收起熊猫"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button></div>`;
+ pet.innerHTML=`<div class="panda-bubble" hidden role="status"><button class="panda-bubble-close" aria-label="关闭熊猫提示" type="button">×</button><strong class="panda-note-heading">${art(true)}<span>熊猫说</span></strong><p></p><button type="button" class="panda-tip-search">查找相关内容 →</button></div><button type="button" class="panda-grab" aria-label="熊猫：单击听小技巧，双击搜索；方向键移动" title="单击：小技巧 · 双击：搜索 · 拖动：移动">${art(false,'熊猫学习伙伴')}</button><a class="panda-nameplate" href="/account/#my-panda"><span></span><b></b></a><div class="panda-tools"><button type="button" data-pet-menu aria-label="熊猫动作" title="选个动作" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button><button type="button" data-pet-search aria-label="站内搜索" title="搜索站内内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" data-pet-checkin aria-label="每日签到" title="每日签到"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></button><button type="button" data-pet-hide aria-label="收起熊猫" title="收起熊猫"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button></div>`;
  document.body.append(pet);
  const menu=document.createElement('div');menu.className='panda-play-menu';menu.hidden=true;menu.id='panda-play-menu';menu.setAttribute('aria-label','熊猫动作');pet.append(menu);$('[data-pet-menu]',pet).setAttribute('aria-controls',menu.id);
  const dock=document.createElement('button');dock.type='button';dock.className='panda-dock';dock.hidden=true;dock.setAttribute('aria-label','显示熊猫学习伙伴');dock.title='显示熊猫';dock.innerHTML=art(true);document.body.append(dock);
@@ -200,6 +200,12 @@
 'use strict';
 (() => {
  const mark=window.foamPandaArt(true);
+ const namedPrefix=/^\s*熊猫说(?:\s*[：:]\s*|\s*$)/;
+ const containers='blockquote,.tip,.callout-tip,.note,.panda-note';
+ function headingIcon(el){
+  if(!el.querySelector(':scope > .panda-face'))el.insertAdjacentHTML('afterbegin',mark);
+  el.classList.add('panda-note-heading');
+ }
  function removePrefix(element,length){
   const walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
   let node=walker.nextNode(),remaining=length;
@@ -211,20 +217,30 @@
   element.querySelectorAll('strong,b').forEach(el=>{if(!el.textContent.trim())el.remove();});
  }
  function enhance(){
+  // Explicit Panda notes also occur as plain paragraphs or section headings.
+  // Preserve their original content, links, formulas and heading anchors.
+  document.querySelectorAll('.prose p,.prose h2,.prose h3,.prose h4,.prose h5,.prose h6,.prose summary').forEach(el=>{
+   if(!namedPrefix.test(el.textContent)||el.closest('pre,code,.lab-preview,.panda-note-label'))return;
+   if(el.closest(containers))return;
+   if(el.matches('p')){const note=document.createElement('aside');note.className='note';el.before(note);note.append(el);}
+   else headingIcon(el);
+  });
   // Restyle a few existing operational explanations without adding duplicate prose.
   const starts=['第一行适用于安装到该路径的 Ubuntu 软件包。','本例是二维方腔。','cp -r 复制整个目录','计算会频繁读写文件，Linux 本地目录','终端显示乱码时，检查文件编码','在另一个终端进入同一算例，执行 tail -f','修改一处打印文本，重新编译并运行。'];
   document.querySelectorAll('.prose > p').forEach(p=>{if(starts.some(s=>p.textContent.trim().startsWith(s))&&!p.closest('.panda-note')){const note=document.createElement('aside');note.className='note';p.before(note);note.append(p);}});
   // Only explicit short learning tips, never source quotations or warnings.
-  document.querySelectorAll('.prose blockquote,.prose .tip,.prose .callout-tip,.prose .note').forEach(el=>{
-   if(el.dataset.pandaNote)return;
+  document.querySelectorAll('.prose blockquote,.prose .tip,.prose .callout-tip,.prose .note,.prose .panda-note').forEach(el=>{
+   if(el.closest('pre,code,.lab-preview'))return;
+   const existing=el.querySelector(':scope > .panda-note-label');
+   if(existing){headingIcon(existing);el.dataset.pandaNote='true';el.classList.add('panda-note');return;}
    const first=el.firstElementChild,lead=first?.querySelector(':scope > strong:first-child');
-   const named=el.textContent.match(/^\s*熊猫说\s*[：:]\s*/);
+   const named=(first?.textContent||el.textContent).match(namedPrefix);
    const explicit=el.matches('.tip,.callout-tip,.note');
    if(!named&&(el.querySelector('pre,figure,table')||el.textContent.length>450))return;
    if(!named&&!explicit&&!(lead&&/^(提示|小提示|小技巧|操作提示|学习提示)[：:]?$/.test(lead.textContent.trim())))return;
    el.dataset.pandaNote='true';el.classList.add('panda-note');
    if(named)removePrefix(el,named[0].length);else if(lead)lead.remove();
-   const label=document.createElement('div');label.className='panda-note-label';label.innerHTML=mark+'<span>熊猫说</span>';el.prepend(label);
+   const label=document.createElement('div');label.className='panda-note-label panda-note-heading';label.innerHTML=mark+'<span>熊猫说</span>';el.prepend(label);
   });
  }
  enhance();window.addEventListener('foamlab:content-ready',enhance);document.addEventListener('foamlab:content-ready',enhance);
