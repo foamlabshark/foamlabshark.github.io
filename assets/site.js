@@ -31,7 +31,7 @@
   if(!open&&restoreFocus)menu?.focus();
   document.body.classList.toggle('nav-open',open);menu?.setAttribute('aria-expanded',String(open));
   if(!sidebar)return;
-  sidebar.inert=mobileNav.matches&&!open;
+  sidebar.inert=mobileNav.matches?!open:document.documentElement.classList.contains('sidebar-collapsed');
   if(sidebar.inert)sidebar.setAttribute('aria-hidden','true');else sidebar.removeAttribute('aria-hidden');
   if(open){sidebar.setAttribute('role','dialog');sidebar.setAttribute('aria-modal','true');sidebar.setAttribute('aria-label','网站导航');navFocusable()[0]?.focus();}
   else{sidebar.removeAttribute('role');sidebar.removeAttribute('aria-modal');sidebar.removeAttribute('aria-label');}

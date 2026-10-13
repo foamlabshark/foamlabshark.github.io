@@ -10,7 +10,7 @@
  // Accented Latin letters and combining marks remain part of a word, so a
  // field such as P must not be extracted from Péclet. Chinese prose can still
  // sit directly beside an OpenFOAM keyword without surrounding spaces.
- const wordBoundary=/[\w@.\/\-\p{Script=Latin}\p{M}]/u;
+ const wordBoundary=/[\w@.\/\-\u2010-\u2015\p{Script=Latin}\p{M}]/u;
  function parts(text,parameter=false){
   const result=[];let offset=0;
   const pattern=/\$[A-Za-z_][\w]*(?:\/[\w.*-]+)*|--?[A-Za-z][\w-]*|[A-Za-z_][\w]*(?:(?:[.:/]|::)[\w*]+)*/g;

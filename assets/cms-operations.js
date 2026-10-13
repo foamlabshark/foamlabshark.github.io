@@ -3,21 +3,47 @@ window.FoamCMSOperations=async C=>{
  if(!C.admin)throw Error('维护日志仅供管理员查看。');
  const {L,UI}=C,esc=L.esc,panel=document.querySelector('#cms-panel'),labels={create:'新增',update:'修改',publish:'发布',archive:'下架',trash:'移入回收站',restore:'恢复',delete:'永久删除',move:'调整位置',snapshot:'首次同步基线'};
  panel.innerHTML='<section class="cms-operations"><div class="cms-toolbar"><div><h2>维护日志</h2><p>保留最近一个月的文章与栏目操作记录，过期日志自动清理。</p></div><button class="button secondary" data-operations-refresh>刷新</button></div><div class="cms-filters"><select aria-label="操作对象" data-operation-entity><option value="">文章与栏目</option><option value="content">文章</option><option value="section">栏目</option></select><select aria-label="操作类型" data-operation-kind><option value="">全部操作</option>'+Object.entries(labels).filter(([k])=>k!=='snapshot').map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></div><p class="muted" role="status" data-operation-state>正在读取维护日志…</p><div class="table-scroll" data-operation-list></div><div data-operation-pager></div><details class="cms-member-help"><summary>本地同步与发布</summary><p>双击本地工程中的“发布学习网站.cmd”，程序会先读取网站的最新内容状态，更新文章、栏目和检索目录，再检查并发布网站。也可以双击“同步网站内容.cmd”单独同步。</p><p>本地与网站同时修改同一篇文章时，程序会保留两份内容并暂停发布，比较后再继续。下架、回收站和删除操作同步对应的内容状态；原本地文件保存在同步备份中。</p></details></section>';
+ const filters=panel.querySelector('.cms-filters');
+ filters.classList.add('cms-operation-filters');
+ filters.insertAdjacentHTML('afterbegin','<label><span>操作者</span><input type="search" maxlength="120" placeholder="输入操作者名称" data-operation-actor></label><label><span>开始日期</span><input type="date" data-operation-start></label><label><span>结束日期</span><input type="date" data-operation-end></label>');
+ for(const [selector,label] of [['[data-operation-entity]','操作对象'],['[data-operation-kind]','操作类型']]){
+  const select=filters.querySelector(selector),wrapper=document.createElement('label');
+  const caption=document.createElement('span');caption.textContent=label;
+  select.before(wrapper);wrapper.append(caption,select);
+ }
+ filters.insertAdjacentHTML('beforeend','<button class="button secondary" type="button" data-operation-reset>重置筛选</button>');
  panel.querySelector('.cms-operations').insertAdjacentHTML('beforeend','<details class="cms-member-help"><summary>登记本机同步连接</summary><p>新电脑运行本地初始化程序后，将输出的连接信息粘贴到这里。连接只用于读取日志和文章，由当前管理员管理。</p><form data-sync-register><label class="form-field"><span>本机连接信息</span><textarea name="connection" rows="4" maxlength="600" required></textarea></label><button class="button secondary" type="submit">登记连接</button><p role="status" data-sync-register-state></p></form></details>');
  const view=panel.querySelector('.cms-operations'),list=view.querySelector('[data-operation-list]'),state=view.querySelector('[data-operation-state]'),pager=view.querySelector('[data-operation-pager]');let page=1,request=0,latest=null,polling=false,refreshedMinute=-1;
- async function load(){const current=++request;state.textContent='正在读取维护日志…';list.inert=true;try{
+ const actor=view.querySelector('[data-operation-actor]'),start=view.querySelector('[data-operation-start]'),end=view.querySelector('[data-operation-end]');let filterTimer=null;
+ // The table uses local dates; include the entire selected end date, also across DST changes.
+ function dateBoundary(value,nextDay=false){const date=new Date(value+'T00:00:00');if(nextDay)date.setDate(date.getDate()+1);return date.toISOString();}
+ async function load(){const current=++request;
+  if(!view.isConnected)return false;
+  if(!start.validity.valid||!end.validity.valid||(start.value&&end.value&&start.value>end.value)){
+   state.textContent='请选择有效的日期范围，开始日期不能晚于结束日期。';list.innerHTML='';pager.innerHTML='';list.inert=false;return false;
+  }
+  state.textContent='正在读取维护日志…';list.inert=true;try{
   let query=L.client.from('foamlab_content_operations').select('id,entity,record_id,operation,actor_name,actor_role,title,slug,previous_status,current_status,changed_fields,created_at',{count:'exact'}).neq('operation','snapshot');
   const entity=view.querySelector('[data-operation-entity]').value,operation=view.querySelector('[data-operation-kind]').value;
   if(entity)query=query.eq('entity',entity);if(operation)query=query.eq('operation',operation);
+  const name=actor.value.trim();
+  if(name)query=query.ilike('actor_name','%'+name.replace(/[\\%_*]/g,'\\$&')+'%');
+  if(start.value)query=query.gte('created_at',dateBoundary(start.value));
+  if(end.value)query=query.lt('created_at',dateBoundary(end.value,true));
   const response=await query.order('id',{ascending:false}).range((page-1)*25,page*25-1),rows=L.check(response);if(current!==request||!view.isConnected)return false;
   const pages=Math.max(1,Math.ceil((response.count??rows.length)/25));if(page>pages){page=pages;return load();}
   state.textContent='最近一个月共 '+(response.count??rows.length)+' 条操作记录';
   list.innerHTML=rows.length?'<table class="cms-member-table"><thead><tr><th>时间</th><th>操作者</th><th>对象</th><th>操作</th><th>修改内容</th></tr></thead><tbody>'+rows.map(r=>'<tr><td data-label="时间">'+esc(new Date(r.created_at).toLocaleString('zh-CN',{hour12:false}))+'</td><td data-label="操作者">'+esc(r.actor_name)+(r.actor_id?'<small>'+esc(r.actor_id)+'</small>':'')+(r.actor_role==='system'?' · 系统':'')+'</td><td data-label="对象">'+esc(r.entity==='section'?'栏目':'文章')+' · '+esc(r.title)+'<small>'+esc(r.slug)+'</small></td><td data-label="操作">'+esc(labels[r.operation]||r.operation)+'</td><td data-label="修改内容">'+esc((r.changed_fields||[]).map(k=>({read_access:'阅读权限',title:'标题',body:'正文',summary:'摘要',metadata:'配置与附件',section_ids:'所在栏目',status:'状态',cover_url:'封面',name:'名称',parent_id:'上级栏目',visible:'显示状态',sort_order:'排序'})[k]||k).join('、'))+'</td></tr>').join('')+'</tbody></table>':'<p class="cms-empty">尚无符合条件的操作记录。</p>';
   pager.innerHTML=UI.pager(page,response.count??rows.length,25);return true;
- }catch(e){if(current===request&&view.isConnected){state.textContent=e.message;list.innerHTML='<p class="cms-empty">维护日志暂时无法读取，请刷新重试。</p>';}return false;}finally{if(current===request)list.inert=false;}}
+ }catch(e){if(current===request&&view.isConnected){state.textContent=e.message;list.innerHTML='<p class="cms-empty">维护日志暂时无法读取，请刷新重试。</p>';pager.innerHTML='';}return false;}finally{if(current===request)list.inert=false;}}
  view.querySelector('[data-sync-register]').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,button=form.querySelector('button'),note=form.querySelector('[data-sync-register-state]');button.disabled=true;try{const connection=JSON.parse(form.elements.connection.value);if(connection.project_id!=='nmkforbzmbstasnjxlid'||!connection.client_id||!connection.key_hash)throw Error('请粘贴初始化程序输出的完整连接信息。');L.check(await L.client.rpc('foamlab_register_content_sync_client',{p_client_id:connection.client_id,p_key_hash:connection.key_hash}));form.reset();note.textContent='本机同步连接已登记，可以继续本地发布。';}catch(error){note.textContent=error instanceof SyntaxError?'连接信息不是有效的 JSON，请重新粘贴。':error.message;}finally{button.disabled=false;}};
- view.querySelectorAll('select').forEach(e=>e.onchange=()=>{page=1;void load();});view.querySelector('[data-operations-refresh]').onclick=()=>void load();pager.onclick=e=>{const b=e.target.closest('[data-page]');if(b&&!b.disabled){page=Number(b.dataset.page);void load();}};
- async function refreshIfChanged(){if(polling||document.hidden||!view.isConnected)return;polling=true;try{const rows=L.check(await L.client.from('foamlab_content_operations').select('id').neq('operation','snapshot').order('id',{ascending:false}).limit(1));const id=rows[0]?.id||0;const minute=Math.floor(Date.now()/60000);if((id!==latest||minute!==refreshedMinute)&&!await load())return;latest=id;refreshedMinute=minute;}catch(e){if(latest===null&&view.isConnected){state.textContent=e.message;list.innerHTML='<p class="cms-empty">维护日志暂时无法读取，请刷新重试。</p>';}}finally{polling=false;}}
+ function filterChanged(delay=0){clearTimeout(filterTimer);++request;page=1;filterTimer=setTimeout(()=>{filterTimer=null;void load();},delay);}
+ filters.querySelectorAll('select,input[type=date]').forEach(e=>e.onchange=()=>filterChanged());
+ actor.oninput=()=>filterChanged(300);
+ actor.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();filterChanged();}};
+ view.querySelector('[data-operation-reset]').onclick=()=>{filters.querySelectorAll('input,select').forEach(e=>e.value='');filterChanged();};
+ view.querySelector('[data-operations-refresh]').onclick=()=>{clearTimeout(filterTimer);filterTimer=null;void load();};pager.onclick=e=>{const b=e.target.closest('[data-page]');if(b&&!b.disabled){page=Number(b.dataset.page);void load();}};
+ async function refreshIfChanged(){if(polling||filterTimer!==null||document.hidden||!view.isConnected)return;polling=true;try{const rows=L.check(await L.client.from('foamlab_content_operations').select('id').neq('operation','snapshot').order('id',{ascending:false}).limit(1));const id=rows[0]?.id||0;const minute=Math.floor(Date.now()/60000);if((id!==latest||minute!==refreshedMinute)&&!await load())return;latest=id;refreshedMinute=minute;}catch(e){if(latest===null&&view.isConnected){state.textContent=e.message;list.innerHTML='<p class="cms-empty">维护日志暂时无法读取，请刷新重试。</p>';}}finally{polling=false;}}
  const controller=new AbortController(),timer=setInterval(()=>{if(!view.isConnected){clearInterval(timer);controller.abort();return;}void refreshIfChanged();},15000);
  window.addEventListener('focus',()=>void refreshIfChanged(),{signal:controller.signal});document.addEventListener('visibilitychange',()=>void refreshIfChanged(),{signal:controller.signal});await refreshIfChanged();
 };
