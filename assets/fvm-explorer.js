@@ -2,6 +2,12 @@
 'use strict';
 (function(root){
  const finite={
+  steadyDiffusion(n,left,right,gamma=1){
+   const h=1/n,g=gamma/h,x=Array.from({length:n},(_,i)=>left+(right-left)*(i+.5)*h);
+   const A=this.diffusion(n,g),b=Array.from({length:n},(_,i)=>i===0?2*g*left:i===n-1?2*g*right:0);
+   const flux=[2*g*(left-x[0]),...x.slice(1).map((v,i)=>g*(x[i]-v)),2*g*(x[n-1]-right)];
+   return {h,g,x,A,b,flux};
+  },
   pressureFace(p,i,D=1,h=1){
    const left=(p[i+1]-p[i-1])/(2*h),right=(p[i+2]-p[i])/(2*h);
    const average=(left+right)/2,compact=(p[i+1]-p[i])/h;
@@ -52,6 +58,7 @@
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const fmt=n=>Math.abs(n)<1e-10?'0':Number(n.toFixed(3)).toString();
  function mount(host,type){
+  if(type==='diffusion')return diffusionExplorer(host);
   if(type==='pressure')return pressureExplorer(host);
   if(type==='time')return timeExplorer(host);
   if(type==='limiter')return limiterExplorer(host);
@@ -477,6 +484,46 @@
   svg.addEventListener('pointerup',()=>{drag=-1;});svg.addEventListener('pointercancel',()=>{drag=-1;});
   const io=new IntersectionObserver(es=>{if(!es[0].isIntersecting)pause();});io.observe(host);draw();
   return {pause,destroy(){pause();io.disconnect();}};
+ }
+ function diffusionExplorer(host){
+  host.classList.add('fvm-explorer','fvm-diffusion-linked');
+  let n=6,left=100,right=0,gamma=1,selected=0,drag=null,state;
+  host.innerHTML=`<div class="fvm-explorer-heading"><span class="fvm-explorer-kicker">交互推导</span><h3>从边界值到每个单元的扩散平衡</h3><p>拖动两端的橙色点改变边界值；移到单元或中心点上，查看该行方程与左右面通量。</p></div><div class="fvm-explorer-controls fvm-controls"></div><div class="fvm-scene-scroll"><svg viewBox="0 0 900 470" role="group" aria-label="一维扩散的网格、剖面与边界"></svg></div><div class="fvm-equation-panel"></div><div class="fvm-explorer-detail"></div><output class="fvm-readout"></output>`;
+  const controls=host.querySelector('.fvm-controls'),svg=host.querySelector('svg'),panel=host.querySelector('.fvm-equation-panel'),detail=host.querySelector('.fvm-explorer-detail'),out=host.querySelector('output');
+  const slider=(key,label,min,max,value,step)=>{const wrap=document.createElement('label');wrap.innerHTML=`<span>${label} <b>${value}</b></span><input data-diffusion-control="${key}" aria-label="${label}" type="range" min="${min}" max="${max}" value="${value}" step="${step}">`;controls.append(wrap);};
+  slider('n','单元数 N',2,16,n,1);slider('left','左端值 φL',0,100,left,1);slider('right','右端值 φR',0,100,right,1);slider('gamma','扩散系数 Γ',.1,5,gamma,.1);
+  const tx=(x,y,s,size=17)=>`<text x="${x}" y="${y}" text-anchor="middle" style="font-size:${size}px">${s}</text>`;
+  function choose(i){
+   selected=Math.max(0,Math.min(n-1,i));
+   svg.querySelectorAll('[data-diffusion-cell]').forEach(el=>el.classList.toggle('is-linked',+el.dataset.diffusionCell===selected));
+   const s=state,k=selected,diag=s.A[k][k],terms=[];
+   if(k)terms.push(`− ${fmt(s.g)} φ${k}`);terms.push(`+ ${fmt(diag)} φ${k+1}`);if(k<n-1)terms.push(`− ${fmt(s.g)} φ${k+2}`);
+   panel.innerHTML=`<div class="fvm-equation"><span>单元 ${k+1} 的矩阵行</span><strong>${terms.join(' ')} = ${fmt(s.b[k])}</strong><small>φ${k+1} = ${fmt(s.x[k])}；中心系数 ${fmt(diag)}</small></div><div class="fvm-equation"><span>左面 · 沿 x 正向</span><strong>q左 = ${fmt(s.flux[k])}</strong><small>${k===0?'边界至中心只有 Δx/2，系数为 2Γ/Δx。':'相邻中心距离为 Δx，系数为 Γ/Δx。'}</small></div><div class="fvm-equation"><span>右面 · 沿 x 正向</span><strong>q右 = ${fmt(s.flux[k+1])}</strong><small>${k===n-1?'中心至边界只有 Δx/2，系数为 2Γ/Δx。':'相邻中心距离为 Δx，系数为 Γ/Δx。'}</small></div>`;
+   detail.textContent=k===0||k===n-1?'固定边界面到最近单元中心的距离为半个单元宽度。边界导通系数加倍，与另一个面的内部导通系数合并后，中心系数为 3Γ/Δx。':'内部单元两侧导通系数相等，因此中心值等于相邻两个中心值的平均值。两个面上的输运相互平衡，单元内没有积累。';
+   out.textContent=`取长度 L = 1、截面积 A = 1，无源、常扩散系数。Δx = ${fmt(s.h)}；净流出 q右 − q左 = ${fmt(s.flux[k+1]-s.flux[k])}。改变 Γ 会改变通量，给定两端值时线性剖面不变。`;
+  }
+  function draw(){
+   state=finite.steadyDiffusion(n,left,right,gamma);selected=Math.min(selected,n-1);
+   const width=720/n,yy=v=>405-2*v;
+   let s=tx(450,35,'上方：控制体与单元中心　下方：解析直线与离散中心值')+`<path d="M90 410H810M90 410V195" fill="none" stroke="#56776a"/>`;
+   for(const v of [0,25,50,75,100])s+=`<path d="M90 ${yy(v)}H810" stroke="#d5e1d8" stroke-width="1"/>`+tx(65,yy(v)+6,v,14);
+   s+=tx(450,455,'x / L')+tx(40,183,'φ')+tx(90,435,'0',14)+tx(810,435,'1',14);
+   for(let i=0;i<n;i++){const x=90+i*width,c=x+width/2;s+=`<g class="fvm-hotspot" data-diffusion-cell="${i}" tabindex="0" role="button" aria-label="选择单元 ${i+1}"><rect class="fvm-cell-shape" x="${x}" y="70" width="${width}" height="85"/><circle class="fvm-centre-dot" cx="${c}" cy="112" r="4"/>${tx(c,139,i+1,14)}</g>`;}
+   s+=`<path d="M90 ${yy(left)}L810 ${yy(right)}" stroke="#307365" stroke-width="3" fill="none"/>`;
+   for(let i=0;i<n;i++){const c=90+(i+.5)*width;s+=`<g class="fvm-hotspot" data-diffusion-cell="${i}" tabindex="0" role="button" aria-label="查看中心值 ${i+1}"><circle class="fvm-cell-shape" cx="${c}" cy="${yy(state.x[i])}" r="7"/></g>`;}
+   for(const [key,x,value,label] of [['left',90,left,'左端'],['right',810,right,'右端']])s+=`<g class="fvm-hotspot" data-diffusion-boundary="${key}" tabindex="0" role="slider" aria-label="${label}边界值" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value}"><circle class="fvm-drag-handle" cx="${x}" cy="${yy(value)}" r="11"/>${tx(x,yy(value)-19,label+' '+fmt(value),15)}</g>`;
+   svg.innerHTML=s;
+   for(const [key,value] of Object.entries({n,left,right,gamma})){const input=controls.querySelector('[data-diffusion-control="'+key+'"]');input.value=value;input.previousElementSibling.querySelector('b').textContent=fmt(value);}
+   choose(selected);
+  }
+  controls.addEventListener('input',e=>{const key=e.target.dataset.diffusionControl,value=+e.target.value;if(key==='n')n=value;if(key==='left')left=value;if(key==='right')right=value;if(key==='gamma')gamma=value;draw();});
+  const pick=e=>{const cell=e.target.closest('[data-diffusion-cell]');if(cell)choose(+cell.dataset.diffusionCell);};
+  svg.addEventListener('pointerover',pick);svg.addEventListener('focusin',pick);svg.addEventListener('click',pick);
+  svg.addEventListener('keydown',e=>{const boundary=e.target.closest('[data-diffusion-boundary]'),cell=e.target.closest('[data-diffusion-cell]');if(boundary&&['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const key=boundary.dataset.diffusionBoundary,delta=e.key==='ArrowUp'?1:-1;if(key==='left')left=Math.max(0,Math.min(100,left+delta));else right=Math.max(0,Math.min(100,right+delta));draw();svg.querySelector('[data-diffusion-boundary="'+key+'"]').focus();}else if(cell&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();choose(selected+(e.key==='ArrowLeft'?-1:1));svg.querySelector('[data-diffusion-cell="'+selected+'"]').focus();}});
+  svg.addEventListener('pointerdown',e=>{const boundary=e.target.closest('[data-diffusion-boundary]');if(!boundary)return;e.preventDefault();drag=boundary.dataset.diffusionBoundary;svg.setPointerCapture(e.pointerId);});
+  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse()),value=Math.round(Math.max(0,Math.min(100,(405-p.y)/2)));if(drag==='left')left=value;else right=value;draw();});
+  const end=()=>{drag=null;};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+  draw();return {pause(){drag=null;},destroy(){host.replaceChildren();}};
  }
  root.FoamFVMExplorer={mount,math:finite};
 })(typeof window==='undefined'?globalThis:window);
