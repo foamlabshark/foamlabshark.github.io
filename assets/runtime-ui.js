@@ -27,7 +27,7 @@
  D.url=n=>{if(n?.href&&!n.href.startsWith('/read/?')&&!(n.key==='programming-examples'&&n.href.startsWith('/programming/?'))){try{const u=new URL(n.href,location.origin);if(u.origin===location.origin)return u.pathname+u.search+u.hash;}catch{}}return '/section/?id='+encodeURIComponent(n.id);};
  D.locations=row=>(row.section_ids||[]).map(D.path).filter(Boolean);
  D.options=(selected='',exclude=[])=>'<option value="">顶层模块</option>'+D.nodes.filter(n=>!exclude.includes(n.id)).map(n=>'<option value="'+n.id+'" '+(n.id===selected?'selected':'')+'>'+esc(D.path(n.id))+'</option>').join('');
- D.current=(nodes=D.nodes)=>{const u=new URL(location.href),id=u.searchParams.get('id');if(u.pathname==='/section/')return nodes.find(n=>n.id===id);return nodes.filter(n=>n.href&&n.href!=='/admin/'&&(()=>{const v=new URL(n.href,location.origin);return v.pathname===u.pathname&&[...v.searchParams].every(([k,x])=>u.searchParams.get(k)===x);})()).sort((a,b)=>new URL(b.href,location.origin).search.length-new URL(a.href,location.origin).search.length)[0];};
+ D.current=(nodes=D.nodes)=>{const u=new URL(location.href),id=u.searchParams.get('id');if(u.pathname==='/section/')return nodes.find(n=>n.id===id);return nodes.filter(n=>n.href&&n.href!=='/admin/'&&(()=>{const v=new URL(n.href,location.origin);return v.pathname===u.pathname&&(!v.hash||v.hash===u.hash)&&[...v.searchParams].every(([k,x])=>u.searchParams.get(k)===x);})()).sort((a,b)=>(new URL(b.href,location.origin).search+new URL(b.href,location.origin).hash).length-(new URL(a.href,location.origin).search+new URL(a.href,location.origin).hash).length)[0];};
  const contentReads=new Map(),hintKey='foamlab.directory-hint.v1';
  function readContent(ids){
   const key=[...ids].sort().join(',');if(contentReads.has(key))return contentReads.get(key);
@@ -36,9 +36,9 @@
  }
  function prefetchCatalog(){
   // Cached IDs only schedule a fresh request. Never render cached names or rows.
-  const catalog=document.querySelector('[data-lab-catalog]'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!hub&&!home)return;
+  const catalog=document.querySelector('[data-lab-catalog],#fvm-catalog'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!hub&&!home)return;
   try{const saved=JSON.parse(sessionStorage.getItem(hintKey)||'null');if(!saved||saved.user!==(L.user?.id||null)||Date.now()-saved.at>86400000||!Array.isArray(saved.nodes)||saved.nodes.length>2000)return;
-   const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||hub?.dataset.root||'topics',node=(!home&&D.current(nodes))||nodes.find(n=>n.key===key);
+   const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||(catalog?.id==='fvm-catalog'?'fvm':'')||hub?.dataset.root||'topics',node=(!home&&catalog?.id!=='fvm-catalog'&&D.current(nodes))||nodes.find(n=>n.key===key);
    if(node)void readContent(D.descendants(node.id,nodes)).catch(()=>{});
   }catch{}
  }
@@ -97,7 +97,7 @@
   }
   // Home, quick start and functional pages can host newly placed content too.
   const current=D.current();
-  if(current&&!reference&&!document.querySelector('[data-lab-catalog],#topic-hub,#fo-list,#model-list,.quick-reference-hub,#live-article,.article[data-cms-slug],#cms-root,#town-app')&&!location.pathname.startsWith('/admin/')){
+  if(current&&!reference&&!document.querySelector('[data-lab-catalog],#fvm-catalog,#topic-hub,#fo-list,#model-list,.quick-reference-hub,#live-article,.article[data-cms-slug],#cms-root,#town-app')&&!location.pathname.startsWith('/admin/')){
    try{
     const host=document.querySelector('main .page-wrap')||document.querySelector('main'),links=new Set([...host.querySelectorAll('a[href]')].map(a=>new URL(a.href).pathname+new URL(a.href).search));
     const children=D.children(current.id).filter(n=>D.isVisible(n)&&!links.has(n.href)&&!links.has(D.url(n)));
@@ -516,16 +516,24 @@
 /* fvm-loader.js */
 'use strict';
 (() => {
- if(!/\/(read|fvm)\//.test(location.pathname))return;
+ if(!/\/read\//.test(location.pathname))return;
  let loading=false;
  function scan(){
-  if(!document.querySelector('.fvm-lab,.fvm-book-art,#fvm-catalog'))return;
+  const book=!!window.foamCurrentContent?.metadata?.fvm_book;
+  document.querySelector('#live-article')?.classList.toggle('fvm-book-lesson',book);
+  if(!book&&!document.querySelector('.fvm-lab,.fvm-book-art'))return;
+  if(!document.querySelector('link[data-fvm-style]')){const css=document.createElement('link');css.rel='stylesheet';css.dataset.fvmStyle='true';css.href='/assets/fvm-labs.css?v=20261013-fvm-navigation';document.head.append(css);}
+  for(const img of document.querySelectorAll('.fvm-book-art img:not([data-fvm-sized])')){
+   const width=Number(img.getAttribute('width'));
+   if(width>0&&width<20000)img.style.setProperty('--fvm-art-width',Math.min(width/2,840)+'px');
+   img.dataset.fvmSized='true';
+  }
+  if(!document.querySelector('.fvm-lab'))return;
   if(window.FoamFVM){window.FoamFVM.mount();return;}
   if(loading)return;loading=true;
-  if(!document.querySelector('link[data-fvm-style]')){const css=document.createElement('link');css.rel='stylesheet';css.dataset.fvmStyle='true';css.href='/assets/fvm-labs.css?v=20261013-expanded-final';document.head.append(css);}
-  const loadLabs=()=>{const js=document.createElement('script');js.src='/assets/fvm-labs.js?v=20261013-expanded-final';js.onload=()=>window.FoamFVM?.mount();js.onerror=()=>{loading=false;};document.head.append(js);};
+  const loadLabs=()=>{const js=document.createElement('script');js.src='/assets/fvm-labs.js?v=20261013-fvm-navigation';js.onload=()=>window.FoamFVM?.mount();js.onerror=()=>{loading=false;};document.head.append(js);};
   if(window.FoamFVMExplorer){loadLabs();return;}
-  const explorer=document.createElement('script');explorer.src='/assets/fvm-explorer.js?v=20261013-expanded-final';explorer.onload=loadLabs;explorer.onerror=()=>{loading=false;};document.head.append(explorer);
+  const explorer=document.createElement('script');explorer.src='/assets/fvm-explorer.js?v=20261013-fvm-navigation';explorer.onload=loadLabs;explorer.onerror=()=>{loading=false;};document.head.append(explorer);
  }
  let queued=false;const main=document.querySelector('main');
  if(main)new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;scan();});}).observe(main,{childList:true,subtree:true});
