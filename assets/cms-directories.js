@@ -28,6 +28,6 @@
    host.innerHTML='<h3>'+(api.treeTitle||(rootId?'资料目录':'网站目录'))+'</h3><div class="cms-tree-root-actions"><button class="directory-select '+(!selected?'selected':'')+'" data-select-directory="">'+(api.allLabel||(rootId?'全部资料':'全部内容'))+'</button><button class="directory-select '+(selected==='unassigned'?'selected':'')+'" data-select-directory="unassigned">未归类</button><button data-add-module>＋ 添加模块</button></div>'+D.children(rootId).map(branch).join('');
    host.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-tree-toggle')){const id=b.dataset.treeToggle;if(opened.has(id))opened.delete(id);else opened.add(id);mount(host);}else if(b.hasAttribute('data-select-directory'))select(b.dataset.selectDirectory);else if(b.hasAttribute('data-add-module'))run(()=>edit(null,rootId));};
   }
-  return {mount,edit:node=>run(()=>edit(node)),add:parent=>run(()=>edit(null,parent)),remove:node=>run(()=>remove(node)),refresh};
+  return {mount,edit:node=>run(()=>edit(node)),editPage:node=>run(()=>window.FoamCMSSectionPage({L,UI,notice,refresh},node)),add:parent=>run(()=>edit(null,parent)),remove:node=>run(()=>remove(node)),refresh};
  };
 })();

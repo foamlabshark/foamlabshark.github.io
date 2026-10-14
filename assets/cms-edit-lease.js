@@ -1,7 +1,7 @@
 'use strict';
-window.FoamCMSEditLease=L=>{
+window.FoamCMSEditLease=(L,entity='content')=>{
  let held=null,timer=null,form=null,restore=null,renewing=false;
- const call=(entry,action)=>L.client.rpc('foamlab_content_edit_lease',{p_content_id:entry.id,p_token:entry.token,p_action:action}).then(L.check);
+ const call=(entry,action)=>L.client.rpc(entity==='section'?'foamlab_section_edit_lease':'foamlab_content_edit_lease',{[entity==='section'?'p_section_id':'p_content_id']:entry.id,p_token:entry.token,p_action:action}).then(L.check);
  const message=data=>(data.owner_name||'另一位管理员')+'正在编辑此文档，请在其退出后重试。';
  function lost(reason){
   if(!form?.isConnected)return;
@@ -19,8 +19,9 @@ window.FoamCMSEditLease=L=>{
  async function release(){const previous=held;held=null;form=null;restore=null;clearInterval(timer);timer=null;if(previous)try{await call(previous,'release');}catch{/* An interrupted connection expires after 120 seconds. */}}
  async function open(id){if(held?.id!==id)await release();const entry=held||{id,token:crypto.randomUUID()};const data=await call(entry,'acquire');if(!data.acquired)throw Error(message(data));held=entry;entry.expires=data.expires_at;clearInterval(timer);timer=setInterval(()=>void renew(),30000);return data;}
  async function ensure(id){if(!held||held.id!==id)return open(id);const data=await call(held,'acquire');if(!data.acquired){lost(message(data));throw Error(message(data));}held.expires=data.expires_at;}
- window.addEventListener('pagehide',()=>void release());
- window.addEventListener('focus',()=>void renew());
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)void renew();});
- return {open,ensure,release,bind:f=>{form=f;},headers:query=>held?query.setHeader('x-foamlab-edit-token',held.token):query};
+ const onPageHide=()=>void release(),onFocus=()=>void renew(),onVisibility=()=>{if(!document.hidden)void renew();};
+ window.addEventListener('pagehide',onPageHide);
+ window.addEventListener('focus',onFocus);
+ document.addEventListener('visibilitychange',onVisibility);
+ return {open,ensure,release,dispose:async()=>{window.removeEventListener('pagehide',onPageHide);window.removeEventListener('focus',onFocus);document.removeEventListener('visibilitychange',onVisibility);await release();},bind:f=>{form=f;},headers:query=>held?query.setHeader('x-foamlab-edit-token',held.token):query};
 };

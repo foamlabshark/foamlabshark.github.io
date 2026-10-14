@@ -42,7 +42,7 @@
    if(node)void readContent(D.descendants(node.id,nodes)).catch(()=>{});
   }catch{}
  }
- D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('*').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;
+ D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('id,key,name,parent_id,href,description,nav_group,visible,sort_order,revision,created_at,updated_at,read_access').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;
   try{sessionStorage.setItem(hintKey,JSON.stringify({user:L.user?.id||null,at:Date.now(),nodes:nodes.map(({id,key,href,parent_id})=>({id,key,href,parent_id}))}));}catch{}
   return D;
  };
@@ -107,6 +107,48 @@
   }
  });
  window.addEventListener('popstate',()=>D.nav());
+})();
+
+;
+/* section-page.js */
+'use strict';
+(() => {
+ const L=window.FoamLab,D=window.FoamDirectory,requests=new Map();
+ const supported=node=>{const url=new URL(D.url(node),location.origin);return url.pathname!=='/'&&!/^\/(?:admin|studio|account|read|support|town)(?:\/|$)/.test(url.pathname);};
+ async function read(node,fresh=false){
+  if(fresh)requests.delete(node.id);
+  if(!requests.has(node.id))requests.set(node.id,L.client.from('foamlab_sections').select('id,name,description,page_content,revision').eq('id',node.id).maybeSingle().then(L.check).catch(error=>{requests.delete(node.id);throw error;}));
+  return requests.get(node.id);
+ }
+ async function defaults(node){
+  const result={subtitle:node.description||'',body:''};
+  if(!node.href||new URL(D.url(node),location.origin).pathname==='/section/')return result;
+  const response=await fetch(D.url(node));if(!response.ok)throw Error('入口页暂时无法读取，请稍后重试。');
+  const doc=new DOMParser().parseFromString(await response.text(),'text/html');
+  const heading=doc.querySelector('main .page-heading');
+  if(heading?.querySelector('p')&&!doc.querySelector('#topic-hub[data-topic]:not([data-topic=""])'))result.subtitle=heading.querySelector('p').textContent.trim();
+  // Existing rich introductions are registered explicitly; avoid consuming cards or course text.
+  const intro=doc.querySelector('[data-section-page-body]');
+  if(intro)result.body=[...intro.children].map(p=>p.textContent.trim()).join('\n\n');
+  return result;
+ }
+ async function apply(node){
+  if(!node||!supported(node)||document.querySelector('#cms-root,#live-article,.article[data-cms-slug]'))return;
+  const heading=document.querySelector('main .page-heading,main .topic-detail-header > div'),title=heading?.querySelector('h1');if(!title)return;
+  try{
+   const item=await read(node),value=item?.page_content;if(!value||!Object.keys(value).length||!heading.isConnected)return;
+   title.textContent=item.name;document.title=item.name+' · FoamLab';
+   if(typeof value.subtitle==='string'){let subtitle=heading.querySelector('p');if(!subtitle){subtitle=document.createElement('p');heading.append(subtitle);}subtitle.textContent=value.subtitle;subtitle.hidden=!value.subtitle;}
+   if(typeof value.body==='string'){
+    let intro=document.querySelector('[data-section-page-body]');
+    if(!intro){intro=document.createElement('div');intro.dataset.sectionPageBody='';(heading.closest('.catalog-header,.topic-detail-header')||heading).after(intro);}
+    intro.classList.add('prose','section-page-intro');intro.innerHTML=L.markdown(value.body);intro.hidden=!value.body.trim();
+   }
+   heading.dataset.sectionPageLoaded='true';
+  }catch{/* Retain the last locally synchronized introduction if the network is unavailable. */}
+ }
+ window.FoamSectionPage={supported,read,defaults,apply};
+ D.ready.then(()=>{if(D.available)void apply(D.current());});
 })();
 
 ;
@@ -431,12 +473,12 @@
   const ownIntro=(items,node)=>items.find(r=>(r.kind==='module'||r.metadata?.curriculum_series)&&r.kind!=='lesson'&&r.section_ids?.includes(node.id));
   const collection=(nodes=children)=>nodes.map(n=>{const ids=D.descendants(n.id),items=all.filter(r=>r.section_ids?.some(id=>ids.includes(id))),intro=ownIntro(items,n),count=items.filter(r=>r.id!==intro?.id&&r.kind!=='module'&&(!intro?.metadata?.curriculum_series||r.series===intro.metadata.curriculum_series)).length;return '<a class="topic-collection" href="'+esc(D.url(n))+'">'+(intro?figure(intro):'')+'<div class="topic-collection-body"><small>'+count+(programming?' 节课':' 篇内容')+'</small><h2>'+esc(n.name)+'</h2><p>'+esc(n.description||intro?.summary||'')+'</p><span class="text-link">进入'+collectionLabel+' →</span></div></a>';}).join('');
   if(home)home.innerHTML=collection();if(!hub)return;
-  if(node.id===root.id){hub.querySelector('h1').textContent=root.name;hub.querySelector('.page-content-loading')?.remove();const grid=document.createElement('div');grid.className='topic-collection-grid';grid.innerHTML=collection();hub.append(grid);return;}
+  if(node.id===root.id){hub.querySelector('h1').textContent=root.name;hub.querySelector('.page-content-loading')?.remove();const grid=document.createElement('div');grid.className='topic-collection-grid';grid.innerHTML=collection();hub.append(grid);void window.FoamSectionPage?.apply(node);return;}
   const ids=D.descendants(node.id),items=all.filter(r=>r.section_ids?.some(id=>ids.includes(id))),intro=ownIntro(items,node),selected=items.filter(r=>r.id!==intro?.id&&r.kind!=='module'&&(!intro?.metadata?.curriculum_series||r.series===intro.metadata.curriculum_series)),subtopics=D.children(node.id).filter(D.isVisible);
   let introduction='';if(intro){const userId=window.foamAuth.user?.id||null,record=L.check(await L.client.rpc('foamlab_read_article',{p_slug:intro.slug}));if((window.foamAuth.user?.id||null)===userId&&record.allowed&&record.item)introduction=L.markdown(record.item.body);}
   const crumbs=D.ancestors(node.id).map(n=>n.id===node.id?'<span aria-current="page">'+esc(n.name)+'</span>':'<a href="'+esc(D.url(n))+'">'+esc(n.name)+'</a>').join('<span aria-hidden="true">/</span>');
   document.title=node.name+' · FoamLab';hub.innerHTML='<nav class="topic-breadcrumbs" aria-label="专题导航">'+crumbs+'</nav><header class="topic-detail-header"><div><h1>'+esc(node.name)+'</h1><p>'+esc(node.description||intro?.summary||'')+'</p><nav class="topic-section-links" aria-label="专题内容"><a href="#topic-courses">内容目录 · '+selected.length+' 篇 ↓</a></nav></div>'+(intro?figure(intro):'')+'</header>'+(introduction?'<section class="topic-introduction"><div class="prose">'+introduction+'</div></section>':'')+(subtopics.length?'<section id="topic-branches"><h2>'+ (node.key==='topic-meshes'?'选择网格主题':'子专题') +'</h2><div class="topic-collection-grid">'+collection(subtopics)+'</div></section>':'')+'<section id="topic-courses"><h2>'+'内容目录'+'</h2><div class="lab-card-grid"></div></section>';
-  const grid=hub.querySelector('.lab-card-grid');window.foamListState.remember(grid);await L.names(selected.filter(r=>['article','log'].includes(r.kind)).map(r=>r.author_id));
+  void window.FoamSectionPage?.apply(node);const grid=hub.querySelector('.lab-card-grid');window.foamListState.remember(grid);await L.names(selected.filter(r=>['article','log'].includes(r.kind)).map(r=>r.author_id));
   let industrySelect,countLabel;
   if(node.key==='topic-engineering'){
    const industries=[...new Set(selected.map(r=>r.metadata?.industry).filter(Boolean))];
