@@ -1,7 +1,8 @@
 'use strict';
 (() => {
  const L=window.FoamLab,D=window.FoamDirectory,requests=new Map();
- const supported=node=>{const url=new URL(D.url(node),location.origin);return url.pathname!=='/'&&!/^\/(?:admin|studio|account|read|support|town)(?:\/|$)/.test(url.pathname);};
+ const supported=node=>{if(!node)return false;const url=new URL(D.url(node),location.origin);return !url.hash&&url.pathname!=='/'&&!/^\/(?:admin|studio|account|read|support|town)(?:\/|$)/.test(url.pathname);};
+ const entryNode=node=>{if(!node)return null;const url=new URL(D.url(node),location.origin);if(!url.hash)return node;return D.ancestors(node.id).reverse().find(parent=>{const target=new URL(D.url(parent),location.origin);return !target.hash&&target.pathname===url.pathname&&target.search===url.search;});};
  async function read(node,fresh=false){
   if(fresh)requests.delete(node.id);
   if(!requests.has(node.id))requests.set(node.id,L.client.from('foamlab_sections').select('id,name,description,page_content,revision').eq('id',node.id).maybeSingle().then(L.check).catch(error=>{requests.delete(node.id);throw error;}));
@@ -20,6 +21,7 @@
   return result;
  }
  async function apply(node){
+  node=entryNode(node);
   if(!node||!supported(node)||document.querySelector('#cms-root,#live-article,.article[data-cms-slug]'))return;
   const heading=document.querySelector('main .page-heading,main .topic-detail-header > div'),title=heading?.querySelector('h1');if(!title)return;
   try{
