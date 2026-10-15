@@ -236,14 +236,15 @@
  }
  function listShell(){
   const el=$('#my-notes');if(!el||el.dataset.ready)return;el.dataset.ready='true';
-  el.innerHTML='<div class="section-heading"><div><h2>我的笔记</h2><p class="muted">仅自己可见。点击标题返回关联的页面位置。</p></div><button class="button" data-new-private-note>新建笔记</button></div><div class="private-note-filters"><label>查找笔记<input type="search" maxlength="120" data-notes-search placeholder="按标题查找"></label><label>排序<select data-notes-order><option value="updated_at">最近修改</option><option value="created_at">最近创建</option><option value="title">标题</option></select></label></div><p data-notes-status role="status"></p><div class="private-note-list"></div><button class="button secondary" data-notes-more hidden>加载更多</button>';
+  el.innerHTML='<div class="section-heading"><div><h2>我的笔记</h2><p class="muted">仅自己可见。点击笔记打开窗口，点击“跳转到记录位置”返回关联页面。</p></div><button class="button" data-new-private-note>新建笔记</button></div><div class="private-note-filters"><label>查找笔记<input type="search" maxlength="120" data-notes-search placeholder="按标题查找"></label><label>排序<select data-notes-order><option value="updated_at">最近修改</option><option value="created_at">最近创建</option><option value="title">标题</option></select></label></div><p data-notes-status role="status"></p><div class="private-note-list"></div><button class="button secondary" data-notes-more hidden>加载更多</button>';
   $('[data-new-private-note]',el).onclick=async()=>{await show();await newNote();};
   let debounce;$('[data-notes-search]',el).oninput=()=>{clearTimeout(debounce);debounce=setTimeout(()=>void loadList(false),250);};
   $('[data-notes-order]',el).onchange=()=>void loadList(false);
   $('[data-notes-more]',el).onclick=()=>void loadList(true);
   $('.private-note-list',el).onclick=async e=>{
-   const b=e.target.closest('[data-note-edit],[data-note-delete]');if(!b)return;
-   const id=b.dataset.noteEdit||b.dataset.noteDelete;if(b.dataset.noteEdit)return show(id);
+   const b=e.target.closest('[data-note-show],[data-note-edit],[data-note-delete]');
+   if(!b){const row=e.target.closest('[data-private-note-id]');if(row&&!e.target.closest('a,button,input,select,textarea')&&!window.getSelection()?.toString())return show(row.dataset.privateNoteId);return;}
+   const id=b.dataset.noteShow||b.dataset.noteEdit||b.dataset.noteDelete;if(b.dataset.noteShow||b.dataset.noteEdit)return show(id);
    const row=rows.find(r=>r.id===id);if(!row||!confirm('删除笔记“'+row.title+'”？删除后无法恢复。'))return;
    b.disabled=true;
    try{
@@ -266,7 +267,7 @@
    if(query)request=request.ilike('title','%'+query.replace(/[%_\\]/g,'\\$&')+'%');
    const result=check(await request);if(token!==listToken||who!==identity())return;
    more=result.length>30;listPage=page;rows=append?rows.concat(result.slice(0,30)):result.slice(0,30);listQuery=query;
-   target.innerHTML=rows.map(r=>'<article class="private-note-row"><div><a class="private-note-row-title" href="'+esc(noteLink(r))+'">'+esc(r.title)+'</a><p>'+esc(r.page_title)+(r.anchor_text?' · '+esc(r.anchor_text):' · '+Math.round(r.scroll_ratio*100)+'%')+'</p><div class="private-note-dates"><span>'+r.word_count+' 字</span><span>创建 '+esc(window.FoamLab.dateTime(r.created_at))+'</span><span>修改 '+esc(window.FoamLab.dateTime(r.updated_at))+'</span></div></div><div class="private-note-actions"><button type="button" data-note-edit="'+r.id+'">编辑</button><button type="button" data-note-delete="'+r.id+'">删除</button></div></article>').join('');
+   target.innerHTML=rows.map(r=>'<article class="private-note-row" data-private-note-id="'+esc(r.id)+'"><div><button type="button" class="private-note-row-title" data-note-show="'+esc(r.id)+'" aria-haspopup="dialog" aria-controls="private-notebook">'+esc(r.title)+'</button><p>'+esc(r.page_title)+(r.anchor_text?' · '+esc(r.anchor_text):' · '+Math.round(r.scroll_ratio*100)+'%')+'</p><div class="private-note-dates"><span>'+r.word_count+' 字</span><span>创建 '+esc(window.FoamLab.dateTime(r.created_at))+'</span><span>修改 '+esc(window.FoamLab.dateTime(r.updated_at))+'</span></div></div><div class="private-note-actions"><a class="text-link" data-note-visit href="'+esc(noteLink(r))+'">跳转到记录位置 →</a><button type="button" data-note-edit="'+r.id+'">编辑</button><button type="button" data-note-delete="'+r.id+'">删除</button></div></article>').join('');
    statusEl.textContent=rows.length?'已显示 '+rows.length+' 篇笔记':query?'没有符合条件的笔记。':'还没有笔记。阅读时双击熊猫即可记录。';
    $('[data-notes-more]',el).hidden=!more;
   }catch(e){if(token===listToken)statusEl.textContent='笔记读取失败：'+e.message;}

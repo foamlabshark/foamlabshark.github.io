@@ -4,14 +4,15 @@
  if(!root||!child)return;
  let nodes=[];const groups=new Map(),matchers=new Map();
  const excluded=new Set(['home','town','community','internal']);
+ const order=(a,b)=>(a.sort_order||0)-(b.sort_order||0)||String(a.name||'').localeCompare(String(b.name||''));
  const option=(value,label)=>{const el=document.createElement('option');el.value=value;el.textContent=label;return el;};
  const selected=()=>child.value||root.value;
- const descendants=key=>{if(groups.has(key))return groups.get(key);const found=[],seen=new Set();function visit(n){if(!n||seen.has(n.id))return;seen.add(n.id);found.push(n);nodes.filter(x=>x.parent_id===n.id).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).forEach(visit);}visit(nodes.find(n=>n.key===key));groups.set(key,found);return found;};
+ const descendants=key=>{if(groups.has(key))return groups.get(key);const found=[],seen=new Set();function visit(n){if(!n||seen.has(n.id))return;seen.add(n.id);found.push(n);nodes.filter(x=>x.parent_id===n.id).sort(order).forEach(visit);}visit(nodes.find(n=>n.key===key));groups.set(key,found);return found;};
  function children(){const value=child.value,items=root.value?descendants(root.value).filter(n=>n.key!==root.value):[];child.replaceChildren(option('','全部子模块'));
-  for(const n of items){const names=[n.name];let p=nodes.find(x=>x.id===n.parent_id);while(p&&p.key!==root.value){names.unshift(p.name);p=nodes.find(x=>x.id===p.parent_id);}child.append(option(n.key,names.join(' / ')));}
+  for(const n of items){const names=[n.name];let p=nodes.find(x=>x.id===n.parent_id);while(p&&p.key!==root.value){names.unshift(p.name);p=nodes.find(x=>x.id===p.parent_id);}child.append(option(n.key,'　'.repeat(Math.min(names.length-1,8))+(names.length>1?'↳ ':'')+names.join(' / ')));}
   child.value=items.some(n=>n.key===value)?value:'';child.closest('label').hidden=!items.length;
  }
- function populate(items){groups.clear();matchers.clear();const value=root.value;const byId=new Map(items.map(n=>[n.id,n]));nodes=items.filter(n=>{const seen=new Set();for(let p=n;p;p=byId.get(p.parent_id)){if(p.visible===false||seen.has(p.id))return false;seen.add(p.id);}return true;});root.replaceChildren(option('','全站'));
+ function populate(items){groups.clear();matchers.clear();const value=root.value;const byId=new Map(items.map(n=>[n.id,n]));nodes=items.filter(n=>{const seen=new Set();for(let p=n;p;p=byId.get(p.parent_id)){if(p.visible===false||seen.has(p.id))return false;seen.add(p.id);}return true;}).sort(order);root.replaceChildren(option('','全站'));
   for(const n of nodes.filter(n=>!n.parent_id&&!excluded.has(n.key)))root.append(option(n.key,n.name));
   root.value=nodes.some(n=>n.key===value)?value:'';children();
  }

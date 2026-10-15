@@ -12,6 +12,15 @@
  }
  D.get=id=>indexFor().byId.get(id);
  D.children=id=>(indexFor().children.get(id||null)||[]).map(D.get);
+ // Flatten the same sibling lists used by the sidebar, keeping each branch
+ // together instead of interleaving unrelated nodes by their numeric order.
+ D.orderedNodes=(rootId=null)=>{
+  const result=[],seen=new Set();
+  const visit=node=>{if(!node||seen.has(node.id))return;seen.add(node.id);result.push(node);D.children(node.id).forEach(visit);};
+  if(rootId)visit(D.get(rootId));
+  else{D.children(null).forEach(visit);D.nodes.forEach(visit);}
+  return result;
+ };
  D.descendants=(id,nodes=D.nodes)=>{
   const index=indexFor(nodes);
   if(!index.descendants.has(id)){const seen=new Set([id]),queue=[id];for(let i=0;i<queue.length;i++)for(const child of index.children.get(queue[i])||[])if(!seen.has(child)){seen.add(child);queue.push(child);}index.descendants.set(id,queue);}
@@ -25,21 +34,33 @@
  D.primary=item=>{const nodes=(item?.section_ids||[]).map(D.get).filter(n=>n&&D.isVisible(n));if(item?.track==='OpenFOAM 编程'){const root=D.nodes.find(n=>n.key==='programming');return nodes.find(n=>D.ancestors(n.id).some(a=>a.id===root?.id))||nodes[0];}return nodes[0];};
  D.url=n=>{if(n?.href&&!n.href.startsWith('/read/?')&&!(n.key==='programming-examples'&&n.href.startsWith('/programming/?'))){try{const u=new URL(n.href,location.origin);if(u.origin===location.origin)return u.pathname+u.search+u.hash;}catch{}}return '/section/?id='+encodeURIComponent(n.id);};
  D.locations=row=>(row.section_ids||[]).map(D.path).filter(Boolean);
- D.options=(selected='',exclude=[])=>'<option value="">顶层模块</option>'+D.nodes.filter(n=>!exclude.includes(n.id)).map(n=>'<option value="'+n.id+'" '+(n.id===selected?'selected':'')+'>'+esc(D.path(n.id))+'</option>').join('');
+ D.optionLabel=node=>{const depth=Math.max(0,D.ancestors(node.id).length-1);return '　'.repeat(Math.min(depth,8))+(depth?'↳ ':'')+D.path(node.id);};
+ D.option=(node,selected='')=>'<option value="'+esc(node.id)+'" title="'+esc(D.path(node.id))+'" '+(node.id===selected?'selected':'')+'>'+esc(D.optionLabel(node))+'</option>';
+ D.options=(selected='',exclude=[],rootId=null)=>(rootId?'':'<option value="">顶层模块</option>')+D.orderedNodes(rootId).filter(n=>!exclude.includes(n.id)).map(n=>D.option(n,selected)).join('');
  D.current=(nodes=D.nodes)=>{const u=new URL(location.href),id=u.searchParams.get('id');if(u.pathname==='/section/')return nodes.find(n=>n.id===id);return nodes.filter(n=>n.href&&n.href!=='/admin/'&&(()=>{const v=new URL(n.href,location.origin);return v.pathname===u.pathname&&(!v.hash||v.hash===u.hash)&&[...v.searchParams].every(([k,x])=>u.searchParams.get(k)===x);})()).sort((a,b)=>(new URL(b.href,location.origin).search+new URL(b.href,location.origin).hash).length-(new URL(a.href,location.origin).search+new URL(a.href,location.origin).hash).length)[0];};
  const contentReads=new Map(),hintKey='foamlab.directory-hint.v1';
- function readContent(ids){
-  const key=[...ids].sort().join(',');if(contentReads.has(key))return contentReads.get(key);
-  const pending=(async()=>{const rows=[];for(let start=0;;start+=500){const batch=L.check(await L.client.from('foamlab_content').select('id,slug,kind,title,summary,track,series,cover_url,metadata,section_ids,author_id,author_name,sort_order,pinned,published_at,created_at,updated_at').eq('status','published').overlaps('section_ids',ids).order('sort_order').order('id').range(start,start+499));rows.push(...batch);if(batch.length<500)return rows;}})().catch(error=>{contentReads.delete(key);throw error;});
+ const projections={
+  full:'id,slug,kind,title,summary,track,series,cover_url,metadata,section_ids,author_id,author_name,sort_order,pinned,published_at,created_at,updated_at',
+  overview:'id,kind,title,summary,series,cover_url,section_ids,curriculum_series:metadata->curriculum_series',
+  book:'id,slug,title,summary,sort_order,fvm_book:metadata->fvm_book,turbulence_book:metadata->turbulence_book,heat_transfer_book:metadata->heat_transfer_book'
+ };
+ function readContent(ids,shape='full'){
+  if(!Object.hasOwn(projections,shape))shape='full';
+  const key=shape+':'+[...ids].sort().join(',');if(contentReads.has(key))return contentReads.get(key);
+  const pending=(async()=>{const rows=[];for(let start=0;;start+=500){const batch=L.check(await L.client.from('foamlab_content').select(projections[shape]).eq('status','published').overlaps('section_ids',ids).order('sort_order').order('id').range(start,start+499));
+   for(const row of batch){if(shape==='overview')row.metadata={curriculum_series:row.curriculum_series};if(shape==='book')row.metadata={fvm_book:row.fvm_book,turbulence_book:row.turbulence_book,heat_transfer_book:row.heat_transfer_book};}
+   rows.push(...batch);if(batch.length<500)return rows;}})().catch(error=>{contentReads.delete(key);throw error;});
   contentReads.set(key,pending);return pending;
  }
  function prefetchCatalog(){
   // Cached IDs only schedule a fresh request. Never render cached names or rows.
-  const catalog=document.querySelector('[data-lab-catalog],#fvm-catalog'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!hub&&!home)return;
-  try{const saved=JSON.parse(sessionStorage.getItem(hintKey)||'null');if(!saved||saved.user!==(L.user?.id||null)||Date.now()-saved.at>86400000||!Array.isArray(saved.nodes)||saved.nodes.length>2000)return;
-   const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||(catalog?.id==='fvm-catalog'?'fvm':'')||hub?.dataset.root||'topics',node=(!home&&catalog?.id!=='fvm-catalog'&&D.current(nodes))||nodes.find(n=>n.key===key);
-   if(node)void readContent(D.descendants(node.id,nodes)).catch(()=>{});
-  }catch{}
+  const catalog=document.querySelector('[data-lab-catalog]'),book=document.querySelector('#fvm-catalog,#pope-catalog,#incropera-catalog'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!book&&!hub&&!home)return;
+  const shapeFor=node=>book?'book':home||hub&&node.key===(hub.dataset.root||'topics')?'overview':'full';
+  try{const saved=JSON.parse(sessionStorage.getItem(hintKey)||'null');if(saved&&saved.user===(L.user?.id||null)&&Date.now()-saved.at<86400000&&Array.isArray(saved.nodes)&&saved.nodes.length<=2000){
+   const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||book?.id.replace('-catalog','')||hub?.dataset.root||'topics',node=(!home&&!book&&D.current(nodes))||nodes.find(n=>n.key===key);
+   if(node){void readContent(D.descendants(node.id,nodes),shapeFor(node)).catch(()=>{});return;}
+  }}catch{}
+  try{const hint=JSON.parse(document.getElementById('catalog-hint')?.textContent||'null');if(hint?.path===location.pathname&&Array.isArray(hint.ids)&&hint.ids.length&&hint.ids.length<=2000&&!new URLSearchParams(location.search).has('topic'))void readContent(hint.ids,shapeFor(hint)).catch(()=>{});}catch{}
  }
  D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('id,key,name,parent_id,href,description,nav_group,visible,sort_order,revision,created_at,updated_at,read_access').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;
   try{sessionStorage.setItem(hintKey,JSON.stringify({user:L.user?.id||null,at:Date.now(),nodes:nodes.map(({id,key,href,parent_id})=>({id,key,href,parent_id}))}));}catch{}
@@ -47,9 +68,9 @@
  };
  D.ready=D.load().catch(e=>{D.error=e;return D;});
  document.dispatchEvent(new Event('foamlab:directory-init'));
- D.content=node=>readContent(D.descendants(node.id));
+ D.content=(node,shape='full')=>readContent(D.descendants(node.id),shape);
  D.picker=(host,ids=[],editable=true)=>{
-  host.innerHTML='<h3>所在位置</h3><p class="cms-muted">可选择多个目录，同一篇正文会同时出现在这些位置。</p><div class="cms-selected-locations" role="status"></div><input type="search" class="cms-location-search" placeholder="查找模块或子模块" aria-label="查找发布位置"><div class="cms-location-picker">'+D.nodes.map(n=>'<label data-location-label="'+esc(D.path(n.id).toLowerCase())+'"><input type="checkbox" name="section_ids" value="'+n.id+'" '+(ids.includes(n.id)?'checked':'')+' '+(!editable?'disabled':'')+'><span>'+esc(D.path(n.id))+'</span></label>').join('')+'</div>';
+  host.innerHTML='<h3>所在位置</h3><p class="cms-muted">可选择多个目录，同一篇正文会同时出现在这些位置。</p><div class="cms-selected-locations" role="status"></div><input type="search" class="cms-location-search" placeholder="查找模块或子模块" aria-label="查找发布位置"><div class="cms-location-picker">'+D.orderedNodes().map(n=>'<label data-location-label="'+esc(D.path(n.id).toLowerCase())+'" style="padding-inline-start:'+Math.min(7+Math.max(0,D.ancestors(n.id).length-1)*14,119)+'px"><input type="checkbox" name="section_ids" value="'+n.id+'" '+(ids.includes(n.id)?'checked':'')+' '+(!editable?'disabled':'')+'><span>'+esc(D.path(n.id))+'</span></label>').join('')+'</div>';
   const selected=()=>{const paths=D.readPicker(host).map(D.path);host.querySelector('.cms-selected-locations').textContent=paths.length?'已选择：'+paths.join('；'):'未归类';};selected();host.addEventListener('change',selected);
   host.querySelector('input[type=search]').oninput=e=>host.querySelectorAll('[data-location-label]').forEach(row=>row.hidden=!row.dataset.locationLabel.includes(e.target.value.trim().toLowerCase()));
  };
@@ -90,7 +111,7 @@
    if(!current)return;
    const heading=document.querySelector('.page-heading h1');if(heading&&node)heading.textContent=node.name;
    try{
-    const rows=await D.content(current),asset=key==='commands'?'/assets/commands.json':'/assets/dictionaries.json',response=await fetch(asset),known=await response.json(),paths=new Set(known.map(x=>x.url)),extra=rows.filter(r=>!paths.has(r.metadata?.canonical_path));
+    const [rows,response]=await Promise.all([D.content(current),fetch('/assets/reference-paths.json')]);if(!response.ok)throw Error('reference paths unavailable');const known=await response.json(),paths=new Set(known[key]||[]),extra=rows.filter(r=>!paths.has(r.metadata?.canonical_path));
     if(extra.length){const host=document.createElement('section');host.className='directory-extra';host.innerHTML='<h2>本目录中的其他内容</h2><div class="lab-card-grid"></div>';reference.parentElement.append(host);const grid=host.querySelector('.lab-card-grid');await L.names(extra.map(r=>r.author_id));const render=()=>{grid.innerHTML=window.FoamPagination.slice(grid,extra,render,12).map(L.card).join('');};render();}
    }catch{}
   }

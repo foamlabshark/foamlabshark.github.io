@@ -24,7 +24,7 @@
   try{
    const D=await window.FoamDirectory.ready,node=D.nodes.find(x=>x.key==='fvm');
    if(!node)throw Error('课程目录暂时无法读取。');
-   const rows=(await D.content(node)).filter(x=>x.metadata?.fvm_book).sort((a,b)=>a.sort_order-b.sort_order);
+   const rows=(await D.content(node,'book')).filter(x=>x.metadata?.fvm_book).sort((a,b)=>a.sort_order-b.sort_order);
    host.innerHTML=['基础','离散','算法','应用','附录'].map((name,i)=>{
     const part=rows.filter(x=>x.metadata.fvm_book.part===i+1),chapters=[...new Set(part.map(x=>x.metadata.fvm_book.chapter))];
     return `<section class="fvm-part" id="part-${i+1}"><h2>${i<4?'第'+['一','二','三','四'][i]+'部分 · ':''}${name}</h2>${chapters.map(ch=>{

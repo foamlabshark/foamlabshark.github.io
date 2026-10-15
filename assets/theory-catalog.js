@@ -30,7 +30,7 @@
     const children=D.children(node.id).filter(D.isVisible);
     hub.innerHTML=children.map(row=>`<article class="lab-card"><div class="lab-card-body"><h2><a href="${esc(D.url(row))}">${esc(row.name)}</a></h2><p>${esc(row.description||'')}</p><a class="button secondary" href="${esc(D.url(row))}">查看课程目录 →</a></div></article>`).join('');
    }else{
-    const rows=(await D.content(node)).filter(row=>row.metadata?.[metaKey]).sort((a,b)=>a.sort_order-b.sort_order);
+    const rows=(await D.content(node,'book')).filter(row=>row.metadata?.[metaKey]).sort((a,b)=>a.sort_order-b.sort_order);
     if(!rows.length)throw Error('missing lessons');
     host.innerHTML=(heat?['传热机制与导热','对流与相变','换热器与辐射','扩散传质','附录']:['基础','建模与模拟','数学附录']).map((title,i)=>{
      const part=rows.filter(row=>row.metadata[metaKey].part===i+1),chapters=[...new Set(part.map(row=>String(row.metadata[metaKey].chapter)))];

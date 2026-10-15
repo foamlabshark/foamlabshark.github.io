@@ -11,7 +11,7 @@
  (async()=>{try{await L.contentReady;await L.directoryReady;const D=window.FoamDirectory;
  if(D?.available){
   const root=D.nodes.find(n=>n.key===(hub?.dataset.root||'topics'));if(!root){if(hub)hub.innerHTML='<p>'+collectionLabel+'目录已调整，请从左侧导航选择。</p>';if(home)home.replaceChildren();return;}
-  const node=(hub&&D.current())||root,children=D.children(root.id).filter(D.isVisible),all=await D.content(node);
+  const node=(hub&&D.current())||root,children=D.children(root.id).filter(D.isVisible),all=await D.content(node,home||node.id===root.id?'overview':'full');
   const ownIntro=(items,node)=>items.find(r=>(r.kind==='module'||r.metadata?.curriculum_series)&&r.kind!=='lesson'&&r.section_ids?.includes(node.id));
   const collection=(nodes=children)=>nodes.map(n=>{const ids=D.descendants(n.id),items=all.filter(r=>r.section_ids?.some(id=>ids.includes(id))),intro=ownIntro(items,n),count=items.filter(r=>r.id!==intro?.id&&r.kind!=='module'&&(!intro?.metadata?.curriculum_series||r.series===intro.metadata.curriculum_series)).length;return '<a class="topic-collection" href="'+esc(D.url(n))+'">'+(intro?figure(intro):'')+'<div class="topic-collection-body"><small>'+count+(programming?' 节课':' 篇内容')+'</small><h2>'+esc(n.name)+'</h2><p>'+esc(n.description||intro?.summary||'')+'</p><span class="text-link">进入'+collectionLabel+' →</span></div></a>';}).join('');
   if(home)home.innerHTML=collection();if(!hub)return;
