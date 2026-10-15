@@ -1,4 +1,4 @@
-.private-notebook{position:fixed;z-index:1050;display:flex;flex-direction:column;background:var(--surface,#17221e);color:var(--ink,#1f2b28);border:1px solid var(--line,#3b5147);border-radius:16px;box-shadow:0 20px 70px #0005;overflow:hidden;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);font-size:14px;isolation:isolate}
+.private-notebook{position:fixed;z-index:1050;display:flex;flex-direction:column;box-sizing:border-box;background:var(--surface,#17221e);color:var(--ink,#1f2b28);border:1px solid var(--line,#3b5147);border-radius:16px;box-shadow:0 20px 70px #0005;overflow:hidden;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);font-size:14px;isolation:isolate;container-type:inline-size}
 .private-notebook[hidden]{display:none}
 .private-note-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface-2,#20332b);border-bottom:1px solid var(--line,#3b5147);cursor:grab;touch-action:none;user-select:none;flex-shrink:0}
 .private-note-header:active{cursor:grabbing}
@@ -36,20 +36,31 @@
 .private-note-toolbar>div{display:flex;margin-right:auto;background:#83b9a412;border-radius:8px;padding:3px}
 .private-note-toolbar button,.private-note-location-actions button,.private-note-form footer button:not(.button),.private-note-conflict button,.private-note-actions button{font:inherit;font-size:12px;border:1px solid var(--line,#3b5147);background:transparent;color:inherit;border-radius:6px;padding:5px 10px;cursor:pointer}
 .private-note-toolbar button[aria-selected=true]{background:#8ac8ae;color:#15291f;border-color:#8ac8ae}
-.private-note-form textarea[data-note-body]{display:block;flex:1;min-height:120px;width:100%;box-sizing:border-box;resize:none;border:0;padding:10px 2px;outline-offset:3px;background:transparent!important;color:inherit;font:14px/1.8 "Cascadia Code",Consolas,"Microsoft YaHei",monospace}
+.private-note-form textarea[data-note-body]{display:block;flex:1;min-height:60px;width:100%;box-sizing:border-box;resize:none;border:0;padding:10px 2px;outline-offset:3px;background:transparent!important;color:inherit;font:14px/1.8 "Cascadia Code",Consolas,"Microsoft YaHei",monospace}
 .private-note-form textarea[data-note-body][hidden]{display:none}
-.private-note-preview{flex:1;min-height:120px;overflow:auto;font-size:14px!important;line-height:1.8!important;padding:4px 2px;overflow-wrap:anywhere}
+.private-note-preview{flex:1;min-height:60px;overflow:auto;font-size:14px!important;line-height:1.8!important;padding:4px 2px;overflow-wrap:anywhere}
 .private-note-preview :is(h1,h2,h3){font-size:1.2em!important;margin:12px 0!important}
 .private-note-preview p{margin:8px 0!important}.private-note-preview .katex-display{overflow-x:auto;overflow-y:hidden}
 .private-note-preview img{max-width:100%;max-height:280px;object-fit:contain}
 .private-note-form footer{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line,#3b5147);padding-top:10px;flex-shrink:0}
-.private-note-form footer>div:first-child{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted,#a5b9ae);min-width:0}
+.private-note-form footer>div:first-child{display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.5;color:var(--muted,#a5b9ae);min-width:0}
 .private-note-form footer>div:last-child{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .private-note-form footer a{font-size:12px}
 .private-note-form footer .button{font-size:12px;padding:6px 14px;min-height:32px}
 .private-note-conflict{background:#b7832720;border:1px solid #be9b54;padding:10px;border-radius:8px;font-size:12px}.private-note-conflict p{margin:0 0 8px}
 [data-note-status].is-error{color:var(--danger,#ee9f83)}
-.private-note-resize{position:absolute;width:14px;height:14px;bottom:1px;right:1px;cursor:se-resize;touch-action:none;background:repeating-linear-gradient(135deg,transparent 0 3px,#82988b80 3px 4px);clip-path:polygon(100% 0,100% 100%,0 100%)}
+.private-note-resize{position:absolute;z-index:2;touch-action:none;user-select:none}
+.private-note-resize[data-note-resize=n],.private-note-resize[data-note-resize=s]{left:18px;right:18px;height:6px;cursor:ns-resize}
+.private-note-resize[data-note-resize=n]{top:0}.private-note-resize[data-note-resize=s]{bottom:0}
+.private-note-resize[data-note-resize=e],.private-note-resize[data-note-resize=w]{top:18px;bottom:18px;width:6px;cursor:ew-resize}
+.private-note-resize[data-note-resize=e]{right:0}.private-note-resize[data-note-resize=w]{left:0}
+.private-note-resize[data-note-resize=ne],.private-note-resize[data-note-resize=nw],.private-note-resize[data-note-resize=se],.private-note-resize[data-note-resize=sw]{width:18px;height:18px}
+.private-note-resize[data-note-resize=ne]{top:0;right:0;cursor:nesw-resize}.private-note-resize[data-note-resize=nw]{top:0;left:0;cursor:nwse-resize}
+.private-note-resize[data-note-resize=sw]{bottom:0;left:0;cursor:nesw-resize}.private-note-resize[data-note-resize=se]{bottom:0;right:0;cursor:nwse-resize;border-radius:3px}
+.private-note-resize[data-note-resize=se]::after{content:"";position:absolute;inset:3px 4px 4px 3px;background:repeating-linear-gradient(135deg,transparent 0 3px,var(--accent,#82bda4) 3px 4px);clip-path:polygon(100% 0,100% 100%,0 100%)}
+.private-note-resize:hover,.private-note-resize:focus-visible{background:#8dceb433;outline:0}.private-note-resize:focus-visible{box-shadow:inset 0 0 0 2px var(--accent,#82bda4)}
+.private-notebook.is-adjusting{user-select:none}.private-notebook.is-adjusting :is(textarea,input,.private-note-preview){pointer-events:none}
+@container(max-width:400px){.private-note-form{padding:12px;gap:8px}.private-note-form footer{flex-wrap:wrap;gap:6px}.private-note-header{padding:10px 12px}.private-note-header strong span{margin-left:6px}}
 .private-note-filters{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0}
 .private-note-filters label{display:flex;gap:8px;align-items:center}
 .private-note-filters input{max-width:300px}.private-note-filters :is(input,select){font-size:14px}
@@ -66,4 +77,4 @@ body[data-section=private-notes] .app-shell{margin:0!important}
 .private-notebook.is-standalone{inset:0;border:0;border-radius:0;width:100vw;height:100dvh;max-width:none;max-height:none}
 .private-notebook.is-standalone .private-note-header{cursor:default}.private-notebook.is-standalone .private-note-resize{display:none}
 .notebook-standalone-hint{padding:32px}
-@media(max-width:600px){.private-note-form{padding:12px;gap:10px}.private-note-form footer{flex-wrap:wrap}.private-note-header{padding:10px 12px}.private-note-header strong span{margin-left:6px}.private-note-row{flex-direction:column}.private-note-filters label{width:100%}.private-note-filters input{min-width:0;flex:1}.private-note-dates{gap:4px 12px}.private-note-actions{align-self:flex-end}}
+@media(max-width:600px){.private-note-form{padding:12px;gap:8px}.private-note-form footer{flex-wrap:wrap;gap:6px}.private-note-header{padding:10px 12px}.private-note-header strong span{margin-left:6px}.private-note-row{flex-direction:column}.private-note-filters label{width:100%}.private-note-filters input{min-width:0;flex:1}.private-note-dates{gap:4px 12px}.private-note-actions{align-self:flex-end}}

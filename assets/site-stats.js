@@ -73,6 +73,7 @@
  window.addEventListener('pageshow',e=>{if(e.persisted){leaving=false;update();}});
  setInterval(()=>{touchPage();update();},30000);
  // Background tabs belong to the session even before their first statistics RPC.
+ window.FoamSiteVisit={get:async()=>{await ensureSession();return visit;}};
  ensureSession().catch(()=>{});
  (async()=>{try{await window.foamAuth?.ready;client=window.foamAuth?.client;if(!client)throw Error('No statistics client');
   const response=await fetch('/assets/auth-config.json');if(response.ok){const c=await response.json();if(/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(c.supabaseUrl)&&typeof c.publishableKey==='string'&&!c.publishableKey.startsWith('sb_secret_'))config={...c,supabaseUrl:c.supabaseUrl.replace(/\/$/,'')};}await update();

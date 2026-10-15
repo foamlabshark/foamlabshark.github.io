@@ -30,13 +30,25 @@
   catch{status('浏览器未能保留草稿，请保存到云端或下载 Markdown。',true);}
  }
  function status(message,error=false){if(!host)return;const el=$('[data-note-status]',host);el.textContent=message;el.classList.toggle('is-error',error);}
+ function sizeLimits(){return {w:Math.max(1,innerWidth-16),h:Math.max(1,innerHeight-16)};}
+ function clamp(value,min,max){return Math.max(min,Math.min(value,max));}
  function place(){
   if(!host||standalone)return;
-  const w=Math.min(rect?.w||480,innerWidth-16),h=Math.min(rect?.h||600,innerHeight-24);
+  const limit=sizeLimits();
+  const w=clamp(rect?.w||480,Math.min(320,limit.w),limit.w),h=clamp(rect?.h||600,Math.min(360,limit.h),limit.h);
   const x=Math.max(8,Math.min(rect?.x??innerWidth-w-24,innerWidth-w-8));
   const y=Math.max(8,Math.min(rect?.y??Math.max(16,(innerHeight-h)/2),innerHeight-h-8));
   Object.assign(host.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
   rect={x,y,w,h};
+ }
+ function resizeRect(r,edge,dx,dy){
+  const limit=sizeLimits(),minW=Math.min(320,limit.w),minH=Math.min(360,limit.h);
+  let left=r.x,top=r.y,right=r.x+r.width,bottom=r.y+r.height;
+  if(edge.includes('w'))left=clamp(left+dx,8,right-minW);
+  if(edge.includes('e'))right=clamp(right+dx,left+minW,innerWidth-8);
+  if(edge.includes('n'))top=clamp(top+dy,8,bottom-minH);
+  if(edge.includes('s'))bottom=clamp(bottom+dy,top+minH,innerHeight-8);
+  return {x:left,y:top,w:right-left,h:bottom-top};
  }
  function build(){
   if(host)return;
@@ -49,16 +61,18 @@
    '<div class="private-note-toolbar"><div role="tablist" aria-label="笔记视图"><button role="tab" aria-selected="true" data-note-mode="edit">编辑</button><button role="tab" aria-selected="false" data-note-mode="preview">预览</button></div><button type="button" data-note-formula title="插入 LaTeX 公式">公式</button><button type="button" data-note-download title="下载 Markdown">下载 .md</button></div>'+
    '<textarea data-note-body aria-label="Markdown 笔记正文" maxlength="100000" placeholder="写下推导、疑问或计算记录。支持 Markdown，行内公式使用 $...$，独立公式使用 \\[...\\]。"></textarea><div class="private-note-preview prose" data-note-preview hidden role="tabpanel" aria-label="笔记预览"></div>'+
    '<div class="private-note-conflict" hidden><p>云端内容已变化，当前草稿已保留。可另存为新笔记，或载入云端版本。</p><button type="button" data-note-copy>另存为新笔记</button> <button type="button" data-note-reload>载入云端版本</button></div>'+
-   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-open>打开笔记</button><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div><span class="private-note-resize" aria-hidden="true"></span>';
+   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-open>打开笔记</button><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div>'+
+   ['n','e','s','w','ne','nw','sw','se'].map(edge=>'<span class="private-note-resize" data-note-resize="'+edge+'" '+(edge==='se'?'role="button" tabindex="0" aria-label="调整笔记窗口大小；方向键调整，Shift 加快"':'aria-hidden="true"')+' title="拖动调整笔记窗口大小"></span>').join('');
   document.body.append(host);
   $('[data-note-popout]',host).hidden=standalone;
   if(standalone)$('[data-note-manage]',host).target='_blank';
   const header=$('.private-note-header',host);let drag=null;
   if(standalone){header.removeAttribute('tabindex');header.setAttribute('aria-label','独立笔记窗口');}
-  function start(e,resize){if(e.button!==0||(!resize&&e.target.closest('button'))||standalone)return;e.preventDefault();const r=host.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,r,resize,target:e.currentTarget};drag.target.setPointerCapture(e.pointerId);}
-  function move(e){if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;rect=drag.resize?{x:drag.r.x,y:drag.r.y,w:Math.max(320,drag.r.width+dx),h:Math.max(360,drag.r.height+dy)}:{x:drag.r.x+dx,y:drag.r.y+dy,w:drag.r.width,h:drag.r.height};place();}
-  function stop(e){if(!drag||drag.id!==e.pointerId)return;drag=null;remember();}
-  for(const [el,resize] of [[header,false],[$('.private-note-resize',host),true]]){el.onpointerdown=e=>start(e,resize);el.onpointermove=move;el.onpointerup=stop;el.onpointercancel=stop;}
+  function start(e,edge){if(e.button!==0||drag||(!edge&&e.target.closest('button'))||standalone)return;e.preventDefault();const r=host.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,r,edge,target:e.currentTarget};drag.target.setPointerCapture(e.pointerId);host.classList.add('is-adjusting');}
+  function move(e){if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;rect=drag.edge?resizeRect(drag.r,drag.edge,dx,dy):{x:drag.r.x+dx,y:drag.r.y+dy,w:drag.r.width,h:drag.r.height};place();}
+  function stop(e){if(!drag||drag.id!==e.pointerId)return;const active=drag;drag=null;if(active.target.hasPointerCapture(e.pointerId))active.target.releasePointerCapture(e.pointerId);host.classList.remove('is-adjusting');remember();}
+  for(const el of [header,...host.querySelectorAll('[data-note-resize]')]){el.onpointerdown=e=>start(e,el.dataset.noteResize);el.onpointermove=move;el.onpointerup=stop;el.onpointercancel=stop;el.onlostpointercapture=stop;}
+  $('[data-note-resize="se"]',host).onkeydown=e=>{if(standalone)return;const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d)return;e.preventDefault();const step=e.shiftKey?40:12;rect=resizeRect(host.getBoundingClientRect(),'se',d[0]*step,d[1]*step);place();remember();};
   header.onkeydown=e=>{if(e.target!==header||standalone)return;const d={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]}[e.key];if(!d)return;e.preventDefault();rect.x+=d[0];rect.y+=d[1];place();remember();};
   host.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();void save();}if(e.key==='Escape'){e.stopPropagation();if(!$('.private-note-picker',host).hidden)hidePicker();else void close();}});
   $('[data-note-title]',host).oninput=e=>{note.title=e.target.value;changed();};

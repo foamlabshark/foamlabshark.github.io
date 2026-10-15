@@ -1,7 +1,7 @@
 'use strict';
 (() => {
  const roles={member:'普通会员',supporter:'充电会员',editor:'普通作者',admin:'管理员',blocked:'禁止发言与投稿'};
- const abilities={supporter:'阅读向充电会员开放的文章，并可发布自己的文章、参与讨论和评论。',member:'发布自己的文章，参与讨论和评论。',editor:'发布和管理自己的文章、问题、回复与评论。',admin:'管理全站内容、成员权限和网站设置。',blocked:'暂停发表文章、讨论、回复和评论。'};
+ const abilities={supporter:'阅读向充电会员开放的文章；发布、编辑和删除自己的文章及评论，参与讨论。',member:'发布、编辑和删除自己的文章及评论，参与讨论；不能删除他人的评论。',editor:'管理自己的文章、问题及评论，并可删除他人的评论；不能修改他人的文章和评论。',admin:'管理全站内容、成员权限和网站设置。',blocked:'暂停发表文章、讨论、回复和评论。'};
  let savedState=null;
  window.FoamCMSMembers=async C=>{
   if(!C.admin)throw Error('成员管理需要管理员权限。');

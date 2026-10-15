@@ -635,13 +635,25 @@
   catch{status('浏览器未能保留草稿，请保存到云端或下载 Markdown。',true);}
  }
  function status(message,error=false){if(!host)return;const el=$('[data-note-status]',host);el.textContent=message;el.classList.toggle('is-error',error);}
+ function sizeLimits(){return {w:Math.max(1,innerWidth-16),h:Math.max(1,innerHeight-16)};}
+ function clamp(value,min,max){return Math.max(min,Math.min(value,max));}
  function place(){
   if(!host||standalone)return;
-  const w=Math.min(rect?.w||480,innerWidth-16),h=Math.min(rect?.h||600,innerHeight-24);
+  const limit=sizeLimits();
+  const w=clamp(rect?.w||480,Math.min(320,limit.w),limit.w),h=clamp(rect?.h||600,Math.min(360,limit.h),limit.h);
   const x=Math.max(8,Math.min(rect?.x??innerWidth-w-24,innerWidth-w-8));
   const y=Math.max(8,Math.min(rect?.y??Math.max(16,(innerHeight-h)/2),innerHeight-h-8));
   Object.assign(host.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
   rect={x,y,w,h};
+ }
+ function resizeRect(r,edge,dx,dy){
+  const limit=sizeLimits(),minW=Math.min(320,limit.w),minH=Math.min(360,limit.h);
+  let left=r.x,top=r.y,right=r.x+r.width,bottom=r.y+r.height;
+  if(edge.includes('w'))left=clamp(left+dx,8,right-minW);
+  if(edge.includes('e'))right=clamp(right+dx,left+minW,innerWidth-8);
+  if(edge.includes('n'))top=clamp(top+dy,8,bottom-minH);
+  if(edge.includes('s'))bottom=clamp(bottom+dy,top+minH,innerHeight-8);
+  return {x:left,y:top,w:right-left,h:bottom-top};
  }
  function build(){
   if(host)return;
@@ -654,16 +666,18 @@
    '<div class="private-note-toolbar"><div role="tablist" aria-label="笔记视图"><button role="tab" aria-selected="true" data-note-mode="edit">编辑</button><button role="tab" aria-selected="false" data-note-mode="preview">预览</button></div><button type="button" data-note-formula title="插入 LaTeX 公式">公式</button><button type="button" data-note-download title="下载 Markdown">下载 .md</button></div>'+
    '<textarea data-note-body aria-label="Markdown 笔记正文" maxlength="100000" placeholder="写下推导、疑问或计算记录。支持 Markdown，行内公式使用 $...$，独立公式使用 \\[...\\]。"></textarea><div class="private-note-preview prose" data-note-preview hidden role="tabpanel" aria-label="笔记预览"></div>'+
    '<div class="private-note-conflict" hidden><p>云端内容已变化，当前草稿已保留。可另存为新笔记，或载入云端版本。</p><button type="button" data-note-copy>另存为新笔记</button> <button type="button" data-note-reload>载入云端版本</button></div>'+
-   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-open>打开笔记</button><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div><span class="private-note-resize" aria-hidden="true"></span>';
+   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-open>打开笔记</button><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div>'+
+   ['n','e','s','w','ne','nw','sw','se'].map(edge=>'<span class="private-note-resize" data-note-resize="'+edge+'" '+(edge==='se'?'role="button" tabindex="0" aria-label="调整笔记窗口大小；方向键调整，Shift 加快"':'aria-hidden="true"')+' title="拖动调整笔记窗口大小"></span>').join('');
   document.body.append(host);
   $('[data-note-popout]',host).hidden=standalone;
   if(standalone)$('[data-note-manage]',host).target='_blank';
   const header=$('.private-note-header',host);let drag=null;
   if(standalone){header.removeAttribute('tabindex');header.setAttribute('aria-label','独立笔记窗口');}
-  function start(e,resize){if(e.button!==0||(!resize&&e.target.closest('button'))||standalone)return;e.preventDefault();const r=host.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,r,resize,target:e.currentTarget};drag.target.setPointerCapture(e.pointerId);}
-  function move(e){if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;rect=drag.resize?{x:drag.r.x,y:drag.r.y,w:Math.max(320,drag.r.width+dx),h:Math.max(360,drag.r.height+dy)}:{x:drag.r.x+dx,y:drag.r.y+dy,w:drag.r.width,h:drag.r.height};place();}
-  function stop(e){if(!drag||drag.id!==e.pointerId)return;drag=null;remember();}
-  for(const [el,resize] of [[header,false],[$('.private-note-resize',host),true]]){el.onpointerdown=e=>start(e,resize);el.onpointermove=move;el.onpointerup=stop;el.onpointercancel=stop;}
+  function start(e,edge){if(e.button!==0||drag||(!edge&&e.target.closest('button'))||standalone)return;e.preventDefault();const r=host.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,r,edge,target:e.currentTarget};drag.target.setPointerCapture(e.pointerId);host.classList.add('is-adjusting');}
+  function move(e){if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;rect=drag.edge?resizeRect(drag.r,drag.edge,dx,dy):{x:drag.r.x+dx,y:drag.r.y+dy,w:drag.r.width,h:drag.r.height};place();}
+  function stop(e){if(!drag||drag.id!==e.pointerId)return;const active=drag;drag=null;if(active.target.hasPointerCapture(e.pointerId))active.target.releasePointerCapture(e.pointerId);host.classList.remove('is-adjusting');remember();}
+  for(const el of [header,...host.querySelectorAll('[data-note-resize]')]){el.onpointerdown=e=>start(e,el.dataset.noteResize);el.onpointermove=move;el.onpointerup=stop;el.onpointercancel=stop;el.onlostpointercapture=stop;}
+  $('[data-note-resize="se"]',host).onkeydown=e=>{if(standalone)return;const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d)return;e.preventDefault();const step=e.shiftKey?40:12;rect=resizeRect(host.getBoundingClientRect(),'se',d[0]*step,d[1]*step);place();remember();};
   header.onkeydown=e=>{if(e.target!==header||standalone)return;const d={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]}[e.key];if(!d)return;e.preventDefault();rect.x+=d[0];rect.y+=d[1];place();remember();};
   host.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();void save();}if(e.key==='Escape'){e.stopPropagation();if(!$('.private-note-picker',host).hidden)hidePicker();else void close();}});
   $('[data-note-title]',host).oninput=e=>{note.title=e.target.value;changed();};
@@ -907,5 +921,68 @@
  window.addEventListener('foamlab:account-tab',e=>{if(e.detail?.key==='notes')void loadList(false);});
  document.addEventListener('click',e=>{if(e.target.closest('[data-open-private-notes]'))void show();});
  void authChanged();
+})();
+
+;
+/* page-views.js */
+'use strict';
+(() => {
+ const main=document.querySelector('main');if(!main)return;
+ const box=document.createElement('div');box.className='page-view-stat';box.dataset.pageViews='';box.dataset.state='loading';
+ box.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>浏览 <span data-page-view-count>—</span> 次</span>';
+ const hint='同一次访问中，本页只计一次；刷新不增加浏览数。从功能上线起累计。';box.title=hint;
+ const count=box.querySelector('[data-page-view-count]'),states=new Map(),ackKey='foamlab.page-views.counted';let current='',queued=false,ready=false,visit=null;
+ function acknowledgements(){try{const row=JSON.parse(localStorage.getItem(ackKey)||'null');return row?.visit===visit&&Array.isArray(row.pages)?row.pages:[];}catch{return [];}}
+ function remember(key){try{localStorage.setItem(ackKey,JSON.stringify({visit,pages:[...new Set([...acknowledgements(),key])]}));}catch{}}
+ function showCount(value){if(count.textContent!==value)count.textContent=value;}
+ function identity(){
+  const url=new URL(location.href),slug=document.querySelector('.article[data-cms-slug]')?.dataset.cmsSlug||(url.pathname==='/read/'?url.searchParams.get('slug'):'');
+  if(slug)return 'content:'+slug;
+  if(url.pathname==='/community/'&&url.searchParams.has('topic'))return 'topic:'+url.searchParams.get('topic');
+  const D=window.FoamDirectory;let node=D?.available?D.current():null;
+  if(node&&new URL(D.url(node),location.origin).hash)node=D.ancestors(node.id).reverse().find(n=>!new URL(D.url(n),location.origin).hash);
+  if(node&&!/^\/(?:account|admin|studio|notes)\//.test(url.pathname))return 'section:'+node.id;
+  if(url.pathname==='/section/'&&url.searchParams.has('id'))return 'section:'+url.searchParams.get('id');
+  return 'path:'+url.pathname.replace(/\/index\.html$/,'/');
+ }
+ function mount(){
+  const title=main.querySelector('h1');
+  if(title){if(title.nextElementSibling!==box)title.after(box);}
+  else if(!box.isConnected)main.prepend(box);
+ }
+ async function update(force=false){
+  mount();if(!ready)return;
+  const key=identity();
+  if(key!==current){current=key;showCount('—');box.dataset.state='loading';}
+  let state=states.get(key);if(!state){state={id:visit,counted:acknowledgements().includes(key),busy:false,at:0};states.set(key,state);}
+  if(Number.isSafeInteger(state.views)&&box.dataset.state!=='unavailable')showCount(state.views.toLocaleString('zh-CN'));
+  if(state.busy||document.hidden||(!force&&state.at&&Date.now()-state.at<30000))return;
+  const client=window.foamAuth?.client;if(!client)return;
+  state.busy=true;
+  try{
+   const {data,error}=await client.rpc('foamlab_page_views',{p_page:key,p_view:state.counted?null:state.id});
+   if(error||!Number.isSafeInteger(data?.views)||data.views<0)throw error||Error('Unavailable count');
+   state.counted=true;remember(key);state.views=data.views;state.at=Date.now();
+   if(current===key){showCount(data.views.toLocaleString('zh-CN'));box.dataset.state='ready';box.title=hint;}
+  }catch{
+   state.at=Date.now();if(current===key){showCount('—');box.dataset.state='unavailable';box.title='浏览数暂时无法读取，稍后自动重试';}
+  }finally{state.busy=false;}
+ }
+ function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;void update();});}
+ new MutationObserver(()=>{mount();schedule();}).observe(main,{childList:true,subtree:true});
+ for(const name of ['foamlab:content-ready','foamlab:article-locked'])document.addEventListener(name,schedule);
+ window.addEventListener('foam-auth-change',()=>{for(const state of states.values())state.at=0;schedule();});
+ window.addEventListener('popstate',schedule);
+ window.addEventListener('pageshow',e=>{if(e.persisted)void initialize();});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)void update(true);});
+ window.addEventListener('online',()=>void update(true));
+ setInterval(()=>void update(true),30000);
+ mount();
+ async function initialize(){
+  ready=false;await window.foamAuth?.ready;await window.FoamDirectory?.ready;
+  const next=await window.FoamSiteVisit?.get();if(!next)return;
+  if(next!==visit){visit=next;states.clear();current='';}ready=true;void update();
+ }
+ void initialize();
 })();
 
