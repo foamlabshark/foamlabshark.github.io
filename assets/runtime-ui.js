@@ -949,7 +949,11 @@
 /* page-views.js */
 'use strict';
 (() => {
- const main=document.querySelector('main');if(!main)return;
+ const main=document.querySelector('main'),url=new URL(location.href);
+ // Count reading pages only. Directory cards and account/admin interfaces are
+ // navigation surfaces; their visits are already covered by the site statistics.
+ const isReadingPage=main?.querySelector('article.article')||(url.pathname==='/community/'&&url.searchParams.get('topic'));
+ if(!isReadingPage)return;
  const box=document.createElement('div');box.className='page-view-stat';box.dataset.pageViews='';box.dataset.state='loading';
  box.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>浏览 <span data-page-view-count>—</span> 次</span>';
  const hint='同一次访问中，本页只计一次；刷新不增加浏览数。从功能上线起累计。';box.title=hint;
@@ -968,12 +972,13 @@
   return 'path:'+url.pathname.replace(/\/index\.html$/,'/');
  }
  function mount(){
-  const title=main.querySelector('h1');
-  if(title){if(title.nextElementSibling!==box)title.after(box);}
-  else if(!box.isConnected)main.prepend(box);
+  const title=main.querySelector('article.article h1,article.lab-topic h1');
+  if(!title){box.remove();return false;}
+  if(title.nextElementSibling!==box)title.after(box);
+  return true;
  }
  async function update(force=false){
-  mount();if(!ready)return;
+  if(!mount()||!ready)return;
   const key=identity();
   if(key!==current){current=key;showCount('—');box.dataset.state='loading';}
   let state=states.get(key);if(!state){state={id:visit,counted:acknowledgements().includes(key),busy:false,at:0};states.set(key,state);}
