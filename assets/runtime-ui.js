@@ -611,6 +611,7 @@
  const fields=['title','body','page_url','page_title','anchor_id','anchor_text','anchor_offset','scroll_ratio'];
  let uid=null,note=null,base=null,dirty=false,serial=0,task=null,conflict=false,loadToken=0;
  let host=null,timer,previewTimer,rect=null,open=false,rows=[],listToken=0,listPage=0,more=false,listQuery='';
+ let pickerToken=0,pickerPage=0,pickerRows=[],pickerTimer;
  const client=()=>window.foamAuth?.client,identity=()=>window.foamAuth?.user?.id;
  const payload=n=>Object.fromEntries(fields.map(k=>[k,n[k]]));
  const same=(a,b)=>!!a&&!!b&&JSON.stringify(payload(a))===JSON.stringify(payload(b));
@@ -647,12 +648,13 @@
   host=document.createElement('section');host.id='private-notebook';host.className='private-notebook'+(standalone?' is-standalone':'');
   host.setAttribute('role','dialog');host.setAttribute('aria-modal','false');host.setAttribute('aria-labelledby','private-note-heading');host.hidden=true;
   host.innerHTML='<header class="private-note-header" tabindex="0" aria-label="拖动笔记窗口；方向键移动"><strong id="private-note-heading">我的笔记 <span>仅自己可见</span></strong><div><button type="button" data-note-popout aria-label="在独立窗口打开笔记" title="独立窗口">↗</button><button type="button" data-note-close aria-label="关闭笔记窗口">×</button></div></header>'+
+   '<div class="private-note-picker" hidden aria-labelledby="private-note-picker-heading"><div class="private-note-picker-heading"><h2 id="private-note-picker-heading">打开笔记</h2><button type="button" data-note-picker-back>返回笔记</button></div><label><span class="sr-only">查找已有笔记</span><input type="search" data-note-picker-query maxlength="120" placeholder="按标题查找笔记"></label><p data-note-picker-status role="status"></p><div class="private-note-picker-list"></div><div class="private-note-picker-footer"><button type="button" data-note-picker-new>新建笔记</button><button type="button" data-note-picker-more hidden>加载更多</button></div></div>'+
    '<div class="private-note-form"><label class="private-note-title"><span class="sr-only">笔记标题</span><input data-note-title maxlength="160" placeholder="笔记标题"></label>'+
    '<details class="private-note-location"><summary>关联位置：<span data-note-location></span></summary><a data-note-link>返回阅读位置 →</a><div class="private-note-location-actions"><button type="button" data-note-capture>更新为当前阅读位置</button><button type="button" data-note-headings>选择当前页面章节</button></div><label>章节<select data-note-anchor><option value="">按阅读进度定位</option></select></label><label>阅读进度 <output data-note-percent></output><input data-note-ratio type="range" min="0" max="1000"></label></details>'+
    '<div class="private-note-toolbar"><div role="tablist" aria-label="笔记视图"><button role="tab" aria-selected="true" data-note-mode="edit">编辑</button><button role="tab" aria-selected="false" data-note-mode="preview">预览</button></div><button type="button" data-note-formula title="插入 LaTeX 公式">公式</button><button type="button" data-note-download title="下载 Markdown">下载 .md</button></div>'+
    '<textarea data-note-body aria-label="Markdown 笔记正文" maxlength="100000" placeholder="写下推导、疑问或计算记录。支持 Markdown，行内公式使用 $...$，独立公式使用 \\[...\\]。"></textarea><div class="private-note-preview prose" data-note-preview hidden role="tabpanel" aria-label="笔记预览"></div>'+
    '<div class="private-note-conflict" hidden><p>云端内容已变化，当前草稿已保留。可另存为新笔记，或载入云端版本。</p><button type="button" data-note-copy>另存为新笔记</button> <button type="button" data-note-reload>载入云端版本</button></div>'+
-   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div><span class="private-note-resize" aria-hidden="true"></span>';
+   '<footer><div><span data-note-count>0 字</span><span data-note-status role="status">尚未填写</span></div><div><a href="/account/#notes" data-note-manage>管理笔记</a><button type="button" data-note-open>打开笔记</button><button type="button" data-note-new>新建</button><button type="button" class="button" data-note-save>保存</button></div></footer></div><span class="private-note-resize" aria-hidden="true"></span>';
   document.body.append(host);
   $('[data-note-popout]',host).hidden=standalone;
   if(standalone)$('[data-note-manage]',host).target='_blank';
@@ -663,7 +665,7 @@
   function stop(e){if(!drag||drag.id!==e.pointerId)return;drag=null;remember();}
   for(const [el,resize] of [[header,false],[$('.private-note-resize',host),true]]){el.onpointerdown=e=>start(e,resize);el.onpointermove=move;el.onpointerup=stop;el.onpointercancel=stop;}
   header.onkeydown=e=>{if(e.target!==header||standalone)return;const d={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]}[e.key];if(!d)return;e.preventDefault();rect.x+=d[0];rect.y+=d[1];place();remember();};
-  host.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();void save();}if(e.key==='Escape'){e.stopPropagation();void close();}});
+  host.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();void save();}if(e.key==='Escape'){e.stopPropagation();if(!$('.private-note-picker',host).hidden)hidePicker();else void close();}});
   $('[data-note-title]',host).oninput=e=>{note.title=e.target.value;changed();};
   $('[data-note-body]',host).oninput=e=>{note.body=e.target.value;changed();};
   $('[data-note-capture]',host).onclick=()=>{Object.assign(note,pageInfo());changed();locationView();};
@@ -676,6 +678,12 @@
   };
   $('[data-note-ratio]',host).oninput=e=>{note.scroll_ratio=Number(e.target.value)/1000;note.anchor_id='';note.anchor_text='';note.anchor_offset=0;changed();locationView();};
   $('[data-note-save]',host).onclick=()=>void save();
+  $('[data-note-open]',host).onclick=showPicker;
+  $('[data-note-picker-back]',host).onclick=()=>hidePicker();
+  $('[data-note-picker-new]',host).onclick=()=>{hidePicker(false);void newNote();};
+  $('[data-note-picker-query]',host).oninput=()=>{clearTimeout(pickerTimer);pickerToken++;$('.private-note-picker-list',host).replaceChildren();$('[data-note-picker-more]',host).hidden=true;pickerTimer=setTimeout(()=>void loadPicker(),250);};
+  $('[data-note-picker-more]',host).onclick=()=>void loadPicker(true);
+  $('.private-note-picker-list',host).onclick=e=>{const b=e.target.closest('[data-note-pick]');if(!b)return;hidePicker(false);void show(b.dataset.notePick);};
   $('[data-note-new]',host).onclick=()=>void newNote();
   $('[data-note-close]',host).onclick=()=>void close();
   $('[data-note-popout]',host).onclick=popout;
@@ -687,6 +695,33 @@
   place();
  }
  function noteLink(n){const u=new URL(safePage(n.page_url)||'/',location.origin);u.searchParams.set('note',n.id);return u.pathname+u.search;}
+ function hidePicker(focus=true){
+  pickerToken++;clearTimeout(pickerTimer);pickerRows=[];
+  if(!host)return;
+  $('.private-note-picker',host).hidden=true;$('.private-note-form',host).hidden=false;
+  $('.private-note-picker-list',host).replaceChildren();
+  if(focus)$('[data-note-open]',host).focus({preventScroll:true});
+ }
+ function showPicker(){
+  $('.private-note-form',host).hidden=true;$('.private-note-picker',host).hidden=false;
+  $('[data-note-picker-query]',host).value='';pickerRows=[];
+  void loadPicker();$('[data-note-picker-query]',host).focus({preventScroll:true});
+ }
+ async function loadPicker(append=false){
+  if(!uid||!host||$('.private-note-picker',host).hidden)return;
+  const token=++pickerToken,who=uid,page=append?pickerPage+1:0;
+  const query=$('[data-note-picker-query]',host).value.trim(),message=$('[data-note-picker-status]',host),next=$('[data-note-picker-more]',host);
+  message.textContent='正在读取笔记…';next.disabled=true;if(!append){next.hidden=true;$('.private-note-picker-list',host).replaceChildren();}
+  try{
+   let request=client().from(TABLE).select('id,title,page_title,anchor_text,updated_at').order('updated_at',{ascending:false}).order('id').range(page*30,page*30+30);
+   if(query)request=request.ilike('title','%'+query.replace(/[%_\\]/g,'\\$&')+'%');
+   const result=check(await request);if(token!==pickerToken||who!==identity())return;
+   pickerPage=page;pickerRows=[...new Map((append?pickerRows.concat(result.slice(0,30)):result.slice(0,30)).map(r=>[r.id,r])).values()];
+   $('.private-note-picker-list',host).innerHTML=pickerRows.map(r=>'<button type="button" class="private-note-choice" data-note-pick="'+esc(r.id)+'"><strong>'+esc(r.title)+(r.id===note?.id?'<span>当前</span>':'')+'</strong><span>'+esc(r.page_title)+(r.anchor_text?' · '+esc(r.anchor_text):'')+'</span><small>修改于 '+esc(window.FoamLab.dateTime(r.updated_at))+'</small></button>').join('');
+   message.textContent=pickerRows.length?'按最近修改排列 · '+pickerRows.length+' 篇':query?'没有符合条件的笔记。':'还没有已保存的笔记。';next.hidden=result.length<=30;
+  }catch(e){if(token===pickerToken)message.textContent='笔记读取失败：'+e.message;}
+  finally{if(token===pickerToken)next.disabled=false;}
+ }
  function locationView(){
   $('[data-note-location]',host).textContent=(note.page_title||'页面')+' · '+(note.anchor_text||Math.round(note.scroll_ratio*100)+'%');
   $('[data-note-link]',host).href=noteLink(note);if(standalone)$('[data-note-link]',host).target='_blank';
@@ -707,7 +742,7 @@
  }
  function preview(){if(!host||!note)return;const p=$('[data-note-preview]',host);p.innerHTML=window.FoamLab.markdown(note.body||'*尚未填写笔记。*');p.querySelectorAll('a').forEach(a=>{a.target='_blank';a.rel='noopener noreferrer';});}
  function form(){
-  build();$('[data-note-title]',host).value=note.title;$('[data-note-body]',host).value=note.body;
+  build();hidePicker(false);$('[data-note-title]',host).value=note.title;$('[data-note-body]',host).value=note.body;
   $('[data-note-count]',host).textContent=count(note.body)+' 字';
   $('.private-note-conflict',host).hidden=!conflict;
   locationView();mode('edit');status(conflict?'云端版本已更新，草稿保留在此窗口。':dirty?'未同步的草稿':note.revision?'已保存':'输入后自动保存',conflict);
@@ -774,10 +809,12 @@
   open=true;host.hidden=false;place();remember();$('[data-note-title]',host).focus({preventScroll:true});
  }
  async function close(){
+  hidePicker(false);
   if(standalone){if(dirty&&!await save())return;open=false;remember();window.close();return;}
   open=false;host.hidden=true;remember();void save();
  }
  function popout(){
+  hidePicker(false);
   remember();const popup=window.open('/notes/','_blank','popup,width=560,height=740,resizable=yes,scrollbars=yes');
   if(!popup){status('浏览器阻止了独立窗口，请允许弹出窗口后重试。',true);return;}
   // The new window receives this tab's draft; its lifetime is independent.
@@ -849,7 +886,7 @@
   await window.foamAuth?.ready;
   const next=identity()||'';if(next===uid)return;
   if(uid){try{sessionStorage.removeItem(KEY+uid);}catch{}}
-  uid=next;loadToken++;listToken++;clearTimeout(timer);note=null;base=null;dirty=false;conflict=false;open=false;rows=[];task=null;restoreDone=false;
+  uid=next;loadToken++;listToken++;pickerToken++;clearTimeout(pickerTimer);pickerRows=[];clearTimeout(timer);note=null;base=null;dirty=false;conflict=false;open=false;rows=[];task=null;restoreDone=false;
   if(host){host.remove();host=null;}
   if(uid){
    try{const cached=JSON.parse(sessionStorage.getItem(KEY+uid)||'null');if(cached?.note&&safePage(cached.note.page_url)){({note,base,dirty,rect}=cached);open=cached.open===true;conflict=cached.conflict===true;}}
