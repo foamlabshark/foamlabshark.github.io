@@ -43,19 +43,19 @@
  const projections={
   full:'id,slug,kind,title,summary,track,series,cover_url,metadata,section_ids,author_id,author_name,sort_order,pinned,published_at,created_at,updated_at',
   overview:'id,kind,title,summary,series,cover_url,section_ids,curriculum_series:metadata->curriculum_series',
-  book:'id,slug,title,summary,sort_order,fvm_book:metadata->fvm_book,turbulence_book:metadata->turbulence_book,heat_transfer_book:metadata->heat_transfer_book'
+  book:'id,slug,title,summary,sort_order,fvm_book:metadata->fvm_book,turbulence_book:metadata->turbulence_book,heat_transfer_book:metadata->heat_transfer_book,kolev_book:metadata->kolev_book'
  };
  function readContent(ids,shape='full'){
   if(!Object.hasOwn(projections,shape))shape='full';
   const key=shape+':'+[...ids].sort().join(',');if(contentReads.has(key))return contentReads.get(key);
   const pending=(async()=>{const rows=[];for(let start=0;;start+=500){const batch=L.check(await L.client.from('foamlab_content').select(projections[shape]).eq('status','published').overlaps('section_ids',ids).order('sort_order').order('id').range(start,start+499));
-   for(const row of batch){if(shape==='overview')row.metadata={curriculum_series:row.curriculum_series};if(shape==='book')row.metadata={fvm_book:row.fvm_book,turbulence_book:row.turbulence_book,heat_transfer_book:row.heat_transfer_book};}
+   for(const row of batch){if(shape==='overview')row.metadata={curriculum_series:row.curriculum_series};if(shape==='book')row.metadata={fvm_book:row.fvm_book,turbulence_book:row.turbulence_book,heat_transfer_book:row.heat_transfer_book,kolev_book:row.kolev_book};}
    rows.push(...batch);if(batch.length<500)return rows;}})().catch(error=>{contentReads.delete(key);throw error;});
   contentReads.set(key,pending);return pending;
  }
  function prefetchCatalog(){
   // Cached IDs only schedule a fresh request. Never render cached names or rows.
-  const catalog=document.querySelector('[data-lab-catalog]'),book=document.querySelector('#fvm-catalog,#pope-catalog,#incropera-catalog'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!book&&!hub&&!home)return;
+  const catalog=document.querySelector('[data-lab-catalog]'),book=document.querySelector('#fvm-catalog,#pope-catalog,#incropera-catalog,[data-kolev-catalog]'),hub=document.querySelector('#topic-hub'),home=document.querySelector('#home-special-topics');if(!catalog&&!book&&!hub&&!home)return;
   const shapeFor=node=>book?'book':home||hub&&node.key===(hub.dataset.root||'topics')?'overview':'full';
   try{const saved=JSON.parse(sessionStorage.getItem(hintKey)||'null');if(saved&&saved.user===(L.user?.id||null)&&Date.now()-saved.at<86400000&&Array.isArray(saved.nodes)&&saved.nodes.length<=2000){
    const nodes=saved.nodes,key=home?'topics':catalog?.dataset.labCatalog||book?.id.replace('-catalog','')||hub?.dataset.root||'topics',node=(!home&&!book&&D.current(nodes))||nodes.find(n=>n.key===key);
