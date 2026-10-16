@@ -13,21 +13,24 @@
 (() => {
  const root=document.documentElement;
  root.classList.add('has-js');
- let theme='system',width=null,collapsed=false;
- try{theme=localStorage.getItem('foamlab.theme')||'system';width=Number(localStorage.getItem('foamlab.sidebarWidth'));collapsed=localStorage.getItem('foamlab.sidebarCollapsed')==='1';}catch{}
+ let theme='system',palette='green',width=null,collapsed=false;
+ try{theme=localStorage.getItem('foamlab.theme')||'system';palette=localStorage.getItem('foamlab.palette')||'green';width=Number(localStorage.getItem('foamlab.sidebarWidth'));collapsed=localStorage.getItem('foamlab.sidebarCollapsed')==='1';}catch{}
  root.dataset.theme=['light','dark'].includes(theme)?theme:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+ root.dataset.palette=['green','blue','pink','lavender','beige'].includes(palette)?palette:'green';
  root.style.colorScheme=root.dataset.theme;
+ const backgrounds={green:{light:'#f6f5f0',dark:'#111816'},blue:{light:'#f3f5f8',dark:'#111821'},pink:{light:'#faf4f5',dark:'#20171c'},lavender:{light:'#f6f4fa',dark:'#1b1723'},beige:{light:'#faf6ed',dark:'#201c15'}};
+ document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>meta.content=backgrounds[root.dataset.palette][root.dataset.theme]);
  root.classList.toggle('sidebar-collapsed',collapsed);
  if(innerWidth>=761&&Number.isFinite(width)&&width>=200)root.style.setProperty('--sidebar',Math.round(Math.max(200,Math.min(480,Math.floor(innerWidth*.38),width)))+'px');
 })();
 </script>
   <script>/* Show the Panda Town entry at once from the last known state; town-entry.js revalidates it. */(function(){var d=document.documentElement;try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);if(s&&s.show===false)d.dataset.townEntry='false';}catch(e){d.dataset.townAvailable='true';}})();</script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=06e809d7c177">
+  <link rel="stylesheet" href="/assets/site-core.css?v=f3e8ca4734d6">
   
   
   
   <script src="/assets/runtime-account.js?v=f2a51627974d" defer></script>
-  <script src="/assets/appearance.js?v=c4e3f252c0c0" defer></script>
+  <script src="/assets/appearance.js?v=67ddfcfe66ed" defer></script>
   <script src="/assets/sidebar-resize.js?v=3ef87a0899a4" defer></script>
   <script src="/assets/navigation.js?v=3f7c823fe009" defer></script>
   <script type="application/json" id="catalog-hint">{"path":"/topics/finite-volume/","key":"topic-finite-volume","ids":["2d803b45-4d2f-44d0-b07e-568d11c4abc7"]}</script>
@@ -53,7 +56,7 @@
   <link rel="stylesheet" href="/assets/town/town-eggs.css?v=9d3728d0880d">
   <script src="/assets/runtime-panda-eggs.js?v=d81ee4f1d655" defer fetchpriority="low"></script>
   <link rel="stylesheet" href="/assets/town/town-egg-expansion.css?v=dcf3f2ebebdd">
-  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=4f64e1fd1b4d">
+  <link rel="stylesheet" href="/assets/card-backgrounds.css?v=00e19450f672">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-section="topics" data-lesson="">
 <a class="skip" href="#main">跳到主要内容</a>
