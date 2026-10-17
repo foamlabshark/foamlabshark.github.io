@@ -239,7 +239,13 @@
    if(!named&&(el.querySelector('pre,figure,table')||el.textContent.length>450))return;
    if(!named&&!explicit&&!(lead&&/^(提示|小提示|小技巧|操作提示|学习提示)[：:]?$/.test(lead.textContent.trim())))return;
    el.dataset.pandaNote='true';el.classList.add('panda-note');
-   if(named)removePrefix(el,named[0].length);else if(lead)lead.remove();
+   if(named){
+    // The match and removal must use the same subtree: indentation before
+    // the first element is not part of the visible title.
+    const prefixHost=first||el;
+    removePrefix(prefixHost,named[0].length);
+    if(first&&!first.id&&!first.textContent.trim()&&!first.querySelector('img,svg,math,code'))first.remove();
+   }else if(lead)lead.remove();
    const label=document.createElement('div');label.className='panda-note-label panda-note-heading';label.innerHTML=mark+'<span>熊猫说</span>';el.prepend(label);
   });
  }
