@@ -41,7 +41,6 @@
    const i=math.push({tex,display})-1;return '<span data-foam-math="'+i+'"></span>';
   });
   const holder=document.createElement('div');holder.innerHTML=DOMPurify.sanitize(marked.parse(body,{gfm:true,breaks:false}),{USE_PROFILES:{html:true},ALLOW_DATA_ATTR:false,ADD_ATTR:['data-foam-math'],FORBID_TAGS:['style','form','input','button','textarea','select','option','label','iframe','object','embed','video','audio'],FORBID_ATTR:['style','id']});
-  holder.querySelectorAll('[data-foam-math]').forEach(el=>{const item=math[Number(el.dataset.foamMath)];if(!item){el.remove();return;}try{katex.render(item.tex,el,{displayMode:item.display,throwOnError:true,trust:false,maxExpand:1000});}catch{el.className='math-error';el.textContent=item.tex;}});
   holder.querySelectorAll('a').forEach(a=>{const u=safeURL(a.getAttribute('href'));if(!u)a.removeAttribute('href');else{a.href=u;if(new URL(u).origin!==location.origin){a.target='_blank';a.rel='noopener noreferrer';}}});
   holder.querySelectorAll('img').forEach(img=>{const u=safeURL(img.getAttribute('src'));if(!u)img.remove();else{img.src=u;img.loading='lazy';}});
   holder.querySelectorAll('pre > code').forEach(code=>{const lang=code.className.match(/language-([\w+-]+)/)?.[1];if(window.FoamDictionaryFormat?.isDictionary(code.textContent,lang)){code.textContent=window.FoamDictionaryFormat.format(code.textContent,lang);code.className='language-openfoam';}});
@@ -50,6 +49,11 @@
   window.FoamInlineCode?.decorate(holder);
   holder.querySelectorAll('h2,h3').forEach((h,i)=>h.id='section-'+i);
   holder.querySelectorAll('h4,h5,h6').forEach((h,i)=>h.id='detail-'+i);
+  // Decorate prose and code before expanding formulas into thousands of DOM
+  // nodes. Repeated symbols share markup only within this rendering operation.
+  const mathMarkup=new Map();
+  holder.querySelectorAll('[data-foam-math]').forEach(el=>{const item=math[Number(el.dataset.foamMath)];if(!item){el.remove();return;}if(window.katex){try{const key=String(item.display)+':'+item.tex;if(mathMarkup.has(key))el.replaceChildren(...mathMarkup.get(key).map(node=>node.cloneNode(true)));else{katex.render(item.tex,el,{displayMode:item.display,throwOnError:true,trust:false,maxExpand:1000});mathMarkup.set(key,[...el.childNodes].map(node=>node.cloneNode(true)));}}catch{el.className='math-error';el.textContent=item.tex;}}else{el.className='math-pending';el.dataset.mathDisplay=String(item.display);el.textContent=item.tex;}});
+  if(math.length&&!window.katex)window.FoamMathRenderer.enhance();
   return holder.innerHTML;
  };
  document.addEventListener('click',async e=>{const wrap=e.target.closest('[data-lab-wrap]');if(wrap){const on=wrap.closest('.code-panel').classList.toggle('wrap-lines');wrap.setAttribute('aria-pressed',String(on));return;}const b=e.target.closest('[data-lab-copy]');if(b){try{await navigator.clipboard.writeText(b.closest('.code-panel').querySelector('pre').textContent);window.dispatchEvent(new Event('foamlab:code-copied'));b.textContent='已复制';setTimeout(()=>b.textContent='复制代码',1300);}catch{window.foamNotify?.('请选中代码后复制。');}}});
@@ -162,12 +166,13 @@
   if(user&&!user.is_anonymous){
    const result=await lab.client.from('foamlab_content').select('*').eq('slug',slug).eq('status','published').maybeSingle();
    if(stale())return {locked:true};if(result.error){host.dataset.cmsState='error';throw Error('正文暂时无法读取，请刷新重试。');}
-   if(result.data)return {item:result.data};
+   if(result.data){await window.FoamMathRenderer.ready();if(stale())return {locked:true};return {item:result.data};}
   }
   const result=await lab.client.rpc('foamlab_read_article',{p_slug:slug});
   if(stale())return {locked:true};if(result.error||!result.data){host.dataset.cmsState='error';throw Error('正文暂时无法读取，请刷新重试。');}
   const response=result.data;
   if(!response.allowed){lab.lockArticle(host,response.access);return {locked:true};}
+  if(response.item){await window.FoamMathRenderer.ready();if(stale())return {locked:true};}
   return {item:response.item};
  };
  const articleHosts=()=>document.querySelectorAll('.article[data-cms-slug]:not([data-cms-slug=""]),#live-article');

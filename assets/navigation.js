@@ -46,4 +46,22 @@
  window.addEventListener('popstate',()=>activate(window.foamCurrentContent));
  // Catalog filters update the URL without leaving the page.
  document.addEventListener('click',e=>{if(e.target.closest('[data-command-filter],[data-dictionary-filter],[data-track],[data-catalog-kind]'))queueMicrotask(()=>activate(window.foamCurrentContent));});
+ // Warm only the static shell of a link the reader is about to open. These
+ // requests never execute scripts, fetch article bodies or count page views.
+ const prefetched=new Set();let hoverTimer;
+ function warm(link){
+  const connection=navigator.connection;
+  if(!link||link.hasAttribute('download')||link.target&&link.target!=='_self'||document.visibilityState==='hidden'||connection?.saveData||/^(slow-)?2g$/.test(connection?.effectiveType||''))return;
+  let url;try{url=new URL(link.href);}catch{return;}
+  if(url.origin!==location.origin||!/^\/(?:$|(?:start|courses|topics|theory|fvm|read|reference|commands|dictionaries|function-objects|boundary-conditions|programming|cpp|linux|tools|resources|sharing|announcements)\/)/.test(url.pathname))return;
+  if([...url.searchParams.keys()].some(key=>/token|code|state|auth|logout/i.test(key)))return;
+  url.hash='';const key=url.pathname+url.search;
+  if(key===location.pathname+location.search||prefetched.has(key)||prefetched.size>=3)return;
+  const hint=document.createElement('link');if(!hint.relList.supports?.('prefetch'))return;
+  prefetched.add(key);hint.rel='prefetch';hint.href=key;hint.fetchPriority='low';document.head.append(hint);
+ }
+ document.addEventListener('pointerover',e=>{const link=e.target.closest('a[href]');if(!link||link.contains(e.relatedTarget))return;clearTimeout(hoverTimer);hoverTimer=setTimeout(()=>warm(link),100);},{passive:true});
+ document.addEventListener('pointerout',e=>{const link=e.target.closest('a[href]');if(link&&!link.contains(e.relatedTarget))clearTimeout(hoverTimer);},{passive:true});
+ document.addEventListener('focusin',e=>warm(e.target.closest('a[href]')));
+ document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')warm(e.target.closest('a[href]'));},{passive:true});
 })();
