@@ -1,0 +1,106 @@
+/* 2026-10-21 design pass: one entry title at a time, readable world labels, steadier HUD feedback and tidier windows. Loaded last. */
+
+/* Entry titles: the scene card already names the place, so the province banner waits until it leaves. */
+#town-app .town-street-frame:has(>.story-place-title) .town-area-banner{opacity:0!important;animation:none!important}
+#town-app .story-place-title{top:calc(14px + env(safe-area-inset-top,0px));padding:10px 30px 12px;border-radius:8px;border-color:#b9ad73;box-shadow:inset 0 0 0 2px #fff5d51f,0 6px 0 #1c241c33,0 14px 30px #0f17123d}
+#town-app .story-place-title strong{font-size:24px;line-height:1.45}
+#town-app .town-game-shell:has(.story-place-title) .town-play-toasts{top:calc(132px + env(safe-area-inset-top,0px))}
+@media(max-width:900px){#town-app .story-place-title{top:calc(88px + env(safe-area-inset-top,0px))}#town-app .town-game-shell:has(.story-place-title) .town-play-toasts{top:calc(206px + env(safe-area-inset-top,0px))}}
+
+/* World labels: a building plaque steps aside while a resident's name tag covers it; the building keeps its accessible name. */
+#town-app .town-game-world .town-sign{transition:opacity .18s ease,visibility 0s}
+#town-app .town-game-world .town-sign.is-occluded{opacity:0;visibility:hidden;transition:opacity .18s ease,visibility 0s .18s}
+#town-app .town-game-world .town-resident>span{box-shadow:0 1px 0 #1a221a33}
+
+/* HUD buttons: one hover, press and focus language across every panel. */
+#town-app .town-game-shell :is(.town-game-tool,.town-action-button,.town-game-zoom button,.town-walk-run,.town-music-choose,.town-game-controls button){transition:background-color .14s ease,border-color .14s ease,transform .08s ease,box-shadow .14s ease}
+#town-app .town-game-shell :is(.town-game-tool,.town-action-button,.town-game-zoom button,.town-walk-run,.town-game-controls button):active:not(:disabled){transform:translateY(1px) scale(.96)}
+#town-app .town-game-shell :is(button,a,summary):focus-visible{outline:3px solid #f0c75e;outline-offset:2px;border-radius:6px;position:relative;z-index:1}
+#town-app .town-game-tools .town-game-tool svg.town-glyph{width:21px;height:21px;color:currentColor}
+#town-app .town-game-tools .town-game-tool:has(svg.town-glyph) span{font-size:inherit;width:auto}
+
+/* Walking speed reads as speed, not as a zoom level beside + and −. */
+#town-app .town-game-touch .town-walk-run{position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1.1;font-weight:800;margin-right:6px}
+#town-app .town-game-touch .town-walk-run:before{content:'步速';font-size:9px;font-weight:600;letter-spacing:.08em;opacity:.78}
+#town-app .town-game-touch .town-walk-run:after{content:'';position:absolute;right:-5px;top:8px;bottom:8px;width:1px;background:currentColor;opacity:.22}
+#town-app .town-walk-run[data-speed="2"]{background:#e6f3d7!important;border-color:#5f8f55!important;color:#2f5228!important}
+#town-app .town-walk-run[data-speed="4"]{background:#fff1c4!important;border-color:#c99a32!important;color:#674a12!important}
+#town-app .town-game-controls [data-game-control=speed][data-speed="2"] [data-speed-label]{color:#9fd18e}
+#town-app .town-game-controls [data-game-control=speed][data-speed="4"] [data-speed-label]{color:#f2c35a}
+
+/* Toasts float above the bottom HUD instead of over the hotbar labels. */
+body[data-section=town] .egg-toast{bottom:calc(176px + env(safe-area-inset-bottom,0px));max-width:min(520px,calc(100vw - 40px));text-align:center;line-height:1.55}
+
+/* Keyboard help: keys large enough to read at a glance. */
+#town-app .town-help-grid kbd{display:inline-grid;place-items:center;box-sizing:border-box;min-width:26px;height:26px;margin:0 2px;padding:0 7px;border:1px solid color-mix(in srgb,var(--town-window-ink) 35%,transparent);border-bottom-width:3px;border-radius:6px;background:var(--town-window-soft);color:var(--town-window-ink);font:700 12px/1 ui-monospace,Consolas,monospace;vertical-align:middle}
+#town-app .town-help-grid dt{display:flex;align-items:center;flex-wrap:wrap;gap:2px;line-height:1.9}
+
+/* Errors stay legible in every period and never show raw exception text styling as body copy. */
+#town-app :is(#town-dialog,dialog) :is(.story-error,.story-book .is-error){color:#7d3022!important;background:#f8e7d6!important;border:1px solid #d9a88c;border-left-width:4px;padding:10px 14px;border-radius:6px;line-height:1.65}
+
+/* Windows size to their content when there is little of it. */
+#town-app #town-dialog.is-story:has(.story-world-map){height:fit-content;max-height:calc(100dvh - 32px)}
+#town-app #town-dialog.is-story .story-book>p:first-child{margin-top:4px}
+#town-app .story-world-map button{transition:border-color .14s ease,transform .1s ease,background-color .14s ease}
+#town-app .story-world-map button:hover:not([aria-current]){transform:translateY(-2px);border-color:var(--town-window-link,#9fc6a2)}
+#town-app .story-world-map button small{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--town-window-ink) 30%,transparent)}
+#town-app .story-world-map button[aria-current] small{border-color:currentColor;font-weight:700}
+
+/* Building windows keep a fixed height, so the reserved scrollbar lane only shows up as a stripe. */
+#town-app #town-dialog.is-building:not(.is-story) #town-dialog-body{scrollbar-gutter:auto;padding-right:0}
+
+/* A single tab is a heading, not a control. */
+#town-app #town-dialog .tb-tabs:not(:has(>:nth-child(2))){display:none}
+
+/* Chat: an empty log invites the first message. */
+#town-app .town-chat-log:empty{display:grid;place-items:center}
+#town-app .town-chat-log:empty:before{content:'还没有新消息，来打个招呼吧';font-size:14px;opacity:.72;letter-spacing:.04em}
+
+/* Medal wall: locked provinces are dimmer than unlocked ones but still readable. */
+#town-app dialog .province-wall-map .province-wall-item.is-locked span{color:color-mix(in srgb,var(--town-window-ink) 82%,var(--town-window-soft))!important}
+
+/* Collections: labels line up on the left, counts on the right. */
+#town-app .town-collection-nav button{justify-content:flex-start;text-align:left;gap:10px}
+#town-app .town-collection-nav button span{flex:1;min-width:0}
+#town-app .town-collection-nav button small{margin-left:auto;font-variant-numeric:tabular-nums;opacity:.85}
+
+/* Settings: comfortable checkboxes and a tidy profile line. */
+#town-app #town-settings-form label{display:flex;align-items:center;gap:10px;margin:10px 0;cursor:pointer}
+#town-app #town-settings-form input[type=checkbox]{width:18px;height:18px;margin:0;flex-shrink:0}
+#town-app .town-profile-summary{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:16px}
+#town-app .town-profile-summary>:not(.town-link){grid-column:1}
+#town-app .town-profile-summary p{margin:0}
+#town-app .town-profile-summary .town-link{grid-column:2;grid-row:1/span 3;white-space:nowrap}
+
+/* Map page: the way home is the primary action, and the back link matches the other buttons. */
+#town-app[data-view=map] button.primary[data-town=home]{background:#f0c75e!important;border-color:#a7832f!important;color:#3d3015!important;font-weight:800}
+#town-app[data-view=map] button.primary[data-town=home]:hover{background:#f6d77f!important}
+#town-app[data-view=map] .town-toolbar .town-game-back{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:9px 16px;border-width:1px!important;border-radius:12px!important;box-shadow:none!important;text-decoration:none}
+#town-app[data-view=map] .town-toolbar .town-game-back:hover{border-color:var(--town-green)!important}
+
+/* Phones: the player card and tool grid stay in their corners; the tool grid takes the rest of the bottom edge so every button is a full touch target. */
+@media(max-width:700px){
+ #town-app{--hud-card:140px}
+ #town-app .town-game-player{width:var(--hud-card);min-width:0;max-width:var(--hud-card);box-sizing:border-box;padding:7px 8px!important}
+ #town-app .town-game-player :is(.town-player-status,.town-player-origin,.town-game-xp-text){display:none!important}
+ #town-app .town-game-player .town-game-xp{margin-top:5px}
+ #town-app .town-game-tools{width:calc(100vw - var(--hud-card));max-width:none}
+ #town-app .town-game-tools .town-game-tool{min-height:50px}
+ #town-app .town-game-actions{width:auto}
+ #town-app .town-game-hotbar:not(.is-positioned){width:calc(100vw - var(--hud-card));max-width:calc(100vw - var(--hud-card));box-sizing:border-box;border-bottom-right-radius:0;border-top-right-radius:0}
+ #town-app .town-game-hotbar button{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
+ #town-app .town-game-touch{width:var(--hud-card);max-width:var(--hud-card);box-sizing:border-box}
+ #town-app .town-game-touch .town-walk-run{min-width:40px;width:40px;margin-right:2px}
+ #town-app .town-game-touch .town-walk-run:after{display:none}
+ #town-app .town-game-touch .town-game-zoom button{width:33px;min-width:33px}
+ body[data-section=town] .egg-toast{bottom:calc(260px + env(safe-area-inset-bottom,0px))}
+ #town-app .story-place-title{top:calc(136px + env(safe-area-inset-top,0px));left:50%;translate:-50% 0;max-width:calc(100% - 220px);padding:8px 14px}
+ #town-app .story-place-title strong{font-size:18px}
+ #town-app .town-profile-summary{grid-template-columns:1fr}
+ #town-app .town-profile-summary .town-link{grid-column:1;grid-row:auto;justify-self:start;margin-top:8px}
+}
+
+@media(prefers-reduced-motion:reduce){
+ #town-app .town-game-world .town-sign,#town-app .town-game-shell :is(.town-game-tool,.town-action-button,.town-game-zoom button,.town-walk-run),#town-app .story-world-map button{transition:none}
+ #town-app .town-game-shell :is(.town-game-tool,.town-action-button,.town-game-zoom button,.town-walk-run,.town-game-controls button):active:not(:disabled),#town-app .story-world-map button:hover{transform:none}
+}

@@ -19,7 +19,7 @@
  window.addEventListener('foamlab:town-game',init);
  window.addEventListener('focus',()=>{if(!window.FoamTownGame?.active?.config.guest)refresh().catch(()=>{});});
  function achievementHTML(items){return `<div class="town-achievement-grid">${items.map(i=>i.unlocked?`<article class="town-achievement is-unlocked">${window.FoamTownIcon(i.id,'badge',true)}<div><strong>${E(i.title)}</strong><small>已达成 ✓</small>${window.FoamCollectionTime?.(i.obtained_at,'达成')||''}</div></article>`:`<article class="town-achievement is-locked" aria-label="未解锁成就">${window.FoamTownIcon('lock','',true)}<span>未解锁成就</span></article>`).join('')||'<p class="town-note">完成实训、收集知识卡，点亮第一枚成就。</p>'}</div>`;}
- async function achievements(host,id){try{const rows=await window.FoamTownNet.rpc('foamlab_town_achievements',{owner:id});if(host.isConnected)host.innerHTML=achievementHTML(rows);}catch(e){if(host.isConnected)host.textContent='成就暂时无法读取：'+e.message;}}
+ async function achievements(host,id){try{const rows=await window.FoamTownNet.rpc('foamlab_town_achievements',{owner:id});if(host.isConnected)host.innerHTML=achievementHTML(rows);}catch(e){if(host.isConnected)host.textContent='成就暂时无法读取：'+(/^(TypeError|ReferenceError|SyntaxError|RangeError)$/.test(e?.name)?'请稍后再试。':(e?.message||String(e)));}}
  async function shop(host){
   if(!uid()||window.FoamTownGame?.active?.config.guest){host.innerHTML='<p>登录并入住小镇后，可以用拾取和实训获得的竹笋兑换收藏。</p><a href="/account/">登录 / 个人中心 →</a>';return;}
   const data=await refresh(),pet=await window.FoamTownNet.rpc('foamlab_pet',{operation:'state'}),unlocked=new Set(pet.items.filter(i=>i.unlocked).map(i=>i.id));

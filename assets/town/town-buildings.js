@@ -75,7 +75,7 @@
  const runAt=kind=>{const s=runState();return !s.done&&RUN[s.step]?.at===kind;};
  function show(id){tab=id;back=null;const full=document.querySelector('.tb-full');if(full)full.hidden=ctx.kind==='notice'&&id==='board';document.querySelectorAll('.tb-tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===id)));const fn=TABS[ctx.kind+':'+id]||TABS[id];guard(fn);}
  async function guard(fn,...args){const host=view();if(!host)return;live=Symbol();const token=live;host.innerHTML='<div class="tb-loading"><span></span>正在读取…</div>';host.scrollTop=0;
-  try{await L()?.ready;if(token!==live)return;await fn(host,...args);}catch(error){if(token!==live)return;host.innerHTML=`<div class="tb-error" role="alert"><strong>暂时无法读取</strong><p>${E(error.message||'请稍后重试。')}</p><button type="button" data-tb="retry">重试</button></div>`;host.querySelector('[data-tb=retry]').onclick=()=>guard(fn,...args);}}
+  try{await L()?.ready;if(token!==live)return;await fn(host,...args);}catch(error){if(token!==live)return;host.innerHTML=`<div class="tb-error" role="alert"><strong>暂时无法读取</strong><p>${E(/^(TypeError|ReferenceError|SyntaxError|RangeError)$/.test(error?.name)?'请稍后重试。':(error.message||'请稍后重试。'))}</p><button type="button" data-tb="retry">重试</button></div>`;host.querySelector('[data-tb=retry]').onclick=()=>guard(fn,...args);}}
  const check=r=>L().check(r);
  const empty=text=>`<div class="tb-empty">${E(text)}</div>`;
  const backButton=(label='返回')=>`<button type="button" class="tb-back" data-tb="back">← ${E(label)}</button>`;
