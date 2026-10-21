@@ -146,7 +146,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   })();
   const verification=(async()=>{
    try{const verified=await state.client.auth.getUser(activeSession.access_token);if(!current())return;
-    if(verified.error&&[401,403].includes(verified.error.status)){applySession(null);await state.client.auth.signOut({scope:'local'});return;}
+    if(verified.error&&[401,403].includes(verified.error.status)){await state.client.auth.signOut({scope:'local'});if(current())applySession(null);return;}
     if(verified.data?.user)state.user=verified.data.user;
    }catch{/* Network failure does not invalidate the stored session. RLS protects every query. */}
   })();
