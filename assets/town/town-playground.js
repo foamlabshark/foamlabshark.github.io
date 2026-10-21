@@ -26,7 +26,7 @@
     d.className = 'town-park-player' + (mode === 'full' ? ' is-full' : '');
     d.setAttribute('aria-label', '流光画布');
     d.innerHTML = `<header class="town-park-player-bar"><div><strong>流光画布</strong><span>Esc 退出</span></div><button type="button" data-park-size aria-label="切换全屏">${icon}</button><button type="button" data-park-close aria-label="关闭游戏">×</button></header><div class="town-park-screen"><p class="town-park-loading" role="status">正在调好画布的颜色…</p><iframe title="流光画布游戏" allow="fullscreen" referrerpolicy="no-referrer"></iframe><div class="town-park-load-error" hidden><p>画布暂时没有打开，请重试。</p><button type="button" data-park-retry>重新打开</button></div></div>`;
-    document.body.append(d);
+    (document.querySelector('#town-app')||document.body).append(d);
     const frame = d.querySelector('iframe');
     const state = player = {d, frame, game, previousFocus, context, full:false, closing:false, timer:0};
     if (game) game.externalPaused = true;

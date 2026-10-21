@@ -259,7 +259,7 @@
    const bounds=()=>{const r=bar.getBoundingClientRect();return {x:Math.max(8,innerWidth-r.width-8),y:Math.max(8,innerHeight-r.height-8)};};
    const place=(x,y)=>{bar.classList.add('is-positioned');const b=bounds();bar.style.setProperty('left',clamp(x,8,b.x)+'px','important');bar.style.setProperty('top',clamp(y,8,b.y)+'px','important');};
    const save=()=>{const r=bar.getBoundingClientRect(),b=bounds();try{localStorage.setItem(key(),JSON.stringify({x:(r.left-8)/Math.max(1,b.x-8),y:(r.top-8)/Math.max(1,b.y-8)}));}catch{}};
-   const original=()=>{if(neighbor){const r=neighbor.getBoundingClientRect();if(r.width){place(r.left,r.top-bar.getBoundingClientRect().height-12);return;}}bar.classList.remove('is-positioned');bar.style.removeProperty('left');bar.style.removeProperty('top');};
+   const original=()=>{if(neighbor){const r=neighbor.getBoundingClientRect();if(r.width){bar.classList.remove('is-positioned');bar.style.removeProperty('left');bar.style.removeProperty('top');bar.style.setProperty('--control-default-left',r.left+'px');bar.style.setProperty('--control-default-top',(r.top-bar.getBoundingClientRect().height-12)+'px');return;}}bar.classList.remove('is-positioned');bar.style.removeProperty('left');bar.style.removeProperty('top');};
    const reset=()=>{try{localStorage.removeItem(key());}catch{}original();};
    const restore=()=>{if(drag)return;let p;try{p=JSON.parse(localStorage.getItem(key()));}catch{}if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y)){original();return;}bar.classList.add('is-positioned');const b=bounds();place(8+clamp(p.x,0,1)*(b.x-8),8+clamp(p.y,0,1)*(b.y-8));};
    this.on(bar,'pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;const r=bar.getBoundingClientRect();suppressed=false;tapGuard=0;drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top,moved:false,button:e.target.closest('button')};});
@@ -270,7 +270,7 @@
    this.on(window,'pointerup',end);this.on(window,'pointercancel',end);this.on(bar,'lostpointercapture',e=>{if(e.target===bar)end(e);});
    this.on(bar,'click',e=>{if(e.detail>0&&(suppressed||tapGuard>performance.now())){e.preventDefault();e.stopImmediatePropagation();suppressed=false;}},{capture:true});
    this.on(grip,'keydown',e=>{const d={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]}[e.key];if(e.key==='Home'){e.preventDefault();reset();}else if(d){e.preventDefault();const r=bar.getBoundingClientRect();place(r.left+d[0],r.top+d[1]);save();}});
-   this.on(window,'resize',restore);if(neighbor){const watch=new ResizeObserver(restore);watch.observe(neighbor);watch.observe(bar);this.handlers.push(()=>watch.disconnect());}restore();
+   this.on(window,'resize',()=>requestAnimationFrame(restore));if(neighbor){const watch=new ResizeObserver(restore);watch.observe(neighbor);watch.observe(bar);this.handlers.push(()=>watch.disconnect());}restore();
   }
   emitClose(){let handled=false;for(const fn of this.hooks.escape||[])if(fn())handled=true;return handled;}
   tick(now){this.frame=requestAnimationFrame(this.tick);const suspended=!!this.externalPaused||document.hidden||!!document.querySelector('dialog[open]')||!!this.viewport.closest('[data-overlay],.is-text-mode');
