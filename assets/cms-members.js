@@ -11,6 +11,28 @@
   const opts=(items,selected)=>Object.entries(items).map(([v,label])=>'<option value="'+esc(v)+'" '+(String(selected)===v?'selected':'')+'>'+esc(label)+'</option>').join('');
   panel.innerHTML='<section class="cms-members"><div class="cms-toolbar"><div><h2>成员管理</h2><p>查看全部注册用户，在列表中调整成员权限。</p></div><button type="button" class="button secondary" data-members-refresh>刷新列表</button></div><div class="cms-member-filters"><label class="cms-member-search"><span>搜索成员</span><input type="search" data-member-filter="q" maxlength="200" placeholder="昵称、GitHub 用户名、邮箱或用户 ID" value="'+esc(state.q)+'"></label><label><span>权限筛选</span><select data-member-filter="role">'+opts({'':'全部权限',...roles},state.role)+'</select></label><label><span>排序依据</span><select data-member-filter="sort">'+opts({registered_at:'注册时间',last_sign_in_at:'最近登录',username:'用户名',level:'等级'},state.sort)+'</select></label><label><span>排序方向</span><select data-member-filter="direction">'+opts({desc:'降序',asc:'升序'},state.direction)+'</select></label><label><span>每页显示</span><select data-member-filter="size">'+opts({25:'25 人',50:'50 人',100:'100 人'},state.size)+'</select></label><button type="button" class="text-button" data-members-reset>重置筛选</button></div><details class="cms-member-help"><summary>各类权限可以做什么</summary><dl>'+Object.entries(roles).map(([key,label])=>'<div><dt>'+label+'</dt><dd>'+abilities[key]+'</dd></div>').join('')+'</dl></details><p class="cms-member-status" role="status" aria-live="polite">正在读取注册成员…</p><div class="cms-member-results"></div><div class="cms-member-pager"></div></section>';
   const view=panel.querySelector('.cms-members'),results=view.querySelector('.cms-member-results'),pager=view.querySelector('.cms-member-pager'),status=view.querySelector('.cms-member-status');
+  const refresh=view.querySelector('[data-members-refresh]'),actionsBar=document.createElement('div');actionsBar.className='cms-export-actions';refresh.before(actionsBar);actionsBar.append(refresh);actionsBar.insertAdjacentHTML('afterbegin','<button type="button" class="button secondary" data-members-export title="导出当前筛选条件下的全部成员">导出 Excel</button>');
+  view.querySelector('.cms-toolbar').insertAdjacentHTML('afterend','<p class="cms-export-status" role="status" aria-live="polite" data-export-status></p>');
+  const clearExportStatus=()=>{if(!view.querySelector('[data-members-export]').disabled)view.querySelector('[data-export-status]').textContent='';};
+  view.addEventListener('input',clearExportStatus);view.addEventListener('click',e=>{if(e.target.closest('[data-members-reset],[data-members-refresh]'))clearExportStatus();});
+  const queryArgs=(filter,page,size)=>({p_query:filter.q.trim(),p_role:filter.role,p_sort:filter.sort,p_direction:filter.direction,p_page:page,p_size:Number(size)});
+  view.querySelector('[data-members-export]').onclick=e=>{
+   const filter={...state};
+   void window.FoamCMSExcel.run(C,view,e.currentTarget,async({progress,assertActive})=>{
+    const all=[],seen=new Set();let total=null;
+    for(let page=1;;page++){
+     assertActive();const data=L.check(await L.client.rpc('foamlab_admin_members',queryArgs(filter,page,100)));assertActive();
+     if(!Array.isArray(data?.items)||!Number.isSafeInteger(data.total)||data.total<0||data.page!==page||(total!==null&&data.total!==total))throw Error('成员列表在导出期间发生变化，请重试。');
+     total=data.total;
+     for(const row of data.items){if(!row.user_id||seen.has(row.user_id))throw Error('成员列表在导出期间发生变化，请重试。');seen.add(row.user_id);all.push(row);}
+     progress('已读取 '+all.length+' / '+total+' 位成员…');
+     if(all.length===total)break;
+     if(!data.items.length||all.length>total)throw Error('成员列表读取不完整，请重试。');
+    }
+    const stage={beginner:'入门',intermediate:'进阶',research:'研究应用'},d=window.FoamCMSExcel.date;
+    return {name:'成员管理',columns:[['昵称',24],['GitHub 用户名',24],['邮箱',32],['权限',20],['等级',10,'number'],['经验值',14,'number'],['注册时间',23,'date'],['最近登录',23,'date'],['单位',30],['研究方向',35],['学习阶段',16],['个人介绍',60],['身份受保护',16],['用户 ID',40]],rows:all.map(m=>[m.display_name||'',m.username||'',m.email||'',roles[m.role==='moderator'?'editor':m.role]||m.role,Number(m.level||0),Number(m.xp||0),d(m.registered_at),d(m.last_sign_in_at),m.institution||'',m.research||'',stage[m.learning_stage]||m.learning_stage||'',m.bio||'',m.role_protected?'是':'否',m.user_id]),details:[['搜索条件',filter.q.trim()||'未限制'],['权限筛选',roles[filter.role]||'全部权限'],['排序',({registered_at:'注册时间',last_sign_in_at:'最近登录',username:'用户名',level:'等级'})[filter.sort]+' · '+(filter.direction==='asc'?'升序':'降序')],['导出范围','点击导出时的筛选条件下的全部成员，包含列表后续各页。']]};
+   });
+  };
   const date=value=>{if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});};
   function table(){
    results.innerHTML=members.length?'<table class="cms-member-table"><caption class="sr-only">注册成员与权限</caption><thead><tr><th scope="col">成员</th><th scope="col">等级</th><th scope="col">注册时间</th><th scope="col">最近登录</th><th scope="col">权限</th><th scope="col">操作</th></tr></thead><tbody>'+members.map(m=>{const own=m.user_id===L.user.id;return '<tr data-member-id="'+esc(m.user_id)+'"><td data-label="成员"><button type="button" class="cms-member-name" data-member-info>'+esc(m.display_name)+'</button>'+(own?'<span class="cms-member-self">当前账号</span>':'')+(m.role_protected?'<span class="cms-member-self">身份受保护</span>':'')+'<small>'+esc(m.username?'@'+m.username:'未设置 GitHub 用户名')+'</small></td><td data-label="等级"><strong>Lv.'+Number(m.level)+'</strong><small>'+Number(m.xp)+' 经验</small></td><td data-label="注册时间"><time datetime="'+esc(m.registered_at||'')+'">'+esc(date(m.registered_at))+'</time></td><td data-label="最近登录">'+(m.last_sign_in_at?'<time datetime="'+esc(m.last_sign_in_at)+'">'+esc(date(m.last_sign_in_at))+'</time>':'尚无记录')+'</td><td data-label="权限"><select data-member-role aria-label="'+esc(m.display_name)+'的权限" '+(own||m.role_protected?'disabled':'')+'>'+opts(roles,m.role)+'</select></td><td data-label="操作"><div class="cms-member-actions"><button type="button" class="text-button" data-member-info>资料</button><button type="button" class="text-button" data-member-save disabled>保存</button><button type="button" class="text-button" data-member-cancel disabled>取消</button></div></td></tr>';}).join('')+'</tbody></table>':'<div class="cms-empty">没有找到符合条件的成员。</div>';
@@ -21,7 +43,7 @@
    try{
     await window.foamAuth?.recordMemberVisit?.();
     if(id!==request||!view.isConnected)return;
-    const data=L.check(await L.client.rpc('foamlab_admin_members',{p_query:state.q.trim(),p_role:state.role,p_sort:state.sort,p_direction:state.direction,p_page:state.page,p_size:Number(state.size)}));
+    const data=L.check(await L.client.rpc('foamlab_admin_members',queryArgs(state,state.page,state.size)));
     if(id!==request||!view.isConnected)return;
     members=data.items.map(m=>({...m,role:m.role==='moderator'?'editor':m.role}));state.page=data.page;table();pager.innerHTML=UI.pager(state.page,data.total,Number(state.size));
     status.textContent='共 '+data.total+' 位成员'+(state.q.trim()||state.role?' · 已应用筛选':'')+' · 最近登录按已登录状态下的访问时间记录；时间按当前设备时区显示';
