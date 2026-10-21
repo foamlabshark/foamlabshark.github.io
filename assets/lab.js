@@ -65,7 +65,7 @@
   if(window.foamAuth.loading)return;
   if(!window.foamAuth.user||window.foamAuth.user.is_anonymous){document.querySelectorAll('.article[data-cms-slug]:not([data-cms-slug=""]),#live-article').forEach(host=>lab.lockArticle?.(host));document.querySelectorAll('.topic-introduction').forEach(e=>e.remove());}
   if(!authInitialized)return;
-  if(lab.user?.id===window.foamAuth.user?.id){if(e.detail?.accountUpdated)void lab.refreshAccountProgress();return;}
+  if(lab.user?.id===window.foamAuth.user?.id){if(e.detail?.accountUpdated&&!e.detail?.profileSaved)void lab.refreshAccountProgress();return;}
   lab.user=window.foamAuth.user;lab.role=null;
   document.querySelectorAll('[data-management-link],#profile-admin-link').forEach(link=>link.hidden=true);
   // Rebuild member/admin controls with the new identity, including changes

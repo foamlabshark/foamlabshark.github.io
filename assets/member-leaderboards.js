@@ -13,23 +13,32 @@
    const count=key==='experience'?row.xp:row.days;score.className='member-ranking-score';const number=document.createElement('strong'),unit=document.createElement('small');number.textContent=Number(count||0).toLocaleString('zh-CN');unit.textContent=key==='experience'?'经验':'天';score.append(number,unit);li.append(rank,name,score);ol.append(li);
   });target.append(ol);
  }
- async function refresh(){
-  if(pending)return pending;initialized=true;
+ function render(value){
+  list('experience',value.experience);list('activity',value.activity);
+  $('[data-ranking-period]').textContent=value.start_date&&value.end_date?value.start_date.slice(5).replace('-','.')+'—'+value.end_date.slice(5).replace('-','.'):'';
+  $('[data-ranking-period]').title='北京时间，含今天在内的 15 天';$('[data-ranking-state]').hidden=true;$('[data-ranking-retry]').hidden=true;
+ }
+ let displayed=null;
+ async function refresh(force=false){
+  if(pending)return force?pending.then(()=>refresh(true)):pending;initialized=true;
   pending=(async()=>{try{
-   for(let wait=0;!window.foamAuth&&wait<120;wait++)await new Promise(resolve=>setTimeout(resolve,100));await window.foamAuth?.ready;
-   const client=window.foamAuth?.client;if(!client)throw Error();const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);let result;
-   try{result=await client.from('foamlab_member_leaderboards').select('data,updated_at').eq('id',true).single().abortSignal(controller.signal);}finally{clearTimeout(timer);}
-   const value=result.data?.data;if(result.error||!Array.isArray(value?.experience)||!Array.isArray(value?.activity))throw Error();
-   list('experience',value.experience);list('activity',value.activity);
-   $('[data-ranking-period]').textContent=value.start_date&&value.end_date?value.start_date.slice(5).replace('-','.')+'—'+value.end_date.slice(5).replace('-','.'):'';
-   $('[data-ranking-period]').title='北京时间，含今天在内的 15 天';$('[data-ranking-state]').hidden=true;$('[data-ranking-retry]').hidden=true;lastRead=Date.now();
+   const saved=window.FoamMemberData.cached('foamlab_member_leaderboards');
+   if(!displayed&&saved){displayed=JSON.stringify(saved.data);render(saved.data);}
+   const value=await window.FoamMemberData.read('foamlab_member_leaderboards',{force}),signature=JSON.stringify(value);
+   if(signature!==displayed){displayed=signature;render(value);}$('[data-ranking-state]').hidden=true;$('[data-ranking-retry]').hidden=true;lastRead=Date.now();
   }catch{$('[data-ranking-state]').textContent='排行榜暂时无法读取。';$('[data-ranking-state]').hidden=false;$('[data-ranking-retry]').hidden=false;}
   finally{pending=null;}})();return pending;
  }
- $('[data-ranking-retry]').onclick=()=>void refresh();
+ $('[data-ranking-retry]').onclick=()=>void refresh(true);
  const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&(!initialized||Date.now()-lastRead>60000))void refresh();},{rootMargin:'250px'});observer.observe(card);
- const accountChanged=e=>{const auth=window.foamAuth,signature=JSON.stringify([auth?.user?.id,auth?.profile?.display_name,auth?.pet?.xp,auth?.pet?.checked_in]);if(initialized&&(signature!==lastSignature||e.detail?.accountUpdated)){lastSignature=signature;void refresh();}};
- window.addEventListener('foam-auth-change',accountChanged);window.addEventListener('foam-pet-change',accountChanged);
+ let petOwner=null,petXP=null;
+ window.addEventListener('foam-pet-change',()=>{
+  const pet=window.foamAuth?.pet,owner=window.foamAuth?.user?.id||null,xp=pet?.xp;
+  if(xp==null)return;
+  if(petOwner===owner&&petXP!==null&&xp!==petXP){window.FoamMemberData.invalidate('foamlab_member_leaderboards');if(initialized)void refresh(true);}
+  petOwner=owner;petXP=xp;
+ });
+ window.addEventListener('foam-profile-saved',()=>{window.FoamMemberData.invalidate('foamlab_member_leaderboards');if(initialized)void refresh(true);});
  window.addEventListener('focus',()=>{if(initialized&&Date.now()-lastRead>60000)void refresh();});
  const timer=setInterval(()=>{if(!document.hidden&&initialized&&Date.now()-lastRead>60000){const r=card.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)void refresh();}},60000);
  window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});

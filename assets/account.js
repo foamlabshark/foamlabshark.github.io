@@ -1,8 +1,8 @@
 'use strict';
 (() => {
  const $=s=>document.querySelector(s);const shortcuts={"courses":"系统学习","topics":"专题学习","start":"快速开始","commands":"命令速查","dictionaries":"配置与字典速查","algorithms":"有限体积法","linux":"Linux 入门","cpp":"C++ 入门","programming":"OpenFOAM 编程","tools":"工具生态","resources":"资料中心","sharing":"实践与分享","community":"讨论中心","assignments":"作业与实践","announcements":"网站公告"};const defaultShortcuts=["courses", "topics", "commands", "dictionaries", "programming", "resources", "sharing", "community"];const selectedShortcuts=value=>Array.isArray(value)?[...new Set(value.map(key=>({authors:'sharing',recommendations:'resources'})[key]||key))].filter(key=>Object.hasOwn(shortcuts,key)):defaultShortcuts;
- const state={client:null,user:null,profile:null,progress:[],pet:null,petError:false,configured:false,githubEnabled:false,dataError:false,profileError:false,loading:true,dataLoading:false,signingOut:false};window.foamAuth=state;
- let session=null,revision=0,initializing=true,reloadTimer,renderedProfile='',accountController=null,accountLoad=null;
+ const state={client:null,user:null,profile:null,progress:[],pet:null,petError:false,configured:false,githubEnabled:false,dataError:false,profileError:false,progressError:false,loading:true,dataLoading:false,signingOut:false};window.foamAuth=state;
+ let session=null,revision=0,initializing=true,reloadTimer,renderedProfile='',accountController=null,accountLoad=null,profileVersion=0;
  let activityOwner=null,activityAt=-Infinity,activityRequest=null;
  // Record visible, authenticated visits using the database clock. The callback
  // runs outside the Auth lock; a failed activity request never blocks sign-in.
@@ -31,7 +31,7 @@
  function authFetch(input,options={}){const controller=new AbortController(),abort=()=>controller.abort(),signal=options.signal;if(signal?.aborted)abort();else signal?.addEventListener('abort',abort,{once:true});const timer=setTimeout(abort,12000);return fetch(input,{...options,signal:controller.signal}).finally(()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);});}
  const report=message=>{const box=$('#account-error');if(box){box.hidden=false;box.textContent=message;}else window.foamNotify?.(message);};
  const text=(selector,value)=>{if($(selector))$(selector).textContent=value;};
- const emit=(accountUpdated=false)=>{window.dispatchEvent(new CustomEvent('foam-auth-change',{detail:{user:state.user,progress:[...state.progress],accountUpdated}}));if(state.user&&!state.dataLoading&&!state.profileError&&window.FoamProfile.complete(state.profile)&&location.pathname==='/account/'&&sessionStorage.getItem('foamlab.returnTo')==='admin'){sessionStorage.removeItem('foamlab.returnTo');location.replace('/admin/');}else if(state.user&&!state.dataLoading&&!state.profileError&&window.FoamProfile.complete(state.profile)&&location.pathname==='/account/'){const dest=sessionStorage.getItem('foamlab.afterLogin');if(dest&&dest.startsWith('/')&&!dest.startsWith('//')){sessionStorage.removeItem('foamlab.afterLogin');location.replace(dest);}}};
+ const emit=(accountUpdated=false,profileSaved=false)=>{window.dispatchEvent(new CustomEvent('foam-auth-change',{detail:{user:state.user,progress:[...state.progress],accountUpdated,profileSaved}}));if(state.user&&!state.dataLoading&&!state.profileError&&window.FoamProfile.complete(state.profile)&&location.pathname==='/account/'&&sessionStorage.getItem('foamlab.returnTo')==='admin'){sessionStorage.removeItem('foamlab.returnTo');location.replace('/admin/');}else if(state.user&&!state.dataLoading&&!state.profileError&&window.FoamProfile.complete(state.profile)&&location.pathname==='/account/'){const dest=sessionStorage.getItem('foamlab.afterLogin');if(dest&&dest.startsWith('/')&&!dest.startsWith('//')){sessionStorage.removeItem('foamlab.afterLogin');location.replace(dest);}}};
  function render(){window.FoamProfile?.sync(state);const signed=!!state.user;const nav=$('#account-nav-label');if(nav){nav.textContent=signed||state.loading?'个人中心':'登录 / 个人中心';nav.setAttribute('aria-busy',String(state.loading));}for(const button of document.querySelectorAll('#sign-out,#nav-sign-out')){button.hidden=!signed;button.disabled=state.signingOut;button.textContent=state.signingOut?'正在退出…':'退出登录';}text('#home-panda-account',state.loading?'我的熊猫与学习记录 →':signed?'查看我的熊猫与学习记录 →':'登录后，查看熊猫与学习记录 →');const page=$('.account-page');if(!page)return;
  $('#sign-in').hidden=signed;$('#profile-fields').disabled=!signed||state.profileError||state.dataLoading;$('#sign-in').disabled=state.loading||!state.githubEnabled;
  if(state.loading){text('#account-name','正在恢复登录…');text('#account-state','');return;}
@@ -51,7 +51,7 @@
   if(changed){revision++;accountController?.abort();}
   session=next;state.user=next?.user||null;state.loading=false;
   if(identityChanged||!next){activityOwner=null;activityAt=-Infinity;activityRequest=null;}
-  if(identityChanged||!next){state.profile=null;state.progress=[];state.pet=null;state.petError=false;state.dataError=false;state.profileError=false;state.dataLoading=!!next;renderedProfile='';delete state.visibleCompleted;delete state.totalLessons;}
+  if(identityChanged||!next){state.profile=null;state.progress=[];state.pet=null;state.petError=false;state.dataError=false;state.profileError=false;state.progressError=false;state.dataLoading=!!next;renderedProfile='';delete state.visibleCompleted;delete state.totalLessons;}
   if(changed||initializing){render();emit();if(next)setTimeout(recordMemberVisit,0);}
   return changed;
  }
@@ -62,25 +62,36 @@
   // A confirmed invalid token ends the session. Temporary network errors keep
   // the stored identity visible; database permissions are still enforced by RLS.
   accountController?.abort();const controller=accountController=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
-  let verified,profile,progress;
-  try{[verified,profile,progress]=await Promise.all([
-   state.client.auth.getUser(activeSession.access_token),
-   state.client.from('foamlab_profiles').select('*').eq('user_id',activeSession.user.id).maybeSingle().abortSignal(controller.signal),
-   state.client.from('foamlab_learning_progress').select('content_id,completed').eq('user_id',activeSession.user.id).abortSignal(controller.signal)
-  ]);}finally{clearTimeout(timeout);if(accountController===controller)accountController=null;}
+  const requestProfileVersion=profileVersion;
+  const profileTask=(async()=>{
+   try{
+    const result=await state.client.from('foamlab_profiles').select('*').eq('user_id',activeSession.user.id).maybeSingle().abortSignal(controller.signal);
+    if(!current()||requestProfileVersion!==profileVersion)return;
+    state.profileError=!!result.error;if(!result.error)state.profile=result.data;
+   }catch{if(current()&&requestProfileVersion===profileVersion)state.profileError=true;}
+   if(!current()||requestProfileVersion!==profileVersion)return;
+   state.dataLoading=false;state.dataError=state.profileError||state.progressError;render();emit(true);
+  })();
+  const progressTask=(async()=>{
+   try{const result=await state.client.from('foamlab_learning_progress').select('content_id,completed').eq('user_id',activeSession.user.id).abortSignal(controller.signal);
+    if(!current())return;state.progressError=!!result.error;
+    if(!result.error)state.progress=(result.data||[]).filter(x=>x.completed).map(x=>x.content_id);
+   }catch{if(current())state.progressError=true;}
+  })();
+  const verification=(async()=>{
+   try{const verified=await state.client.auth.getUser(activeSession.access_token);if(!current())return;
+    if(verified.error&&[401,403].includes(verified.error.status)){applySession(null);await state.client.auth.signOut({scope:'local'});return;}
+    if(verified.data?.user)state.user=verified.data.user;
+   }catch{/* Network failure does not invalidate the stored session. RLS protects every query. */}
+  })();
+  try{await Promise.all([profileTask,progressTask,verification]);}
+  finally{clearTimeout(timeout);if(accountController===controller)accountController=null;}
   if(!current())return;
-  if(verified.error&&[401,403].includes(verified.error.status)){
-   applySession(null);
-   await state.client.auth.signOut({scope:'local'});
-   return;
-  }
-  if(verified.data?.user)state.user=verified.data.user;
-  state.dataLoading=false;state.profileError=!!profile.error;state.dataError=!!(profile.error||progress.error);
-  if(!profile.error)state.profile=profile.data;if(!progress.error)state.progress=(progress.data||[]).filter(x=>x.completed).map(x=>x.content_id);
-  if(state.dataError){report('已保持登录，个人资料暂时无法读取。请稍后重试。');}
-  else{if($('#account-error'))$('#account-error').hidden=true;}
-  render();
-  emit(true);
+  state.dataError=state.profileError||state.progressError;
+  if(state.dataError)report('已保持登录，部分账号资料暂时无法读取。请稍后重试。');
+  else if($('#account-error'))$('#account-error').hidden=true;
+  render();emit();
+
  }
  function updateAccount(){
   const requestRevision=revision;
@@ -103,7 +114,7 @@
    if(cfg.publishableKey.startsWith('sb_secret_'))throw Error('认证配置错误：网页不能使用服务端密钥。');
    if(!window.supabase?.createClient)throw Error('认证组件未能加载，请刷新页面。');
    state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{global:{fetch:(input,options={})=>{const url=typeof input==='string'?input:input.url||String(input);return url.includes('/auth/v1/user')?authFetch(input,options):fetch(input,options);}},auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'foamlab-auth'}});
-   state.configured=true;state.githubEnabled=true;
+   state.publicConfig=cfg;state.configured=true;state.githubEnabled=true;
    state.client.auth.onAuthStateChange((event,next)=>{
     if(!['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED','USER_UPDATED'].includes(event))return;
     const changed=applySession(next);
@@ -151,7 +162,7 @@
   const {data,error}=await state.client.from('foamlab_profiles').upsert(profile,{onConflict:'user_id'}).select('*').single();
   if(error)throw Error('保存失败，当前填写内容已保留。请检查网络或填写内容后重试。');
   if(state.user?.id!==owner||state.signingOut)throw Error('登录账号已变化，请重新确认个人资料。');
-  state.profile=data||profile;render();emit(true);return state.profile;
+  profileVersion++;state.profile=data||profile;render();emit(true,true);dispatchEvent(new CustomEvent('foam-profile-saved'));return state.profile;
  };
  if($('#profile-form'))$('#profile-form').elements.birth_month.max=window.FoamProfile.monthNow();
  $('#profile-form')?.addEventListener('input',e=>e.target.setCustomValidity?.(''));

@@ -27,7 +27,7 @@
   const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]');
   let frameId=0,lastTick=0,inView=false,disposed=false,pointer=null,drag=null;
   const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
-  const enabled=()=>!disposed&&inView&&!document.hidden&&!preference.matches&&!motionPaused;
+  const enabled=()=>!disposed&&inView&&!document.hidden&&!preference.matches&&!motionPaused&&!document.documentElement.classList.contains('profile-required-open');
   const coordinates=e=>{const rect=svg.getBoundingClientRect();return {x:(e.clientX-rect.left)*width/rect.width,y:(e.clientY-rect.top)*height/rect.height};};
   function place(item){item.g.setAttribute('transform',`translate(${item.x.toFixed(2)},${item.y.toFixed(2)})`);item.circle.setAttribute('transform',`rotate(${item.angle||0}) scale(${1-item.squeeze},${1/(1-item.squeeze)})`);}
   function tick(now){
@@ -73,8 +73,9 @@
   svg.addEventListener('pointermove',move);svg.addEventListener('pointerleave',leave);svg.addEventListener('pointerdown',down);svg.addEventListener('pointerup',release);svg.addEventListener('pointercancel',release);svg.addEventListener('lostpointercapture',release);
   control.onclick=()=>{motionPaused=!motionPaused;update();};
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
+  const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
-  return ()=>{disposed=true;cancelAnimationFrame(frameId);observer.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);control.onclick=null;control.hidden=true;};
+  return ()=>{disposed=true;cancelAnimationFrame(frameId);observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);control.onclick=null;control.hidden=true;};
  }
  function bubbleChart(svg,list,width,height){
   const root=window.d3.hierarchy({children:list}).sum(d=>d.count||0).sort((a,b)=>b.value-a.value||a.data.label?.localeCompare(b.data.label||'','zh-CN')||0);
@@ -125,7 +126,7 @@
  async function draw(){
   const version=++drawRevision;stopPhysics?.();stopPhysics=null;$('[data-distribution-motion]').hidden=true;if(!data)return;
   $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];$('[data-distribution-selection]').textContent='';
-  renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
+  if(!$('#member-distribution-list').hidden)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.append(p,a);return;}
   const bubble=kind==='institutions'||kind==='research';
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
@@ -139,31 +140,33 @@
   if(bubble)bubbleChart(svg,shown,svgWidth,height);else barChart(svg,shown,svgWidth,height);
   chart.append(svg);if(bubble&&list.length>40)$('[data-distribution-caption]').textContent+=' 图中显示人数最多的 40 项，其余项目可在数据列表中查询。';
  }
- async function refresh(){
-  if(pending)return pending;initialized=true;
+ async function refresh(force=false){
+  if(pending)return force?pending.then(()=>refresh(true)):pending;initialized=true;
   pending=(async()=>{
    try{
-    for(let wait=0;!window.foamAuth&&wait<120;wait++)await new Promise(resolve=>setTimeout(resolve,100));
-    await window.foamAuth?.ready;const client=window.foamAuth?.client;if(!client)throw Error();
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);let result;
-    try{result=await client.from('foamlab_member_distribution').select('data,updated_at').eq('id',true).single().abortSignal(controller.signal);}finally{clearTimeout(timer);}
-    if(result.error||!Number.isSafeInteger(result.data?.data?.members))throw Error();
-    data=result.data.data;lastRead=Date.now();await draw();
+    const saved=window.FoamMemberData.cached('foamlab_member_distribution');
+    if(!data&&saved){data=saved.data;void draw();}
+    if(kind==='institutions'||kind==='research')void packRuntime().catch(()=>{});
+    const value=await window.FoamMemberData.read('foamlab_member_distribution',{force});
+    const changed=JSON.stringify(data)!==JSON.stringify(value);data=value;lastRead=Date.now();
+    $('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-retry]').hidden=true;
+    if(changed||!chart.querySelector('svg'))await draw();
    }catch{
     if(!data)chart.textContent='成员统计暂时无法读取。';
     $('[data-distribution-summary]').textContent=data?'暂时显示上次读取的统计':'请稍后重试';$('[data-distribution-retry]').hidden=false;
    }finally{pending=null;}
   })();return pending;
  }
+
  function activate(tab){kind=tab.dataset.distributionTab;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw();}
  for(const [i,tab]of tabs.entries()){
   tab.onclick=()=>activate(tab);
   tab.onkeydown=e=>{const next=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:null;if(next!==null){e.preventDefault();tabs[next].focus();activate(tabs[next]);}};
  }
  $('[data-distribution-list-toggle]').onclick=e=>{const panel=$('#member-distribution-list');panel.hidden=!panel.hidden;e.currentTarget.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)renderList();};
- $('#member-distribution-search').oninput=renderList;$('[data-distribution-retry]').onclick=()=>void refresh();
+ $('#member-distribution-search').oninput=renderList;$('[data-distribution-retry]').onclick=()=>void refresh(true);
  if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){observer.disconnect();void refresh();}},{rootMargin:'250px'});observer.observe(host);}else void refresh();
  const resize=new ResizeObserver(()=>{const width=Math.round(chart.clientWidth);if(width===lastWidth)return;lastWidth=width;cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>void draw());});resize.observe(chart);
- window.addEventListener('foam-auth-change',e=>{if(initialized&&e.detail?.accountUpdated)void refresh();});
+ window.addEventListener('foam-profile-saved',()=>{window.FoamMemberData.invalidate('foamlab_member_distribution');if(initialized)void refresh(true);});
  window.addEventListener('focus',()=>{if(initialized&&Date.now()-lastRead>180000)void refresh();});
 })();
