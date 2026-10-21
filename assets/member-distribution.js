@@ -3,6 +3,7 @@
  const host=document.querySelector('[data-member-distribution]');if(!host)return;
  const script=document.currentScript,packURL=script.dataset.packRuntime;
  const $=selector=>host.querySelector(selector),chart=$('[data-distribution-chart]'),tabs=[...host.querySelectorAll('[role=tab]')];
+ const listDialog=$('#member-distribution-list');
  const names={institutions:'学校 / 单位',research:'研究方向',stages:'学习阶段',cohorts:'出生年代'};
  const captions={institutions:'气泡面积与成员人数成正比。悬停、点击或用键盘选中气泡可查看全称与人数。',research:'按逗号、顿号、分号等拆分研究方向；同一成员的重复关键词只计一次，一人可计入多个方向。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
  let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastWidth=0,stopPhysics=null,motionPaused=false;
@@ -24,10 +25,10 @@
   element.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(row,element);}});
  }
  function bubbleMotion(svg,items,width,height){
-  const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]');
+  const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),resetControl=$('[data-distribution-reset]');
   let frameId=0,lastTick=0,inView=false,disposed=false,pointer=null,drag=null;
   const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
-  const enabled=()=>!disposed&&inView&&!document.hidden&&!preference.matches&&!motionPaused&&!document.documentElement.classList.contains('profile-required-open');
+  const enabled=()=>!disposed&&inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
   const coordinates=e=>{const rect=svg.getBoundingClientRect();return {x:(e.clientX-rect.left)*width/rect.width,y:(e.clientY-rect.top)*height/rect.height};};
   function place(item){item.g.setAttribute('transform',`translate(${item.x.toFixed(2)},${item.y.toFixed(2)})`);item.circle.setAttribute('transform',`rotate(${item.angle||0}) scale(${1-item.squeeze},${1/(1-item.squeeze)})`);}
   function tick(now){
@@ -37,17 +38,20 @@
    for(const [i,item]of items.entries()){
     item.pressure=0;
     if(drag?.item===item)continue;
-    // Gentle cohesion and slow buoyant drift keep the group together.
-    item.vx+=(item.homeX-item.x)*.0009*dt+Math.sin(now*.00065+i*2.4)*.009*dt;
-    item.vy+=(item.homeY-item.y)*.0009*dt+Math.cos(now*.00058+i*1.9)*.009*dt;
+    // Return displaced bubbles to the packed group while retaining a small buoyant drift.
+    item.vx+=(item.homeX-item.x)*.0028*dt+Math.sin(now*.00065+i*2.4)*.009*dt;
+    item.vy+=(item.homeY-item.y)*.0028*dt+Math.cos(now*.00058+i*1.9)*.009*dt;
     if(pointer&&!drag){const dx=item.x-pointer.x,dy=item.y-pointer.y,d=Math.hypot(dx,dy)||1,reach=item.r+65;if(d<reach){const force=.48*(1-d/reach)**2;item.vx+=dx/d*force*dt;item.vy+=dy/d*force*dt;}}
-    item.vx*=.94;item.vy*=.94;item.x+=clamp(item.vx,-4,4)*dt;item.y+=clamp(item.vy,-4,4)*dt;
+    item.vx*=.91;item.vy*=.91;item.x+=clamp(item.vx,-4,4)*dt;item.y+=clamp(item.vy,-4,4)*dt;
    }
    // Resolve pairs by area-based mass. A dragged bubble pushes its neighbours directly.
    for(let pass=0;pass<3;pass++)for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
     const a=items[i],b=items[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01,overlap=a.r+b.r+3-d;
-    if(overlap<=0)continue;
     const nx=dx/d,ny=dy/d,wa=drag?.item===a?0:drag?.item===b?1:b.r*b.r/(a.r*a.r+b.r*b.r),wb=1-wa;
+    if(overlap<=0){
+     if(pass===0){const pull=Math.min(.09,Math.max(0,-overlap-6)*.001)/Math.sqrt(items.length)*dt;a.vx+=nx*pull*wa;a.vy+=ny*pull*wa;b.vx-=nx*pull*wb;b.vy-=ny*pull*wb;}
+     continue;
+    }
     const push=overlap*.65;a.x-=nx*push*wa;a.y-=ny*push*wa;b.x+=nx*push*wb;b.y+=ny*push*wb;
     a.vx-=nx*overlap*.018*wa;a.vy-=ny*overlap*.018*wa;b.vx+=nx*overlap*.018*wb;b.vy+=ny*overlap*.018*wb;
     for(const item of [a,b])if(overlap>item.pressure){item.pressure=overlap;item.angle=Math.atan2(ny,nx)*180/Math.PI;}
@@ -72,10 +76,17 @@
   const down=e=>{if(!enabled()||e.button!==0)return;const g=e.target.closest('.member-bubble'),item=items.find(item=>item.g===g);if(!item)return;e.preventDefault();pointer=coordinates(e);drag={item,pointerId:e.pointerId,offsetX:pointer.x-item.x,offsetY:pointer.y-item.y};select(item.row,item.g);svg.setPointerCapture(e.pointerId);svg.classList.add('is-dragging');};
   svg.addEventListener('pointermove',move);svg.addEventListener('pointerleave',leave);svg.addEventListener('pointerdown',down);svg.addEventListener('pointerup',release);svg.addEventListener('pointercancel',release);svg.addEventListener('lostpointercapture',release);
   control.onclick=()=>{motionPaused=!motionPaused;update();};
+  resetControl.hidden=false;
+  resetControl.onclick=()=>{
+   if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
+   pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
+   for(const item of items){item.x=item.homeX;item.y=item.homeY;item.vx=0;item.vy=0;item.squeeze=0;item.pressure=0;item.angle=0;item.g.classList.remove('is-selected');place(item);}
+   $('[data-distribution-selection]').textContent='';
+  };
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
-  return ()=>{disposed=true;cancelAnimationFrame(frameId);observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);control.onclick=null;control.hidden=true;};
+  return ()=>{disposed=true;cancelAnimationFrame(frameId);observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);control.onclick=null;control.hidden=true;resetControl.onclick=null;resetControl.hidden=true;};
  }
  function bubbleChart(svg,list,width,height){
   const root=window.d3.hierarchy({children:list}).sum(d=>d.count||0).sort((a,b)=>b.value-a.value||a.data.label?.localeCompare(b.data.label||'','zh-CN')||0);
@@ -116,6 +127,7 @@
   });
  }
  function renderList(){
+  $('#member-distribution-list-title').textContent=names[kind]+' · 数据列表';
   const target=$('[data-distribution-list]');target.replaceChildren();const query=$('#member-distribution-search').value.trim().toLocaleLowerCase();
   const list=rows().filter(r=>(r.label+' '+(r.range||'')).toLocaleLowerCase().includes(query));
   if(!list.length){target.textContent='没有符合条件的统计项目。';return;}
@@ -124,9 +136,9 @@
   const body=document.createElement('tbody');for(const row of list){const tr=document.createElement('tr');for(const value of [row.label+(row.range?'（'+row.range+'）':''),row.count]){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);target.append(table);
  }
  async function draw(){
-  const version=++drawRevision;stopPhysics?.();stopPhysics=null;$('[data-distribution-motion]').hidden=true;if(!data)return;
+  const version=++drawRevision;stopPhysics?.();stopPhysics=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;if(!data)return;
   $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];$('[data-distribution-selection]').textContent='';
-  if(!$('#member-distribution-list').hidden)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
+  if(listDialog.open)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.append(p,a);return;}
   const bubble=kind==='institutions'||kind==='research';
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
@@ -163,7 +175,14 @@
   tab.onclick=()=>activate(tab);
   tab.onkeydown=e=>{const next=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:null;if(next!==null){e.preventDefault();tabs[next].focus();activate(tabs[next]);}};
  }
- $('[data-distribution-list-toggle]').onclick=e=>{const panel=$('#member-distribution-list');panel.hidden=!panel.hidden;e.currentTarget.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)renderList();};
+ $('[data-distribution-list-toggle]').onclick=()=>{renderList();listDialog.showModal();document.documentElement.classList.add('member-distribution-dialog-open');$('#member-distribution-search').focus({preventScroll:true});};
+ $('[data-distribution-list-close]').onclick=()=>listDialog.close();
+ listDialog.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();listDialog.close();}});
+ listDialog.addEventListener('close',()=>document.documentElement.classList.remove('member-distribution-dialog-open'));
+ const outsideDialog=e=>{const r=listDialog.getBoundingClientRect();return e.target===listDialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom);};
+ let backdropDown=false;
+ listDialog.addEventListener('pointerdown',e=>{backdropDown=outsideDialog(e);});
+ listDialog.addEventListener('click',e=>{if(backdropDown&&outsideDialog(e))listDialog.close();backdropDown=false;});
  $('#member-distribution-search').oninput=renderList;$('[data-distribution-retry]').onclick=()=>void refresh(true);
  if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){observer.disconnect();void refresh();}},{rootMargin:'250px'});observer.observe(host);}else void refresh();
  const resize=new ResizeObserver(()=>{const width=Math.round(chart.clientWidth);if(width===lastWidth)return;lastWidth=width;cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>void draw());});resize.observe(chart);

@@ -4,7 +4,7 @@
  const $=s=>card.querySelector(s);let pending=null,initialized=false,lastRead=0,lastSignature='';
  function list(key,rows){
   const target=$(`[data-leaderboard=${key}]`);target.replaceChildren();
-  if(!rows.length){const p=document.createElement('p');p.className='member-ranking-empty';p.textContent=key==='activity'?'近 15 天暂无签到记录。':'暂无成员记录。';target.append(p);return;}
+  if(!rows.length){const p=document.createElement('p');p.className='member-ranking-empty';p.textContent=key==='activity'?'近 30 天暂无签到记录。':'暂无成员记录。';target.append(p);return;}
   const ol=document.createElement('ol');ol.className='member-ranking-list';
   rows.slice(0,10).forEach((row,i)=>{
    const li=document.createElement('li'),rank=document.createElement('span'),name=document.createElement('span'),score=document.createElement('span');
@@ -16,7 +16,7 @@
  function render(value){
   list('experience',value.experience);list('activity',value.activity);
   $('[data-ranking-period]').textContent=value.start_date&&value.end_date?value.start_date.slice(5).replace('-','.')+'—'+value.end_date.slice(5).replace('-','.'):'';
-  $('[data-ranking-period]').title='北京时间，含今天在内的 15 天';$('[data-ranking-state]').hidden=true;$('[data-ranking-retry]').hidden=true;
+  $('[data-ranking-period]').title='北京时间，含今天在内的 30 天';$('[data-ranking-state]').hidden=true;$('[data-ranking-retry]').hidden=true;
  }
  let displayed=null;
  async function refresh(force=false){
