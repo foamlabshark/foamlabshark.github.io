@@ -16,7 +16,8 @@
  function select(row,element){
   for(const n of chart.querySelectorAll('.is-selected'))n.classList.remove('is-selected');element.classList.add('is-selected');
   const share=data.members?` · ${(row.count/data.members*100).toFixed(1)}%`:'';
-  $('[data-distribution-selection]').textContent=`${row.label}${row.range?'（'+row.range+'）':''}：${row.count} 人${kind==='research'?'':share}`;
+  const selection=$('[data-distribution-selection]'),message=`${row.label}${row.range?'（'+row.range+'）':''}：${row.count} 人${kind==='research'?'':share}`;
+  selection.textContent=message;selection.title=message;
  }
  function interactive(element,row){
   element.setAttribute('tabindex','0');element.setAttribute('role','button');element.setAttribute('aria-label',`${row.label}${row.range?'，'+row.range:''}，${row.count} 人`);
@@ -81,7 +82,7 @@
    if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
    pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
    for(const item of items){item.x=item.homeX;item.y=item.homeY;item.vx=0;item.vy=0;item.squeeze=0;item.pressure=0;item.angle=0;item.g.classList.remove('is-selected');place(item);}
-   $('[data-distribution-selection]').textContent='';
+   $('[data-distribution-selection]').textContent='';$('[data-distribution-selection]').title='';
   };
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -137,7 +138,7 @@
  }
  async function draw(){
   const version=++drawRevision;stopPhysics?.();stopPhysics=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;if(!data)return;
-  $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];$('[data-distribution-selection]').textContent='';
+  $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];$('[data-distribution-selection]').textContent='';$('[data-distribution-selection]').title='';
   if(listDialog.open)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.append(p,a);return;}
   const bubble=kind==='institutions'||kind==='research';
