@@ -7,7 +7,7 @@
  const detailDialog=$('#member-distribution-detail'),expand=$('[data-distribution-expand]'),stage=$('[data-distribution-stage]'),plot=$('.member-distribution-plot'),actions=$('.member-distribution-actions'),actionHome=actions.parentElement;
  const names={institutions:'学校 / 单位',research:'研究方向',stages:'学习阶段',cohorts:'出生年代'};
  const captions={institutions:'气泡面积与成员人数成正比。悬停、点击或用键盘选中气泡可查看全称与人数。',research:'按分隔符拆分研究方向，保留全部名称；某名称的字按原顺序包含在另一个名称中时，也计入前者。同一成员对同一名称只计一次，一人可计入多个方向。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
- let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastSize='',stopPhysics=null,motionPaused=false,bubbleZoom=1,view=null,selectedLabel=null;
+ let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastSize='',stopPhysics=null,motionPaused=false,bubbleZoom=1,view=null,selectedLabel=null,wheelFrame=0,wheelDelta=0;
  const node=(tag,attrs={},content)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [key,value]of Object.entries(attrs))n.setAttribute(key,value);if(content!=null)n.textContent=content;return n;};
  const rows=()=>Array.isArray(data?.[kind])?data[kind].filter(r=>typeof r.label==='string'&&Number.isSafeInteger(r.count)&&r.count>=0):[];
  function packRuntime(){
@@ -82,6 +82,7 @@
   control.onclick=()=>{motionPaused=!motionPaused;update();};
   resetControl.hidden=false;
   resetControl.onclick=()=>{
+   cancelWheelZoom();
    if(bubbleZoom!==1){bubbleZoom=1;selectedLabel=null;void draw(true);return;}
    if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
    pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
@@ -192,10 +193,21 @@
   })();return pending;
  }
 
- function activate(tab){kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
- function changeZoom(step){bubbleZoom=Math.max(.5,Math.min(3,bubbleZoom+step));void draw();}
+ function activate(tab){cancelWheelZoom();kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
+ function cancelWheelZoom(){cancelAnimationFrame(wheelFrame);wheelFrame=0;wheelDelta=0;}
+ function applyZoom(value){const next=Math.max(.5,Math.min(3,value));if(next===bubbleZoom)return;bubbleZoom=next;void draw(true);}
+ function changeZoom(step){cancelWheelZoom();applyZoom(bubbleZoom+step);}
  function centerView(){if(view)chart.scrollTo({left:view.offsetX+view.svgWidth/2-chart.clientWidth/2,top:view.offsetY+view.svgHeight/2-chart.clientHeight/2,behavior:'instant'});}
  zoomIn.onclick=()=>changeZoom(.25);zoomOut.onclick=()=>changeZoom(-.25);
+ plot.addEventListener('wheel',e=>{
+  if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||!e.deltaY||view?.kind!==kind||!chart.querySelector('.member-distribution-world'))return;
+  e.preventDefault();
+  if(pan||chart.querySelector('.is-dragging'))return;
+  const unit=e.deltaMode===1?16:e.deltaMode===2?chart.clientHeight:1;
+  wheelDelta=Math.max(-600,Math.min(600,wheelDelta+e.deltaY*unit));
+  // Batch high-frequency mouse and trackpad events into one redraw per frame.
+  if(!wheelFrame)wheelFrame=requestAnimationFrame(()=>{const delta=wheelDelta;wheelFrame=0;wheelDelta=0;applyZoom(bubbleZoom*Math.exp(-delta*.0015));});
+ },{passive:false});
  // Touch pans the background directly; at enlarged scales it can also start over a bubble.
  // Using one gesture controller avoids native scroll inertia moving the chart after a reset.
  let pan=null;
@@ -214,15 +226,17 @@
   if(delta){e.preventDefault();chart.scrollBy(...delta);}
  });
  expand.onclick=()=>{
+  cancelWheelZoom();bubbleZoom=1;selectedLabel=null;
   $('#member-distribution-detail-title').textContent=names[kind];
   detailDialog.showModal();document.documentElement.classList.add('member-distribution-detail-open');
   $('[data-distribution-detail-body]').append(plot);$('[data-distribution-detail-actions]').append(actions);
-  $('[data-distribution-detail-close]').focus({preventScroll:true});void draw();
+  $('[data-distribution-detail-close]').focus({preventScroll:true});void draw(true);
  };
  $('[data-distribution-detail-close]').onclick=()=>detailDialog.close();
  detailDialog.addEventListener('cancel',e=>{e.preventDefault();detailDialog.close();});
  detailDialog.addEventListener('close',()=>{
-  stage.append(plot);actionHome.append(actions);document.documentElement.classList.remove('member-distribution-detail-open');void draw().then(()=>expand.focus({preventScroll:true}));
+  cancelWheelZoom();bubbleZoom=1;selectedLabel=null;
+  stage.append(plot);actionHome.append(actions);document.documentElement.classList.remove('member-distribution-detail-open');void draw(true).then(()=>expand.focus({preventScroll:true}));
  });
  for(const [i,tab]of tabs.entries()){
   tab.onclick=()=>activate(tab);
