@@ -82,7 +82,7 @@
   control.onclick=()=>{motionPaused=!motionPaused;update();};
   resetControl.hidden=false;
   resetControl.onclick=()=>{
-   cancelWheelZoom();
+   cancelWheelZoom();cancelChartGesture();
    if(bubbleZoom!==1){bubbleZoom=1;selectedLabel=null;void draw(true);return;}
    if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
    pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
@@ -174,6 +174,7 @@
   if(bubble){zoomControls.hidden=false;zoomIn.disabled=bubbleZoom>=3;zoomOut.disabled=bubbleZoom<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(bubbleZoom*100)}%`);expand.setAttribute('aria-label','大图查看'+(kind==='institutions'?'学校或单位':'研究方向')+'分布');}
   if(selectedLabel){const selected=[...svg.querySelectorAll('.member-bubble,.member-bar')].find(g=>g.querySelector('title')?.textContent.startsWith(selectedLabel+'：')||g.getAttribute('aria-label')?.startsWith(selectedLabel+'，'));const row=shown.find(r=>r.label===selectedLabel);if(selected&&row)select(row,selected);}
   if(bubble&&list.length>40)$('[data-distribution-caption]').textContent+=' 图中显示人数最多的 40 项，其余项目可在数据列表中查询。';
+  if(pan?.touch)rebaseTouchPan();
  }
  async function refresh(force=false){
   if(pending)return force?pending.then(()=>refresh(true)):pending;initialized=true;
@@ -193,32 +194,78 @@
   })();return pending;
  }
 
- function activate(tab){cancelWheelZoom();kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
+ function activate(tab){cancelWheelZoom();cancelChartGesture();kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
  function cancelWheelZoom(){cancelAnimationFrame(wheelFrame);wheelFrame=0;wheelDelta=0;}
  function applyZoom(value){const next=Math.max(.5,Math.min(3,value));if(next===bubbleZoom)return;bubbleZoom=next;void draw(true);}
- function changeZoom(step){cancelWheelZoom();applyZoom(bubbleZoom+step);}
+ function changeZoom(step){cancelWheelZoom();cancelChartGesture();applyZoom(bubbleZoom+step);}
  function centerView(){if(view)chart.scrollTo({left:view.offsetX+view.svgWidth/2-chart.clientWidth/2,top:view.offsetY+view.svgHeight/2-chart.clientHeight/2,behavior:'instant'});}
  zoomIn.onclick=()=>changeZoom(.25);zoomOut.onclick=()=>changeZoom(-.25);
  plot.addEventListener('wheel',e=>{
   if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||!e.deltaY||view?.kind!==kind||!chart.querySelector('.member-distribution-world'))return;
   e.preventDefault();
-  if(pan||chart.querySelector('.is-dragging'))return;
+  if(pan||pinch||chart.querySelector('.is-dragging'))return;
   const unit=e.deltaMode===1?16:e.deltaMode===2?chart.clientHeight:1;
   wheelDelta=Math.max(-600,Math.min(600,wheelDelta+e.deltaY*unit));
   // Batch high-frequency mouse and trackpad events into one redraw per frame.
   if(!wheelFrame)wheelFrame=requestAnimationFrame(()=>{const delta=wheelDelta;wheelFrame=0;wheelDelta=0;applyZoom(bubbleZoom*Math.exp(-delta*.0015));});
  },{passive:false});
- // Touch pans the background directly; at enlarged scales it can also start over a bubble.
- // Using one gesture controller avoids native scroll inertia moving the chart after a reset.
- let pan=null;
+ // Capture touch pointers on the persistent chart, since zoom redraws its SVG children.
+ // A single touch pans; two touches scale by their distance and keep the drawing centred.
+ let pan=null,pinch=null,pinchFrame=0,pinchZoom=null;
+ const touches=new Map();
+ const touchDistance=()=>{const [a,b]=[...touches.values()];return Math.max(10,Math.hypot(a.x-b.x,a.y-b.y));};
+ function rebaseTouchPan(){
+  if(touches.size!==1)return;
+  const [id,point]=touches.entries().next().value;
+  pan={id,x:point.x,y:point.y,left:chart.scrollLeft,top:chart.scrollTop,touch:true};
+ }
+ function beginPinch(){pan=null;pinch={distance:touchDistance(),zoom:bubbleZoom};}
+ function flushPinchZoom(){
+  cancelAnimationFrame(pinchFrame);pinchFrame=0;
+  if(pinchZoom!==null){const value=pinchZoom;pinchZoom=null;applyZoom(value);}
+ }
+ function cancelChartGesture(){
+  cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;pinch=null;
+  const ids=new Set(touches.keys());if(pan)ids.add(pan.id);
+  touches.clear();pan=null;chart.classList.remove('is-panning');
+  for(const id of ids)if(chart.hasPointerCapture(id))chart.releasePointerCapture(id);
+ }
  chart.addEventListener('pointerdown',e=>{
-  const touchCamera=e.pointerType==='touch'&&(bubbleZoom>1||motionPaused||matchMedia('(prefers-reduced-motion: reduce)').matches);
-  if(!e.isPrimary||e.button!==0||e.target.closest('.member-bar')||e.target.closest('.member-bubble')&&!touchCamera||chart.dataset.pannable!=='true')return;
+  if(e.pointerType!=='touch'||e.button!==0||chart.dataset.pannable!=='true'||!chart.querySelector('.member-distribution-world'))return;
+  e.preventDefault();e.stopPropagation();cancelWheelZoom();
+  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');
+  if(touches.size===1)rebaseTouchPan();else{flushPinchZoom();beginPinch();}
+ },true);
+ chart.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='touch'||!touches.has(e.pointerId))return;
+  e.preventDefault();e.stopPropagation();touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(touches.size>=2){
+   pinchZoom=pinch.zoom*touchDistance()/pinch.distance;
+   if(!pinchFrame)pinchFrame=requestAnimationFrame(()=>{pinchFrame=0;flushPinchZoom();});
+  }else if(pan?.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}
+ },true);
+ const endTouch=e=>{
+  if(e.pointerType!=='touch'||!touches.has(e.pointerId))return;
+  e.stopPropagation();const wasPinching=!!pinch;touches.delete(e.pointerId);
+  if(e.type==='pointerup')flushPinchZoom();else{cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;}
+  if(touches.size>=2)beginPinch();
+  else{
+   pinch=null;if(wasPinching)centerView();
+   if(touches.size)rebaseTouchPan();else{pan=null;chart.classList.remove('is-panning');}
+  }
+  if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);
+ };
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endTouch,true);
+ window.addEventListener('blur',cancelChartGesture);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelChartGesture();});
+ // Mouse dragging still distinguishes moving a bubble from panning its background.
+ chart.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'||!e.isPrimary||e.button!==0||e.target.closest('.member-bar,.member-bubble')||chart.dataset.pannable!=='true')return;
   pan={id:e.pointerId,x:e.clientX,y:e.clientY,left:chart.scrollLeft,top:chart.scrollTop};
   chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');e.preventDefault();
  });
- chart.addEventListener('pointermove',e=>{if(pan?.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}});
- const endPan=e=>{if(pan?.id!==e.pointerId)return;pan=null;chart.classList.remove('is-panning');if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);};
+ chart.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'&&pan?.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}});
+ const endPan=e=>{if(e.pointerType==='touch'||pan?.id!==e.pointerId)return;pan=null;chart.classList.remove('is-panning');if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);};
  for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endPan);
  chart.addEventListener('keydown',e=>{
   if(e.target!==chart||chart.dataset.pannable!=='true')return;
@@ -226,7 +273,7 @@
   if(delta){e.preventDefault();chart.scrollBy(...delta);}
  });
  expand.onclick=()=>{
-  cancelWheelZoom();bubbleZoom=1;selectedLabel=null;
+  cancelWheelZoom();cancelChartGesture();bubbleZoom=1;selectedLabel=null;
   $('#member-distribution-detail-title').textContent=names[kind];
   detailDialog.showModal();document.documentElement.classList.add('member-distribution-detail-open');
   $('[data-distribution-detail-body]').append(plot);$('[data-distribution-detail-actions]').append(actions);
@@ -235,14 +282,14 @@
  $('[data-distribution-detail-close]').onclick=()=>detailDialog.close();
  detailDialog.addEventListener('cancel',e=>{e.preventDefault();detailDialog.close();});
  detailDialog.addEventListener('close',()=>{
-  cancelWheelZoom();bubbleZoom=1;selectedLabel=null;
+  cancelWheelZoom();cancelChartGesture();bubbleZoom=1;selectedLabel=null;
   stage.append(plot);actionHome.append(actions);document.documentElement.classList.remove('member-distribution-detail-open');void draw(true).then(()=>expand.focus({preventScroll:true}));
  });
  for(const [i,tab]of tabs.entries()){
   tab.onclick=()=>activate(tab);
   tab.onkeydown=e=>{const next=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:null;if(next!==null){e.preventDefault();tabs[next].focus();activate(tabs[next]);}};
  }
- $('[data-distribution-list-toggle]').onclick=()=>{renderList();listDialog.showModal();document.documentElement.classList.add('member-distribution-dialog-open');$('#member-distribution-search').focus({preventScroll:true});};
+ $('[data-distribution-list-toggle]').onclick=()=>{cancelChartGesture();renderList();listDialog.showModal();document.documentElement.classList.add('member-distribution-dialog-open');$('#member-distribution-search').focus({preventScroll:true});};
  $('[data-distribution-list-close]').onclick=()=>listDialog.close();
  listDialog.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();listDialog.close();}});
  listDialog.addEventListener('close',()=>document.documentElement.classList.remove('member-distribution-dialog-open'));
