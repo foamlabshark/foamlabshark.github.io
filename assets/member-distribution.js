@@ -205,13 +205,18 @@
  function applyZoom(value){
   const next=Math.max(.5,Math.min(3,value));if(next===bubbleZoom||view?.kind!==kind||!view?.items||!view.svg.isConnected)return;
   holdZoomMotion();bubbleZoom=next;
+  commitZoom();releaseZoomMotion();
+ }
+ function zoomControlsState(){
+  zoomIn.disabled=bubbleZoom>=3;zoomOut.disabled=bubbleZoom<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(bubbleZoom*100)}%`);
+ }
+ function commitZoom(){
   // Keep the existing world coordinates and physics state; scale the camera, not the packing.
-  const {svg,world,width,height,items}=view;view.svgWidth=width*next;view.svgHeight=height*next;
-  svg.setAttribute('width',view.svgWidth);svg.setAttribute('height',view.svgHeight);svg.dataset.zoomed=String(next>1);
+  const {svg,world,width,height,items}=view;view.svgWidth=width*bubbleZoom;view.svgHeight=height*bubbleZoom;
+  svg.setAttribute('width',view.svgWidth);svg.setAttribute('height',view.svgHeight);svg.dataset.zoomed=String(bubbleZoom>1);
   world.style.width=view.svgWidth+width+'px';world.style.height=view.svgHeight+height+'px';
   const measure=document.createElement('canvas').getContext('2d');for(const item of items)bubbleLabel(item.g,item.row,item.r,measure);
-  zoomIn.disabled=next>=3;zoomOut.disabled=next<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(next*100)}%`);
-  centerView();releaseZoomMotion();
+  zoomControlsState();centerView();
  }
  function changeZoom(step){cancelWheelZoom();cancelChartGesture();applyZoom(bubbleZoom+step);}
  function centerView(){
@@ -242,13 +247,27 @@
   const [id,point]=touches.entries().next().value;
   pan={id,x:point.x,y:point.y,left:chart.scrollLeft,top:chart.scrollTop,touch:true};
  }
- function beginPinch(){pan=null;pinch={distance:touchDistance(),zoom:bubbleZoom};holdZoomMotion();}
+ function finishPinch(){
+  if(!pinch)return;const {svg,zoom}=pinch;pinch=null;
+  svg.style.removeProperty('transform');svg.style.removeProperty('transform-origin');chart.classList.remove('is-pinching');
+  if(view?.svg===svg&&svg.isConnected&&bubbleZoom!==zoom)commitZoom();
+ }
+ function beginPinch(){
+  finishPinch();pan=null;holdZoomMotion();centerView();
+  const svg=view.svg,rect=svg.getBoundingClientRect(),bounds=view.items.map(item=>item.circle.getBoundingClientRect());
+  const x=(Math.min(...bounds.map(r=>r.left))+Math.max(...bounds.map(r=>r.right)))/2-rect.left,y=(Math.min(...bounds.map(r=>r.top))+Math.max(...bounds.map(r=>r.bottom)))/2-rect.top;
+  pinch={distance:touchDistance(),zoom:bubbleZoom,svg};svg.style.transformOrigin=`${x}px ${y}px`;chart.classList.add('is-pinching');
+ }
  function flushPinchZoom(){
   cancelAnimationFrame(pinchFrame);pinchFrame=0;
-  if(pinchZoom!==null){const value=pinchZoom;pinchZoom=null;applyZoom(value);}
+  if(pinchZoom!==null&&pinch){
+   bubbleZoom=Math.max(.5,Math.min(3,pinchZoom));pinchZoom=null;
+   // Move one composited image while fingers move; resize and relabel only on release.
+   pinch.svg.style.transform=`scale(${bubbleZoom/pinch.zoom})`;zoomControlsState();
+  }
  }
  function cancelChartGesture(){
-  cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;pinch=null;tap=null;lastTap=null;releaseZoomMotion();
+  cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;finishPinch();tap=null;lastTap=null;releaseZoomMotion();
   const ids=new Set(touches.keys());if(pan)ids.add(pan.id);
   touches.clear();pan=null;chart.classList.remove('is-panning');
   for(const id of ids)if(chart.hasPointerCapture(id))chart.releasePointerCapture(id);
@@ -280,7 +299,7 @@
   if(e.type==='pointerup')flushPinchZoom();else{cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;}
   if(touches.size>=2)beginPinch();
   else{
-   pinch=null;if(wasPinching){centerView();releaseZoomMotion();}
+   finishPinch();if(wasPinching){centerView();releaseZoomMotion();}
    if(touches.size)rebaseTouchPan();else{pan=null;chart.classList.remove('is-panning');}
   }
   if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);
