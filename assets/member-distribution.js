@@ -211,7 +211,7 @@
  },{passive:false});
  // Capture touch pointers on the persistent chart, since zoom redraws its SVG children.
  // A single touch pans; two touches scale by their distance and keep the drawing centred.
- let pan=null,pinch=null,pinchFrame=0,pinchZoom=null;
+ let pan=null,pinch=null,pinchFrame=0,pinchZoom=null,tap=null,lastTap=null;
  const touches=new Map();
  const touchDistance=()=>{const [a,b]=[...touches.values()];return Math.max(10,Math.hypot(a.x-b.x,a.y-b.y));};
  function rebaseTouchPan(){
@@ -225,7 +225,7 @@
   if(pinchZoom!==null){const value=pinchZoom;pinchZoom=null;applyZoom(value);}
  }
  function cancelChartGesture(){
-  cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;pinch=null;
+  cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;pinch=null;tap=null;lastTap=null;
   const ids=new Set(touches.keys());if(pan)ids.add(pan.id);
   touches.clear();pan=null;chart.classList.remove('is-panning');
   for(const id of ids)if(chart.hasPointerCapture(id))chart.releasePointerCapture(id);
@@ -233,12 +233,15 @@
  chart.addEventListener('pointerdown',e=>{
   if(e.pointerType!=='touch'||e.button!==0||chart.dataset.pannable!=='true'||!chart.querySelector('.member-distribution-world'))return;
   e.preventDefault();e.stopPropagation();cancelWheelZoom();
+  if(!touches.size)tap={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now()};
+  else{tap=null;lastTap=null;}
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');
   if(touches.size===1)rebaseTouchPan();else{flushPinchZoom();beginPinch();}
  },true);
  chart.addEventListener('pointermove',e=>{
   if(e.pointerType!=='touch'||!touches.has(e.pointerId))return;
   e.preventDefault();e.stopPropagation();touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(tap?.id===e.pointerId&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>10){tap=null;lastTap=null;}
   if(touches.size>=2){
    pinchZoom=pinch.zoom*touchDistance()/pinch.distance;
    if(!pinchFrame)pinchFrame=requestAnimationFrame(()=>{pinchFrame=0;flushPinchZoom();});
@@ -246,6 +249,10 @@
  },true);
  const endTouch=e=>{
   if(e.pointerType!=='touch'||!touches.has(e.pointerId))return;
+  // Only two short, nearby taps reset the view; a drag or any multi-touch gesture cancels them.
+  const now=performance.now(),shortTap=e.type==='pointerup'&&touches.size===1&&tap?.id===e.pointerId&&now-tap.at<=260&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10;
+  const doubleTap=shortTap&&lastTap&&now-lastTap.at<=320&&Math.hypot(tap.x-lastTap.x,tap.y-lastTap.y)<=32;
+  lastTap=shortTap&&!doubleTap?{x:tap.x,y:tap.y,at:now}:null;tap=null;
   e.stopPropagation();const wasPinching=!!pinch;touches.delete(e.pointerId);
   if(e.type==='pointerup')flushPinchZoom();else{cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;}
   if(touches.size>=2)beginPinch();
@@ -254,6 +261,7 @@
    if(touches.size)rebaseTouchPan();else{pan=null;chart.classList.remove('is-panning');}
   }
   if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);
+  if(doubleTap)$('[data-distribution-reset]').click();
  };
  for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endTouch,true);
  window.addEventListener('blur',cancelChartGesture);
