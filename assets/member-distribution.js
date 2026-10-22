@@ -4,6 +4,7 @@
  const script=document.currentScript,packURL=script.dataset.packRuntime;
  const $=selector=>host.querySelector(selector),chart=$('[data-distribution-chart]'),tabs=[...host.querySelectorAll('[role=tab]')];
  const listDialog=$('#member-distribution-list'),zoomControls=$('[data-distribution-zoom]'),zoomIn=$('[data-distribution-zoom-in]'),zoomOut=$('[data-distribution-zoom-out]');
+ const detailDialog=$('#member-distribution-detail'),expand=$('[data-distribution-expand]'),stage=$('[data-distribution-stage]'),plot=$('.member-distribution-plot'),actions=$('.member-distribution-actions'),actionHome=actions.parentElement;
  const names={institutions:'学校 / 单位',research:'研究方向',stages:'学习阶段',cohorts:'出生年代'};
  const captions={institutions:'气泡面积与成员人数成正比。悬停、点击或用键盘选中气泡可查看全称与人数。',research:'按分隔符拆分研究方向，保留全部名称；某名称的字按原顺序包含在另一个名称中时，也计入前者。同一成员对同一名称只计一次，一人可计入多个方向。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
  let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastSize='',stopPhysics=null,motionPaused=false,bubbleZoom=1,view=null,selectedLabel=null;
@@ -19,6 +20,7 @@
   const share=data.members?` · ${(row.count/data.members*100).toFixed(1)}%`:'';
   const selection=$('[data-distribution-selection]'),message=`${row.label}${row.range?'（'+row.range+'）':''}：${row.count} 人${kind==='research'?'':share}`;
   selection.textContent=message;selection.title=message;
+  const detail=$('[data-distribution-detail-selection]');detail.textContent=message;detail.title=message;
  }
  function interactive(element,row){
   element.setAttribute('tabindex','0');element.setAttribute('role','button');element.setAttribute('aria-label',`${row.label}${row.range?'，'+row.range:''}，${row.count} 人`);
@@ -72,7 +74,7 @@
    if(!enabled()){cancelAnimationFrame(frameId);frameId=0;pointer=null;drag=null;svg.classList.remove('is-dragging');}
    else if(!frameId){lastTick=0;frameId=requestAnimationFrame(tick);}
   }
-  const move=e=>{pointer=coordinates(e);if(drag&&e.pointerId===drag.pointerId){const item=drag.item;item.x=pointer.x-drag.offsetX;item.y=pointer.y-drag.offsetY;item.vx=0;item.vy=0;place(item);}};
+  const move=e=>{if(pan){pointer=null;return;}pointer=coordinates(e);if(drag&&e.pointerId===drag.pointerId){const item=drag.item;item.x=pointer.x-drag.offsetX;item.y=pointer.y-drag.offsetY;item.vx=0;item.vy=0;place(item);}};
   const leave=()=>{if(!drag)pointer=null;};
   const release=e=>{if(drag?.pointerId===e.pointerId){drag=null;svg.classList.remove('is-dragging');if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);if(e.pointerType==='touch')pointer=null;}};
   const down=e=>{if(!enabled()||e.button!==0||e.pointerType==='touch'&&bubbleZoom>1)return;const g=e.target.closest('.member-bubble'),item=items.find(item=>item.g===g);if(!item)return;e.preventDefault();pointer=coordinates(e);drag={item,pointerId:e.pointerId,offsetX:pointer.x-item.x,offsetY:pointer.y-item.y};select(item.row,item.g);svg.setPointerCapture(e.pointerId);svg.classList.add('is-dragging');};
@@ -84,7 +86,7 @@
    if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
    pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
    for(const item of items){item.x=item.homeX;item.y=item.homeY;item.vx=0;item.vy=0;item.squeeze=0;item.pressure=0;item.angle=0;item.g.classList.remove('is-selected');place(item);}
-   selectedLabel=null;$('[data-distribution-selection]').textContent='';$('[data-distribution-selection]').title='';chart.scrollLeft=0;chart.scrollTop=0;
+   selectedLabel=null;for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}centerView();
   };
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -92,7 +94,7 @@
   return ()=>{disposed=true;cancelAnimationFrame(frameId);observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);control.onclick=null;control.hidden=true;resetControl.onclick=null;resetControl.hidden=true;};
  }
  function bubbleLabel(g,row,r,measure){
-  const font=Math.min(13,Math.max(9,r*.4)),lineHeight=font*1.35,width=r*1.5,maxLines=r>=34?2:1,chars=[...row.label],lines=[];
+  const font=Math.min(detailDialog.open?18:13,Math.max(9,r*.4)),lineHeight=font*1.35,width=r*1.5,maxLines=r>=34?2:1,chars=[...row.label],lines=[];
   measure.font=`550 ${font}px ${getComputedStyle(chart).fontFamily}`;
   while(chars.length&&lines.length<maxLines){
    let line=chars.shift();
@@ -108,12 +110,14 @@
  function bubbleChart(svg,list,width,height){
   const root=window.d3.hierarchy({children:list}).sum(d=>d.count||0).sort((a,b)=>b.value-a.value||a.data.label?.localeCompare(b.data.label||'','zh-CN')||0);
   const packed=window.d3.pack().size([width-16,height-16]).padding(6)(root);
+  const leaves=packed.leaves(),left=Math.min(...leaves.map(d=>d.x-d.r)),right=Math.max(...leaves.map(d=>d.x+d.r)),top=Math.min(...leaves.map(d=>d.y-d.r)),bottom=Math.max(...leaves.map(d=>d.y+d.r));
+  const scale=Math.min((width-20)/(right-left||1),(height-20)/(bottom-top||1)),cx=(left+right)/2,cy=(top+bottom)/2;
   const items=[],measure=document.createElement('canvas').getContext('2d');
-  for(const [i,leaf]of packed.leaves().entries()){
-   const {x,y,r}=leaf,row=leaf.data,g=node('g',{class:'member-bubble','data-count':row.count,transform:`translate(${x+8},${y+8})`,style:`--bubble-hue:${[164,208,282,24,336,48,190,252][i%8]}`});
+  for(const [i,leaf]of leaves.entries()){
+   const x=(leaf.x-cx)*scale+width/2,y=(leaf.y-cy)*scale+height/2,r=leaf.r*scale,row=leaf.data,g=node('g',{class:'member-bubble','data-count':row.count,transform:`translate(${x},${y})`,style:`--bubble-hue:${[164,208,282,24,336,48,190,252][i%8]}`});
    const circle=node('circle',{r:r.toFixed(3)});g.append(circle);interactive(g,row);
    bubbleLabel(g,row,r,measure);
-   svg.append(g);items.push({g,circle,row,r,x:x+8,y:y+8,homeX:x+8,homeY:y+8,vx:Math.sin(i*2)*.1,vy:Math.cos(i*2)*.1,squeeze:0,pressure:0,angle:0});
+   svg.append(g);items.push({g,circle,row,r,x,y,homeX:x,homeY:y,vx:Math.sin(i*2)*.1,vy:Math.cos(i*2)*.1,squeeze:0,pressure:0,angle:0});
   }
   stopPhysics=bubbleMotion(svg,items,width,height);
  }
@@ -145,12 +149,12 @@
   const body=document.createElement('tbody');for(const row of list){const tr=document.createElement('tr');for(const value of [row.label+(row.range?'（'+row.range+'）':''),row.count]){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);target.append(table);
  }
  async function draw(resetView=false){
-  const center=!resetView&&view?.kind===kind?{x:(chart.scrollLeft+view.width/2)/Math.max(view.width,view.svgWidth),y:(chart.scrollTop+view.height/2)/Math.max(view.height,view.svgHeight)}:{x:.5,y:.5};
+  const center=!resetView&&view?.kind===kind?{x:(chart.scrollLeft+view.width/2-view.offsetX)/view.svgWidth,y:(chart.scrollTop+view.height/2-view.offsetY)/view.svgHeight}:{x:.5,y:.5};
   const version=++drawRevision;stopPhysics?.();stopPhysics=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;zoomControls.hidden=true;if(!data)return;
-  $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];$('[data-distribution-selection]').textContent='';$('[data-distribution-selection]').title='';
+  $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}
   if(listDialog.open)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.append(p,a);return;}
-  const bubble=kind==='institutions'||kind==='research';
+  const bubble=kind==='institutions'||kind==='research';chart.dataset.pannable=String(bubble);
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
   if(version!==drawRevision)return;
   const width=Math.max(220,chart.clientWidth),height=Math.max(280,chart.clientHeight);
@@ -161,9 +165,12 @@
   svg.style.marginTop=Math.max(0,(height-svgHeight)/2)+'px';
   svg.append(node('desc',{},captions[kind]));
   if(bubble)bubbleChart(svg,shown,svgWidth,svgHeight);else barChart(svg,shown,svgWidth,height);
-  chart.append(svg);view={kind,width,height,svgWidth,svgHeight};
-  chart.scrollLeft=Math.max(0,center.x*svgWidth-chart.clientWidth/2);chart.scrollTop=Math.max(0,center.y*svgHeight-chart.clientHeight/2);
-  if(bubble){zoomControls.hidden=false;zoomIn.disabled=bubbleZoom>=3;zoomOut.disabled=bubbleZoom<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(bubbleZoom*100)}%`);}
+  // A viewport of spare space surrounds the drawing, so the background can also pan at 100%.
+  const offsetX=bubble?width/2:0,offsetY=bubble?height/2:0;
+  if(bubble){const world=document.createElement('div');world.className='member-distribution-world';world.style.width=svgWidth+width+'px';world.style.height=svgHeight+height+'px';svg.style.cssText=`position:absolute;left:${offsetX}px;top:${offsetY}px;margin:0`;world.append(svg);chart.append(world);}else chart.append(svg);
+  view={kind,width,height,svgWidth,svgHeight,offsetX,offsetY};
+  chart.scrollLeft=Math.max(0,offsetX+center.x*svgWidth-chart.clientWidth/2);chart.scrollTop=Math.max(0,offsetY+center.y*svgHeight-chart.clientHeight/2);
+  if(bubble){zoomControls.hidden=false;zoomIn.disabled=bubbleZoom>=3;zoomOut.disabled=bubbleZoom<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(bubbleZoom*100)}%`);expand.setAttribute('aria-label','大图查看'+(kind==='institutions'?'学校或单位':'研究方向')+'分布');}
   if(selectedLabel){const selected=[...svg.querySelectorAll('.member-bubble,.member-bar')].find(g=>g.querySelector('title')?.textContent.startsWith(selectedLabel+'：')||g.getAttribute('aria-label')?.startsWith(selectedLabel+'，'));const row=shown.find(r=>r.label===selectedLabel);if(selected&&row)select(row,selected);}
   if(bubble&&list.length>40)$('[data-distribution-caption]').textContent+=' 图中显示人数最多的 40 项，其余项目可在数据列表中查询。';
  }
@@ -187,7 +194,36 @@
 
  function activate(tab){kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
  function changeZoom(step){bubbleZoom=Math.max(.5,Math.min(3,bubbleZoom+step));void draw();}
+ function centerView(){if(view)chart.scrollTo({left:view.offsetX+view.svgWidth/2-chart.clientWidth/2,top:view.offsetY+view.svgHeight/2-chart.clientHeight/2,behavior:'instant'});}
  zoomIn.onclick=()=>changeZoom(.25);zoomOut.onclick=()=>changeZoom(-.25);
+ // Touch pans the background directly; at enlarged scales it can also start over a bubble.
+ // Using one gesture controller avoids native scroll inertia moving the chart after a reset.
+ let pan=null;
+ chart.addEventListener('pointerdown',e=>{
+  const touchCamera=e.pointerType==='touch'&&(bubbleZoom>1||motionPaused||matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if(!e.isPrimary||e.button!==0||e.target.closest('.member-bar')||e.target.closest('.member-bubble')&&!touchCamera||chart.dataset.pannable!=='true')return;
+  pan={id:e.pointerId,x:e.clientX,y:e.clientY,left:chart.scrollLeft,top:chart.scrollTop};
+  chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');e.preventDefault();
+ });
+ chart.addEventListener('pointermove',e=>{if(pan?.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}});
+ const endPan=e=>{if(pan?.id!==e.pointerId)return;pan=null;chart.classList.remove('is-panning');if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);};
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endPan);
+ chart.addEventListener('keydown',e=>{
+  if(e.target!==chart||chart.dataset.pannable!=='true')return;
+  const delta={ArrowLeft:[-60,0],ArrowRight:[60,0],ArrowUp:[0,-60],ArrowDown:[0,60]}[e.key];
+  if(delta){e.preventDefault();chart.scrollBy(...delta);}
+ });
+ expand.onclick=()=>{
+  $('#member-distribution-detail-title').textContent=names[kind];
+  detailDialog.showModal();document.documentElement.classList.add('member-distribution-detail-open');
+  $('[data-distribution-detail-body]').append(plot);$('[data-distribution-detail-actions]').append(actions);
+  $('[data-distribution-detail-close]').focus({preventScroll:true});void draw();
+ };
+ $('[data-distribution-detail-close]').onclick=()=>detailDialog.close();
+ detailDialog.addEventListener('cancel',e=>{e.preventDefault();detailDialog.close();});
+ detailDialog.addEventListener('close',()=>{
+  stage.append(plot);actionHome.append(actions);document.documentElement.classList.remove('member-distribution-detail-open');void draw().then(()=>expand.focus({preventScroll:true}));
+ });
  for(const [i,tab]of tabs.entries()){
   tab.onclick=()=>activate(tab);
   tab.onkeydown=e=>{const next=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:null;if(next!==null){e.preventDefault();tabs[next].focus();activate(tabs[next]);}};

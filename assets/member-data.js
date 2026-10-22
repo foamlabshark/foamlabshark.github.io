@@ -1,7 +1,7 @@
 'use strict';
 (() => {
  const allowed=new Set(['foamlab_member_distribution','foamlab_member_leaderboards']),pending=new Map(),memory=new Map();let configuration;
- const key=table=>'foamlab-public-members-v1:'+table+(table==='foamlab_member_leaderboards'?':30-days':':ordered-keywords-v2'),ttl=60000,maxAge=600000;
+ const key=table=>'foamlab-public-members-v1:'+table+(table==='foamlab_member_leaderboards'?':30-days':':chinese-institutions-v3'),ttl=60000,maxAge=600000;
  const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Shanghai'});
  function cached(table){
   if(!allowed.has(table))return null;
