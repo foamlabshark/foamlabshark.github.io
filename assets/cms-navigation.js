@@ -13,7 +13,7 @@ window.FoamCMSNavigation=({host,items,primary,active,select,userId,area,UI,esc,n
  const save=()=>{try{localStorage.setItem(key,JSON.stringify(layout));}catch{notice('浏览器未能保存排列，当前页面仍可使用。',true);}};
  function draw(){
   const tab=(id,group)=>'<button type="button" draggable="true" data-cms-tab="'+id+'" data-nav-area="'+group+'" class="'+(id===active()?'selected':'')+'" aria-current="'+(id===active()?'page':'false')+'" title="'+esc(labels.get(id))+' · 可拖动排序">'+esc(labels.get(id))+'</button>';
-  host.innerHTML=layout.main.map(id=>tab(id,'main')).join('')+(layout.more.length?'<details id="cms-more" data-nav-drop="more"><summary>更多管理</summary><div>'+layout.more.map(id=>tab(id,'more')).join('')+'</div></details>':'')+'<button type="button" class="cms-nav-organize" data-organize-navigation aria-label="整理管理入口">整理入口</button>';
+  host.innerHTML=layout.main.map(id=>tab(id,'main')).join('')+'<div class="cms-nav-tools">'+(layout.more.length?'<details id="cms-more" data-nav-drop="more"><summary>更多管理</summary><div>'+layout.more.map(id=>tab(id,'more')).join('')+'</div></details>':'')+'<button type="button" class="cms-nav-organize" data-organize-navigation aria-label="整理管理入口">整理入口</button></div>';
  }
  function move(value,id,group,target=''){
   for(const list of Object.values(value)){const index=list.indexOf(id);if(index>=0)list.splice(index,1);}
