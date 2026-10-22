@@ -31,7 +31,7 @@
     if(document.visibilityState==='hidden'||document.querySelector('dialog[open]')||document.documentElement.classList.contains('profile-required-open')||auth?.user&&(auth.loading||auth.dataLoading||!window.FoamProfile.complete(auth.profile)))return;
     show(cfg);put(sessionStorage,visitKey,'shown');cleanup();
    }
-   observer=new MutationObserver(attempt);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open','class']});
+   observer=new MutationObserver(attempt);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open']});
    document.addEventListener('visibilitychange',attempt);window.addEventListener('storage',attempt);window.addEventListener('pagehide',cleanup,{once:true});window.addEventListener('foam-auth-change',attempt);attempt();
   }catch{/* A failed notice request must not block the page or mark the notice as read. */}
  }
