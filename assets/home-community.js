@@ -1,17 +1,20 @@
 'use strict';
 (() => {
  const entries=document.querySelector('.home-community-links');if(!entries)return;
- const L=window.FoamLab,esc=L.esc,dialogs={},state={page:1,rows:[],total:0,request:0,edit:null,newDraft:'',pending:null,loading:false};let lastUser=null;
+ const L=window.FoamLab,esc=L.esc,dialogs={},state={page:1,rows:[],total:0,request:0,edit:null,newDraft:'',pending:null,loading:false,pinning:false};let lastUser=null;
  const own=row=>!!L.user&&L.role!=='blocked'&&row.author_id===L.user.id;
  const canDelete=row=>!!L.user&&(own(row)||['admin','editor','moderator'].includes(L.role));
+ const canPin=()=>!!L.user&&L.role==='admin';
+ const pinBadge=row=>row.pinned?'<span class="pill home-guestbook-pinned">置顶</span>':'';
+ const orderedMessages=()=>L.client.from('foamlab_guestbook').select('*',{count:'exact'}).order('pinned',{ascending:false}).order('created_at',{ascending:false}).order('id',{ascending:false});
  const preview=kind=>entries.querySelector('[data-home-preview="'+kind+'"]');
  const shortDate=value=>new Date(value).toLocaleDateString('sv-SE',{timeZone:'Asia/Shanghai'});
  function previewUpdates(rows){preview('updates').innerHTML=rows.slice(0,3).map(r=>'<li><button type="button" data-home-open="updates" aria-haspopup="dialog"><time datetime="'+esc(r.date)+'">'+esc(r.date)+'</time><span class="home-preview-title">'+esc(r.title)+'</span></button></li>').join('')||'<li class="home-preview-loading">暂时没有新增页面。</li>';}
- function previewMessages(rows,names){preview('guestbook').innerHTML=rows.slice(0,3).map(r=>{const parsed=document.createElement('template');parsed.innerHTML=L.markdown(r.body);parsed.content.querySelectorAll('script,style,.katex-mathml').forEach(n=>n.remove());const text=parsed.content.textContent.replace(/\s+/g,' ').trim();return '<li><button type="button" data-home-open="guestbook" aria-haspopup="dialog"><span class="home-preview-author">'+esc(names[r.author_id]||'网站成员')+'</span><time datetime="'+esc(r.created_at)+'">'+esc(shortDate(r.created_at))+'</time><span class="home-preview-title">'+esc(text.slice(0,150)||'图片留言')+'</span></button></li>';}).join('')||'<li class="home-preview-loading">还没有留言，登录后写下第一条吧。</li>';}
+ function previewMessages(rows,names){preview('guestbook').innerHTML=rows.slice(0,3).map(r=>{const parsed=document.createElement('template');parsed.innerHTML=L.markdown(r.body);parsed.content.querySelectorAll('script,style,.katex-mathml').forEach(n=>n.remove());const text=parsed.content.textContent.replace(/\s+/g,' ').trim();return '<li><button type="button" data-home-open="guestbook" aria-haspopup="dialog"><span class="home-guestbook-meta">'+pinBadge(r)+'<span class="home-preview-author">'+esc(names[r.author_id]||'网站成员')+'</span><time datetime="'+esc(r.created_at)+'">'+esc(shortDate(r.created_at))+'</time></span><span class="home-preview-title">'+esc(text.slice(0,150)||'图片留言')+'</span></button></li>';}).join('')||'<li class="home-preview-loading">还没有留言，登录后写下第一条吧。</li>';}
  let previewLoading=false;
  async function loadPreviews(){if(previewLoading)return;previewLoading=true;try{await L.ready;await Promise.allSettled([
   (async()=>{try{previewUpdates(L.check(await L.client.rpc('foamlab_recent_updates')));}catch{preview('updates').innerHTML='<li class="home-preview-loading">暂时无法读取，点击“查看全部”重试。</li>';}})(),
-  (async()=>{try{const rows=L.check(await L.client.from('foamlab_guestbook').select('id,author_id,body,created_at').order('created_at',{ascending:false}).order('id',{ascending:false}).limit(3));const names=await L.names(rows.map(r=>r.author_id));previewMessages(rows,names);}catch{preview('guestbook').innerHTML='<li class="home-preview-loading">暂时无法读取，点击“查看全部”重试。</li>';}})()
+  (async()=>{try{const rows=L.check(await L.client.from('foamlab_guestbook').select('id,author_id,body,created_at,pinned').order('pinned',{ascending:false}).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(3));const names=await L.names(rows.map(r=>r.author_id));previewMessages(rows,names);}catch{preview('guestbook').innerHTML='<li class="home-preview-loading">暂时无法读取，点击“查看全部”重试。</li>';}})()
  ]);}catch{for(const kind of ['updates','guestbook'])preview(kind).innerHTML='<li class="home-preview-loading">暂时无法读取，请稍后重试。</li>';}finally{previewLoading=false;}}
  function dialog(kind,title,description){
   const d=document.createElement('dialog');d.className='home-dialog';d.id='home-'+kind+'-dialog';d.setAttribute('aria-labelledby',d.id+'-title');
@@ -59,16 +62,28 @@
  async function loadBoard(){
   const request=++state.request,note=board.querySelector('[data-guestbook-state]'),list=board.querySelector('[data-guestbook-list]');state.loading=true;note.textContent='正在读取留言…';
   try{
-   await L.ready;compose();const response=await L.client.from('foamlab_guestbook').select('*',{count:'exact'}).order('created_at',{ascending:false}).order('id',{ascending:false}).range((state.page-1)*20,state.page*20-1),rows=L.check(response);
+   await L.ready;compose();const response=await orderedMessages().range((state.page-1)*20,state.page*20-1),rows=L.check(response);
    const names=await L.names(rows.map(r=>r.author_id));if(request!==state.request)return;if(state.page===1)previewMessages(rows,names);
    state.total=response.count??rows.length;const pages=Math.max(1,Math.ceil(state.total/20));if(state.page>pages){state.page=pages;return loadBoard();}state.rows=rows;
-   list.innerHTML=rows.map(r=>'<article class="home-guestbook-item" data-guestbook-id="'+esc(r.id)+'"><div class="community-byline">'+L.authorMeta(r)+'</div><div class="prose">'+L.markdown(r.body)+'</div><div class="community-post-actions">'+(own(r)?'<button class="text-button" type="button" data-guestbook-edit="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button class="text-button danger" type="button" data-guestbook-delete="'+esc(r.id)+'">删除</button>':'')+'</div></article>').join('')||'<p class="home-dialog-status">还没有留言，欢迎写下第一条。</p>';
+   list.innerHTML=rows.map(r=>'<article class="home-guestbook-item" data-guestbook-id="'+esc(r.id)+'"><div class="community-byline">'+pinBadge(r)+L.authorMeta(r)+'</div><div class="prose">'+L.markdown(r.body)+'</div><div class="community-post-actions">'+(canPin()?'<button class="text-button" type="button" data-guestbook-pin="'+esc(r.id)+'" aria-pressed="'+String(!!r.pinned)+'" '+(state.pinning?'disabled':'')+'>'+(r.pinned?'取消置顶':'置顶')+'</button>':'')+(own(r)?'<button class="text-button" type="button" data-guestbook-edit="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button class="text-button danger" type="button" data-guestbook-delete="'+esc(r.id)+'">删除</button>':'')+'</div></article>').join('')||'<p class="home-dialog-status">还没有留言，欢迎写下第一条。</p>';
    note.textContent='共 '+state.total+' 条留言';board.querySelector('.home-guestbook-pager').innerHTML=pages>1?'<button type="button" class="text-button" data-guestbook-page="'+(state.page-1)+'" '+(state.page===1?'disabled':'')+'>上一页</button><span>'+state.page+' / '+pages+'</span><button type="button" class="text-button" data-guestbook-page="'+(state.page+1)+'" '+(state.page===pages?'disabled':'')+'>下一页</button>':'';
    window.dispatchEvent(new Event('foamlab:messages'));
   }catch(error){if(request===state.request)note.textContent='留言暂时无法读取，请点击“刷新留言”重试。';}
   finally{if(request===state.request)state.loading=false;}
  }
  board.addEventListener('click',async e=>{
+  const pin=e.target.closest('[data-guestbook-pin]');if(pin){
+   if(pin.disabled||state.pinning||!canPin())return;const row=state.rows.find(r=>r.id===pin.dataset.guestbookPin);if(!row)return;
+   state.pinning=true;for(const button of board.querySelectorAll('[data-guestbook-pin]'))button.disabled=true;
+   try{
+    const saved=L.check(await L.client.from('foamlab_guestbook').update({pinned:!row.pinned}).eq('id',row.id).eq('updated_at',row.updated_at).eq('pinned',!!row.pinned).select('id'));
+    if(!saved.length)throw Error('留言已变化或当前账号无权置顶，请刷新后重试。');
+    state.page=1;await loadBoard();
+    const scroller=board.querySelector('.home-dialog-body'),list=board.querySelector('[data-guestbook-list]');scroller.scrollTop+=list.getBoundingClientRect().top-scroller.getBoundingClientRect().top-scroller.clientTop;
+   }catch(error){board.querySelector('[data-guestbook-state]').textContent=error.message;}
+   finally{state.pinning=false;for(const button of board.querySelectorAll('[data-guestbook-pin]'))button.disabled=false;}
+   return;
+  }
   const page=e.target.closest('[data-guestbook-page]');if(page&&!page.disabled){state.page=Number(page.dataset.guestbookPage);await loadBoard();return;}
   const edit=e.target.closest('[data-guestbook-edit]');if(edit){const row=state.rows.find(r=>r.id===edit.dataset.guestbookEdit),form=board.querySelector('form');if(!row||!own(row)||form.querySelector('[type=submit]').disabled)return;
    if(state.edit?.id===row.id){form.elements.body.focus();return;}if(state.edit&&form.elements.body.value!==state.edit.body&&!confirm('放弃当前尚未保存的修改？'))return;
@@ -83,7 +98,7 @@
  entries.onclick=e=>{const b=e.target.closest('[data-home-open]'),card=e.target.closest('[data-home-card]');if(b)void open(b.dataset.homeOpen);else if(card&&!getSelection()?.toString())void open(card.dataset.homeCard);};
  function fromHash(){if(location.hash==='#guestbook')void open('guestbook');else if(location.hash==='#updates')void open('updates');}
  addEventListener('hashchange',fromHash);fromHash();
- setInterval(()=>{if(board.open&&!document.hidden&&!state.loading&&!state.edit)void loadBoard();},30000);
+ setInterval(()=>{if(board.open&&!document.hidden&&!state.loading&&!state.edit&&!state.pinning)void loadBoard();},30000);
  setInterval(()=>{if(!document.hidden)void loadPreviews();},60000);
  window.addEventListener('foam-auth-change',()=>{const id=window.foamAuth.user?.id||null;if(lastUser!==id){lastUser=id;state.edit=null;state.newDraft='';state.pending=null;board.querySelector('[data-guestbook-compose]').replaceChildren();if(board.open)void loadBoard();}});
  L.ready.then(()=>lastUser=L.user?.id||null).catch(()=>{});
