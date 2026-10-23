@@ -162,7 +162,7 @@
  let fluidPromise=null;
  function fluidRuntime(){
   if(window.FoamWordFluid)return Promise.resolve();if(fluidPromise)return fluidPromise;
-  fluidPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/assets/vendor/member-word-fluid.js?v=04786f01fb18';s.async=true;
+  fluidPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/assets/vendor/member-word-fluid.js?v=ebd0b5f32bb9';s.async=true;
    const timer=setTimeout(fail,15000);function fail(){clearTimeout(timer);s.remove();fluidPromise=null;reject(Error('流体组件暂时无法加载'));}
    s.onerror=fail;s.onload=()=>{clearTimeout(timer);if(window.FoamWordFluid)resolve();else fail();};document.head.append(s);
   });return fluidPromise;
@@ -182,7 +182,7 @@
   function rasterise(items){ctx.clearRect(0,0,width,height);for(const item of items){ctx.save();ctx.translate(item.x,item.y);ctx.rotate(item.angle*Math.PI/180);ctx.font=`400 ${item.font*cloudZoom}px ${family}`;ctx.fillText(item.row.label,0,item.baseline*item.font*cloudZoom);ctx.restore();}}
   rasterise(placed);
   try{await fluidRuntime();const effect=window.FoamWordFluid(canvas,mask);canvas.addEventListener('foam-fluid-restore',()=>{if(canvas.isConnected)void draw();});
-   return{canvas,setObstacles(items){rasterise(items);effect.setObstacles(mask);},setEnabled:value=>effect.setEnabled(value),pointer:(x,y,id,phase)=>effect.pointer(x*scale,y*scale,id,phase),dispose:()=>effect.dispose()};
+   return{canvas,present:()=>effect.present(),cancelInput:()=>effect.cancelInput(),setObstacles(items){rasterise(items);effect.setObstacles(mask);},setEnabled:value=>effect.setEnabled(value),pointer:(x,y,id,phase)=>effect.pointer(x*scale,y*scale,id,phase),dispose:()=>effect.dispose()};
   }catch{canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();const fallback=document.createElement('canvas');fallback.className=canvas.className;fallback.width=canvas.width;fallback.height=canvas.height;fallback.setAttribute('aria-hidden','true');const effect=wordFlowFallback(fallback,mask,width,height);return{...effect,setObstacles(items){rasterise(items);effect.setObstacles(mask);}};}
  }
  function wordFlowFallback(canvas,mask,width,height){
@@ -193,7 +193,7 @@
    for(const p of particles){if(p.age++>550)continue;const oldX=p.x,oldY=p.y,gx=solid(p.x+3,p.y)-solid(p.x-3,p.y),gy=solid(p.x,p.y+3)-solid(p.x,p.y-3);p.vx=(p.vx+Math.sin(p.y*.04+time)*.08-gx*.4)*.98;p.vy=(p.vy+Math.cos(p.x*.035-time)*.08-gy*.4)*.98;p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width||p.y<0||p.y>canvas.height){p.age=551;continue;}ctx.strokeStyle=`hsla(${p.hue} 85% ${dark?65:35}% / .3)`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(oldX,oldY);ctx.lineTo(p.x,p.y);ctx.stroke();}
   }frame=requestAnimationFrame(tick);}
   let nextParticle=0;
-  return{canvas,setObstacles(next){ink=next.getContext('2d').getImageData(0,0,next.width,next.height).data;},setEnabled(value){enabled=value;if(enabled&&!frame)frame=requestAnimationFrame(tick);if(!enabled){cancelAnimationFrame(frame);frame=0;}},pointer(x,y,id,phase){if(!enabled||phase==='end')return;for(let i=0;i<12;i++){const a=i*Math.PI/6;particles[nextParticle++%particles.length]={x:x*canvas.width/width,y:y*canvas.height/height,vx:Math.cos(a)*2,vy:Math.sin(a)*2,hue:(performance.now()*.25+x*.8)%360,age:0};}},dispose(){disposed=true;cancelAnimationFrame(frame);}};
+  return{canvas,setObstacles(next){ink=next.getContext('2d').getImageData(0,0,next.width,next.height).data;},setEnabled(value){enabled=value;if(enabled&&!frame)frame=requestAnimationFrame(tick);if(!enabled){cancelAnimationFrame(frame);frame=0;}},pointer(x,y,id,phase){if(!enabled||phase==='end'||phase==='resume')return;for(let i=0;i<12;i++){const a=i*Math.PI/6;particles[nextParticle++%particles.length]={x:x*canvas.width/width,y:y*canvas.height/height,vx:Math.cos(a)*2,vy:Math.sin(a)*2,hue:(performance.now()*.25+x*.8)%360,age:0};}},dispose(){disposed=true;cancelAnimationFrame(frame);}};
  }
  async function wordCloud(svg,list,width,height,version){
   // Pack every aggregated direction, including the longer names that also count toward shorter ones.
@@ -239,23 +239,30 @@
    drift.append(text);g.append(drift);interactive(g,item.row);svg.append(g);item.element=g;
   }
   const flow=await wordFlow(placed,width,height,family);if(version!==drawRevision){flow.dispose();return null;}const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),reset=$('[data-distribution-reset]');
-  let inView=false,disposed=false,densityFrame=0;const drawingPointers=new Set();
+  let inView=false,disposed=false,densityFrame=0,cloudPinch=null;const drawingPointers=new Map();
   function setDensity(){if(densityFrame||disposed)return;densityFrame=requestAnimationFrame(()=>{densityFrame=0;if(disposed)return;applySpacing(cloudDensity);flow.setObstacles(placed);});}
+  function setZoom(value){cloudZoom=Math.max(.5,Math.min(3,value));setDensity();zoomControlsState();}
+  const fingerPoints=()=>[...drawingPointers.values()].filter(p=>p.pointerType==='touch');
+  const fingerDistance=()=>{const [a,b]=fingerPoints();return Math.max(10,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY));};
+  function beginCloudPinch(){flow.cancelInput?.();cloudPinch={distance:fingerDistance(),zoom:cloudZoom};}
+  function cancelInput(){const ids=[...drawingPointers.keys()];drawingPointers.clear();cloudPinch=null;flow.cancelInput?.();for(const id of ids)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);}
   function update(){
    if(disposed)return;const enabled=inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
    svg.classList.toggle('is-flowing',enabled);control.hidden=preference.matches;control.dataset.paused=String(motionPaused);control.setAttribute('aria-label',motionPaused?'播放词云动效':'暂停词云动效');control.title=motionPaused?'播放词云动效':'暂停词云动效';
-   flow.setEnabled(enabled);if(!enabled){for(const id of drawingPointers)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);drawingPointers.clear();}
+   flow.setEnabled(enabled);if(!inView||document.hidden||listDialog.open||document.documentElement.classList.contains('profile-required-open'))cancelInput();
   }
   const inject=(e,phase)=>{const r=svg.getBoundingClientRect();flow.pointer((e.clientX-r.left)*width/r.width,(e.clientY-r.top)*height/r.height,e.pointerId,phase);};
-  const down=e=>{if(e.button!==0||!svg.classList.contains('is-flowing'))return;e.preventDefault();drawingPointers.add(e.pointerId);svg.setPointerCapture(e.pointerId);inject(e,'start');};
-  const move=e=>{if(!drawingPointers.has(e.pointerId))return;e.preventDefault();inject(e,'move');};
-  const up=e=>{if(!drawingPointers.delete(e.pointerId))return;inject(e,'end');if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);};
+  const remember=e=>drawingPointers.set(e.pointerId,{pointerId:e.pointerId,pointerType:e.pointerType,clientX:e.clientX,clientY:e.clientY});
+  const down=e=>{if(e.button!==0||disposed||e.pointerType!=='touch'&&!svg.classList.contains('is-flowing'))return;e.preventDefault();cancelWheelZoom();remember(e);svg.setPointerCapture(e.pointerId);if(fingerPoints().length>=2)beginCloudPinch();else inject(e,'start');};
+  const move=e=>{if(!drawingPointers.has(e.pointerId))return;e.preventDefault();remember(e);if(cloudPinch){setZoom(cloudPinch.zoom*fingerDistance()/cloudPinch.distance);}else inject(e,'move');};
+  const up=e=>{if(!drawingPointers.delete(e.pointerId))return;inject(e,'end');const wasPinching=!!cloudPinch;cloudPinch=null;if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);if(fingerPoints().length>=2)beginCloudPinch();else if(wasPinching){setDensity();flow.cancelInput?.();const remaining=fingerPoints()[0];if(remaining)inject(remaining,'resume');}};
   svg.addEventListener('pointerdown',down);svg.addEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.addEventListener(name,up);
+  window.addEventListener('blur',cancelInput);
   control.onclick=()=>{motionPaused=!motionPaused;update();};reset.hidden=false;reset.setAttribute('aria-label','复原词云');reset.title='复原词云';reset.onclick=()=>{cloudDensity=42;cloudZoom=1;density.value='42';density.setAttribute('aria-valuetext','适中');selectedLabel=null;void draw(true);};
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});gate.observe(listDialog,{attributes:true,attributeFilter:['open']});
   document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
-  return{canvas:flow.canvas,setDensity,setZoom(value){cloudZoom=Math.max(.5,Math.min(3,value));setDensity();},setZooming(){},dispose(){disposed=true;cancelAnimationFrame(densityFrame);for(const id of drawingPointers)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);drawingPointers.clear();flow.dispose();observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);svg.removeEventListener('pointerdown',down);svg.removeEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.removeEventListener(name,up);control.onclick=null;reset.onclick=null;}};
+  return{canvas:flow.canvas,present:()=>flow.present?.(),setDensity,setZoom,setZooming(){},dispose(){disposed=true;cancelAnimationFrame(densityFrame);cancelInput();flow.dispose();observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);window.removeEventListener('blur',cancelInput);svg.removeEventListener('pointerdown',down);svg.removeEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.removeEventListener(name,up);control.onclick=null;reset.onclick=null;}};
  }
  async function draw(resetView=false){
   const cloud=kind==='research'&&researchView==='words',bubble=kind==='institutions'||kind==='research'&&!cloud;chart.dataset.pannable=String(bubble);plot.dataset.view=cloud?'words':'chart';plot.dataset.research=String(kind==='research');researchViews.hidden=kind!=='research';densityControl.hidden=!cloud;
@@ -263,7 +270,8 @@
   const center=!resetView&&view?.kind===kind?{x:(chart.scrollLeft+view.width/2-view.offsetX)/view.svgWidth,y:(chart.scrollTop+view.height/2-view.offsetY)/view.svgHeight}:{x:.5,y:.5};
   const version=++drawRevision;clearTimeout(zoomTimer);motion?.dispose();motion=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;zoomControls.hidden=true;if(!data)return;
   $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}
-  if(listDialog.open)renderList();if(!cloud||!chart.querySelector('.member-wordcloud'))chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
+  // Keep the previous chart while the cloud font, layout and GPU frame are prepared.
+  if(listDialog.open)renderList();if(!cloud)chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length||cloud&&!list.some(r=>r.count>0)){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.replaceChildren(p,a);densityControl.hidden=true;return;}
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
   if(version!==drawRevision)return;
@@ -274,7 +282,7 @@
   const svg=node('svg',{viewBox:`0 0 ${bubble?width:svgWidth} ${bubble?height:svgHeight}`,width:svgWidth,height:svgHeight,role:'group','aria-label':names[kind]+'人数统计','data-zoomed':String(bubble&&bubbleZoom>1)});
   svg.style.marginTop=Math.max(0,(height-svgHeight)/2)+'px';
   svg.append(node('desc',{},captions[kind]));
-  let items=null;if(cloud){svg.classList.add('member-wordcloud');const controller=await wordCloud(svg,shown,width,height,version);if(version!==drawRevision){controller?.dispose();return;}chart.replaceChildren(controller.canvas,svg);motion=controller;}else if(bubble)items=bubbleChart(svg,shown,width,height);else barChart(svg,shown,svgWidth,height);
+  let items=null;if(cloud){svg.classList.add('member-wordcloud');const controller=await wordCloud(svg,shown,width,height,version);if(version!==drawRevision){controller?.dispose();return;}chart.replaceChildren(controller.canvas,svg);controller.present();motion=controller;}else if(bubble)items=bubbleChart(svg,shown,width,height);else barChart(svg,shown,svgWidth,height);
   // A viewport of spare space surrounds the drawing, so the background can also pan at 100%.
   const offsetX=bubble?width/2:0,offsetY=bubble?height/2:0;
   if(bubble){const world=document.createElement('div');world.className='member-distribution-world';world.style.width=svgWidth+width+'px';world.style.height=svgHeight+height+'px';svg.style.cssText=`position:absolute;left:${offsetX}px;top:${offsetY}px;margin:0`;world.append(svg);chart.append(world);}else chart.append(svg);
@@ -340,13 +348,14 @@
  }
  zoomIn.onclick=()=>changeZoom(.25);zoomOut.onclick=()=>changeZoom(-.25);
  plot.addEventListener('wheel',e=>{
-  if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||!e.deltaY||view?.kind!==kind||!chart.querySelector('.member-distribution-world'))return;
+  const cloud=kind==='research'&&researchView==='words';
+  if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||!e.deltaY||view?.kind!==kind||(!cloud&&!chart.querySelector('.member-distribution-world'))||e.target.closest('input'))return;
   e.preventDefault();
   if(pan||pinch||chart.querySelector('.is-dragging'))return;
   const unit=e.deltaMode===1?16:e.deltaMode===2?chart.clientHeight:1;
   wheelDelta=Math.max(-600,Math.min(600,wheelDelta+e.deltaY*unit));
   // Batch high-frequency mouse and trackpad events into one scale change per frame.
-  if(!wheelFrame)wheelFrame=requestAnimationFrame(()=>{const delta=wheelDelta;wheelFrame=0;wheelDelta=0;applyZoom(bubbleZoom*Math.exp(-delta*.0015));});
+  if(!wheelFrame)wheelFrame=requestAnimationFrame(()=>{const delta=wheelDelta;wheelFrame=0;wheelDelta=0;if(cloud)motion?.setZoom(cloudZoom*Math.exp(-delta*.0015));else applyZoom(bubbleZoom*Math.exp(-delta*.0015));});
  },{passive:false});
  // Capture touch pointers on the chart so a pinch can transition back to one-finger panning.
  // A single touch pans; two touches scale by their distance and keep the drawing centred.

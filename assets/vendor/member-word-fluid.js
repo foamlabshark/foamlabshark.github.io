@@ -32,7 +32,7 @@ window.FoamWordFluid = function(canvas, mask) {
 const mobile=canvas.width<600;
 const config={SIM_RESOLUTION:mobile?160:192,DYE_RESOLUTION:mobile?512:768,
  DENSITY_DISSIPATION:1,VELOCITY_DISSIPATION:.2,PRESSURE:.8,PRESSURE_ITERATIONS:20,
- CURL:30,SPLAT_RADIUS:.25,SPLAT_FORCE:6000,SHADING:true,COLORFUL:true,COLOR_UPDATE_SPEED:10,
+ CURL:45,SPLAT_RADIUS:.25,SPLAT_FORCE:8000,SHADING:true,COLORFUL:true,COLOR_UPDATE_SPEED:10,
  BLOOM:true,BLOOM_ITERATIONS:6,BLOOM_RESOLUTION:128,BLOOM_INTENSITY:.3,BLOOM_THRESHOLD:.65,BLOOM_SOFT_KNEE:.7,
  SUNRAYS:false,SUNRAYS_RESOLUTION:128,SUNRAYS_WEIGHT:1.,TRANSPARENT:true};
 const {gl,ext}=getWebGLContext(canvas);
@@ -1299,6 +1299,8 @@ canvas.dataset.renderer='pavel-fluid';
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;});
 canvas.addEventListener('webglcontextrestored',()=>canvas.dispatchEvent(new CustomEvent('foam-fluid-restore')));
 return{canvas,
+ present(){if(!disposed&&!lost)render(null);},
+ cancelInput(){touches.clear();queue.length=0;},
  setObstacles(next){if(disposed||lost)return;gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_2D,obstacleTexture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,next);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);},
  setEnabled(value){running=value;if(!running){cancelAnimationFrame(frame);frame=0;last=0;queue.length=0;touches.clear();}else if(!frame&&!lost)frame=requestAnimationFrame(tick);},
  pointer(x,y,id,phase){if(!running||disposed)return;const p={x:x/canvas.width,y:1-y/canvas.height};
