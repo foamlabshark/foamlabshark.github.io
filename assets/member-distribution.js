@@ -88,12 +88,12 @@
   control.onclick=()=>{motionPaused=!motionPaused;update();};
   resetControl.hidden=false;
   resetControl.onclick=()=>{
-   cancelWheelZoom();cancelChartGesture();
-   applyZoom(1);
+   cancelWheelZoom();cancelChartGesture();holdZoomMotion();
    if(drag&&svg.hasPointerCapture(drag.pointerId))svg.releasePointerCapture(drag.pointerId);
    pointer=null;drag=null;lastTick=0;svg.classList.remove('is-dragging');
    for(const item of items){item.x=item.homeX;item.y=item.homeY;item.vx=0;item.vy=0;item.squeeze=0;item.pressure=0;item.angle=0;item.g.classList.remove('is-selected');place(item);}
-   selectedLabel=null;for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}centerView();
+   selectedLabel=null;for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}
+   if(bubbleZoom!==1){bubbleZoom=1;commitZoom();}else centerView();releaseZoomMotion();
   };
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -344,7 +344,7 @@
  }
  function cancelWheelZoom(){cancelAnimationFrame(wheelFrame);wheelFrame=0;wheelDelta=0;}
  function holdZoomMotion(){clearTimeout(zoomTimer);motion?.setZooming(true);}
- function releaseZoomMotion(){clearTimeout(zoomTimer);zoomTimer=setTimeout(()=>{if(!pinch)motion?.setZooming(false);},180);}
+ function releaseZoomMotion(){clearTimeout(zoomTimer);zoomTimer=setTimeout(()=>{if(!pinch&&!touches.size)motion?.setZooming(false);},180);}
  function applyZoom(value){
   const next=Math.max(.5,Math.min(3,value));if(next===bubbleZoom||view?.kind!==kind||!view?.items||!view.svg.isConnected)return;
   holdZoomMotion();bubbleZoom=next;
@@ -359,17 +359,18 @@
   svg.setAttribute('width',view.svgWidth);svg.setAttribute('height',view.svgHeight);svg.dataset.zoomed=String(bubbleZoom>1);
   world.style.width=view.svgWidth+width+'px';world.style.height=view.svgHeight+height+'px';
   const measure=document.createElement('canvas').getContext('2d');for(const item of items)bubbleLabel(item.g,item.row,item.r,measure);
-  zoomControlsState();centerView();
+  zoomControlsState();return centerView();
  }
  function changeZoom(step){cancelWheelZoom();cancelChartGesture();if(kind==='research'&&researchView==='words'){motion?.setZoom(cloudZoom+step);zoomControlsState();}else applyZoom(bubbleZoom+step);}
  function centerView(){
   if(!view?.svg.isConnected)return;
-  const bounds=view.items?.map(item=>item.circle.getBoundingClientRect());
-  if(bounds?.length){
-   const rect=chart.getBoundingClientRect();
-   chart.scrollBy({left:(Math.min(...bounds.map(r=>r.left))+Math.max(...bounds.map(r=>r.right)))/2-rect.left-chart.clientLeft-chart.clientWidth/2,top:(Math.min(...bounds.map(r=>r.top))+Math.max(...bounds.map(r=>r.bottom)))/2-rect.top-chart.clientTop-chart.clientHeight/2,behavior:'instant'});
-  }else chart.scrollTo({left:view.offsetX+view.svgWidth/2-chart.clientWidth/2,top:view.offsetY+view.svgHeight/2-chart.clientHeight/2,behavior:'instant'});
+  const center=bubbleCenter(),left=view.offsetX+(center?center.x*bubbleZoom:view.svgWidth/2)-chart.clientWidth/2,top=view.offsetY+(center?center.y*bubbleZoom:view.svgHeight/2)-chart.clientHeight/2;
+  // Absolute world coordinates are independent of Safari's delayed scroll geometry.
+  // Repeated centring must not accumulate corrections from a previous scroll request.
+  const camera={left:Math.max(0,Math.min(view.svgWidth+view.width-chart.clientWidth,left)),top:Math.max(0,Math.min(view.svgHeight+view.height-chart.clientHeight,top))};
+  chart.scrollTo({...camera,behavior:'instant'});return camera;
  }
+ function bubbleCenter(){const items=view?.items;if(!items?.length)return null;return{x:(Math.min(...items.map(p=>p.x-p.r))+Math.max(...items.map(p=>p.x+p.r)))/2,y:(Math.min(...items.map(p=>p.y-p.r))+Math.max(...items.map(p=>p.y+p.r)))/2};}
  zoomIn.onclick=()=>changeZoom(.25);zoomOut.onclick=()=>changeZoom(-.25);
  plot.addEventListener('wheel',e=>{
   const cloud=kind==='research'&&researchView==='words';
@@ -386,20 +387,19 @@
  let pan=null,pinch=null,pinchFrame=0,pinchZoom=null,tap=null,lastTap=null;
  const touches=new Map();
  const touchDistance=()=>{const [a,b]=[...touches.values()];return Math.max(10,Math.hypot(a.x-b.x,a.y-b.y));};
- function rebaseTouchPan(){
+ function rebaseTouchPan(camera){
   if(touches.size!==1)return;
   const [id,point]=touches.entries().next().value;
-  pan={id,x:point.x,y:point.y,left:chart.scrollLeft,top:chart.scrollTop,touch:true};
+  pan={id,x:point.x,y:point.y,left:camera?.left??chart.scrollLeft,top:camera?.top??chart.scrollTop,touch:true};
  }
  function finishPinch(){
   if(!pinch)return;const {svg,zoom}=pinch;pinch=null;
   svg.style.removeProperty('transform');svg.style.removeProperty('transform-origin');chart.classList.remove('is-pinching');
-  if(view?.svg===svg&&svg.isConnected&&bubbleZoom!==zoom)commitZoom();
+  if(view?.svg===svg&&svg.isConnected&&bubbleZoom!==zoom)return commitZoom();
  }
  function beginPinch(){
   finishPinch();pan=null;holdZoomMotion();centerView();
-  const svg=view.svg,rect=svg.getBoundingClientRect(),bounds=view.items.map(item=>item.circle.getBoundingClientRect());
-  const x=(Math.min(...bounds.map(r=>r.left))+Math.max(...bounds.map(r=>r.right)))/2-rect.left,y=(Math.min(...bounds.map(r=>r.top))+Math.max(...bounds.map(r=>r.bottom)))/2-rect.top;
+  const svg=view.svg,center=bubbleCenter(),x=center.x*bubbleZoom,y=center.y*bubbleZoom;
   pinch={distance:touchDistance(),zoom:bubbleZoom,svg};svg.style.transformOrigin=`${x}px ${y}px`;chart.classList.add('is-pinching');
  }
  function flushPinchZoom(){
@@ -418,7 +418,7 @@
  }
  chart.addEventListener('pointerdown',e=>{
   if(e.pointerType!=='touch'||e.button!==0||chart.dataset.pannable!=='true'||!chart.querySelector('.member-distribution-world'))return;
-  e.preventDefault();e.stopPropagation();cancelWheelZoom();
+  e.preventDefault();e.stopPropagation();cancelWheelZoom();holdZoomMotion();
   if(!touches.size)tap={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now()};
   else{tap=null;lastTap=null;}
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');
@@ -439,12 +439,12 @@
   const now=performance.now(),shortTap=e.type==='pointerup'&&touches.size===1&&tap?.id===e.pointerId&&now-tap.at<=260&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10;
   const doubleTap=shortTap&&lastTap&&now-lastTap.at<=320&&Math.hypot(tap.x-lastTap.x,tap.y-lastTap.y)<=32;
   lastTap=shortTap&&!doubleTap?{x:tap.x,y:tap.y,at:now}:null;tap=null;
-  e.stopPropagation();const wasPinching=!!pinch;touches.delete(e.pointerId);
+  e.stopPropagation();touches.delete(e.pointerId);
   if(e.type==='pointerup')flushPinchZoom();else{cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;}
   if(touches.size>=2)beginPinch();
   else{
-   finishPinch();if(wasPinching){centerView();releaseZoomMotion();}
-   if(touches.size)rebaseTouchPan();else{pan=null;chart.classList.remove('is-panning');}
+   const camera=finishPinch();
+   if(touches.size)rebaseTouchPan(camera);else{pan=null;chart.classList.remove('is-panning');releaseZoomMotion();}
   }
   if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);
   if(doubleTap)$('[data-distribution-reset]').click();
@@ -454,12 +454,14 @@
  document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelChartGesture();});
  // Mouse dragging still distinguishes moving a bubble from panning its background.
  chart.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='touch'||!e.isPrimary||e.button!==0||e.target.closest('.member-bar,.member-bubble')||chart.dataset.pannable!=='true')return;
+  if(e.pointerType==='touch'||touches.size||!e.isPrimary||e.button!==0||e.target.closest('.member-bar,.member-bubble')||chart.dataset.pannable!=='true')return;
   pan={id:e.pointerId,x:e.clientX,y:e.clientY,left:chart.scrollLeft,top:chart.scrollTop};
   chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');e.preventDefault();
  });
- chart.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'&&pan?.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}});
- const endPan=e=>{if(e.pointerType==='touch'||pan?.id!==e.pointerId)return;pan=null;chart.classList.remove('is-panning');if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);};
+ // Safari can emit compatibility mouse events after a touch changes. Their ID
+ // may match the surviving finger; they must never move or finish a touch pan.
+ chart.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'&&pan&&!pan.touch&&pan.id===e.pointerId){chart.scrollLeft=pan.left+pan.x-e.clientX;chart.scrollTop=pan.top+pan.y-e.clientY;}});
+ const endPan=e=>{if(e.pointerType==='touch'||!pan||pan.touch||pan.id!==e.pointerId)return;pan=null;chart.classList.remove('is-panning');if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);};
  for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endPan);
  chart.addEventListener('keydown',e=>{
   if(e.target!==chart||chart.dataset.pannable!=='true')return;
