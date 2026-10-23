@@ -27,7 +27,7 @@ SOFTWARE.
  * Glyph obstacles, scoped interactions, theme composition and managed lifecycle.
  * Upstream SHA256: 291d86de38ea23b8fb63d1879afeea77e9a4556900bbd67e13bc1d5ea007ce4e */
 'use strict';
-window.FoamWordFluid = function(canvas, mask) {
+window.FoamWordFluid = async function(canvas, mask) {
 
 const mobile=canvas.width<600;
 const config={SIM_RESOLUTION:mobile?160:192,DYE_RESOLUTION:mobile?512:768,
@@ -38,6 +38,8 @@ const config={SIM_RESOLUTION:mobile?160:192,DYE_RESOLUTION:mobile?512:768,
 const {gl,ext}=getWebGLContext(canvas);
 if(!ext.formatRGBA||!ext.formatRG||!ext.formatR)throw Error('Floating point fluid buffers unavailable');
 const resources=[];
+const pendingPrograms=[],parallel=gl.getExtension('KHR_parallel_shader_compile');
+const yieldTask=()=>new Promise(resolve=>setTimeout(resolve,0));
 for(const type of ['Texture','Framebuffer','Buffer','Program','Shader']){const create=gl['create'+type].bind(gl);gl['create'+type]=(...args)=>{const value=create(...args);resources.push([type,value]);return value;};}
 let obstacleTexture=null;
 function bindObstacles(uniforms){if(uniforms.uObstacles&&obstacleTexture){gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_2D,obstacleTexture);gl.uniform1i(uniforms.uObstacles,7);}}
@@ -157,7 +159,7 @@ class Material {
 
         if (program == this.activeProgram) return;
 
-        this.uniforms = getUniforms(program);
+        pendingPrograms.push({program,owner:this});
         this.activeProgram = program;
     }
 
@@ -170,7 +172,7 @@ class Program {
     constructor (vertexShader, fragmentShader) {
         this.uniforms = {};
         this.program = createProgram(vertexShader, fragmentShader);
-        this.uniforms = getUniforms(this.program);
+        pendingPrograms.push({program:this.program,owner:this});
     }
 
     bind () {
@@ -184,8 +186,7 @@ function createProgram (vertexShader, fragmentShader) {
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
 
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-        throw Error(gl.getProgramInfoLog(program));
+
 
     return program;
 }
@@ -207,8 +208,7 @@ function compileShader (type, source, keywords) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-        throw Error(gl.getShaderInfoLog(shader));
+
 
     return shader;
 };
@@ -1282,13 +1282,26 @@ obstacleTexture=gl.createTexture();gl.activeTexture(gl.TEXTURE7);gl.bindTexture(
 gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,mask);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
-updateKeywords();initFramebuffers();
+updateKeywords();
+const compileStart=performance.now();
+for(const item of pendingPrograms){
+ await yieldTask();
+ while(parallel&&!gl.getProgramParameter(item.program,parallel.COMPLETION_STATUS_KHR)){
+  if(gl.isContextLost()||performance.now()-compileStart>15000)throw Error('Fluid shader setup interrupted');
+  await new Promise(resolve=>setTimeout(resolve,8));
+ }
+ if(!gl.getProgramParameter(item.program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(item.program));
+ item.owner.uniforms=getUniforms(item.program);
+}
+initFramebuffers();await yieldTask();
 let running=false,disposed=false,frame=0,last=0,lost=false;
 const touches=new Map(),queue=[];
 function inject(x,y,dx,dy,hue,amount=.15){const c=HSVtoRGB(hue,1,1);splat(x,y,dx,dy,{r:c.r*amount,g:c.g*amount,b:c.b*amount});}
 // A handful of free dye splashes starts the scene. There is no permanent inflow.
 for(let i=0;i<4;i++)inject(.23+(i%2)*.54,.25+Math.floor(i/2)*.5,Math.sin(i*2.4)*420,Math.cos(i*1.7)*350,(i*.247+.42)%1,.65);
-for(let i=0;i<3;i++)step(.016);render(null);
+for(let i=0;i<3;i++){step(.016);await yieldTask();}render(null);
+// Keep the unready canvas detached until the GPU has completed its first image.
+if(gl.fenceSync){const fence=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();const start=performance.now();while(gl.clientWaitSync(fence,0,0)===gl.TIMEOUT_EXPIRED&&performance.now()-start<3000)await new Promise(resolve=>setTimeout(resolve,8));gl.deleteSync(fence);}
 function tick(now){frame=0;if(!running||disposed||lost)return;
  if(now-last>=30){const dt=last?Math.min((now-last)/1000,.033):.016;last=now;
   while(queue.length){const s=queue.shift();inject(...s);}step(dt);render(null);

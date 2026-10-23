@@ -159,10 +159,11 @@
   const head=document.createElement('thead'),tr=document.createElement('tr');for(const label of [names[kind],'人数']){const th=document.createElement('th');th.scope='col';th.textContent=label;tr.append(th);}head.append(tr);table.append(head);
   const body=document.createElement('tbody');for(const row of list){const tr=document.createElement('tr');for(const value of [row.label+(row.range?'（'+row.range+'）':''),row.count]){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);target.append(table);
  }
- let fluidPromise=null;
+ let fluidPromise=null,cloudCache=null,cloudBuild=null,warmTimer=0;
+ const retiredClouds=[];
  function fluidRuntime(){
   if(window.FoamWordFluid)return Promise.resolve();if(fluidPromise)return fluidPromise;
-  fluidPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/assets/vendor/member-word-fluid.js?v=ebd0b5f32bb9';s.async=true;
+  fluidPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/assets/vendor/member-word-fluid.js?v=084c727938e5';s.async=true;
    const timer=setTimeout(fail,15000);function fail(){clearTimeout(timer);s.remove();fluidPromise=null;reject(Error('流体组件暂时无法加载'));}
    s.onerror=fail;s.onload=()=>{clearTimeout(timer);if(window.FoamWordFluid)resolve();else fail();};document.head.append(s);
   });return fluidPromise;
@@ -181,7 +182,7 @@
   // Rasterise the glyphs, leaving both character gaps and the spaces between words open.
   function rasterise(items){ctx.clearRect(0,0,width,height);for(const item of items){ctx.save();ctx.translate(item.x,item.y);ctx.rotate(item.angle*Math.PI/180);ctx.font=`400 ${item.font*cloudZoom}px ${family}`;ctx.fillText(item.row.label,0,item.baseline*item.font*cloudZoom);ctx.restore();}}
   rasterise(placed);
-  try{await fluidRuntime();const effect=window.FoamWordFluid(canvas,mask);canvas.addEventListener('foam-fluid-restore',()=>{if(canvas.isConnected)void draw();});
+  try{await fluidRuntime();const effect=await window.FoamWordFluid(canvas,mask);canvas.addEventListener('foam-fluid-restore',()=>{if(cloudCache?.controller.canvas===canvas){retiredClouds.push(cloudCache);cloudCache=null;}if(canvas.isConnected)void draw();else cleanClouds();});
    return{canvas,present:()=>effect.present(),cancelInput:()=>effect.cancelInput(),setObstacles(items){rasterise(items);effect.setObstacles(mask);},setEnabled:value=>effect.setEnabled(value),pointer:(x,y,id,phase)=>effect.pointer(x*scale,y*scale,id,phase),dispose:()=>effect.dispose()};
   }catch{canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();const fallback=document.createElement('canvas');fallback.className=canvas.className;fallback.width=canvas.width;fallback.height=canvas.height;fallback.setAttribute('aria-hidden','true');const effect=wordFlowFallback(fallback,mask,width,height);return{...effect,setObstacles(items){rasterise(items);effect.setObstacles(mask);}};}
  }
@@ -195,10 +196,11 @@
   let nextParticle=0;
   return{canvas,setObstacles(next){ink=next.getContext('2d').getImageData(0,0,next.width,next.height).data;},setEnabled(value){enabled=value;if(enabled&&!frame)frame=requestAnimationFrame(tick);if(!enabled){cancelAnimationFrame(frame);frame=0;}},pointer(x,y,id,phase){if(!enabled||phase==='end'||phase==='resume')return;for(let i=0;i<12;i++){const a=i*Math.PI/6;particles[nextParticle++%particles.length]={x:x*canvas.width/width,y:y*canvas.height/height,vx:Math.cos(a)*2,vy:Math.sin(a)*2,hue:(performance.now()*.25+x*.8)%360,age:0};}},dispose(){disposed=true;cancelAnimationFrame(frame);}};
  }
- async function wordCloud(svg,list,width,height,version){
+ async function wordCloud(svg,list,width,height,valid){
   // Pack every aggregated direction, including the longer names that also count toward shorter ones.
   // Measure once, then find a non-overlapping layout; never fabricate or repeat words to fill space.
-  const measure=document.createElement('canvas').getContext('2d'),family=await wordFont();if(version!==drawRevision)return null;svg.style.fontFamily=family;
+  void fluidRuntime().catch(()=>{});
+  const measure=document.createElement('canvas').getContext('2d'),family=await wordFont();if(!valid())return null;svg.style.fontFamily=family;
   const sorted=[...list].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label,'zh-CN')),maximum=Math.max(...sorted.map(r=>r.count));
   measure.font=`400 100px ${family}`;
   const specs=sorted.map((row,i)=>{const m=measure.measureText(row.label);return{row,weight:.36+.84*Math.sqrt(row.count/maximum),ratio:Math.max(.7,m.width/100,(m.actualBoundingBoxLeft+m.actualBoundingBoxRight)/100),baseline:(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/200,angle:i===0?0:[0,0,-12,0,12,0,-90][i%7]};});
@@ -206,6 +208,7 @@
   // these fixed centres; glyph sizes, angles, ordering and fluid buffers stay intact.
   const safeTop=56,safeBottom=16,cx=width/2,cy=(safeTop+height-safeBottom)/2,availableW=width*.8,availableH=(height-safeTop-safeBottom)*.85,padding=3,left=(width-availableW)/2,top=cy-availableH/2;
   let base=Math.min(76,Math.sqrt(availableW*availableH*.44/specs.reduce((sum,s)=>sum+s.weight*s.weight*s.ratio,0))),placed=[];
+  let sliceStart=performance.now();
   for(let attempt=0;attempt<22;attempt++){
    placed=[];
    for(const [index,spec]of specs.entries()){
@@ -213,6 +216,7 @@
     const bw=Math.abs(w*Math.cos(a))+Math.abs(h*Math.sin(a))+padding*2,bh=Math.abs(w*Math.sin(a))+Math.abs(h*Math.cos(a))+padding*2;
     let found=null;
     for(let step=0;step<1800;step++){
+     if(step%100===0&&performance.now()-sliceStart>8){await new Promise(resolve=>setTimeout(resolve,0));if(!valid())return null;sliceStart=performance.now();}
      const radius=Math.sqrt(step/1799)*availableH*.54,theta=step*.38+index*2.399;
      const x=cx+Math.cos(theta)*radius*availableW/availableH,y=cy+Math.sin(theta)*radius;
      if(x-bw/2<left||x+bw/2>width-left||y-bh/2<top||y+bh/2>top+availableH)continue;
@@ -220,11 +224,11 @@
      found={...spec,font,x,y,bw,bh};break;
     }
     if(!found)break;placed.push(found);
-    if(index%20===19){await new Promise(resolve=>setTimeout(resolve,0));if(version!==drawRevision)return null;}
+    if(index%20===19){await new Promise(resolve=>setTimeout(resolve,0));if(!valid())return null;sliceStart=performance.now();}
    }
    if(placed.length===specs.length)break;base*=.85;
   }
-  if(version!==drawRevision)return null;
+  if(!valid())return null;
   // A finite grid fallback keeps unusual or very large datasets complete, with the list available for reading.
   if(placed.length!==specs.length){const cols=Math.max(1,Math.ceil(Math.sqrt(specs.length*availableW/availableH))),cw=availableW/cols,ch=availableH/Math.ceil(specs.length/cols);placed=specs.map((s,i)=>{const font=Math.max(.5,Math.min(ch*.65,(cw-8)/s.ratio));return{...s,angle:0,font,x:left+cw*(i%cols+.5),y:top+ch*(Math.floor(i/cols)+.5),bw:font*s.ratio+6,bh:font*1.25+6};});}
   const bounds={left:Math.min(...placed.map(p=>p.x-p.bw/2)),right:Math.max(...placed.map(p=>p.x+p.bw/2)),top:Math.min(...placed.map(p=>p.y-p.bh/2)),bottom:Math.max(...placed.map(p=>p.y+p.bh/2))};
@@ -238,8 +242,8 @@
    const drift=node('g',{class:'member-word-drift'}),text=node('text',{'text-anchor':'middle','dominant-baseline':'alphabetic',y:(item.baseline*item.font).toFixed(3),'font-size':item.font.toFixed(3),'font-weight':400},item.row.label);
    drift.append(text);g.append(drift);interactive(g,item.row);svg.append(g);item.element=g;
   }
-  const flow=await wordFlow(placed,width,height,family);if(version!==drawRevision){flow.dispose();return null;}const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),reset=$('[data-distribution-reset]');
-  let inView=false,disposed=false,densityFrame=0,cloudPinch=null;const drawingPointers=new Map();
+  const flow=await wordFlow(placed,width,height,family);if(!valid()){flow.dispose();return null;}const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),reset=$('[data-distribution-reset]');
+  let active=false,inView=false,disposed=false,densityFrame=0,cloudPinch=null;const drawingPointers=new Map();
   function setDensity(){if(densityFrame||disposed)return;densityFrame=requestAnimationFrame(()=>{densityFrame=0;if(disposed)return;applySpacing(cloudDensity);flow.setObstacles(placed);});}
   function setZoom(value){cloudZoom=Math.max(.5,Math.min(3,value));setDensity();zoomControlsState();}
   const fingerPoints=()=>[...drawingPointers.values()].filter(p=>p.pointerType==='touch');
@@ -247,7 +251,7 @@
   function beginCloudPinch(){flow.cancelInput?.();cloudPinch={distance:fingerDistance(),zoom:cloudZoom};}
   function cancelInput(){const ids=[...drawingPointers.keys()];drawingPointers.clear();cloudPinch=null;flow.cancelInput?.();for(const id of ids)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);}
   function update(){
-   if(disposed)return;const enabled=inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
+   if(disposed)return;if(!active){flow.setEnabled(false);svg.classList.remove('is-flowing');cancelInput();return;}const enabled=inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
    svg.classList.toggle('is-flowing',enabled);control.hidden=preference.matches;control.dataset.paused=String(motionPaused);control.setAttribute('aria-label',motionPaused?'播放词云动效':'暂停词云动效');control.title=motionPaused?'播放词云动效':'暂停词云动效';
    flow.setEnabled(enabled);if(!inView||document.hidden||listDialog.open||document.documentElement.classList.contains('profile-required-open'))cancelInput();
   }
@@ -258,31 +262,51 @@
   const up=e=>{if(!drawingPointers.delete(e.pointerId))return;inject(e,'end');const wasPinching=!!cloudPinch;cloudPinch=null;if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);if(fingerPoints().length>=2)beginCloudPinch();else if(wasPinching){setDensity();flow.cancelInput?.();const remaining=fingerPoints()[0];if(remaining)inject(remaining,'resume');}};
   svg.addEventListener('pointerdown',down);svg.addEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.addEventListener(name,up);
   window.addEventListener('blur',cancelInput);
-  control.onclick=()=>{motionPaused=!motionPaused;update();};reset.hidden=false;reset.setAttribute('aria-label','复原词云');reset.title='复原词云';reset.onclick=()=>{cloudDensity=42;cloudZoom=1;density.value='42';density.setAttribute('aria-valuetext','适中');selectedLabel=null;void draw(true);};
+  const toggle=()=>{motionPaused=!motionPaused;update();};
+  const restore=()=>{cloudDensity=42;cloudZoom=1;density.value='42';density.setAttribute('aria-valuetext','适中');selectedLabel=null;svg.querySelectorAll('.is-selected').forEach(n=>n.classList.remove('is-selected'));for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}setDensity();zoomControlsState();};
+  function setActive(value){active=value;if(active){const r=svg.getBoundingClientRect();inView=r.bottom>0&&r.top<innerHeight;control.onclick=toggle;reset.hidden=false;reset.setAttribute('aria-label','复原词云');reset.title='复原词云';reset.onclick=restore;}else{if(control.onclick===toggle)control.onclick=null;if(reset.onclick===restore)reset.onclick=null;}update();}
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
   const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});gate.observe(listDialog,{attributes:true,attributeFilter:['open']});
   document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
-  return{canvas:flow.canvas,present:()=>flow.present?.(),setDensity,setZoom,setZooming(){},dispose(){disposed=true;cancelAnimationFrame(densityFrame);cancelInput();flow.dispose();observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);window.removeEventListener('blur',cancelInput);svg.removeEventListener('pointerdown',down);svg.removeEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.removeEventListener(name,up);control.onclick=null;reset.onclick=null;}};
+  return{canvas:flow.canvas,present:()=>flow.present?.(),setActive,setDensity,setZoom,setZooming(){},dispose(){setActive(false);disposed=true;cancelAnimationFrame(densityFrame);cancelInput();flow.dispose();observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);window.removeEventListener('blur',cancelInput);svg.removeEventListener('pointerdown',down);svg.removeEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.removeEventListener(name,up);}};
  }
+ function cleanClouds(){for(let i=retiredClouds.length-1;i>=0;i--)if(!retiredClouds[i].controller.canvas.isConnected){retiredClouds.splice(i,1)[0].controller.dispose();}}
+ function prepareCloud(list,width,height){
+  const key=JSON.stringify([width,height,devicePixelRatio||1,list]);
+  if(cloudCache?.key===key)return Promise.resolve(cloudCache);
+  if(cloudBuild?.key===key)return cloudBuild.promise;
+  if(cloudBuild)cloudBuild.cancelled=true;
+  const entry={key,cancelled:false};cloudBuild=entry;
+  entry.promise=(async()=>{
+   const svg=node('svg',{viewBox:`0 0 ${width} ${height}`,width,height,role:'group','aria-label':'研究方向人数统计',class:'member-wordcloud'});svg.append(node('desc',{},captions.research));
+   const controller=await wordCloud(svg,list,width,height,()=>!entry.cancelled);
+   if(!controller)return null;
+   if(entry.cancelled){controller.dispose();return null;}
+   if(cloudCache)retiredClouds.push(cloudCache);
+   cloudCache={key,svg,controller};cleanClouds();return cloudCache;
+  })().finally(()=>{if(cloudBuild===entry)cloudBuild=null;});return entry.promise;
+ }
+ function warmCloud(){clearTimeout(warmTimer);warmTimer=setTimeout(()=>{if(kind==='research'&&researchView==='bubbles'&&data){const list=rows().filter(r=>r.count>0);if(list.length)void prepareCloud(list,Math.max(220,chart.clientWidth),Math.max(160,chart.clientHeight)).catch(()=>{});}},80);}
  async function draw(resetView=false){
   const cloud=kind==='research'&&researchView==='words',bubble=kind==='institutions'||kind==='research'&&!cloud;chart.dataset.pannable=String(bubble);plot.dataset.view=cloud?'words':'chart';plot.dataset.research=String(kind==='research');researchViews.hidden=kind!=='research';densityControl.hidden=!cloud;
   chart.setAttribute('aria-label',cloud?'研究方向词云':'成员分布图'+(bubble?'，可拖动空白背景平移':''));
   const center=!resetView&&view?.kind===kind?{x:(chart.scrollLeft+view.width/2-view.offsetX)/view.svgWidth,y:(chart.scrollTop+view.height/2-view.offsetY)/view.svgHeight}:{x:.5,y:.5};
-  const version=++drawRevision;clearTimeout(zoomTimer);motion?.dispose();motion=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;zoomControls.hidden=true;if(!data)return;
+  const version=++drawRevision;clearTimeout(zoomTimer);clearTimeout(warmTimer);if(motion?.setActive)motion.setActive(false);else motion?.dispose();motion=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;zoomControls.hidden=true;if(!data)return;
   $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}
   // Keep the previous chart while the cloud font, layout and GPU frame are prepared.
-  if(listDialog.open)renderList();if(!cloud)chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
+  if(listDialog.open)renderList();if(!cloud){chart.replaceChildren();cleanClouds();}$('[data-distribution-retry]').hidden=true;
   const list=rows();if(!data.members||!list.length||cloud&&!list.some(r=>r.count>0)){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.replaceChildren(p,a);densityControl.hidden=true;return;}
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
   if(version!==drawRevision)return;
   const width=Math.max(220,chart.clientWidth),height=Math.max(cloud?160:bubble?240:280,chart.clientHeight);
+  lastSize=Math.round(chart.clientWidth)+':'+Math.round(chart.clientHeight);cancelAnimationFrame(resizeFrame);
   const shown=cloud?list.filter(r=>r.count>0):bubble?list.filter(r=>r.count>0).slice(0,40):list;
   // Preserve readable bar labels; the chart scrolls horizontally if many birth decades are present.
   const svgWidth=cloud?width:bubble?width*bubbleZoom:Math.max(width,shown.length*(kind==='cohorts'?90:65)+48),svgHeight=bubble?height*bubbleZoom:height;
-  const svg=node('svg',{viewBox:`0 0 ${bubble?width:svgWidth} ${bubble?height:svgHeight}`,width:svgWidth,height:svgHeight,role:'group','aria-label':names[kind]+'人数统计','data-zoomed':String(bubble&&bubbleZoom>1)});
+  let svg=node('svg',{viewBox:`0 0 ${bubble?width:svgWidth} ${bubble?height:svgHeight}`,width:svgWidth,height:svgHeight,role:'group','aria-label':names[kind]+'人数统计','data-zoomed':String(bubble&&bubbleZoom>1)});
   svg.style.marginTop=Math.max(0,(height-svgHeight)/2)+'px';
   svg.append(node('desc',{},captions[kind]));
-  let items=null;if(cloud){svg.classList.add('member-wordcloud');const controller=await wordCloud(svg,shown,width,height,version);if(version!==drawRevision){controller?.dispose();return;}chart.replaceChildren(controller.canvas,svg);controller.present();motion=controller;}else if(bubble)items=bubbleChart(svg,shown,width,height);else barChart(svg,shown,svgWidth,height);
+  let items=null;if(cloud){const entry=await prepareCloud(shown,width,height);if(version!==drawRevision||!entry)return;svg=entry.svg;const controller=entry.controller;chart.replaceChildren(controller.canvas,svg);controller.present();controller.setActive(true);motion=controller;cleanClouds();svg.querySelectorAll('.is-selected').forEach(n=>n.classList.remove('is-selected'));}else if(bubble){items=bubbleChart(svg,shown,width,height);if(kind==='research')warmCloud();}else barChart(svg,shown,svgWidth,height);
   // A viewport of spare space surrounds the drawing, so the background can also pan at 100%.
   const offsetX=bubble?width/2:0,offsetY=bubble?height/2:0;
   if(bubble){const world=document.createElement('div');world.className='member-distribution-world';world.style.width=svgWidth+width+'px';world.style.height=svgHeight+height+'px';svg.style.cssText=`position:absolute;left:${offsetX}px;top:${offsetY}px;margin:0`;world.append(svg);chart.append(world);}else chart.append(svg);
