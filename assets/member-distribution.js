@@ -5,6 +5,11 @@
  const $=selector=>host.querySelector(selector),chart=$('[data-distribution-chart]'),tabs=[...host.querySelectorAll('[role=tab]')];
  const listDialog=$('#member-distribution-list'),zoomControls=$('[data-distribution-zoom]'),zoomIn=$('[data-distribution-zoom-in]'),zoomOut=$('[data-distribution-zoom-out]');
  const detailDialog=$('#member-distribution-detail'),expand=$('[data-distribution-expand]'),stage=$('[data-distribution-stage]'),plot=$('.member-distribution-plot'),actions=$('.member-distribution-actions'),actionHome=actions.parentElement;
+ const researchViews=document.createElement('div');researchViews.className='member-research-views';researchViews.hidden=true;researchViews.setAttribute('role','group');researchViews.setAttribute('aria-label','研究方向展示方式');
+ for(const [value,label]of [['bubbles','气泡图'],['words','流动词云']]){const button=document.createElement('button');button.type='button';button.dataset.researchView=value;button.setAttribute('aria-label',label);button.title=label;button.setAttribute('aria-pressed',String(value==='bubbles'));button.append(document.createElement('span'));researchViews.append(button);}plot.append(researchViews);
+ const densityControl=document.createElement('label');densityControl.className='member-cloud-density';densityControl.hidden=true;
+ const compact=document.createElement('span'),loose=document.createElement('span'),density=document.createElement('input');compact.textContent='紧凑';loose.textContent='舒展';density.type='range';density.min='0';density.max='100';density.step='1';density.value='42';density.dataset.cloudDensity='';density.setAttribute('aria-label','词云疏密');densityControl.append(compact,density,loose);plot.append(densityControl);
+ let researchView='bubbles',cloudDensity=42,densityTimer=0;
  const names={institutions:'学校 / 单位',research:'研究方向',stages:'学习阶段',cohorts:'出生年代'};
  const captions={institutions:'气泡面积与成员人数成正比。悬停、点击或用键盘选中气泡可查看全称与人数。',research:'按分隔符拆分研究方向，保留全部名称；某名称的字按原顺序包含在另一个名称中时，也计入前者。同一成员对同一名称只计一次，一人可计入多个方向。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
  let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastSize='',motion=null,motionPaused=false,bubbleZoom=1,view=null,selectedLabel=null,wheelFrame=0,wheelDelta=0,zoomTimer=0;
@@ -29,6 +34,7 @@
   element.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(row,element);}});
  }
  function bubbleMotion(svg,items,width,height){
+  $('[data-distribution-reset]').setAttribute('aria-label','复原气泡位置');$('[data-distribution-reset]').title='复原气泡位置';
   const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),resetControl=$('[data-distribution-reset]');
   let frameId=0,lastTick=0,inView=false,disposed=false,pointer=null,drag=null,zooming=false;
   const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
@@ -153,30 +159,115 @@
   const head=document.createElement('thead'),tr=document.createElement('tr');for(const label of [names[kind],'人数']){const th=document.createElement('th');th.scope='col';th.textContent=label;tr.append(th);}head.append(tr);table.append(head);
   const body=document.createElement('tbody');for(const row of list){const tr=document.createElement('tr');for(const value of [row.label+(row.range?'（'+row.range+'）':''),row.count]){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);target.append(table);
  }
+ let fluidPromise=null;
+ function fluidRuntime(){
+  if(window.FoamWordFluid)return Promise.resolve();if(fluidPromise)return fluidPromise;
+  fluidPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/assets/vendor/member-word-fluid.js?v=86e1c23d523f';s.async=true;
+   const timer=setTimeout(fail,15000);function fail(){clearTimeout(timer);s.remove();fluidPromise=null;reject(Error('流体组件暂时无法加载'));}
+   s.onerror=fail;s.onload=()=>{clearTimeout(timer);if(window.FoamWordFluid)resolve();else fail();};document.head.append(s);
+  });return fluidPromise;
+ }
+ async function wordFlow(placed,width,height,family){
+  const canvas=document.createElement('canvas');canvas.className='member-word-flow';canvas.setAttribute('aria-hidden','true');
+  const scale=Math.min(devicePixelRatio||1,1.5,Math.sqrt(900000/(width*height)));canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+  const mask=document.createElement('canvas');mask.width=canvas.width;mask.height=canvas.height;
+  const ctx=mask.getContext('2d');ctx.scale(scale,scale);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+  // Rasterise the glyphs, leaving both character gaps and the spaces between words open.
+  const maxCount=Math.max(...placed.map(p=>p.row.count));
+  for(const item of placed){ctx.save();ctx.translate(item.x,item.y);ctx.rotate(item.angle*Math.PI/180);ctx.font=`${item.row.count===maxCount?780:650} ${item.font}px ${family}`;if('letterSpacing'in ctx)ctx.letterSpacing=`${-item.font*.025}px`;ctx.fillText(item.row.label,0,0);ctx.restore();}
+  try{await fluidRuntime();const effect=window.FoamWordFluid(canvas,mask);canvas.addEventListener('foam-fluid-restore',()=>{if(canvas.isConnected)void draw();});
+   return{canvas,setEnabled:value=>effect.setEnabled(value),pointer:(x,y,id,phase)=>effect.pointer(x*scale,y*scale,id,phase),dispose:()=>effect.dispose()};
+  }catch{canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();const fallback=document.createElement('canvas');fallback.className=canvas.className;fallback.width=canvas.width;fallback.height=canvas.height;fallback.setAttribute('aria-hidden','true');return wordFlowFallback(fallback,mask,width,height);}
+ }
+ function wordFlowFallback(canvas,mask,width,height){
+  const ctx=canvas.getContext('2d'),ink=mask.getContext('2d').getImageData(0,0,mask.width,mask.height).data,particles=Array.from({length:360},(_,i)=>({x:(.2+(i%3)*.3)*canvas.width+Math.sin(i)*20,y:(.3+(i%2)*.4)*canvas.height+Math.cos(i)*20,vx:Math.sin(i*2)*.7,vy:Math.cos(i*3)*.7,hue:i*137.5%360,age:0}));
+  let frame=0,enabled=false,disposed=false,last=0,time=0;canvas.dataset.renderer='canvas';
+  const solid=(x,y)=>ink[(Math.max(0,Math.min(mask.height-1,Math.round(y)))*mask.width+Math.max(0,Math.min(mask.width-1,Math.round(x))))*4+3]/255;
+  function tick(now){frame=0;if(!enabled||disposed)return;if(now-last>32){last=now;time+=.033;ctx.globalCompositeOperation='destination-out';ctx.fillStyle='rgba(0,0,0,.055)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.globalCompositeOperation='source-over';const dark=document.documentElement.dataset.theme==='dark';
+   for(const p of particles){if(p.age++>550)continue;const oldX=p.x,oldY=p.y,gx=solid(p.x+3,p.y)-solid(p.x-3,p.y),gy=solid(p.x,p.y+3)-solid(p.x,p.y-3);p.vx=(p.vx+Math.sin(p.y*.04+time)*.08-gx*.4)*.98;p.vy=(p.vy+Math.cos(p.x*.035-time)*.08-gy*.4)*.98;p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width||p.y<0||p.y>canvas.height){p.age=551;continue;}ctx.strokeStyle=`hsla(${p.hue} 85% ${dark?65:35}% / .3)`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(oldX,oldY);ctx.lineTo(p.x,p.y);ctx.stroke();}
+  }frame=requestAnimationFrame(tick);}
+  let nextParticle=0;
+  return{canvas,setEnabled(value){enabled=value;if(enabled&&!frame)frame=requestAnimationFrame(tick);if(!enabled){cancelAnimationFrame(frame);frame=0;}},pointer(x,y,id,phase){if(!enabled||phase==='end')return;for(let i=0;i<12;i++){const a=i*Math.PI/6;particles[nextParticle++%particles.length]={x:x*canvas.width/width,y:y*canvas.height/height,vx:Math.cos(a)*2,vy:Math.sin(a)*2,hue:performance.now()*.05%360,age:0};}},dispose(){disposed=true;cancelAnimationFrame(frame);}};
+ }
+ async function wordCloud(svg,list,width,height,version){
+  // Pack every aggregated direction, including the longer names that also count toward shorter ones.
+  // Measure once, then find a non-overlapping layout; never fabricate or repeat words to fill space.
+  const measure=document.createElement('canvas').getContext('2d'),family=getComputedStyle(chart).fontFamily;
+  const sorted=[...list].sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label,'zh-CN')),maximum=Math.max(...sorted.map(r=>r.count));
+  measure.font=`700 100px ${family}`;
+  const specs=sorted.map((row,i)=>({row,weight:.36+.84*Math.sqrt(row.count/maximum),ratio:Math.max(.7,measure.measureText(row.label).width/100),angle:i===0?0:[0,0,-12,0,12,0,-90][i%7]}));
+  const availableH=height-72,padding=2+cloudDensity*.12;
+  let base=Math.min(76,Math.sqrt(width*availableH*.44/specs.reduce((sum,s)=>sum+s.weight*s.weight*s.ratio,0))),placed=[];
+  for(let attempt=0;attempt<22;attempt++){
+   placed=[];
+   for(const [index,spec]of specs.entries()){
+    const font=Math.min(base*spec.weight,width*.78/spec.ratio),a=Math.abs(spec.angle)*Math.PI/180,w=font*spec.ratio,h=font*1.55;
+    const bw=Math.abs(w*Math.cos(a))+Math.abs(h*Math.sin(a))+padding*2,bh=Math.abs(w*Math.sin(a))+Math.abs(h*Math.cos(a))+padding*2;
+    let found=null;
+    for(let step=0;step<1800;step++){
+     const radius=Math.sqrt(step/1799)*availableH*.54,theta=step*.38+index*2.399;
+     const x=width/2+Math.cos(theta)*radius*width/availableH,y=36+availableH/2+Math.sin(theta)*radius;
+     if(x-bw/2<10||x+bw/2>width-10||y-bh/2<32||y+bh/2>height-38)continue;
+     if(placed.some(p=>Math.abs(p.x-x)<(p.bw+bw)/2&&Math.abs(p.y-y)<(p.bh+bh)/2))continue;
+     found={...spec,font,x,y,bw,bh};break;
+    }
+    if(!found)break;placed.push(found);
+    if(index%20===19){await new Promise(resolve=>setTimeout(resolve,0));if(version!==drawRevision)return null;}
+   }
+   if(placed.length===specs.length)break;base*=.85;
+  }
+  if(version!==drawRevision)return null;
+  // A finite grid fallback keeps unusual or very large datasets complete, with the list available for reading.
+  if(placed.length!==specs.length){const cols=Math.max(1,Math.ceil(Math.sqrt(specs.length*width/availableH))),cw=(width-24)/cols,ch=availableH/Math.ceil(specs.length/cols);placed=specs.map((s,i)=>({...s,angle:0,font:Math.max(.5,Math.min(ch*.65,(cw-8)/s.ratio)),x:12+cw*(i%cols+.5),y:36+ch*(Math.floor(i/cols)+.5)}));}
+  for(const [i,item]of placed.entries()){
+   const g=node('g',{class:'member-word','data-count':item.row.count,transform:`translate(${item.x.toFixed(2)},${item.y.toFixed(2)}) rotate(${item.angle})`,style:`--word-hue:${[174,199,30,211,158,336,44][i%7]};--word-delay:${-i*.73}s;--word-duration:${6+i%5}s`});
+   const drift=node('g',{class:'member-word-drift'}),text=node('text',{'text-anchor':'middle','dominant-baseline':'central','font-size':item.font.toFixed(2),'font-weight':item.row.count===maximum?780:650},item.row.label);
+   drift.append(text);g.append(drift);interactive(g,item.row);svg.append(g);
+  }
+  const flow=await wordFlow(placed,width,height,family);if(version!==drawRevision){flow.dispose();return null;}const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),reset=$('[data-distribution-reset]');
+  let inView=false,disposed=false;const drawingPointers=new Set();
+  function update(){
+   if(disposed)return;const enabled=inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
+   svg.classList.toggle('is-flowing',enabled);control.hidden=preference.matches;control.dataset.paused=String(motionPaused);control.setAttribute('aria-label',motionPaused?'播放词云动效':'暂停词云动效');control.title=motionPaused?'播放词云动效':'暂停词云动效';
+   flow.setEnabled(enabled);if(!enabled){for(const id of drawingPointers)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);drawingPointers.clear();}
+  }
+  const inject=(e,phase)=>{const r=svg.getBoundingClientRect();flow.pointer((e.clientX-r.left)*width/r.width,(e.clientY-r.top)*height/r.height,e.pointerId,phase);};
+  const down=e=>{if(e.button!==0||!svg.classList.contains('is-flowing'))return;e.preventDefault();drawingPointers.add(e.pointerId);svg.setPointerCapture(e.pointerId);inject(e,'start');};
+  const move=e=>{if(!drawingPointers.has(e.pointerId))return;e.preventDefault();inject(e,'move');};
+  const up=e=>{if(!drawingPointers.delete(e.pointerId))return;inject(e,'end');if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);};
+  svg.addEventListener('pointerdown',down);svg.addEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.addEventListener(name,up);
+  control.onclick=()=>{motionPaused=!motionPaused;update();};reset.hidden=false;reset.setAttribute('aria-label','复原词云');reset.title='复原词云';reset.onclick=()=>{clearTimeout(densityTimer);cloudDensity=42;density.value='42';density.setAttribute('aria-valuetext','适中');selectedLabel=null;void draw(true);};
+  const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
+  const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});gate.observe(listDialog,{attributes:true,attributeFilter:['open']});
+  document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
+  return{canvas:flow.canvas,setZooming(){},dispose(){disposed=true;for(const id of drawingPointers)if(svg.hasPointerCapture(id))svg.releasePointerCapture(id);drawingPointers.clear();flow.dispose();observer.disconnect();gate.disconnect();document.removeEventListener('visibilitychange',update);preference.removeEventListener('change',update);svg.removeEventListener('pointerdown',down);svg.removeEventListener('pointermove',move);for(const name of ['pointerup','pointercancel','lostpointercapture'])svg.removeEventListener(name,up);control.onclick=null;reset.onclick=null;}};
+ }
  async function draw(resetView=false){
-  const bubble=kind==='institutions'||kind==='research';chart.dataset.pannable=String(bubble);
+  const cloud=kind==='research'&&researchView==='words',bubble=kind==='institutions'||kind==='research'&&!cloud;chart.dataset.pannable=String(bubble);plot.dataset.view=cloud?'words':'chart';plot.dataset.research=String(kind==='research');researchViews.hidden=kind!=='research';densityControl.hidden=!cloud;
+  chart.setAttribute('aria-label',cloud?'研究方向词云':'成员分布图'+(bubble?'，可拖动空白背景平移':''));
   const center=!resetView&&view?.kind===kind?{x:(chart.scrollLeft+view.width/2-view.offsetX)/view.svgWidth,y:(chart.scrollTop+view.height/2-view.offsetY)/view.svgHeight}:{x:.5,y:.5};
   const version=++drawRevision;clearTimeout(zoomTimer);motion?.dispose();motion=null;$('[data-distribution-motion]').hidden=true;$('[data-distribution-reset]').hidden=true;zoomControls.hidden=true;if(!data)return;
   $('[data-distribution-total]').textContent=data.members+' 人';$('[data-distribution-summary]').textContent='已完善资料的成员';$('[data-distribution-caption]').textContent=captions[kind];for(const selection of host.querySelectorAll('[data-distribution-selection],[data-distribution-detail-selection]')){selection.textContent='';selection.title='';}
-  if(listDialog.open)renderList();chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
-  const list=rows();if(!data.members||!list.length){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.append(p,a);return;}
+  if(listDialog.open)renderList();if(!cloud||!chart.querySelector('.member-wordcloud'))chart.replaceChildren();$('[data-distribution-retry]').hidden=true;
+  const list=rows();if(!data.members||!list.length||cloud&&!list.some(r=>r.count>0)){const p=document.createElement('p');p.textContent='成员完善资料后，统计将在这里显示。';const a=document.createElement('a');a.href='/account/#profile-form';a.textContent='前往个人中心';chart.replaceChildren(p,a);densityControl.hidden=true;return;}
   if(bubble){try{await packRuntime();}catch(error){if(version!==drawRevision)return;chart.textContent=error.message+' 可在数据列表中查看统计。';$('[data-distribution-retry]').hidden=false;return;}}
   if(version!==drawRevision)return;
-  const width=Math.max(220,chart.clientWidth),height=Math.max(280,chart.clientHeight);
-  const shown=bubble?list.filter(r=>r.count>0).slice(0,40):list;
+  const width=Math.max(220,chart.clientWidth),height=Math.max(cloud?160:bubble?240:280,chart.clientHeight);
+  const shown=cloud?list.filter(r=>r.count>0):bubble?list.filter(r=>r.count>0).slice(0,40):list;
   // Preserve readable bar labels; the chart scrolls horizontally if many birth decades are present.
-  const svgWidth=bubble?width*bubbleZoom:Math.max(width,shown.length*(kind==='cohorts'?90:65)+48),svgHeight=bubble?height*bubbleZoom:height;
+  const svgWidth=cloud?width:bubble?width*bubbleZoom:Math.max(width,shown.length*(kind==='cohorts'?90:65)+48),svgHeight=bubble?height*bubbleZoom:height;
   const svg=node('svg',{viewBox:`0 0 ${bubble?width:svgWidth} ${bubble?height:svgHeight}`,width:svgWidth,height:svgHeight,role:'group','aria-label':names[kind]+'人数统计','data-zoomed':String(bubble&&bubbleZoom>1)});
   svg.style.marginTop=Math.max(0,(height-svgHeight)/2)+'px';
   svg.append(node('desc',{},captions[kind]));
-  let items=null;if(bubble)items=bubbleChart(svg,shown,width,height);else barChart(svg,shown,svgWidth,height);
+  let items=null;if(cloud){svg.classList.add('member-wordcloud');const controller=await wordCloud(svg,shown,width,height,version);if(version!==drawRevision){controller?.dispose();return;}chart.replaceChildren(controller.canvas,svg);motion=controller;}else if(bubble)items=bubbleChart(svg,shown,width,height);else barChart(svg,shown,svgWidth,height);
   // A viewport of spare space surrounds the drawing, so the background can also pan at 100%.
   const offsetX=bubble?width/2:0,offsetY=bubble?height/2:0;
   if(bubble){const world=document.createElement('div');world.className='member-distribution-world';world.style.width=svgWidth+width+'px';world.style.height=svgHeight+height+'px';svg.style.cssText=`position:absolute;left:${offsetX}px;top:${offsetY}px;margin:0`;world.append(svg);chart.append(world);}else chart.append(svg);
   view={kind,width,height,svgWidth,svgHeight,offsetX,offsetY,svg,world:svg.parentElement,items};
   chart.scrollLeft=Math.max(0,offsetX+center.x*svgWidth-chart.clientWidth/2);chart.scrollTop=Math.max(0,offsetY+center.y*svgHeight-chart.clientHeight/2);
   if(bubble){zoomControls.hidden=false;zoomIn.disabled=bubbleZoom>=3;zoomOut.disabled=bubbleZoom<=.5;zoomControls.setAttribute('aria-label',`气泡图缩放，当前 ${Math.round(bubbleZoom*100)}%`);expand.setAttribute('aria-label','大图查看'+(kind==='institutions'?'学校或单位':'研究方向')+'分布');}
-  if(selectedLabel){const selected=[...svg.querySelectorAll('.member-bubble,.member-bar')].find(g=>g.querySelector('title')?.textContent.startsWith(selectedLabel+'：')||g.getAttribute('aria-label')?.startsWith(selectedLabel+'，'));const row=shown.find(r=>r.label===selectedLabel);if(selected&&row)select(row,selected);}
+  if(cloud){zoomControls.hidden=false;zoomControls.setAttribute('aria-label','词云查看');expand.setAttribute('aria-label','大图查看研究方向词云');}
+  if(selectedLabel){const selected=[...svg.querySelectorAll('.member-bubble,.member-bar,.member-word')].find(g=>g.querySelector('title')?.textContent.startsWith(selectedLabel+'：')||g.getAttribute('aria-label')?.startsWith(selectedLabel+'，'));const row=shown.find(r=>r.label===selectedLabel);if(selected&&row)select(row,selected);}
   if(bubble&&list.length>40)$('[data-distribution-caption]').textContent+=' 图中显示人数最多的 40 项，其余项目可在数据列表中查询。';
   if(pan?.touch)rebaseTouchPan();
  }
@@ -199,6 +290,11 @@
  }
 
  function activate(tab){cancelWheelZoom();cancelChartGesture();kind=tab.dataset.distributionTab;bubbleZoom=1;selectedLabel=null;for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;}$('[role=tabpanel]').setAttribute('aria-labelledby',tab.id);$('#member-distribution-search').value='';void draw(true);}
+ density.oninput=()=>{cloudDensity=Number(density.value);density.setAttribute('aria-valuetext',cloudDensity<34?'紧凑':cloudDensity>66?'舒展':'适中');clearTimeout(densityTimer);densityTimer=setTimeout(()=>{if(kind==='research'&&researchView==='words')void draw(true);},90);};
+ for(const [i,button]of [...researchViews.children].entries()){
+  button.onclick=()=>{if(researchView===button.dataset.researchView)return;cancelWheelZoom();cancelChartGesture();researchView=button.dataset.researchView;bubbleZoom=1;for(const b of researchViews.children)b.setAttribute('aria-pressed',String(b===button));void draw(true);};
+  button.onkeydown=e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const other=researchViews.children[1-i];other.focus();other.click();}};
+ }
  function cancelWheelZoom(){cancelAnimationFrame(wheelFrame);wheelFrame=0;wheelDelta=0;}
  function holdZoomMotion(){clearTimeout(zoomTimer);motion?.setZooming(true);}
  function releaseZoomMotion(){clearTimeout(zoomTimer);zoomTimer=setTimeout(()=>{if(!pinch)motion?.setZooming(false);},180);}
