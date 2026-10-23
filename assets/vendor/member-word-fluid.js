@@ -31,9 +31,9 @@ window.FoamWordFluid = function(canvas, mask) {
 
 const mobile=canvas.width<600;
 const config={SIM_RESOLUTION:mobile?160:192,DYE_RESOLUTION:mobile?512:768,
- DENSITY_DISSIPATION:.28,VELOCITY_DISSIPATION:.18,PRESSURE:.8,PRESSURE_ITERATIONS:24,
- CURL:24,SPLAT_RADIUS:.16,SPLAT_FORCE:6500,SHADING:true,COLORFUL:true,
- BLOOM:true,BLOOM_ITERATIONS:6,BLOOM_RESOLUTION:128,BLOOM_INTENSITY:.85,BLOOM_THRESHOLD:.55,BLOOM_SOFT_KNEE:.7,
+ DENSITY_DISSIPATION:1,VELOCITY_DISSIPATION:.2,PRESSURE:.8,PRESSURE_ITERATIONS:20,
+ CURL:30,SPLAT_RADIUS:.25,SPLAT_FORCE:6000,SHADING:true,COLORFUL:true,COLOR_UPDATE_SPEED:10,
+ BLOOM:true,BLOOM_ITERATIONS:6,BLOOM_RESOLUTION:128,BLOOM_INTENSITY:.3,BLOOM_THRESHOLD:.65,BLOOM_SOFT_KNEE:.7,
  SUNRAYS:false,SUNRAYS_RESOLUTION:128,SUNRAYS_WEIGHT:1.,TRANSPARENT:true};
 const {gl,ext}=getWebGLContext(canvas);
 if(!ext.formatRGBA||!ext.formatRG||!ext.formatR)throw Error('Floating point fluid buffers unavailable');
@@ -395,8 +395,8 @@ const displayShaderSource = `
         float a = max(c.r, max(c.g, c.b));
         float strength=max(c.r,max(c.g,c.b));
         vec3 hue=c/max(.001,strength);
-        float opacity=clamp(1.-exp(-strength*3.4),0.,.96);
-        vec3 ink=mix(hue*.42,hue,dark);
+        float opacity=clamp(1.-exp(-strength*3.4),0.,.85);
+        vec3 ink=hue*mix(.42,.85,dark);
         gl_FragColor=vec4(ink*opacity,opacity);
     }
 `;
@@ -1285,9 +1285,9 @@ gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB
 updateKeywords();initFramebuffers();
 let running=false,disposed=false,frame=0,last=0,lost=false;
 const touches=new Map(),queue=[];
-function inject(x,y,dx,dy,hue,amount=.4){const c=HSVtoRGB(hue,1,1);splat(x,y,dx,dy,{r:c.r*amount,g:c.g*amount,b:c.b*amount});}
+function inject(x,y,dx,dy,hue,amount=.15){const c=HSVtoRGB(hue,1,1);splat(x,y,dx,dy,{r:c.r*amount,g:c.g*amount,b:c.b*amount});}
 // A handful of free dye splashes starts the scene. There is no permanent inflow.
-for(let i=0;i<4;i++)inject(.23+(i%2)*.54,.25+Math.floor(i/2)*.5,Math.sin(i*2.4)*420,Math.cos(i*1.7)*350,(i*.247+.42)%1,1.4);
+for(let i=0;i<4;i++)inject(.23+(i%2)*.54,.25+Math.floor(i/2)*.5,Math.sin(i*2.4)*420,Math.cos(i*1.7)*350,(i*.247+.42)%1,.65);
 for(let i=0;i<3;i++)step(.016);render(null);
 function tick(now){frame=0;if(!running||disposed||lost)return;
  if(now-last>=30){const dt=last?Math.min((now-last)/1000,.033):.016;last=now;
@@ -1299,12 +1299,18 @@ canvas.dataset.renderer='pavel-fluid';
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;});
 canvas.addEventListener('webglcontextrestored',()=>canvas.dispatchEvent(new CustomEvent('foam-fluid-restore')));
 return{canvas,
+ setObstacles(next){if(disposed||lost)return;gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_2D,obstacleTexture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,next);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);},
  setEnabled(value){running=value;if(!running){cancelAnimationFrame(frame);frame=0;last=0;queue.length=0;touches.clear();}else if(!frame&&!lost)frame=requestAnimationFrame(tick);},
  pointer(x,y,id,phase){if(!running||disposed)return;const p={x:x/canvas.width,y:1-y/canvas.height};
   if(phase==='end'){touches.delete(id);return;}
-  const old=touches.get(id);touches.set(id,p);const hue=(performance.now()*.00006+id*.11)%1;
-  if(phase==='start')queue.push([p.x,p.y,0,0,hue]);
-  else if(old){queue.push([p.x,p.y,correctDeltaX(p.x-old.x)*config.SPLAT_FORCE,correctDeltaY(p.y-old.y)*config.SPLAT_FORCE,hue]);if(queue.length>32)queue.shift();}
+  const now=performance.now(),old=touches.get(id);
+  p.hue=old?.hue??Math.random();p.colorTime=old?.colorTime??now;
+  p.colorDistance=(old?.colorDistance||0)+(old?Math.hypot(correctDeltaX(p.x-old.x),correctDeltaY(p.y-old.y)):0);
+  // Upstream's 10 Hz palette, plus distance-based changes for a quick swipe.
+  if(now-p.colorTime>=1000/config.COLOR_UPDATE_SPEED||p.colorDistance>=.075){p.hue=(p.hue+.23)%1;p.colorTime=now;p.colorDistance=0;}
+  touches.set(id,p);
+  if(phase==='start')queue.push([p.x,p.y,0,0,p.hue]);
+  else if(old){queue.push([p.x,p.y,correctDeltaX(p.x-old.x)*config.SPLAT_FORCE,correctDeltaY(p.y-old.y)*config.SPLAT_FORCE,p.hue]);if(queue.length>32)queue.shift();}
  },
  dispose(){disposed=true;cancelAnimationFrame(frame);theme.disconnect();queue.length=0;touches.clear();for(const [type,value]of resources)gl['delete'+type](value);gl.getExtension('WEBGL_lose_context')?.loseContext();}
 };
