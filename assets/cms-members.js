@@ -63,10 +63,19 @@
   function info(m){
    const previous=document.activeElement,d=document.createElement('dialog');d.className='cms-dialog cms-member-profile';d.setAttribute('aria-labelledby','cms-member-profile-title');
    const stage={beginner:'入门',intermediate:'进阶',research:'研究应用'};
-   const fields=[['GitHub 用户名',m.username?'@'+m.username:'未填写'],['邮箱',m.email||'未填写'],['等级','Lv.'+m.level+' · '+m.xp+' 经验'],['权限',roles[m.role]],['注册时间',date(m.registered_at)],['最近登录',date(m.last_sign_in_at)],['单位',m.institution||'未填写'],['研究方向',m.research||'未填写'],['学习阶段',stage[m.learning_stage]||'未填写'],['个人介绍',m.bio||'未填写'],['用户 ID',m.user_id]];
-   d.innerHTML='<h2 id="cms-member-profile-title">'+esc(m.display_name)+'</h2><dl>'+fields.map(([key,value])=>'<div><dt>'+esc(key)+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl><form method="dialog" class="cms-dialog-actions"><button class="button secondary" autofocus>关闭</button></form>';
+   const fields=[['GitHub 用户名',m.username?'@'+m.username:'未填写'],['邮箱',m.email||'未填写'],['等级','Lv.'+m.level+' · '+m.xp+' 经验'],['权限',roles[m.role]],['注册时间',date(m.registered_at)],['最近登录',date(m.last_sign_in_at)],['单位',m.institution||'未填写'],['研究方向',m.research||'未填写'],['学习阶段',stage[m.learning_stage]||'未填写'],['出生年月','正在读取…'],['个人介绍',m.bio||'未填写'],['用户 ID',m.user_id]];
+   d.innerHTML='<h2 id="cms-member-profile-title">'+esc(m.display_name)+'</h2><dl>'+fields.map(([key,value])=>'<div><dt>'+esc(key)+'</dt><dd'+(key==='出生年月'?' data-member-birth-month aria-live="polite"':'')+'>'+esc(value)+'</dd></div>').join('')+'</dl><form method="dialog" class="cms-dialog-actions"><button class="button secondary" autofocus>关闭</button></form>';
    const edit=document.createElement('button');edit.type='button';edit.className='button';edit.textContent='编辑资料';edit.onclick=()=>{d.close();editProfile(m);};d.querySelector('.cms-dialog-actions').prepend(edit);
-   d.addEventListener('close',()=>{d.remove();if(previous?.isConnected)previous.focus();},{once:true});document.body.append(d);d.showModal();
+   async function readBirthMonth(){
+    const field=d.querySelector('[data-member-birth-month]');field.textContent='正在读取…';
+    try{
+     const data=L.check(await L.client.rpc('foamlab_admin_member_profile',{p_user_id:m.user_id}));if(!d.isConnected||!d.open)return;
+     if(data?.profile?.user_id!==m.user_id)throw Error('资料读取不完整。');
+     const month=String(data.profile.birth_month||'').match(/^((?:19|20)\d{2})-(0[1-9]|1[0-2])$/);
+     field.textContent=month?month[1]+'年'+Number(month[2])+'月':'未填写';
+    }catch{if(d.isConnected&&d.open){field.textContent='读取失败 ';const retry=document.createElement('button');retry.type='button';retry.className='text-button';retry.textContent='重试';retry.onclick=()=>void readBirthMonth();field.append(retry);}}
+   }
+   d.addEventListener('close',()=>{d.remove();if(previous?.isConnected)previous.focus();},{once:true});document.body.append(d);d.showModal();void readBirthMonth();
   }
   function editProfile(m){
    const previous=document.activeElement,d=document.createElement('dialog');d.className='cms-dialog cms-member-editor';d.setAttribute('aria-labelledby','cms-member-editor-title');
