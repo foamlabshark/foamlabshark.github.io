@@ -97,6 +97,8 @@
   $('[data-note-close]',host).onclick=()=>void close();
   $('[data-note-popout]',host).onclick=popout;
   $('[data-note-download]',host).onclick=download;
+  const share=document.createElement('button');share.type='button';share.dataset.noteShare='';share.textContent='分享给好友';$('[data-note-download]',host).after(share);
+  share.onclick=async()=>{if(share.disabled)return;share.disabled=true;try{const id=note?.id;if(!window.FoamSocial)throw Error('好友服务尚未就绪，请稍后重试。');if(!await save()||dirty||conflict||note?.id!==id)return;await window.FoamSocial.shareNote(id,note.title);}catch(error){status(error.message,true);}finally{share.disabled=false;}};
   $('[data-note-copy]',host).onclick=()=>{clearTimeout(timer);note={...payload(note),id:crypto.randomUUID(),title:(note.title.slice(0,150)+'（副本）'),revision:0};base=null;conflict=false;serial++;form();changed();void save();};
   $('[data-note-reload]',host).onclick=async()=>{if(!confirm('载入云端版本会替换窗口内的草稿。是否继续？'))return;try{const r=check(await client().from(TABLE).select('*').eq('id',note.id).single());adopt(r);}catch(e){status(e.message,true);}};
   host.querySelectorAll('[data-note-mode]').forEach(b=>b.onclick=()=>mode(b.dataset.noteMode));
@@ -242,9 +244,10 @@
   $('[data-notes-order]',el).onchange=()=>void loadList(false);
   $('[data-notes-more]',el).onclick=()=>void loadList(true);
   $('.private-note-list',el).onclick=async e=>{
-   const b=e.target.closest('[data-note-show],[data-note-edit],[data-note-delete]');
+   const b=e.target.closest('[data-note-show],[data-note-edit],[data-note-delete],[data-note-share-id]');
    if(!b){const row=e.target.closest('[data-private-note-id]');if(row&&!e.target.closest('a,button,input,select,textarea')&&!window.getSelection()?.toString())return show(row.dataset.privateNoteId);return;}
-   const id=b.dataset.noteShow||b.dataset.noteEdit||b.dataset.noteDelete;if(b.dataset.noteShow||b.dataset.noteEdit)return show(id);
+   const id=b.dataset.noteShow||b.dataset.noteEdit||b.dataset.noteDelete||b.dataset.noteShareId;if(b.dataset.noteShow||b.dataset.noteEdit)return show(id);
+   if(b.dataset.noteShareId){const row=rows.find(r=>r.id===id);if(row)await window.FoamSocial?.shareNote(id,row.title);return;}
    const row=rows.find(r=>r.id===id);if(!row||!confirm('删除笔记“'+row.title+'”？删除后无法恢复。'))return;
    b.disabled=true;
    try{
@@ -267,7 +270,7 @@
    if(query)request=request.ilike('title','%'+query.replace(/[%_\\]/g,'\\$&')+'%');
    const result=check(await request);if(token!==listToken||who!==identity())return;
    more=result.length>30;listPage=page;rows=append?rows.concat(result.slice(0,30)):result.slice(0,30);listQuery=query;
-   target.innerHTML=rows.map(r=>'<article class="private-note-row" data-private-note-id="'+esc(r.id)+'"><div><button type="button" class="private-note-row-title" data-note-show="'+esc(r.id)+'" aria-haspopup="dialog" aria-controls="private-notebook">'+esc(r.title)+'</button><p>'+esc(r.page_title)+(r.anchor_text?' · '+esc(r.anchor_text):' · '+Math.round(r.scroll_ratio*100)+'%')+'</p><div class="private-note-dates"><span>'+r.word_count+' 字</span><span>创建 '+esc(window.FoamLab.dateTime(r.created_at))+'</span><span>修改 '+esc(window.FoamLab.dateTime(r.updated_at))+'</span></div></div><div class="private-note-actions"><a class="text-link" data-note-visit href="'+esc(noteLink(r))+'">跳转到记录位置 →</a><button type="button" data-note-edit="'+r.id+'">编辑</button><button type="button" data-note-delete="'+r.id+'">删除</button></div></article>').join('');
+   target.innerHTML=rows.map(r=>'<article class="private-note-row" data-private-note-id="'+esc(r.id)+'"><div><button type="button" class="private-note-row-title" data-note-show="'+esc(r.id)+'" aria-haspopup="dialog" aria-controls="private-notebook">'+esc(r.title)+'</button><p>'+esc(r.page_title)+(r.anchor_text?' · '+esc(r.anchor_text):' · '+Math.round(r.scroll_ratio*100)+'%')+'</p><div class="private-note-dates"><span>'+r.word_count+' 字</span><span>创建 '+esc(window.FoamLab.dateTime(r.created_at))+'</span><span>修改 '+esc(window.FoamLab.dateTime(r.updated_at))+'</span></div></div><div class="private-note-actions"><a class="text-link" data-note-visit href="'+esc(noteLink(r))+'">跳转到记录位置 →</a><button type="button" data-note-edit="'+r.id+'">编辑</button><button type="button" data-note-share-id="'+r.id+'">分享给好友</button><button type="button" data-note-delete="'+r.id+'">删除</button></div></article>').join('');
    statusEl.textContent=rows.length?'已显示 '+rows.length+' 篇笔记':query?'没有符合条件的笔记。':'还没有笔记。阅读时双击熊猫即可记录。';
    $('[data-notes-more]',el).hidden=!more;
   }catch(e){if(token===listToken)statusEl.textContent='笔记读取失败：'+e.message;}

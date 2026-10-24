@@ -115,10 +115,12 @@
    const list=dialog.querySelector('[data-online-list]');list.replaceChildren();
    for(const row of data.items){
     const card=document.createElement('article');card.className='town-online-person';card.dataset.onlineUser=row.user_id;
-    const avatar=document.createElement('span');avatar.className='town-online-avatar';avatar.setAttribute('aria-hidden','true');avatar.innerHTML=window.FoamAvatar?.markup(row.avatar||{user_id:row.user_id})||'🐼';
-    const info=document.createElement('div'),head=document.createElement('div'),name=document.createElement('strong'),level=document.createElement('span'),region=document.createElement('p'),location=document.createElement('p');head.className='town-online-person-heading';
-    name.textContent=row.name||'学习者';level.className='town-online-level';level.textContent='Lv.'+(Number(row.level)||1);head.append(name,level);
-    region.textContent='归属地区：'+label(row.province);location.textContent='当前所在：'+(row.current_province?label(row.current_province):'世界地图');info.append(head,region,location);card.append(avatar,info);list.append(card);
+    const house='/town/#'+encodeURIComponent(row.province)+'/house/'+encodeURIComponent(row.user_id);
+    const avatar=document.createElement('a');avatar.className='town-online-avatar';avatar.href=house;avatar.dataset.onlineHouse='';avatar.setAttribute('aria-label','进入'+(row.name||'这位居民')+'的小屋');avatar.innerHTML=window.FoamAvatar?.markup(row.avatar||{user_id:row.user_id})||'🐼';
+    const info=document.createElement('div'),head=document.createElement('div'),name=document.createElement('a'),level=document.createElement('span'),region=document.createElement('p'),location=document.createElement('p');head.className='town-online-person-heading';
+    name.className='town-online-name';name.href=house;name.dataset.onlineHouse='';name.textContent=row.name||'学习者';level.className='town-online-level';level.textContent='Lv.'+(Number(row.level)||1);head.append(name,level);
+    const friend=document.createElement('button');friend.type='button';friend.className='town-online-friend';friend.dataset.socialProfile=row.user_id;friend.textContent='资料 / 加好友';
+    region.textContent='归属地区：'+label(row.province);location.textContent='当前所在：'+(row.current_province?label(row.current_province):'世界地图');info.append(head,region,location,friend);card.append(avatar,info);list.append(card);
    }
    if(!data.items.length){const empty=document.createElement('p');empty.className='town-online-empty';empty.textContent='暂时没有在线居民。';list.append(empty);}
    status.textContent='当前在线 '+data.items.length+' 人 · 最近两分钟在小镇活动的居民';
@@ -131,6 +133,7 @@
   const previous=document.activeElement,dialog=document.createElement('dialog');onlineDialog=dialog;onlineBusy=false;dialog.id='town-online-dialog';dialog.className='town-online-dialog';dialog.setAttribute('aria-labelledby','town-online-title');
   dialog.innerHTML='<header><h2 id="town-online-title">在线居民</h2><button type="button" data-online-close aria-label="关闭在线居民">×</button></header><div class="town-online-toolbar"><p role="status" aria-live="polite" data-online-status></p><button type="button" data-online-refresh>刷新</button></div><div class="town-online-list" data-online-list></div>';
   dialog.querySelector('[data-online-close]').onclick=()=>dialog.close();dialog.querySelector('[data-online-refresh]').onclick=()=>void readOnline();
+  dialog.addEventListener('click',e=>{if(e.target.closest('[data-online-house]'))dialog.close();});
   dialog.addEventListener('keydown',e=>e.stopPropagation());dialog.addEventListener('close',()=>{onlineRequest++;if(onlineDialog===dialog){onlineDialog=null;onlineBusy=false;}dialog.remove();if(previous?.isConnected)previous.focus({preventScroll:true});},{once:true});
   root.append(dialog);dialog.showModal();window.FoamTownGame?.active?.stopMovement();await readOnline();
  }
