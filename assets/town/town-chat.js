@@ -3,14 +3,26 @@
  const N={rpc:(...args)=>window.FoamTownNet.rpc(...args)};
  const emoji=['😊','🐼','👋','👍','🎋','❤️','🎉','🤔','😂','🙌','☕','✨','💪','🙏','🎆','🌙'];
  const drafts=new Map(),pending=new Map();
- let root,panel,ctx,identity,scope='world',room='world',revision=0,request=0,channel,timer,populationTimer;
+ const streams=new Map(),unreadKeys=new Set();
+ let root,panel,ctx,identity,scope='world',room='world',revision=0,request=0,channel,timer,populationTimer,watchedRooms='';
  let messages=new Map(),unread=0,collapsed=true,connected=false,loading=false,sending=false,refreshing=null,reconnectTimer,followLatest=true;
  const $=s=>panel.querySelector(s),me=()=>window.foamAuth?.user?.id||null;
  const label=id=>ctx?.provinces.find(p=>p.id===id)?.name||'未入住';
  const fullTime=new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
  function status(text){$('[data-chat-status]').textContent=text;}
- function badge(){for(const b of root.querySelectorAll('[data-chat-unread]')){b.textContent=unread?String(Math.min(99,unread))+(unread>99?'+':''):'';b.hidden=!unread;}}
- function bottom(){const log=$('[data-chat-log]');followLatest=true;log.scrollTop=log.scrollHeight;unread=0;badge();$('[data-chat-latest]').hidden=true;}
+ function badge(){unread=unreadKeys.size;for(const b of root.querySelectorAll('[data-chat-unread]')){b.textContent=unread?String(Math.min(99,unread))+(unread>99?'+':''):'';b.hidden=!unread;b.setAttribute('aria-label',unread+'条未读聊天消息');}}
+ function bottom(){const log=$('[data-chat-log]');followLatest=true;log.scrollTop=log.scrollHeight;if(!collapsed)unreadKeys.clear();badge();$('[data-chat-latest]').hidden=true;}
+ const rooms=()=>[...new Set(['world',ctx?.province].filter(Boolean))];
+ function receive(rows,target,initial=false,push=false){
+  if(!Array.isArray(rows)||!rooms().includes(target))return;
+  const stream=streams.get(target)||{baseline:null,seen:new Set()};const firstHistory=!push&&stream.baseline===null;
+  if(firstHistory)stream.baseline=rows.reduce((latest,m)=>/^\d+$/.test(String(m.id))&&BigInt(m.id)>latest?BigInt(m.id):latest,0n);
+  for(const message of rows){if(message.channel!==target||!/^\d+$/.test(String(message.id))||typeof message.body!=='string')continue;const id=BigInt(message.id);
+   if(!firstHistory&&!stream.seen.has(String(message.id))&&(stream.baseline===null||id>stream.baseline)&&collapsed&&message.author_id!==me())unreadKeys.add(target+':'+message.id);
+   stream.seen.add(String(message.id));
+  }
+  streams.set(target,stream);badge();if(target===room)merge(rows,initial);
+ }
  function nearBottom(){const log=$('[data-chat-log]');return log.scrollHeight-log.scrollTop-log.clientHeight<40;}
  function updateForm(){const input=$('textarea'),count=Array.from(input.value).length;
   $('[data-chat-count]').textContent=count+'/500';
@@ -35,14 +47,19 @@
   const existing=new Map([...log.querySelectorAll('[data-message-id]')].map(n=>[n.dataset.messageId,n]));
   log.querySelector('.town-chat-empty')?.remove();let previous=null;for(const m of ordered){const node=existing.get(String(m.id))||makeMessage(m),position=previous?previous.nextSibling:log.firstChild;if(node!==position)log.insertBefore(node,position);previous=node;existing.delete(String(m.id));}existing.forEach(n=>n.remove());
   if(!ordered.length){const empty=document.createElement('p');empty.className='town-chat-empty';empty.textContent=room==='world'?'还没有消息，来和大家打个招呼吧。':'这里还没有消息，来和邻居打个招呼吧。';log.append(empty);}
-  if(initial||atBottom&&!collapsed)bottom();else {log.scrollTop=Math.max(0,oldTop+Math.min(0,log.scrollHeight-oldHeight));if(added){unread+=added;badge();$('[data-chat-latest]').hidden=collapsed;}}
+  if(initial||atBottom&&!collapsed)bottom();else {log.scrollTop=Math.max(0,oldTop+Math.min(0,log.scrollHeight-oldHeight));if(added)$('[data-chat-latest]').hidden=collapsed;}
  }
- async function refresh(initial=false){const rev=revision;if(refreshing===rev)return;refreshing=rev;const req=++request,target=room;try{const rows=await N.rpc('foamlab_town_chat_history',{channel:target});if(rev!==revision||req!==request)return;merge(rows,initial||loading);loading=false;$('[data-chat-retry]').hidden=true;status(connected?'消息实时更新':'正在恢复实时连接，消息自动更新');}catch(error){if(rev===revision&&req===request){loading=false;status('消息暂时无法更新，点击重试。');$('[data-chat-retry]').hidden=false;}}finally{if(refreshing===rev)refreshing=null;}}
+ async function refresh(initial=false){const rev=revision;if(refreshing===rev)return;refreshing=rev;const req=++request,targets=rooms();try{
+  const results=await Promise.allSettled(targets.map(async target=>({target,rows:await N.rpc('foamlab_town_chat_history',{channel:target})})));if(rev!==revision||req!==request)return;
+  for(const result of results)if(result.status==='fulfilled')receive(result.value.rows,result.value.target,initial||loading);
+  loading=false;if(results.some(result=>result.status==='rejected'))throw Error('history unavailable');
+  $('[data-chat-retry]').hidden=true;status(connected?'消息实时更新':'正在恢复实时连接，消息自动更新');
+ }catch(error){if(rev===revision&&req===request){loading=false;status('消息暂时无法更新，点击重试。');$('[data-chat-retry]').hidden=false;}}finally{if(refreshing===rev)refreshing=null;}}
  function stop(){revision++;request++;clearInterval(timer);clearTimeout(reconnectTimer);timer=null;connected=false;if(channel){window.foamAuth?.client?.removeChannel(channel).catch(()=>{});channel=null;}}
- function listen(){stop();if(document.hidden||!ctx)return;const rev=revision;loading=true;status('正在读取消息…');$('[data-chat-retry]').hidden=true;
-  const client=window.foamAuth?.client;if(client){channel=client.channel('town-chat:'+room+':'+rev,{config:{postgres_changes_options:{wait:true}}})
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'foamlab_town_chat_messages',filter:'channel=eq.'+room},event=>{if(rev===revision)merge([event.new]);})
-   .on('system',{},event=>{if(rev!==revision||event.extension!=='postgres_changes')return;if(event.status==='error'){connected=false;status('正在恢复实时连接，消息自动更新');}else if(event.status==='ok'){connected=true;status('消息实时更新');void refresh();}})
+ function listen(){stop();if(document.hidden||!ctx)return;const rev=revision;watchedRooms=JSON.stringify([me(),...rooms()]);loading=true;status('正在读取消息…');$('[data-chat-retry]').hidden=true;
+  const client=window.foamAuth?.client;if(client){channel=client.channel('town-chat:'+room+':'+rev,{config:{postgres_changes_options:{wait:true}}});
+   for(const target of rooms())channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'foamlab_town_chat_messages',filter:'channel=eq.'+target},event=>{if(rev===revision)receive([event.new],target,false,true);});
+   channel.on('system',{},event=>{if(rev!==revision||event.extension!=='postgres_changes')return;if(event.status==='error'){connected=false;status('正在恢复实时连接，消息自动更新');}else if(event.status==='ok'){connected=true;status('消息实时更新');void refresh();}})
    .subscribe(state=>{if(rev!==revision)return;connected=state==='SUBSCRIBED';if(connected){clearTimeout(reconnectTimer);status('消息实时更新');void refresh();}else if(state==='CHANNEL_ERROR'||state==='TIMED_OUT'||state==='CLOSED'){status('正在恢复实时连接，消息自动更新');if(state==='CLOSED'){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(()=>{if(rev===revision&&!document.hidden)listen();},3000);}}});}
   // Push delivers new messages immediately. Only a disconnected channel uses
   // short catch-up reads; slow requests never pile up or cancel one another.
@@ -51,7 +68,7 @@
  function select(next){drafts.set(room,$('textarea').value);scope=next;const target=scope==='town'&&ctx.province?ctx.province:'world';
   const changed=target!==room;room=target;for(const b of panel.querySelectorAll('[data-chat-tab]')){b.setAttribute('aria-selected',String(b.dataset.chatTab===scope));b.tabIndex=b.dataset.chatTab===scope?0:-1;}
   $('[data-chat-log]').setAttribute('aria-label',room==='world'?'世界聊天消息':label(room)+'聊天消息');
-  if(changed){messages.clear();$('[data-chat-log]').replaceChildren();unread=0;badge();$('textarea').value=drafts.get(room)||'';listen();}
+  if(changed){messages.clear();$('[data-chat-log]').replaceChildren();badge();$('textarea').value=drafts.get(room)||'';listen();}
   $('[data-chat-title]').textContent=room==='world'?'世界聊天':label(room)+'聊天';$('[data-chat-emojis]').hidden=true;$('[data-chat-emoji-toggle]').setAttribute('aria-expanded','false');updateForm();
  }
  async function send(){const input=$('textarea'),body=input.value.trim(),target=room,who=me();
@@ -60,7 +77,7 @@
   sending=true;updateForm();status('正在发送…');
   try{const message=await N.rpc('foamlab_town_chat_send',{channel:target,body,client_id:nonce});if(who!==me())return;
    pending.delete(key);if(drafts.get(target)?.trim()===body)drafts.delete(target);
-   if(target===room){merge([message]);if(input.value.trim()===body){input.value='';drafts.delete(target);}bottom();status('已发送');}
+   if(target===room){receive([message],target,false,true);if(input.value.trim()===body){input.value='';drafts.delete(target);}bottom();status('已发送');}
   }catch(error){if(who===me()&&target===room)status(error.message||'发送未成功，请重试。');}
   finally{sending=false;if(panel&&who===me())updateForm();}
  }
@@ -79,8 +96,9 @@
   panel.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('[data-chat-emojis]').hidden){$('[data-chat-emojis]').hidden=true;$('[data-chat-emoji-toggle]').setAttribute('aria-expanded','false');}else{toggle(true);}e.preventDefault();}e.stopPropagation();});
   panel.addEventListener('focusin',()=>{window.FoamTownGame?.active?.stopMovement();fitKeyboard();});
   panel.addEventListener('focusout',()=>requestAnimationFrame(fitKeyboard));
-  $('[data-chat-log]').onscroll=()=>{followLatest=nearBottom();if(followLatest){unread=0;badge();$('[data-chat-latest]').hidden=true;}};
+  $('[data-chat-log]').onscroll=()=>{followLatest=nearBottom();if(followLatest&&!collapsed){unreadKeys.clear();badge();$('[data-chat-latest]').hidden=true;}};
   new ResizeObserver(()=>{if(followLatest&&!collapsed)bottom();}).observe($('[data-chat-log]'));
+  root.addEventListener('click',e=>{if(e.target.closest('[data-town-online]'))void openOnline();});
  }
  function fitKeyboard(){if(!panel)return;const v=window.visualViewport,raised=v&&innerWidth<=700&&!collapsed&&panel.contains(document.activeElement)&&innerHeight-v.height>100;
   panel.classList.toggle('is-keyboard-open',!!raised);if(raised){panel.style.setProperty('--chat-visible-height',v.height+'px');panel.style.setProperty('--chat-visible-top',v.offsetTop+'px');}
@@ -88,18 +106,47 @@
  window.visualViewport?.addEventListener('resize',fitKeyboard);
  window.visualViewport?.addEventListener('scroll',fitKeyboard);
  let populationRequest=0;
+ let onlineDialog=null,onlineRequest=0,onlineBusy=false;
+ async function readOnline(){
+  if(!onlineDialog?.open||onlineBusy)return;onlineBusy=true;const dialog=onlineDialog,rev=++onlineRequest,status=dialog.querySelector('[data-online-status]'),refresh=dialog.querySelector('[data-online-refresh]');refresh.disabled=true;status.textContent='正在读取在线居民…';
+  try{
+   const data=await N.rpc('foamlab_town_online_residents');if(dialog!==onlineDialog||!dialog.open||rev!==onlineRequest)return;
+   if(!data?.enabled||!Array.isArray(data.items))throw Error('unavailable');
+   const list=dialog.querySelector('[data-online-list]');list.replaceChildren();
+   for(const row of data.items){
+    const card=document.createElement('article');card.className='town-online-person';card.dataset.onlineUser=row.user_id;
+    const avatar=document.createElement('span');avatar.className='town-online-avatar';avatar.setAttribute('aria-hidden','true');avatar.innerHTML=window.FoamAvatar?.markup(row.avatar||{user_id:row.user_id})||'🐼';
+    const info=document.createElement('div'),head=document.createElement('div'),name=document.createElement('strong'),level=document.createElement('span'),region=document.createElement('p'),location=document.createElement('p');head.className='town-online-person-heading';
+    name.textContent=row.name||'学习者';level.className='town-online-level';level.textContent='Lv.'+(Number(row.level)||1);head.append(name,level);
+    region.textContent='归属地区：'+label(row.province);location.textContent='当前所在：'+(row.current_province?label(row.current_province):'世界地图');info.append(head,region,location);card.append(avatar,info);list.append(card);
+   }
+   if(!data.items.length){const empty=document.createElement('p');empty.className='town-online-empty';empty.textContent='暂时没有在线居民。';list.append(empty);}
+   status.textContent='当前在线 '+data.items.length+' 人 · 最近两分钟在小镇活动的居民';
+   const count=root.querySelector('[data-total-online]');if(count)count.textContent=data.items.length.toLocaleString('zh-CN');
+  }catch{if(dialog===onlineDialog&&dialog.open)status.textContent='在线列表暂时无法更新，请点击刷新重试。';}
+  finally{if(dialog===onlineDialog){onlineBusy=false;refresh.disabled=false;}}
+ }
+ async function openOnline(){
+  if(onlineDialog?.open)return;
+  const previous=document.activeElement,dialog=document.createElement('dialog');onlineDialog=dialog;onlineBusy=false;dialog.id='town-online-dialog';dialog.className='town-online-dialog';dialog.setAttribute('aria-labelledby','town-online-title');
+  dialog.innerHTML='<header><h2 id="town-online-title">在线居民</h2><button type="button" data-online-close aria-label="关闭在线居民">×</button></header><div class="town-online-toolbar"><p role="status" aria-live="polite" data-online-status></p><button type="button" data-online-refresh>刷新</button></div><div class="town-online-list" data-online-list></div>';
+  dialog.querySelector('[data-online-close]').onclick=()=>dialog.close();dialog.querySelector('[data-online-refresh]').onclick=()=>void readOnline();
+  dialog.addEventListener('keydown',e=>e.stopPropagation());dialog.addEventListener('close',()=>{onlineRequest++;if(onlineDialog===dialog){onlineDialog=null;onlineBusy=false;}dialog.remove();if(previous?.isConnected)previous.focus({preventScroll:true});},{once:true});
+  root.append(dialog);dialog.showModal();window.FoamTownGame?.active?.stopMovement();await readOnline();
+ }
  async function population(){if(document.hidden||!ctx)return;const rev=++populationRequest;try{const data=await N.rpc('foamlab_town_population',{touch:!!me()});if(rev!==populationRequest)return;
-   const el=root.querySelector('[data-town-population]');if(!el)return;if(!data?.enabled)throw Error('unavailable');el.dataset.state='ready';el.querySelector('[data-total-residents]').textContent=Number(data.residents||0).toLocaleString('zh-CN');el.querySelector('[data-total-online]').textContent=Number(data.online||0).toLocaleString('zh-CN');
+   if(onlineDialog?.open)void readOnline();const el=root.querySelector('[data-town-population]');if(!el)return;if(!data?.enabled)throw Error('unavailable');el.dataset.state='ready';el.querySelector('[data-total-residents]').textContent=Number(data.residents||0).toLocaleString('zh-CN');el.querySelector('[data-total-online]').textContent=Number(data.online||0).toLocaleString('zh-CN');
   }catch{const el=root.querySelector('[data-town-population]');if(el){el.dataset.state='error';el.querySelector('[data-population-state]').textContent='人数暂时无法更新';}}}
  function sync(context){ctx=context;root=document.querySelector('#town-app');if(!panel)create();const nextIdentity=me();
-  if(identity!==nextIdentity){identity=nextIdentity;drafts.clear();pending.clear();messages.clear();$('textarea').value='';sending=false;}
+  if(identity!==nextIdentity){identity=nextIdentity;drafts.clear();pending.clear();messages.clear();streams.clear();unreadKeys.clear();$('textarea').value='';sending=false;}
+  for(const key of unreadKeys)if(!rooms().some(target=>key.startsWith(target+':')))unreadKeys.delete(key);
   const local=$('[data-chat-tab=town]');local.disabled=!ctx.province;local.textContent=ctx.province?'当前小镇 · '+label(ctx.province):'当前小镇';local.title=ctx.province?'和正在这里的朋友聊天':'进入小镇后打开当前频道';
-  if(scope==='town'&&!ctx.province)scope='world';select(scope);badge();if(!timer)listen();clearInterval(populationTimer);void population();populationTimer=setInterval(population,60000);
+  if(scope==='town'&&!ctx.province)scope='world';select(scope);badge();if(!timer||watchedRooms!==JSON.stringify([me(),...rooms()]))listen();clearInterval(populationTimer);void population();populationTimer=setInterval(population,60000);
  }
  window.addEventListener('online',()=>{if(ctx&&!document.hidden)listen();});
  document.addEventListener('visibilitychange',()=>{if(!ctx)return;if(document.hidden)stop();else{listen();void population();}});
  window.addEventListener('pagehide',()=>{stop();clearInterval(populationTimer);});
  window.addEventListener('pageshow',e=>{if(e.persisted&&ctx){listen();clearInterval(populationTimer);populationTimer=setInterval(population,60000);void population();}});
- window.addEventListener('foam-auth-change',()=>{if(!panel||identity===me())return;stop();identity=me();drafts.clear();pending.clear();messages.clear();$('textarea').value='';$('[data-chat-log]').replaceChildren();updateForm();});
+ window.addEventListener('foam-auth-change',()=>{if(!panel||identity===me())return;stop();identity=me();drafts.clear();pending.clear();messages.clear();streams.clear();unreadKeys.clear();badge();$('textarea').value='';$('[data-chat-log]').replaceChildren();updateForm();});
  window.FoamTownChat={sync,open:()=>{if(panel)toggle(false);},close:()=>{if(panel)toggle(true);}};
 })();
