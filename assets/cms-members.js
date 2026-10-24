@@ -37,7 +37,6 @@
   const date=value=>{if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});};
   function table(){
    results.innerHTML=members.length?'<table class="cms-member-table"><caption class="sr-only">注册成员与权限</caption><thead><tr><th scope="col">成员</th><th scope="col">等级</th><th scope="col">注册时间</th><th scope="col">最近登录</th><th scope="col">权限</th><th scope="col">操作</th></tr></thead><tbody>'+members.map(m=>{const own=m.user_id===L.user.id;return '<tr data-member-id="'+esc(m.user_id)+'"><td data-label="成员"><button type="button" class="cms-member-name" data-member-info>'+esc(m.display_name)+'</button>'+(own?'<span class="cms-member-self">当前账号</span>':'')+(m.role_protected?'<span class="cms-member-self">身份受保护</span>':'')+'<small>'+esc(m.username?'@'+m.username:'未设置 GitHub 用户名')+'</small></td><td data-label="等级"><strong>Lv.'+Number(m.level)+'</strong><small>'+Number(m.xp)+' 经验</small></td><td data-label="注册时间"><time datetime="'+esc(m.registered_at||'')+'">'+esc(date(m.registered_at))+'</time></td><td data-label="最近登录">'+(m.last_sign_in_at?'<time datetime="'+esc(m.last_sign_in_at)+'">'+esc(date(m.last_sign_in_at))+'</time>':'尚无记录')+'</td><td data-label="权限"><select data-member-role aria-label="'+esc(m.display_name)+'的权限" '+(own||m.role_protected?'disabled':'')+'>'+opts(roles,m.role)+'</select></td><td data-label="操作"><div class="cms-member-actions"><button type="button" class="text-button" data-member-info>资料</button><button type="button" class="text-button" data-member-save disabled>保存</button><button type="button" class="text-button" data-member-cancel disabled>取消</button></div></td></tr>';}).join('')+'</tbody></table>':'<div class="cms-empty">没有找到符合条件的成员。</div>';
-   results.querySelectorAll('.cms-member-actions').forEach(actions=>actions.insertAdjacentHTML('afterbegin','<button type="button" class="text-button" data-member-edit>编辑资料</button>'));
   }
   async function load(){
    clearTimeout(timer);const id=++request;if(!view.isConnected)return;
@@ -117,7 +116,6 @@
    if(e.target.closest('[data-members-reset]')){Object.assign(state,{q:'',role:'',sort:'registered_at',direction:'desc',page:1,size:25});view.querySelectorAll('[data-member-filter]').forEach(el=>el.value=state[el.dataset.memberFilter]);load();return;}
    const page=e.target.closest('[data-page]');if(page&&!page.disabled){state.page=Number(page.dataset.page);load();return;}
    const row=e.target.closest('[data-member-id]');if(!row)return;const m=members.find(x=>x.user_id===row.dataset.memberId);if(!m)return;
-   if(e.target.closest('[data-member-edit]')){editProfile(m);return;}
    if(e.target.closest('[data-member-info]')){info(m);return;}
    if(e.target.closest('[data-member-cancel]')){row.querySelector('[data-member-role]').value=m.role;actions(row,m);return;}
    if(e.target.closest('[data-member-save]'))run(async()=>{
