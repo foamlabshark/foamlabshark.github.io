@@ -5,7 +5,7 @@
  const $=(s,r=document)=>r.querySelector(s),avatar=p=>window.FoamAvatar?.markup(p?.avatar||{user_id:p?.user_id})||'🐼';
  const title=p=>p?.remark||p?.name||'学习者',date=value=>value?L.dateTime(value):'',notify=text=>window.foamNotify?.(text);
  let owner='',epoch=0,channel=null,retryTimer,pollTimer,summaryPending=null,summaryVersion=0,summaryAgain=false,lastSummary=0,summary={},hub=null,hubTab='friends',hubPage=0,hubRows=[],hubMore=false,hubRequest=0,currentPeer=null,listTimer,signalTimer;
- const profiles=new Map(),chats=new Map(),drafts=new Map();let dialogId=0;
+ const profiles=new Map(),chats=new Map(),drafts=new Map(),listCache=new Map(),listPending=new Map();let dialogId=0,listVersion=0;
  async function api(operation,payload={}){
   await A.ready;const who=A.user?.id;if(!who)throw Error('请先登录后使用好友功能。');
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
@@ -35,7 +35,7 @@
  async function requireLogin(){await A.ready;if(A.user)return true;const d=makeDialog('social-login','登录后使用好友功能','<p>添加好友、私聊和分享笔记需要登录。</p><button type="button" data-social-login>使用 GitHub 登录</button>');$('[data-social-login]',d).onclick=()=>{d.close();void L.login();};return false;}
  async function act(button,status,operation,payload,done){
   if(button.disabled)return;button.disabled=true;status.textContent='正在处理…';
-  try{const result=await api(operation,payload);summaryVersion++;status.textContent='';await done?.(result);void refreshSummary(true);refreshOpenList();}
+  try{const result=await api(operation,payload);summaryVersion++;invalidateLists();status.textContent='';await done?.(result);void refreshSummary(true);refreshOpenList();}
   catch(error){if(status.isConnected)status.textContent=error.message;}
   finally{if(button.isConnected)button.disabled=false;}
  }
@@ -67,49 +67,75 @@
     const f=document.createElement('form');f.className='social-request-form';f.innerHTML='<label>好友申请留言（选填）<textarea name="message" rows="2" maxlength="140" placeholder="介绍一下自己，方便对方认识你"></textarea></label><button type="submit">申请加为好友</button>';f.onsubmit=e=>{e.preventDefault();void act($('[type=submit]',f),status,'request',{user_id:id,message:f.elements.message.value},render);};controls.append(f);
    }else{const p=document.createElement('p');p.textContent='暂时无法联系这位成员。';controls.append(p);}
    if(['removed','blocked','unavailable'].includes(p.relation))add('查看聊天记录',()=>{d.close();void openChat(id);},true);
-   if(p.relation!=='blocked')add('拉黑',async b=>{if(await confirm('拉黑这位成员？','拉黑后将阻止双方的新申请和私聊，可在黑名单中解除。','拉黑'))void act(b,status,'block',{user_id:id},render);},true);
+   if(p.relation!=='blocked'){const block=add('拉黑',async b=>{if(await confirm('拉黑这位成员？','拉黑后将阻止双方的新申请和私聊，可在黑名单中解除。','拉黑'))void act(b,status,'block',{user_id:id},render);},true);block.classList.add('social-block');const corner=document.createElement('div');corner.className='social-profile-corner';corner.append(block);controls.append(corner);}
   }
   await read();
  }
  function buildHub(){
   if(hub?.isConnected)return;
-  hub=makeDialog('social-hub','好友与私聊','<nav class="social-tabs" aria-label="好友功能">'+[['friends','好友'],['requests','新的朋友'],['invitations','小镇邀请'],['blocked','黑名单']].map(([id,name])=>'<button type="button" data-social-tab="'+id+'">'+name+' <b hidden></b></button>').join('')+'</nav><div class="social-workspace"><section class="social-contacts"><form class="social-search"><label class="sr-only" for="social-search">搜索好友</label><input id="social-search" type="search" maxlength="100" placeholder="搜索好友或备注"><button type="button" data-social-find>添加好友</button></form><p class="social-status" role="status" data-social-list-status></p><div class="social-contact-list"></div><button type="button" class="secondary social-more" data-social-more hidden>加载更多</button></section><section class="social-conversation"><div class="social-welcome"><p>选择一位好友开始聊天。</p><small>好友申请通过后，才可以互发消息和分享笔记。</small></div></section></div>');
+  hub=makeDialog('social-hub','好友','<nav class="social-tabs" aria-label="好友功能">'+[['friends','好友'],['requests','新的朋友'],['invitations','小镇邀请'],['blocked','黑名单']].map(([id,name])=>'<button type="button" data-social-tab="'+id+'">'+name+' <b hidden></b></button>').join('')+'</nav><div class="social-workspace"><section class="social-contacts"><form class="social-search"><label class="sr-only" for="social-search">搜索好友</label><input id="social-search" type="search" maxlength="100" placeholder="搜索好友或备注"><button type="button" data-social-find>添加好友</button></form><p class="social-status" role="status" data-social-list-status></p><div class="social-contact-list"></div><button type="button" class="secondary social-more" data-social-more hidden>加载更多</button></section><section class="social-conversation"><div class="social-welcome"><p>选择一位好友开始聊天。</p><small>好友申请通过后，才可以互发消息和分享笔记。</small></div></section></div>');
   hub.dataset.view='list';
   hub.addEventListener('close',()=>{hub=null;currentPeer=null;++hubRequest;});
-  hub.querySelectorAll('[data-social-tab]').forEach(b=>b.onclick=()=>{hubTab=b.dataset.socialTab;hub.dataset.view='list';currentPeer=null;hubPage=0;hubRows=[];$('input[type=search]',hub).value='';void loadList();});
-  $('[data-social-find]',hub).onclick=()=>{hubTab=hubTab==='search'?'friends':'search';hub.dataset.view='list';currentPeer=null;hubPage=0;hubRows=[];void loadList();$('input[type=search]',hub).focus();};
+  hub.querySelectorAll('[data-social-tab]').forEach(b=>b.onclick=()=>{hubTab=b.dataset.socialTab;resetConversation();hub.dataset.view='list';currentPeer=null;hubPage=0;hubRows=[];$('input[type=search]',hub).value='';void loadList();});
+  $('[data-social-find]',hub).onclick=()=>{hubTab=hubTab==='search'?'friends':'search';resetConversation();hub.dataset.view='list';currentPeer=null;hubPage=0;hubRows=[];void loadList();$('input[type=search]',hub).focus();};
   $('.social-search',hub).onsubmit=e=>{e.preventDefault();hubPage=0;void loadList();};
   $('input[type=search]',hub).oninput=()=>{clearTimeout(listTimer);++hubRequest;hubPage=0;listTimer=setTimeout(()=>void loadList(),250);};
   $('[data-social-more]',hub).onclick=()=>void loadList(true);
   badges();
  }
- async function openHub(tab='friends'){if(!await requireLogin())return;buildHub();hubTab=tab;hubPage=0;hubRows=[];hub.dataset.view='list';currentPeer=null;void refreshSummary(true);await loadList();}
+ async function openHub(tab='friends'){if(!await requireLogin())return;buildHub();resetConversation();hubTab=tab;hubPage=0;hubRows=[];hub.dataset.view='list';currentPeer=null;void refreshSummary(true);warmLists();await loadList();}
  function refreshOpenList(){if(hub?.open)void loadList(false,true);}
- async function loadList(append=false,quiet=false){
-  if(!hub?.open)return;const d=hub,token=++hubRequest,tab=hubTab,status=$('[data-social-list-status]',d),list=$('.social-contact-list',d),query=$('input[type=search]',d).value.trim(),page=append?hubPage+1:0;d.dataset.tab=tab;
-  d.querySelectorAll('[data-social-tab]').forEach(b=>{b.setAttribute('aria-current',String(b.dataset.socialTab===tab));b.classList.toggle('is-active',b.dataset.socialTab===tab);});
-  $('.social-search',d).hidden=!['friends','search'].includes(tab);$('input[type=search]',d).placeholder=tab==='search'?'搜索昵称（至少两个字）或用户 ID':'搜索好友或备注';$('[data-social-find]',d).textContent=tab==='search'?'返回好友':'添加好友';
-  if(!quiet)status.textContent='正在读取…';$('[data-social-more]',d).disabled=true;
-  try{
-   const data=await api(tab,{query,page});if(hub!==d||token!==hubRequest)return;
+ function resetConversation(){if(hub)$('.social-conversation',hub).innerHTML='<div class="social-welcome"><p>选择一位好友开始聊天。</p><small>好友申请通过后，才可以互发消息和分享笔记。</small></div>';}
+ function invalidateLists(){listVersion++;listPending.clear();}
+ const listKey=(tab,query,page)=>JSON.stringify([tab,query,page]);
+ function fetchList(tab,query,page,force=false){
+  const key=listKey(tab,query,page),cached=listCache.get(key),pending=listPending.get(key),version=listVersion,who=owner;
+  if(!force&&cached?.version===version&&Date.now()-cached.at<15000)return Promise.resolve(cached.data);
+  if(pending?.version===version)return pending.task;
+  const task=api(tab,{query,page}).then(data=>{if(owner===who&&listVersion===version){listCache.set(key,{data,version,at:Date.now()});if(listCache.size>64)listCache.delete(listCache.keys().next().value);}return data;}).finally(()=>{if(listPending.get(key)?.task===task)listPending.delete(key);});
+  listPending.set(key,{task,version});return task;
+ }
+ function warmLists(){for(const tab of ['friends','requests','invitations','blocked'])if(tab!==hubTab)void fetchList(tab,'',0).catch(()=>{});}
+ function readListNotices(d,tab){if(d.contains(document.activeElement)&&['requests','invitations'].includes(tab))void api('notices_read',{scope:tab}).then(()=>{summaryVersion++;return refreshSummary(true);}).catch(()=>{});}
+ function renderList(d,tab,query,data,append,page){
+  const status=$('[data-social-list-status]',d),list=$('.social-contact-list',d);
    if(tab==='requests'){
     list.innerHTML='<h3>收到的申请</h3>'+((data.incoming||[]).map(p=>requestRow(p,true)).join('')||'<p class="social-empty">暂无待处理的申请。</p>')+'<h3>我发出的申请</h3>'+((data.outgoing||[]).map(p=>requestRow(p,false)).join('')||'<p class="social-empty">暂无等待中的申请。</p>')+'<h3>最近提醒</h3>'+((data.notices||[]).map(n=>'<p class="social-notice"><button type="button" data-social-profile="'+esc(n.peer_id)+'">查看成员</button> '+esc(n.body)+'<time>'+esc(date(n.created_at))+'</time></p>').join('')||'<p class="social-empty">暂无提醒。</p>');hubMore=false;
     list.querySelectorAll('[data-request-decision]').forEach(b=>b.onclick=()=>void act(b,status,'respond',{user_id:b.dataset.user,decision:b.dataset.requestDecision},()=>loadList()));
-    if(d.contains(document.activeElement))void api('notices_read',{scope:'requests'}).then(()=>{summaryVersion++;return refreshSummary(true);}).catch(()=>{});
    }else{
     hubRows=append?hubRows.concat(data.items||[]):data.items||[];hubPage=page;hubMore=!!data.more;
     if(tab==='invitations'){
      list.innerHTML=hubRows.map(i=>'<article class="social-invitation">'+(i.profile?'<button type="button" class="social-person" data-social-profile="'+esc(i.profile.user_id)+'">'+person(i.profile)+'</button>':'')+'<p>'+(i.incoming?'邀请你加入熊猫小镇':'你发出的小镇邀请')+'</p><small>'+esc(({pending:'等待处理',accepted:'已接受，等待完成入住',completed:'已完成，双方获得好伙伴友谊称号',declined:'已拒绝',expired:'已过期'})[i.status]||i.status)+'</small>'+(i.incoming&&['pending','accepted'].includes(i.status)?'<div class="social-actions"><button type="button" data-town-invitation="'+esc(i.id)+'">'+(i.status==='accepted'?'继续入住':'接受并入住')+'</button><button type="button" class="secondary" data-town-decline="'+esc(i.id)+'">拒绝</button></div>':'')+'</article>').join('')||'<p class="social-empty">暂无小镇邀请。邀请好友首次入住，双方可获得“好伙伴友谊”称号。</p>';
      list.querySelectorAll('[data-town-invitation]').forEach(b=>b.onclick=()=>void acceptInvite(b.dataset.townInvitation,b,status));list.querySelectorAll('[data-town-decline]').forEach(b=>b.onclick=()=>void act(b,status,'town_decline',{id:b.dataset.townDecline},()=>loadList()));
-     if(d.contains(document.activeElement))void api('notices_read',{scope:'invitations'}).then(()=>{summaryVersion++;return refreshSummary(true);}).catch(()=>{});
     }else{
      list.innerHTML=hubRows.map(p=>{profiles.set(p.user_id,p);return '<article class="social-contact-row"><button type="button" class="social-contact" data-contact="'+esc(p.user_id)+'">'+person(p)+'<span class="social-contact-state">'+online(p)+(p.unread?'<b class="social-unread">'+(p.unread>99?'99+':Number(p.unread))+'</b>':'')+'</span>'+(tab==='friends'?'<span class="social-contact-preview">'+esc(p.last_kind==='note'?'[分享笔记]':p.last_kind==='town_invite'?'[小镇邀请]':p.last_body||'开始聊天')+'</span>':'')+'</button>'+(tab==='blocked'?'<button type="button" class="secondary" data-unblock="'+esc(p.user_id)+'">解除拉黑</button>':'')+'</article>';}).join('')||'<p class="social-empty">'+(tab==='search'?(query.length<2?'输入至少两个字查找成员。':'没有找到匹配的成员。'):tab==='blocked'?'黑名单为空。':'还没有好友。点击“添加好友”，或点击文章和评论中的头像认识成员。')+'</p>';
      list.querySelectorAll('[data-contact]').forEach(b=>b.onclick=()=>void(tab==='friends'?openChat(b.dataset.contact):showProfile(b.dataset.contact)));list.querySelectorAll('[data-unblock]').forEach(b=>b.onclick=()=>void act(b,status,'block',{user_id:b.dataset.unblock,blocked:false},()=>loadList()));
     }
    }
    status.textContent='';$('[data-social-more]',d).hidden=!hubMore;
-  }catch(error){if(hub===d&&token===hubRequest){status.textContent=error.message;const retry=document.createElement('button');retry.type='button';retry.textContent='重试';retry.onclick=()=>void loadList();status.append(' ',retry);}}
-  finally{if(hub===d&&token===hubRequest)$('[data-social-more]',d).disabled=false;}
+ }
+ async function loadList(append=false,quiet=false){
+  if(!hub?.open)return;
+  const d=hub,token=++hubRequest,tab=hubTab,version=listVersion,status=$('[data-social-list-status]',d),list=$('.social-contact-list',d),query=$('input[type=search]',d).value.trim(),page=append?hubPage+1:0,key=listKey(tab,query,0),cached=listCache.get(key),sameView=list.dataset.viewKey===key;
+  const current=()=>hub===d&&token===hubRequest;
+  d.dataset.tab=tab;list.dataset.viewKey=key;
+  d.querySelectorAll('[data-social-tab]').forEach(b=>{b.setAttribute('aria-current',String(b.dataset.socialTab===tab));b.classList.toggle('is-active',b.dataset.socialTab===tab);});
+  $('.social-search',d).hidden=!['friends','search'].includes(tab);$('input[type=search]',d).placeholder=tab==='search'?'搜索昵称（至少两个字）或用户 ID':'搜索好友或备注';$('[data-social-find]',d).textContent=tab==='search'?'返回好友':'添加好友';
+  status.textContent='';
+  if(!append&&!quiet&&cached)renderList(d,tab,query,cached.data,false,0);
+  else if(!sameView){list.replaceChildren();hubRows=[];hubMore=false;$('[data-social-more]',d).hidden=true;}
+  $('[data-social-more]',d).disabled=true;list.setAttribute('aria-busy','true');
+  const loading=setTimeout(()=>{if(current()&&!list.children.length)status.textContent='连接较慢，正在加载…';},700);
+  try{
+   const lastPage=quiet&&sameView&&!append?hubPage:0;
+   let data=await fetchList(tab,query,page,quiet),renderPage=page;
+   if(lastPage>0&&Array.isArray(data.items)){const pages=await Promise.all(Array.from({length:lastPage},(_,i)=>fetchList(tab,query,i+1,true)));data={...data,items:[...data.items,...pages.flatMap(p=>p.items||[])],more:pages.at(-1).more};renderPage=lastPage;}
+   if(!current())return;
+   if(version!==listVersion){void loadList(append,true);return;}
+   if(append||quiet||data!==cached?.data)renderList(d,tab,query,data,append,renderPage);
+   readListNotices(d,tab);
+  }catch(error){if(current()){status.textContent=error.message;const retry=document.createElement('button');retry.type='button';retry.textContent='重试';retry.onclick=()=>void loadList(append,true);status.append(' ',retry);}}
+  finally{clearTimeout(loading);if(current()){list.setAttribute('aria-busy','false');$('[data-social-more]',d).disabled=false;}}
  }
  function requestRow(p,incoming){return '<article class="social-request"><button type="button" class="social-person" data-social-profile="'+esc(p.user_id)+'">'+person(p)+'</button>'+(p.request_text?'<p>'+esc(p.request_text)+'</p>':'')+'<small>'+esc(date(p.requested_at))+'</small><div class="social-actions">'+(incoming?'<button type="button" data-request-decision="accept" data-user="'+esc(p.user_id)+'">同意</button><button type="button" class="secondary" data-request-decision="decline" data-user="'+esc(p.user_id)+'">拒绝</button>':'<button type="button" class="secondary" data-request-decision="cancel" data-user="'+esc(p.user_id)+'">撤回申请</button>')+'</div></article>';}
  async function acceptInvite(id,button,status){await act(button,status,'town_accept',{id},data=>{location.href=data.join_url;});}
@@ -209,15 +235,15 @@
  // A single controller and subscription are used on the website and in town.
  window.FoamSocial={open:openHub,profile:showProfile,chat:openChat,shareNote:chooseShare,refresh:()=>refreshSummary(true)};
  function entrances(){
-  const top=$('.account-actions');if(top&&!$('[data-social-open]',top)){const b=document.createElement('button');b.type='button';b.className='social-entry';b.dataset.socialOpen='friends';b.setAttribute('aria-haspopup','dialog');b.innerHTML='好友<span class="social-unread" data-social-count hidden></span>';top.prepend(b);}
-  const menu=$('.account-panel-links');if(menu&&!$('[data-social-open]',menu)){const b=document.createElement('button');b.type='button';b.dataset.socialOpen='friends';b.innerHTML='好友与私聊 <span class="social-unread" data-social-count hidden></span>';menu.prepend(b);}
+  const top=$('.account-actions');if(top&&!$('[data-social-open]',top)){const b=document.createElement('button');b.type='button';b.className='account-nav social-entry';b.dataset.socialOpen='friends';b.setAttribute('aria-haspopup','dialog');b.innerHTML='好友<span class="social-unread" data-social-count hidden></span>';top.prepend(b);}
+  const menu=$('.account-panel-links');if(menu&&!$('[data-social-open]',menu)){const b=document.createElement('button');b.type='button';b.dataset.socialOpen='friends';b.className='account-panel-action';b.innerHTML='好友<span class="social-menu-tail"><b class="social-unread" data-social-count hidden></b><span aria-hidden="true">→</span></span>';menu.prepend(b);}
   badges();
  }
  function stop(){epoch++;clearInterval(pollTimer);clearTimeout(retryTimer);if(channel){const old=channel;channel=null;A.client?.removeChannel(old).catch(()=>{});}}
  function connect(){
   if(!owner||!A.client)return;const who=owner,generation=epoch;
   const active=A.client.channel('foamlab-social:'+who,{config:{private:true}});channel=active;active.on('broadcast',{event:'social'},event=>{
-   if(owner!==who||generation!==epoch||channel!==active)return;const data=event.payload||{};
+   if(owner!==who||generation!==epoch||channel!==active)return;const data=event.payload||{};invalidateLists();
    if(data.kind==='friend_request')notify('收到新的好友申请，可在“好友 → 新的朋友”处理。');
    if(data.kind==='friend_accepted')notify('你的好友申请已通过。');
    if(data.kind==='town_reward'){notify('已获得“好伙伴友谊”称号。');window.dispatchEvent(new Event('foam-social-reward'));}
@@ -226,7 +252,7 @@
  }
  async function identity(){
   await A.ready;const next=A.user?.id||'';entrances();if(next===owner)return;
-  const previous=owner;stop();owner=next;summary={};lastSummary=0;summaryPending=null;summaryAgain=false;summaryVersion++;profiles.clear();chats.clear();drafts.clear();currentPeer=null;
+  const previous=owner;stop();owner=next;summary={};lastSummary=0;summaryPending=null;summaryAgain=false;summaryVersion++;profiles.clear();chats.clear();drafts.clear();invalidateLists();listCache.clear();currentPeer=null;
   document.querySelectorAll('.social-dialog').forEach(d=>d.close());
   if(previous){try{sessionStorage.removeItem(draftKey(previous));}catch{}}
   if(owner){try{for(const [id,value] of JSON.parse(sessionStorage.getItem(draftKey(owner))||'[]'))if(uuid(id)&&typeof value==='string')drafts.set(id,value.slice(0,5000));}catch{}connect();void refreshSummary(true);pollTimer=setInterval(()=>{if(document.hidden)return;void refreshSummary();if(hub?.open){refreshOpenList();if(currentPeer)void refreshChat();}},15000);}
