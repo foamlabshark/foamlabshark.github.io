@@ -10,7 +10,11 @@
    const li=document.createElement('li'),rank=document.createElement('span'),name=document.createElement('span'),score=document.createElement('span');
    rank.className='member-ranking-rank'+(i<3?' medal':'');rank.dataset.rank=String(i+1);rank.textContent=i<3?['🥇','🥈','🥉'][i]:String(i+1);rank.setAttribute('aria-label','第 '+(i+1)+' 名');
    name.className='member-ranking-name';name.textContent=row.name||'学习者';name.title=name.textContent;
-   const count=key==='experience'?row.xp:row.days;score.className='member-ranking-score';const number=document.createElement('strong'),unit=document.createElement('small');number.textContent=Number(count||0).toLocaleString('zh-CN');unit.textContent=key==='experience'?'经验':'天';score.append(number,unit);li.append(rank,name,score);ol.append(li);
+   const count=key==='experience'?row.xp:row.days;score.className='member-ranking-score';const number=document.createElement('strong'),unit=document.createElement('small');number.textContent=Number(count||0).toLocaleString('zh-CN');unit.textContent=key==='experience'?'经验':'天';score.append(number,unit);
+   if(/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(row.user_id||'')){
+    const button=document.createElement('button');button.type='button';button.className='member-ranking-person';button.dataset.socialProfile=row.user_id;button.setAttribute('aria-label','查看'+name.textContent+'的资料');button.append(rank,name,score);li.className='is-clickable';li.append(button);
+   }else li.append(rank,name,score);
+   ol.append(li);
   });target.append(ol);
  }
  function render(value){
