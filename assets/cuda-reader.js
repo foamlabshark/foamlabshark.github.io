@@ -25,6 +25,21 @@
   if(found)window.FoamMathRenderer.enhance();
  }
  function scrollHash(){if(!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView());}
+ async function chapterFeatures(chapter){
+  const L=window.FoamLab,comments=$('#lab-comments');
+  try{
+   await L.ready;const item=L.check(await L.client.from('foamlab_content').select('id,slug,kind,title,series,sort_order,metadata,section_ids,comments_enabled').eq('slug',chapter.slug).eq('status','published').maybeSingle());if(!item)throw Error('本章的评论和翻页暂时无法读取，请稍后重试。');
+   $('#cuda-discuss').href='/community/?about='+encodeURIComponent(item.title)+'&from='+encodeURIComponent(item.slug);
+   await L.lessonNavigation(root.querySelector('article'),item,{chapterURL:url,directoryURL:'/cuda/'});
+   const complete=$('#lab-complete');let done=false;
+   if(L.user){const result=await L.client.from('foamlab_learning_progress').select('completed').eq('user_id',L.user.id).eq('content_id',item.id).maybeSingle();done=!!result.data?.completed;}
+   const completionLabel=()=>{complete.textContent=done?'已学完 · 点击撤销':'标记为已学';};completionLabel();
+   complete.onclick=async()=>{if(!L.user){L.login();return;}complete.disabled=true;try{await L.recordCompletion(item.id,!done);done=!done;completionLabel();}catch(error){window.foamNotify?.(error.message);}finally{complete.disabled=false;}};
+   comments.querySelector('.cuda-comments-loading')?.remove();
+   if(item.comments_enabled)await L.messages(comments,{content_id:item.id});else comments.insertAdjacentHTML('beforeend','<p class="muted">作者已关闭这篇内容的评论。</p>');
+   root.dataset.community='ready';
+  }catch(error){root.dataset.community='error';L.error(comments,error);}
+ }
  async function renderChapter(){
   const chapter=state.chapters.find(c=>c.slug===slug);if(!chapter)throw Error('没有找到该章节，请从全书目录选择。');state.chapter=chapter;
   if(!/^\/cuda\/book\/html\/\d{2}\.html$/.test(chapter.html))throw Error('章节地址无效。');
@@ -32,8 +47,7 @@
   const body=$('#cuda-article');body.innerHTML=window.DOMPurify.sanitize(await response.text(),{FORBID_TAGS:['script','style','iframe','form']});const heading=body.querySelector('h1');$('#cuda-page-title').textContent=heading?.textContent||chapter.displayTitle;heading?.remove();document.title=chapter.displayTitle+' · FoamLab';
   body.querySelectorAll('h1').forEach(heading=>{const section=document.createElement('h2');section.id=heading.id;section.append(...heading.childNodes);heading.replaceWith(section);});
   body.querySelectorAll('pre').forEach(pre=>{const code=pre.querySelector('code');if(code&&!code.className)code.className='language-cpp';window.foamEnhanceCode?.(pre);});window.foamHighlightCode?.(body);formulas(body);
-  const toc=$('#toc'),heads=[...body.querySelectorAll('h2,h3,h4')];toc.innerHTML=heads.map(h=>'<a data-level="'+h.tagName.slice(1)+'" href="#'+encodeURIComponent(h.id)+'">'+esc(h.textContent)+'</a>').join('');
-  const previous=state.chapters.find(c=>c.number===chapter.number-1),next=state.chapters.find(c=>c.number===chapter.number+1);$('#cuda-reader-footer').innerHTML=(previous?'<a class="button secondary" href="'+url(previous)+'">← '+esc(previous.displayTitle)+'</a>':'<span></span>')+(next?'<a class="button secondary" href="'+url(next)+'">'+esc(next.displayTitle)+' →</a>':'<span></span>');
+  void chapterFeatures(chapter);
   root.querySelector('article').setAttribute('aria-busy','false');const parent=document.querySelector('#breadcrumb-parent'),back=document.querySelector('#page-back-link');if(parent){parent.href='/cuda/';parent.textContent='CUDA C++ 编程指南';}if(back){back.href='/cuda/';back.textContent='← 返回全书目录';}scrollHash();
  }
  (async()=>{try{const response=await fetch('/cuda/book/manifest.json');if(!response.ok)throw Error('课程目录暂时无法读取。');const data=await response.json();state.chapters=data.chapters||[];if(root.dataset.cudaPage==='index')renderCatalog();else await renderChapter();root.dataset.loaded='true';await window.FoamDirectory.ready;sidebar();}catch(error){const host=$('#cuda-catalog')||$('#cuda-article');host.innerHTML='<p role="alert">'+esc(error.message)+'</p><a class="button secondary" href="/cuda/">返回全书目录</a>';host.setAttribute('aria-busy','false');root.querySelector('article')?.setAttribute('aria-busy','false');root.dataset.loaded='error';}})();
