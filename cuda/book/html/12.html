@@ -1,0 +1,731 @@
+<h1 id="第十二章-cuda-动态并行-cuda-dynamic-parallelism">第十二章 CUDA 动态并行（CUDA Dynamic Parallelism）</h1>
+<h2 id="12-1-简介-introduction">12.1 简介（Introduction）</h2>
+<h3 id="12-1-1-概述-overview">12.1.1 概述（Overview）</h3>
+<p>动态并行是 CUDA 编程模型的一项扩展，使 CUDA 内核能够直接在 GPU 上创建新工作，并与这些工作进行同步。程序可以在需要的位置动态创建并行任务，从而获得更灵活的执行方式。</p>
+<p>直接由 GPU 创建工作，可以减少主机与设备之间传递执行控制权和数据的需要，因为启动配置可以在运行时由设备上的线程决定。此外，内核也可以在运行时内联生成依赖数据的并行工作，利用 GPU 的硬件调度器和负载均衡器，根据数据驱动的决策或工作负载动态调整执行。</p>
+<p>以前需要修改算法、消除递归、不规则循环或其他不适合扁平单层并行结构的程序模式，现在可以更直接地表达。</p>
+<p>本章介绍支持动态并行的 CUDA 扩展能力，包括所需的编程模型修改和新增内容，以及有效利用这些能力的指导与最佳实践。动态并行仅支持计算能力为 3.5 及以上的设备。</p>
+<h3 id="12-1-2-术语表-glossary">12.1.2 术语表（Glossary）</h3>
+<ul>
+<li><strong>Grid（网格）：</strong> 由线程组成的集合。网格中的线程执行内核函数，并被划分为线程块。</li>
+<li><strong>Thread Block（线程块）：</strong> 在同一个多处理器（SM）上执行的一组线程。线程块内线程可以访问共享内存，并可显式同步。</li>
+<li><strong>Kernel Function（内核函数）：</strong> 在 CUDA 执行和内存模型下，为网格中的每个线程执行的隐式并行子程序。</li>
+<li><strong>Host（主机）：</strong> 最初调用 CUDA 的执行环境，通常是运行在系统 CPU 上的线程。</li>
+<li><strong>Parent（父级）：</strong> 启动一个或多个新网格的父线程、线程块或网格。父级在其启动的所有子网格完成之前，不被视为已完成。</li>
+<li><strong>Child（子级）：</strong> 由父网格启动的子线程、子线程块或子网格。子网格必须完成，父线程、线程块或网格才算完成。</li>
+<li><strong>Thread Block Scope（线程块作用域）：</strong> 对象的生命周期仅限于一个线程块。只有由创建该对象的线程块中的线程操作时，行为才有定义；创建线程块完成后，对象即被销毁。</li>
+<li><strong>Device Runtime（设备端运行时）：</strong> 为内核函数提供动态并行能力的运行时系统和 API。</li>
+</ul>
+<h2 id="12-2-执行环境与内存模型-execution-environment-and-memory-model">12.2 执行环境与内存模型（Execution Environment and Memory Model）</h2>
+<h3 id="12-2-1-执行环境-execution-environment">12.2.1 执行环境（Execution Environment）</h3>
+<p>CUDA 执行模型基于线程、线程块和网格这些基本原语。内核函数定义在某个线程块和网格中，由各个线程执行的程序。当调用内核函数时，网格属性由执行配置描述，CUDA 为其提供专门语法。</p>
+<p>CUDA 动态并行将配置、启动新网格以及隐式同步新网格的能力扩展到了正在设备上运行的线程。</p>
+<h4 id="12-2-1-1-父网格与子网格-parent-and-child-grids">12.2.1.1 父网格与子网格（Parent and Child Grids）</h4>
+<p>配置并启动新网格的设备线程属于父网格，而该次调用创建的网格就是子网格。</p>
+<p>子网格的调用和完成严格嵌套：父网格必须等其线程创建的所有子网格都完成后，才被视为完成；运行时会保证父网格与子网格之间的隐式同步。</p>
+<p><em>图 29：父网格与子网格的启动嵌套。</em></p>
+<p><img alt="图 29：父网格与子网格的启动嵌套" decoding="async" loading="lazy" src="/cuda/book/images/figure_29_parent_child_launch_nesting.png"/></p>
+<h4 id="12-2-1-2-cuda-原语的作用域-scope-of-cuda-primitives">12.2.1.2 CUDA 原语的作用域（Scope of CUDA Primitives）</h4>
+<p>在主机和设备两侧，CUDA Runtime 都提供用于启动内核的 API，以及通过执行流和事件跟踪启动依赖关系的机制。</p>
+<p>在主机端，进程中的所有线程共享启动状态，以及引用执行流和事件的 CUDA 原语；不同进程则独立执行，不能共享 CUDA 对象。</p>
+<p>在设备端，已启动内核和 CUDA 对象对网格中的所有线程可见。例如，一个线程创建的执行流可以由同一网格中的其他线程使用。</p>
+<h4 id="12-2-1-3-同步-synchronization">12.2.1.3 同步（Synchronization）</h4>
+<p><strong>警告：</strong> 从父线程块中显式同步子内核（即在设备代码中使用 <code>cudaDeviceSynchronize()</code>）已从 CUDA 11.6 起弃用，并且在针对 <code>compute_90+</code> 编译时已移除。对于计算能力低于 9.0 的设备，若要继续在设备代码中使用 <code>cudaDeviceSynchronize()</code>，必须通过 <code>-DCUDA_FORCE_CDP1_IF_SUPPORTED</code> 在编译期显式启用 CDP1。该功能计划在未来 CUDA 版本中完全移除。</p>
+<p>来自任意线程的 CUDA Runtime 操作（包括内核启动）对网格中的所有线程可见。因此，父网格中的某个调用线程可以通过同步操作，控制该网格中任意线程在任意线程创建的执行流中启动的网格顺序。</p>
+<p>只有当网格中所有线程发起的所有子网格启动都完成后，该网格才算执行完成。如果网格中的所有线程在子网格启动完成之前退出，运行时会自动触发隐式同步操作。</p>
+<h4 id="12-2-1-4-执行流与事件-streams-and-events">12.2.1.4 执行流与事件（Streams and Events）</h4>
+<p>CUDA 执行流和事件可用于控制网格启动之间的依赖关系：同一执行流中的网格按顺序执行；事件可用于在不同执行流之间建立依赖。设备端创建的执行流和事件也具有相同用途。</p>
+<p>在某个网格中创建的执行流和事件属于该网格作用域，在创建它们的网格之外使用会导致未定义行为。网格退出时，会隐式同步其启动的所有工作，包括执行流中的工作，并适当解决依赖关系。若执行流在网格作用域之外被修改，则对该执行流的操作行为未定义。</p>
+<p>在内核中使用主机端创建的执行流或事件同样属于未定义行为；父网格创建的执行流和事件也不能在子网格中使用。</p>
+<h4 id="12-2-1-5-顺序与并发-ordering-and-concurrency">12.2.1.5 顺序与并发（Ordering and Concurrency）</h4>
+<p>设备端运行时的内核启动顺序遵循 CUDA 执行流的排序语义。在同一个网格中，进入同一执行流的所有内核启动（后文介绍的 fire-and-forget 执行流除外）都按顺序执行。如果同一网格中的多个线程向同一执行流启动内核，执行流内的顺序取决于网格中的线程调度，必要时可以使用 <code>__syncthreads()</code> 等同步原语控制。</p>
+<p>虽然具名执行流由网格中的所有线程共享，但隐式 NULL 执行流只由同一个线程块中的线程共享。如果同一个线程块中的多个线程向隐式执行流启动内核，这些启动会按顺序执行；如果不同线程块中的线程向隐式执行流启动内核，这些启动则可能并发执行。如果希望同一线程块中的多个线程启动的内核能够并发，应使用显式具名执行流。</p>
+<p>动态并行让程序更容易表达并发，但设备端运行时不会在 CUDA 执行模型中增加新的并发保证。设备上任意不同线程块之间都不保证并发执行，父网格与子网格之间也一样。当父网格启动子网格后，只要执行流依赖已满足且硬件资源可用于承载子网格，子网格就可能开始执行；但不保证它会在父网格到达隐式同步点之前开始执行。</p>
+<p>并发通常可能发生，但会随设备配置、应用工作负载和运行时调度而变化。因此，依赖不同线程块之间必定并发执行是不安全的。</p>
+<h4 id="12-2-1-6-设备管理-device-management">12.2.1.6 设备管理（Device Management）</h4>
+<p>设备端运行时不支持多 GPU 管理，只能操作当前正在执行的设备。不过，它允许查询系统中任意支持 CUDA 的设备的属性。</p>
+<h3 id="12-2-2-内存模型-memory-model">12.2.2 内存模型（Memory Model）</h3>
+<p>父网格和子网格共享相同的全局内存和常量内存存储，但具有各自独立的本地内存和共享内存。</p>
+<h4 id="12-2-2-1-一致性与连贯性-coherence-and-consistency">12.2.2.1 一致性与连贯性（Coherence and Consistency）</h4>
+<h5 id="12-2-2-1-1-全局内存-global-memory">12.2.2.1.1 全局内存（Global Memory）</h5>
+<p>父网格和子网格可以连贯地访问全局内存，但二者之间的一致性保证较弱。子网格执行期间，只有一个时间点可以保证其内存视图与父线程完全一致：子网格由父线程启动的那一刻。</p>
+<p>父线程在启动子网格之前执行的所有全局内存操作，对子网格都可见。随着 <code>cudaDeviceSynchronize()</code> 被移除，父网格不再能读取子网格线程所做的修改。若父网格退出前需要访问子网格的修改，唯一方式是将后续内核启动到 <code>cudaStreamTailLaunch</code> 执行流。</p>
+<pre><code class="language-cpp">__global__ void tail_launch(int *data) {
+    data[threadIdx.x] = data[threadIdx.x] + 1;
+}
+
+__global__ void child_launch(int *data) {
+    data[threadIdx.x] = data[threadIdx.x] + 1;
+}
+
+__global__ void parent_launch(int *data) {
+    data[threadIdx.x] = threadIdx.x;
+    __syncthreads();
+
+    if (threadIdx.x == 0) {
+        child_launch&lt;&lt;&lt;1, 256&gt;&gt;&gt;(data);
+        tail_launch&lt;&lt;&lt;1, 256, 0, cudaStreamTailLaunch&gt;&gt;&gt;(data);
+    }
+}
+
+void host_launch(int *data) {
+    parent_launch&lt;&lt;&lt;1, 256&gt;&gt;&gt;(data);
+}
+</code></pre>
+<p>子网格只能保证看到启动之前的修改。由于父网格中的线程 0 负责启动，子网格的内存视图与父线程 0 的视图一致。第一个 <code>__syncthreads()</code> 确保子网格能看到 <code>data[0]=0</code>、<code>data[1]=1</code> 等数据；如果没有该同步，只能保证 <code>data[0]=0</code> 对子网格可见。</p>
+<p>子网格只保证在隐式同步点完成。其线程所做的修改并不保证会对父网格可见。若需要在父网格退出前访问这些修改，应将尾部内核启动到 <code>cudaStreamTailLaunch</code> 执行流。</p>
+<h5 id="12-2-2-1-2-零拷贝内存-zero-copy-memory">12.2.2.1.2 零拷贝内存（Zero Copy Memory）</h5>
+<p>零拷贝系统内存具有与全局内存相同的一致性保证，遵循前述语义。内核不能分配或释放零拷贝内存，但可以使用从主机程序传入的零拷贝内存指针。</p>
+<h5 id="12-2-2-1-3-常量内存-constant-memory">12.2.2.1.3 常量内存（Constant Memory）</h5>
+<p>设备端不能修改常量内存，只能由主机修改。但如果某个网格仍在执行，并且其生命周期内任何时刻都可能访问该常量，那么主机同时修改该常量的行为未定义。</p>
+<h5 id="12-2-2-1-4-共享内存与本地内存-shared-and-local-memory">12.2.2.1.4 共享内存与本地内存（Shared and Local Memory）</h5>
+<p>共享内存和本地内存分别属于线程块和线程私有，父网格与子网格之间不可见，也不保持连贯。如果在所属作用域之外引用这些位置中的对象，行为未定义，并可能导致错误。</p>
+<p>NVIDIA 编译器会尝试在检测到传递共享内存或本地内存指针作为内核启动参数时发出警告。运行时也可以使用 <code>__isGlobal()</code> 内建函数判断指针是否指向全局内存，从而确定它能否安全地传递给子网格。</p>
+<p><code>cudaMemcpy*Async()</code> 或 <code>cudaMemset*Async()</code> 可能在设备端调用新的子内核，以保持执行流语义。因此，将共享内存或本地内存指针传给这些 API 是非法的，会返回错误。</p>
+<h5 id="12-2-2-1-5-本地内存-local-memory">12.2.2.1.5 本地内存（Local Memory）</h5>
+<p>本地内存是正在执行的线程私有存储，在线程外不可见。启动子内核时，不能将本地内存指针作为参数；子内核解引用该指针的结果未定义。</p>
+<pre><code class="language-cpp">int x_array[10];
+child_launch&lt;&lt;&lt;1, 1&gt;&gt;&gt;(x_array); // 非法：x_array 是父线程的本地内存
+</code></pre>
+<p>有时程序员难以判断编译器是否将变量放入本地内存。通常，传给子内核的存储应显式分配在全局内存堆中，例如使用 <code>cudaMalloc()</code>、<code>new()</code>，或在全局作用域声明 <code>__device__</code> 存储：</p>
+<pre><code class="language-cpp">// 正确：value 位于全局存储中。
+__device__ int value;
+__device__ void x() {
+    value = 5;
+    child&lt;&lt;&lt;1, 1&gt;&gt;&gt;(&amp;value);
+}
+
+// 错误：value 位于本地存储中。
+__device__ void y() {
+    int value = 5;
+    child&lt;&lt;&lt;1, 1&gt;&gt;&gt;(&amp;value);
+}
+</code></pre>
+<h5 id="12-2-2-1-6-纹理内存-texture-memory">12.2.2.1.6 纹理内存（Texture Memory）</h5>
+<p>映射到纹理的全局内存区域，其写入与纹理读取之间不保持连贯性。纹理内存的连贯性会在启动子网格时和子网格完成时建立。因此，子内核启动前对内存的写入会反映在子网格的纹理读取中；与全局内存的情况相同，子网格的写入并不保证会反映到父网格的纹理读取中。若父网格退出前需要读取子网格的修改，唯一方式是将内核启动到 <code>cudaStreamTailLaunch</code> 执行流。父网格和子网格并发访问时，可能读到不一致的数据。</p>
+<p>&lt;!-- Added section: 12.3.1 Device Runtime Interface --&gt;</p>
+<h1 id="第十二章续译-设备端运行时编程接口">第十二章续译：设备端运行时编程接口</h1>
+<blockquote>
+<p>对应原 PDF 第 333–339 页（原书印刷页码 317–323）。</p>
+</blockquote>
+<h2 id="12-3-编程接口-programming-interface">12.3 编程接口（Programming Interface）</h2>
+<h3 id="12-3-1-cuda-c-参考-cuda-c-reference">12.3.1 CUDA C++ 参考（CUDA C++ Reference）</h3>
+<p>本节介绍为支持动态并行，对 CUDA C++ 语言扩展所做的修改和新增内容。</p>
+<p>动态并行使用的 CUDA C++ 内核语言接口和 API 称为<strong>设备端运行时（Device Runtime）</strong>，其设计与主机端 CUDA Runtime API 大体相似。为方便在主机和设备环境中复用代码，尽可能保留了 Runtime API 的语法和语义。</p>
+<p>与所有 CUDA C++ 代码一样，这些 API 和代码都是按线程执行的。因此，每个线程都可以动态决定下一步要执行的内核或操作。调用设备端运行时 API 不要求线程块内线程事先同步，因此这些 API 可以在任意发散的内核代码中调用，而不会因此发生死锁。</p>
+<h3 id="12-3-1-1-设备端内核启动-device-side-kernel-launch">12.3.1.1 设备端内核启动（Device-Side Kernel Launch）</h3>
+<p>设备端可以使用标准 CUDA <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 语法启动内核：</p>
+<pre><code class="language-cpp">kernel_name&lt;&lt;&lt;Dg, Db, Ns, S&gt;&gt;&gt;([kernel arguments]);
+</code></pre>
+<ul>
+<li><code>Dg</code>：类型为 <code>dim3</code>，指定网格的维度和大小。</li>
+<li><code>Db</code>：类型为 <code>dim3</code>，指定每个线程块的维度和大小。</li>
+<li><code>Ns</code>：类型为 <code>size_t</code>，指定本次调用每个线程块额外动态分配的共享内存字节数，不包含静态分配部分。该参数可选，默认值为 0。</li>
+<li><code>S</code>：类型为 <code>cudaStream_t</code>，指定与调用关联的执行流。该执行流必须在发起调用的同一网格中创建。该参数可选，默认使用 NULL 执行流。</li>
+</ul>
+<h4 id="12-3-1-1-1-启动是异步的-launches-are-asynchronous">12.3.1.1.1 启动是异步的（Launches are Asynchronous）</h4>
+<p>与主机端启动相同，所有设备端内核启动相对于发起启动的线程都是异步的。也就是说，<code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 启动语句会立即返回，发起线程继续执行，直到遇到隐式启动同步点（例如启动到 <code>cudaStreamTailLaunch</code> 执行流的内核）。</p>
+<p>子网格启动会提交给设备，并独立于父线程执行。子网格可以在启动后的任意时刻开始执行，但不保证会在发起线程到达隐式启动同步点之前开始执行。</p>
+<h4 id="12-3-1-1-2-启动环境配置-launch-environment-configuration">12.3.1.1.2 启动环境配置（Launch Environment Configuration）</h4>
+<p>所有全局设备配置设置（例如 <code>cudaDeviceGetCacheConfig()</code> 返回的共享内存和 L1 缓存配置，以及 <code>cudaDeviceGetLimit()</code> 返回的设备限制）都会从父环境继承。设备限制（例如栈大小）也会保持原有配置。</p>
+<p>对于主机启动的内核，主机设置的每内核配置优先于全局设置；从设备端启动该内核时也会使用这些配置。设备端无法重新配置内核的执行环境。</p>
+<h3 id="12-3-1-2-执行流-streams">12.3.1.2 执行流（Streams）</h3>
+<p>设备端运行时支持具名执行流和未命名的 NULL 执行流。网格内任意线程都可以使用具名执行流，但执行流句柄不能传给其他父/子内核。换言之，执行流应视为创建它的网格私有资源。</p>
+<p>与主机端启动类似，不同执行流中的工作可能并发执行，但不保证真正并发。依赖子内核之间必定并发执行的程序不受 CUDA 编程模型支持，行为未定义。</p>
+<p>设备端不支持主机端 NULL 执行流的跨流屏障语义。为了与主机运行时保持语义兼容，所有设备端执行流都必须通过 <code>cudaStreamCreateWithFlags()</code> 创建，并传入 <code>cudaStreamNonBlocking</code> 标志。<code>cudaStreamCreate()</code> 仅支持主机端运行时，在设备代码中会编译失败。</p>
+<p>由于设备端运行时不支持 <code>cudaStreamSynchronize()</code> 和 <code>cudaStreamQuery()</code>，若应用程序需要确认执行流中启动的子内核已经完成，应改为将内核启动到 <code>cudaStreamTailLaunch</code> 执行流。</p>
+<h4 id="12-3-1-2-1-隐式-null-执行流-the-implicit-null-stream">12.3.1.2.1 隐式（NULL）执行流（The Implicit NULL Stream）</h4>
+<p>在主机程序中，未命名的 NULL 执行流与其他执行流之间具有额外的屏障同步语义。设备端运行时只提供一个隐式、未命名的执行流，由同一个线程块中的所有线程共享。</p>
+<p>由于所有具名执行流都必须使用 <code>cudaStreamNonBlocking</code> 标志创建，提交到 NULL 执行流的工作不会隐式依赖其他执行流中尚未完成的工作，也不会依赖其他线程块的 NULL 执行流。</p>
+<h4 id="12-3-1-2-2-发起后不等待执行流-fire-and-forget-stream">12.3.1.2.2 发起后不等待执行流（Fire-and-Forget Stream）</h4>
+<p>具名执行流 <code>cudaStreamFireAndForget</code> 允许用户以更少的样板代码、且无需跟踪执行流开销的方式启动发起后不等待的工作。它在功能上等同于每次启动时新建一个执行流并将内核启动到该流中，但速度更快。</p>
+<p>发起后不等待的启动会立即安排执行，不依赖此前已启动网格的完成。除父网格结束时的隐式同步外，其他网格启动都不能依赖该启动的完成。因此，尾部启动或父网格执行流中的下一个网格，都不会在父网格的 fire-and-forget 工作完成前启动。</p>
+<pre><code class="language-cpp">// C2 的启动不会等待 C1 完成。
+__global__ void P(...) {
+    C1&lt;&lt;&lt;..., cudaStreamFireAndForget&gt;&gt;&gt;(...);
+    C2&lt;&lt;&lt;..., cudaStreamFireAndForget&gt;&gt;&gt;(...);
+}
+</code></pre>
+<p>发起后不等待执行流不能用于记录或等待事件。尝试这样做会返回 <code>cudaErrorInvalidValue</code>。使用 <code>CUDA_FORCE_CDP1_IF_SUPPORTED</code> 编译时不支持该执行流；使用该执行流要求以 64 位模式编译。</p>
+<h4 id="12-3-1-2-3-尾部启动执行流-tail-launch-stream">12.3.1.2.3 尾部启动执行流（Tail Launch Stream）</h4>
+<p>具名执行流 <code>cudaStreamTailLaunch</code> 允许网格安排一个新网格在自身完成后启动。在多数情况下，可以使用尾部启动实现与 <code>cudaDeviceSynchronize()</code> 类似的功能。</p>
+<p>每个网格都有自己的尾部启动执行流。父网格在尾部流启动之前，会隐式同步其启动到普通执行流、每线程执行流或 fire-and-forget 执行流中的所有非尾部工作。也就是说，父网格及其启动的所有非尾部后代工作完成前，尾部流中的网格不会启动。如果同一个尾部启动流中有两个网格，后一个网格必须等前一个网格及其所有后代工作完成后才会启动。</p>
+<pre><code class="language-cpp">// C2 只会在 C1 完成后启动。
+__global__ void P(...) {
+    C1&lt;&lt;&lt;..., cudaStreamTailLaunch&gt;&gt;&gt;(...);
+    C2&lt;&lt;&lt;..., cudaStreamTailLaunch&gt;&gt;&gt;(...);
+}
+</code></pre>
+<p>尾部启动流中的网格会等待父网格发起的所有工作完成，包括父网格在尾部启动之后、通过其他非尾部执行流启动的工作及其后代。</p>
+<pre><code class="language-cpp">// 只有在 X、F 和 P 全部完成后，C 才会启动。
+__global__ void P(...) {
+    C&lt;&lt;&lt;..., cudaStreamTailLaunch&gt;&gt;&gt;(...);
+    X&lt;&lt;&lt;..., cudaStreamPerThread&gt;&gt;&gt;(...);
+    F&lt;&lt;&lt;..., cudaStreamFireAndForget&gt;&gt;&gt;(...);
+}
+</code></pre>
+<p>父网格执行流中的下一个网格也不会在父网格尾部启动工作完成前启动。因此，尾部启动流的行为就像被插入父网格与父网格执行流中的下一个网格之间。</p>
+<p>每个网格只有一个尾部启动流。如果希望尾部启动多个并发网格，可以先从尾部流启动一个网格，再由该网格通过 fire-and-forget 启动多个并发子网格。</p>
+<p>尾部启动流不能用于记录或等待事件；尝试这样做会返回 <code>cudaErrorInvalidValue</code>。使用 <code>CUDA_FORCE_CDP1_IF_SUPPORTED</code> 编译时不支持该执行流；使用该执行流要求以 64 位模式编译。</p>
+<h3 id="12-3-1-3-事件-events">12.3.1.3 事件（Events）</h3>
+<p>设备端只支持 CUDA 事件的跨执行流同步能力。因此，支持 <code>cudaStreamWaitEvent()</code>，但不支持 <code>cudaEventSynchronize()</code>、<code>cudaEventElapsedTime()</code> 和 <code>cudaEventQuery()</code>。</p>
+<p>由于不支持 <code>cudaEventElapsedTime()</code>，必须通过 <code>cudaEventCreateWithFlags()</code> 创建事件，并传入 <code>cudaEventDisableTiming</code> 标志。</p>
+<p>与具名执行流一样，事件对象可以由创建它们的网格中的所有线程共享，但仅属于该网格，不能传递给其他内核。不同网格中的事件句柄不保证唯一，因此在未创建该事件的网格中使用句柄会导致未定义行为。</p>
+<h3 id="12-3-1-4-同步-synchronization">12.3.1.4 同步（Synchronization）</h3>
+<p>如果调用线程需要与由其他线程启动的子网格同步，程序必须自行执行足够的线程间同步，例如通过 CUDA 事件实现。</p>
+<p>由于无法从父线程显式同步子工作，因此不能保证子网格所做的修改对父网格中的线程可见。</p>
+<h3 id="12-3-1-5-设备管理-device-management">12.3.1.5 设备管理（Device Management）</h3>
+<p>内核只能控制自身正在运行的设备。因此，<code>cudaSetDevice()</code> 等设备 API 不受设备端运行时支持。</p>
+<p>从 GPU 端通过 <code>cudaGetDevice()</code> 返回的当前设备编号，与主机系统看到的设备编号相同。<code>cudaDeviceGetAttribute()</code> 可以查询其他设备的信息，因为该 API 接受设备 ID 参数。但设备端运行时不提供通用的 <code>cudaGetDeviceProperties()</code> API；必须逐项查询设备属性。</p>
+<h3 id="12-3-1-6-内存声明-memory-declarations">12.3.1.6 内存声明（Memory Declarations）</h3>
+<h4 id="12-3-1-6-1-设备内存与常量内存-device-and-constant-memory">12.3.1.6.1 设备内存与常量内存（Device and Constant Memory）</h4>
+<p>在文件作用域使用 <code>__device__</code> 或 <code>__constant__</code> 声明的内存，在设备端运行时中的行为保持不变。所有内核都可以读取或写入设备变量，无论该内核最初由主机还是设备运行时启动。类似地，所有内核对模块作用域中声明的 <code>__constant__</code> 变量都有相同视图。</p>
+<h4 id="12-3-1-6-2-纹理与表面-textures-and-surfaces">12.3.1.6.2 纹理与表面（Textures and Surfaces）</h4>
+<p>CUDA 支持动态创建纹理和表面对象：纹理对象可以在主机端创建、传给内核、在内核中使用，最后再由主机销毁。</p>
+<p>设备端运行时不允许在设备代码中创建或销毁纹理、表面对象，但主机创建的纹理和表面对象可以在设备端自由使用并传递给子内核。无论对象在哪里创建，动态创建的纹理对象始终有效，可以由父内核传给子内核。</p>
+<p>注意：设备端运行时不支持在设备启动的内核中使用旧式模块作用域（Fermi 风格）的纹理和表面。主机仍可创建旧式模块作用域纹理，并像普通内核一样在设备代码中使用，但只能由顶层内核（即由主机启动的内核）使用。</p>
+<h4 id="12-3-1-6-3-共享内存变量声明-shared-memory-variable-declarations">12.3.1.6.3 共享内存变量声明（Shared Memory Variable Declarations）</h4>
+<p>CUDA C++ 中，共享内存既可以声明为静态大小的文件作用域或函数作用域变量，也可以声明为 <code>extern</code> 变量，其大小由调用内核时的启动配置在运行时指定。两种声明方式都受设备端运行时支持。</p>
+<pre><code class="language-cpp">__global__ void permute(int n, int *data) {
+    extern __shared__ int smem[];
+    if (n &lt;= 1)
+        return;
+
+    smem[threadIdx.x] = data[threadIdx.x];
+    __syncthreads();
+    permute_data(smem, n);
+    __syncthreads();
+
+    // 由于不能将共享内存指针传给子内核，因此先写回全局内存。
+    data[threadIdx.x] = smem[threadIdx.x];
+    __syncthreads();
+
+    if (threadIdx.x == 0) {
+        permute&lt;&lt;&lt;1, 256, n/2*sizeof(int)&gt;&gt;&gt;(n/2, data);
+        permute&lt;&lt;&lt;1, 256, n/2*sizeof(int)&gt;&gt;&gt;(n/2, data+n/2);
+    }
+}
+
+void host_launch(int *data) {
+    permute&lt;&lt;&lt;1, 256, 256*sizeof(int)&gt;&gt;&gt;(256, data);
+}
+</code></pre>
+<h4 id="12-3-1-6-4-符号地址-symbol-addresses">12.3.1.6.4 符号地址（Symbol Addresses）</h4>
+<p>设备端符号（即标记为 <code>__device__</code> 的符号）可以在内核中直接通过 <code>&amp;</code> 运算符引用，因为所有全局作用域设备变量都位于内核可见的地址空间中。<code>__constant__</code> 符号也一样，但其指针指向只读数据。</p>
+<p>由于设备端符号可以直接引用，引用符号的 Runtime API（例如 <code>cudaMemcpyToSymbol()</code> 或 <code>cudaGetSymbolAddress()</code>）在设备端运行时中是多余的，因此不受支持。这也意味着，内核运行期间不能修改常量数据，即使是在启动子内核之前也不行，因为 <code>__constant__</code> 空间是只读的。</p>
+<h3 id="12-3-1-7-api-错误与启动失败-api-errors-and-launch-failures">12.3.1.7 API 错误与启动失败（API Errors and Launch Failures）</h3>
+<p>与常规 CUDA Runtime 一样，任何函数都可能返回错误代码。最近一次返回的错误代码会被记录，并可通过 <code>cudaGetLastError()</code> 获取。错误按线程记录，因此每个线程都可以识别自己最近产生的错误。错误代码类型为 <code>cudaError_t</code>。</p>
+<p>与主机端启动类似，设备端启动也可能因参数无效等原因失败。用户必须调用 <code>cudaGetLastError()</code> 判断启动是否产生错误；但启动后没有错误，并不意味着子内核已成功完成。</p>
+<p>设备端异常（例如访问无效地址）会使子网格中的错误返回给主机。</p>
+<h4 id="12-3-1-7-1-启动设置-api-launch-setup-apis">12.3.1.7.1 启动设置 API（Launch Setup APIs）</h4>
+<p>内核启动是通过设备端运行时库提供的系统级机制，因此也可以直接通过 PTX 使用底层 <code>cudaGetParameterBuffer()</code> 和 <code>cudaLaunchDevice()</code> API。CUDA 应用程序可以自行调用这些 API，但必须满足与 PTX 使用方式相同的要求，并负责按规范正确填充所有必要的数据结构。这些数据结构保证向后兼容。</p>
+<p>与主机端启动类似，设备端 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 运算符会映射到底层内核启动 API。这样，面向 PTX 的用户可以执行启动操作，编译器前端也可以将 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 转换为这些调用。</p>
+<p>新设备端启动实现函数如下：</p>
+<table>
+<thead>
+<tr>
+<th>Runtime API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cudaGetParameterBuffer</code></td>
+<td>由 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 自动生成；与主机端对应 API 不同</td>
+</tr>
+<tr>
+<td><code>cudaLaunchDevice</code></td>
+<td>由 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 自动生成；与主机端对应 API 不同</td>
+</tr>
+</tbody>
+</table>
+<p>函数声明如下：</p>
+<pre><code class="language-cpp">extern __device__ cudaError_t cudaGetParameterBuffer(void **params);
+
+extern __device__ cudaError_t cudaLaunchDevice(
+    void *kernel, void *params, dim3 gridDim, dim3 blockDim,
+    unsigned int sharedMemSize = 0, cudaStream_t stream = 0);
+</code></pre>
+<p>&lt;!-- Added section: 12.3.2 through 12.4.3.1.6 --&gt;</p>
+<h1 id="第十二章续译-ptx-启动接口-工具包支持与编程指南">第十二章续译：PTX 启动接口、工具包支持与编程指南</h1>
+<blockquote>
+<p>对应原 PDF 第 340–348 页（原书印刷页码 324–332）。</p>
+</blockquote>
+<h2 id="12-3-1-8-api-参考-api-reference">12.3.1.8 API 参考（API Reference）</h2>
+<p>设备端运行时 API 与主机端 Runtime API 语法相似，但只有本章明确说明的例外情况存在语义差异。原书表 12 总结了设备端支持的 API。</p>
+<p><strong>表 12：设备端支持的 API 函数</strong></p>
+<table>
+<thead>
+<tr>
+<th>Runtime API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cudaDeviceGetCacheConfig</code>、<code>cudaDeviceGetLimit</code></td>
+<td>支持</td>
+</tr>
+<tr>
+<td><code>cudaGetLastError</code>、<code>cudaPeekAtLastError</code></td>
+<td>最近错误按线程保存，而非按线程块保存</td>
+</tr>
+<tr>
+<td><code>cudaGetErrorString</code>、<code>cudaGetDeviceCount</code></td>
+<td>支持</td>
+</tr>
+<tr>
+<td><code>cudaDeviceGetAttribute</code></td>
+<td>可查询任意设备的属性</td>
+</tr>
+<tr>
+<td><code>cudaGetDevice</code></td>
+<td>返回与主机端所见一致的当前设备 ID</td>
+</tr>
+<tr>
+<td><code>cudaStreamCreateWithFlags</code></td>
+<td>必须传入 <code>cudaStreamNonBlocking</code> 标志</td>
+</tr>
+<tr>
+<td><code>cudaStreamDestroy</code>、<code>cudaStreamWaitEvent</code></td>
+<td>支持</td>
+</tr>
+<tr>
+<td><code>cudaEventCreateWithFlags</code></td>
+<td>必须传入 <code>cudaEventDisableTiming</code> 标志</td>
+</tr>
+<tr>
+<td><code>cudaEventRecord</code>、<code>cudaEventDestroy</code>、<code>cudaFuncGetAttributes</code></td>
+<td>支持</td>
+</tr>
+<tr>
+<td><code>cudaMemcpyAsync</code>、<code>cudaMemcpy2DAsync</code>、<code>cudaMemcpy3DAsync</code></td>
+<td>仅支持异步复制；只允许设备到设备复制；不能传入本地或共享内存指针</td>
+</tr>
+<tr>
+<td><code>cudaMemsetAsync</code>、<code>cudaMemset2DAsync</code>、<code>cudaMemset3DAsync</code></td>
+<td>受上述异步操作限制</td>
+</tr>
+<tr>
+<td><code>cudaRuntimeGetVersion</code></td>
+<td>支持</td>
+</tr>
+<tr>
+<td><code>cudaMalloc</code>、<code>cudaFree</code></td>
+<td>设备端分配的指针不能由主机端 <code>cudaFree</code> 释放，反之亦然</td>
+</tr>
+<tr>
+<td><code>cudaOccupancyMaxActiveBlocksPerMultiprocessor</code>、<code>cudaOccupancyMaxPotentialBlockSize</code>、<code>cudaOccupancyMaxPotentialBlockSizeVariableSMem</code></td>
+<td>支持</td>
+</tr>
+</tbody>
+</table>
+<h2 id="12-3-2-从-ptx-进行设备端启动-device-side-launch-from-ptx">12.3.2 从 PTX 进行设备端启动（Device-side Launch from PTX）</h2>
+<p>本节面向以 Parallel Thread Execution（PTX）为目标语言、并计划支持动态并行的编程语言和编译器实现者，介绍在 PTX 层面支持内核启动所需的底层细节。</p>
+<h3 id="12-3-2-1-内核启动-api-kernel-launch-apis">12.3.2.1 内核启动 API（Kernel Launch APIs）</h3>
+<p>设备端内核启动可使用两个可从 PTX 访问的 API 实现：<code>cudaLaunchDevice()</code> 和 <code>cudaGetParameterBuffer()</code>。<code>cudaLaunchDevice()</code> 使用参数缓冲区启动指定内核。该缓冲区由 <code>cudaGetParameterBuffer()</code> 获取，并由调用者填入内核参数。如果目标内核不接受参数，则缓冲区可以是 <code>NULL</code>，此时不必调用 <code>cudaGetParameterBuffer()</code>。</p>
+<h4 id="12-3-2-1-1-cudalaunchdevice">12.3.2.1.1 <code>cudaLaunchDevice</code></h4>
+<p>在 PTX 层使用 <code>cudaLaunchDevice()</code> 前，必须根据地址大小进行声明。对于 64 位地址：</p>
+<pre><code class="language-ptx">.extern .func(.param .b32 func_retval0) cudaLaunchDevice
+(
+    .param .b64 func,
+    .param .b64 parameterBuffer,
+    .param .align 4 .b8 gridDimension[12],
+    .param .align 4 .b8 blockDimension[12],
+    .param .b32 sharedMemSize,
+    .param .b64 stream
+);
+</code></pre>
+<p>对应的 CUDA 层声明位于系统头文件 <code>cuda_device_runtime_api.h</code> 中。该函数定义在系统库 <code>cudadevrt</code> 中，使用设备端内核启动功能的程序必须链接该库。</p>
+<pre><code class="language-cpp">extern "C" __device__
+cudaError_t cudaLaunchDevice(
+    void *func, void *parameterBuffer,
+    dim3 gridDimension, dim3 blockDimension,
+    unsigned int sharedMemSize,
+    cudaStream_t stream);
+</code></pre>
+<p>第一个参数是待启动内核的指针，第二个参数是保存内核实参的参数缓冲区。其他参数指定网格维度、线程块维度、共享内存大小以及关联执行流。参数缓冲区的布局见“参数缓冲区布局”。</p>
+<h4 id="12-3-2-1-2-cudagetparameterbuffer">12.3.2.1.2 <code>cudaGetParameterBuffer</code></h4>
+<p>在 PTX 层使用 <code>cudaGetParameterBuffer()</code> 前，必须根据地址大小进行声明。对于 64 位地址：</p>
+<pre><code class="language-ptx">.extern .func(.param .b64 func_retval0) cudaGetParameterBuffer
+(
+    .param .b64 alignment,
+    .param .b64 size
+);
+</code></pre>
+<p>对应的 CUDA 层声明为：</p>
+<pre><code class="language-cpp">extern "C" __device__
+void *cudaGetParameterBuffer(size_t alignment, size_t size);
+</code></pre>
+<p>第一个参数指定参数缓冲区的对齐要求，第二个参数指定所需字节数。当前实现返回的参数缓冲区始终按 64 字节对齐，并忽略 <code>alignment</code> 参数。不过，为保证未来的可移植性，建议传入正确的对齐值，即缓冲区中所有参数所需的最大对齐要求。</p>
+<h3 id="12-3-2-2-参数缓冲区布局-parameter-buffer-layout">12.3.2.2 参数缓冲区布局（Parameter Buffer Layout）</h3>
+<p>参数缓冲区中的参数不允许重新排序，并且每个参数都必须满足对齐要求。每个参数必须放在参数缓冲区中这样一个字节偏移处：该偏移是大于前一个参数最后一个字节偏移的最小参数大小整数倍。</p>
+<p>参数缓冲区的最大大小为 4 KB。关于 CUDA 编译器生成的 PTX 代码的更多细节，请参阅 PTX 3.5 规范。</p>
+<h2 id="12-3-3-动态并行的工具包支持-toolkit-support-for-dynamic-parallelism">12.3.3 动态并行的工具包支持（Toolkit Support for Dynamic Parallelism）</h2>
+<h3 id="12-3-3-1-在-cuda-代码中包含设备端运行时-api-including-device-runtime-api-in-cuda-code">12.3.3.1 在 CUDA 代码中包含设备端运行时 API（Including Device Runtime API in CUDA Code）</h3>
+<p>与主机端 Runtime API 类似，CUDA 设备端运行时 API 的原型会在程序编译时自动包含，无需显式包含 <code>cuda_device_runtime_api.h</code>。</p>
+<h3 id="12-3-3-2-编译与链接-compiling-and-linking">12.3.3.2 编译与链接（Compiling and Linking）</h3>
+<p>使用 <code>nvcc</code> 编译和链接支持动态并行的 CUDA 程序时，程序会自动链接静态设备端运行时库 <code>libcudadevrt</code>。</p>
+<p>设备端运行时以静态库形式提供：Windows 为 <code>cudadevrt.lib</code>，Linux 为 <code>libcudadevrt.a</code>。使用设备端运行时的 GPU 应用必须链接该库。设备库可通过 <code>nvcc</code> 和/或 <code>nvlink</code> 链接。</p>
+<p>如果所有源文件都能在命令行中指定，可以一次完成编译和链接：</p>
+<pre><code class="language-bash">nvcc -arch=sm_75 -rdc=true hello_world.cu -o hello -lcudadevrt
+</code></pre>
+<p>也可以先将 <code>.cu</code> 源文件编译为目标文件，再分两步链接：</p>
+<pre><code class="language-bash">nvcc -arch=sm_75 -dc hello_world.cu -o hello_world.o
+nvcc -arch=sm_75 -rdc=true hello_world.o -o hello -lcudadevrt
+</code></pre>
+<h2 id="12-4-编程指南-programming-guidelines">12.4 编程指南（Programming Guidelines）</h2>
+<h3 id="12-4-1-基础-basics">12.4.1 基础（Basics）</h3>
+<p>设备端运行时是主机端运行时的一个功能子集，提供设备管理、内核启动、设备内存复制、执行流管理和事件管理等 API。熟悉 CUDA 的程序员应能较容易地使用设备端运行时。其语法和语义与主机端 API 大体相同，例外情况已在前文说明。</p>
+<p>下面是一个简单的动态并行 Hello World 程序：</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+__global__ void childKernel() { printf("Hello "); }
+__global__ void tailKernel() { printf("World!\\n"); }
+
+__global__ void parentKernel() {
+    childKernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;();
+    if (cudaSuccess != cudaGetLastError())
+        return;
+
+    // 尾部启动隐式同步，等待 childKernel 完成。
+    tailKernel&lt;&lt;&lt;1, 1, 0, cudaStreamTailLaunch&gt;&gt;&gt;();
+}
+
+int main(int argc, char *argv[]) {
+    parentKernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;();
+    if (cudaSuccess != cudaGetLastError())
+        return 1;
+    if (cudaSuccess != cudaDeviceSynchronize())
+        return 2;
+    return 0;
+}
+</code></pre>
+<p>该程序可通过以下命令一次编译：</p>
+<pre><code class="language-bash">nvcc -arch=sm_75 -rdc=true hello_world.cu -o hello -lcudadevrt
+</code></pre>
+<h3 id="12-4-2-性能-performance">12.4.2 性能（Performance）</h3>
+<h4 id="12-4-2-1-启用动态并行的内核开销-dynamic-parallelism-enabled-kernel-overhead">12.4.2.1 启用动态并行的内核开销（Dynamic-parallelism-enabled Kernel Overhead）</h4>
+<p>控制动态启动的系统软件会对正在运行的内核引入额外开销，无论该内核是否自行启动其他内核。这些开销来自设备端运行时用于执行跟踪和管理的软件，可能降低性能。通常，只要应用程序链接了设备端运行时库，就可能产生此开销。</p>
+<h3 id="12-4-3-实现限制与约束-implementation-restrictions-and-limitations">12.4.3 实现限制与约束（Implementation Restrictions and Limitations）</h3>
+<p>动态并行保证本章描述的语义，但某些硬件和软件资源依赖具体实现，会限制使用设备端运行时的程序规模、性能和其他属性。</p>
+<h4 id="12-4-3-1-运行时-runtime">12.4.3.1 运行时（Runtime）</h4>
+<h5 id="12-4-3-1-1-内存占用-memory-footprint">12.4.3.1.1 内存占用（Memory Footprint）</h5>
+<p>设备端运行时系统软件会预留内存用于管理，其中包括跟踪待处理网格启动的内存。可以通过配置选项减小这部分预留，但会相应限制启动行为。</p>
+<h5 id="12-4-3-1-2-待处理内核启动-pending-kernel-launches">12.4.3.1.2 待处理内核启动（Pending Kernel Launches）</h5>
+<p>内核启动后，相关配置和参数数据会一直跟踪到内核完成，并存储在系统管理的启动池中。固定大小启动池可通过主机端调用 <code>cudaDeviceSetLimit()</code>，并指定 <code>cudaLimitDevRuntimePendingLaunchCount</code> 来配置。</p>
+<h5 id="12-4-3-1-3-配置选项-configuration-options">12.4.3.1.3 配置选项（Configuration Options）</h5>
+<p>设备端运行时系统软件的资源分配由主机端的 <code>cudaDeviceSetLimit()</code> 控制。必须在启动任何内核之前设置这些限制，并且 GPU 正在运行程序时不能修改。</p>
+<table>
+<thead>
+<tr>
+<th>限制</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cudaLimitDevRuntimePendingLaunchCount</code></td>
+<td>控制为尚未开始执行的内核启动和事件保留的缓冲内存。若缓冲区已满，设备端内核启动会返回 <code>cudaErrorLaunchOutOfResources</code>；事件槽分配失败则返回 <code>cudaErrorMemoryAllocation</code>。默认启动槽数量为 2048，事件槽数量是该限制值的两倍。</td>
+</tr>
+<tr>
+<td><code>cudaLimitStackSize</code></td>
+<td>控制每个 GPU 线程的栈大小（字节）。驱动程序会根据需要自动增大每线程栈大小，且不会在每次启动后自动恢复。可以通过 <code>cudaDeviceSetLimit()</code> 设置，并通过 <code>cudaDeviceGetLimit()</code> 查询。调整栈大小时，若有必要，设备会等待此前请求的任务完成。</td>
+</tr>
+</tbody>
+</table>
+<h5 id="12-4-3-1-4-内存分配与生命周期-memory-allocation-and-lifetime">12.4.3.1.4 内存分配与生命周期（Memory Allocation and Lifetime）</h5>
+<p>主机和设备环境中的 <code>cudaMalloc()</code> 与 <code>cudaFree()</code> 具有不同语义。在主机端调用 <code>cudaMalloc()</code> 会从未使用的设备内存中分配新区域；在设备端运行时中，这些函数映射到设备端 <code>malloc()</code> 和 <code>free()</code>。</p>
+<p>因此，设备端可分配的总内存受设备 <code>malloc()</code> 堆大小限制，该大小可能小于设备上当前未使用的内存。主机程序不能释放设备端 <code>cudaMalloc()</code> 分配的指针，反之亦然。</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>主机端分配的指针</th>
+<th>设备端分配的指针</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主机端 <code>cudaFree()</code></td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>设备端 <code>cudaFree()</code></td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>分配上限</td>
+<td>可用设备内存</td>
+<td><code>cudaLimitMallocHeapSize</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="12-4-3-1-5-sm-id-与-warp-id-sm-id-and-warp-id">12.4.3.1.5 SM ID 与 Warp ID（SM Id and Warp Id）</h5>
+<p>PTX 中的 <code>%smid</code> 和 <code>%warpid</code> 定义为易变值。设备端运行时可能为了更有效地管理资源，将线程块重新调度到不同的 SM。因此，依赖 <code>%smid</code> 或 <code>%warpid</code> 在线程或线程块生命周期内保持不变是不安全的。</p>
+<h5 id="12-4-3-1-6-ecc-错误-ecc-errors">12.4.3.1.6 ECC 错误（ECC Errors）</h5>
+<p>CUDA 内核代码无法接收 ECC 错误通知。ECC 错误会在整个启动树完成后由主机端报告。嵌套程序执行期间发生的 ECC 错误，可能触发异常，也可能继续执行，具体取决于错误类型和配置。</p>
+<p>&lt;!-- Added section: 12.5 CDP2 and CDP1 --&gt;</p>
+<h1 id="第十二章续译-cdp1-与-cdp2-的差异及兼容性">第十二章续译：CDP1 与 CDP2 的差异及兼容性</h1>
+<blockquote>
+<p>对应原 PDF 第 348–350 页（原书印刷页码 332–334）。</p>
+</blockquote>
+<h2 id="12-5-cdp2-与-cdp1-cdp2-vs-cdp1">12.5 CDP2 与 CDP1（CDP2 vs CDP1）</h2>
+<p>本节总结新版（CDP2）和旧版（CDP1）CUDA 动态并行接口之间的差异、兼容性和互操作性，并说明如何在计算能力低于 9.0 的设备上选择不使用 CDP2。</p>
+<h3 id="12-5-1-cdp1-与-cdp2-的差异-differences-between-cdp1-and-cdp2">12.5.1 CDP1 与 CDP2 的差异（Differences Between CDP1 and CDP2）</h3>
+<ul>
+<li>CDP2 不再支持显式设备端同步；计算能力为 9.0 及以上的设备同样如此。必须改用尾部启动等隐式同步方式。</li>
+<li>在 CDP2 或计算能力为 9.0 及以上的设备上，查询或设置 <code>cudaLimitDevRuntimeSyncDepth</code>（或 <code>CU_LIMIT_DEV_RUNTIME_SYNC_DEPTH</code>）会返回 <code>cudaErrorUnsupportedLimit</code>。</li>
+<li>CDP2 不再为超出固定启动池容量的待处理启动提供虚拟化池。必须将 <code>cudaLimitDevRuntimePendingLaunchCount</code> 设置得足够大，以避免启动槽耗尽。</li>
+<li>CDP2 对同时存在的事件总数有限制。事件只会在对应启动完成后销毁，上限等于待处理启动数量的两倍。必须正确设置 <code>cudaLimitDevRuntimePendingLaunchCount</code>，避免事件槽耗尽。</li>
+<li>在 CDP2 或计算能力为 9.0 及以上的设备上，执行流按网格而不是按线程块跟踪。因此，一个线程块创建的执行流可以由另一个线程块使用。CDP1 中这样做会返回 <code>cudaErrorInvalidValue</code>。</li>
+<li>CDP2 引入 <code>cudaStreamTailLaunch</code> 和 <code>cudaStreamFireAndForget</code> 具名执行流。</li>
+<li>CDP2 仅支持 64 位编译模式。</li>
+</ul>
+<h3 id="12-5-2-兼容性与互操作性-compatibility-and-interoperability">12.5.2 兼容性与互操作性（Compatibility and Interoperability）</h3>
+<p>CDP2 是默认接口。在计算能力低于 9.0 的设备上，可以使用 <code>-DCUDA_FORCE_CDP1_IF_SUPPORTED</code> 编译，以选择退出 CDP2。</p>
+<table>
+<thead>
+<tr>
+<th>编译方式</th>
+<th>计算能力低于 9.0</th>
+<th>计算能力 9.0 及以上</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CUDA 12.0 及更高版本，默认方式</td>
+<td>使用新版接口 CDP2</td>
+<td>使用新版接口 CDP2</td>
+</tr>
+<tr>
+<td>CUDA 12.0 及更高版本，定义 <code>CUDA_FORCE_CDP1_IF_SUPPORTED</code>，或 CUDA 12.0 之前编译</td>
+<td>使用旧版接口 CDP1</td>
+<td>使用新版接口 CDP2</td>
+</tr>
+</tbody>
+</table>
+<p>编译限制如下：</p>
+<ul>
+<li>使用新版接口时，如果设备代码引用 <code>cudaDeviceSynchronize</code>，会编译失败。</li>
+<li>使用旧版接口时，如果代码引用 <code>cudaStreamTailLaunch</code> 或 <code>cudaStreamFireAndForget</code>，会编译失败。</li>
+<li>如果代码引用 <code>cudaDeviceSynchronize</code>，并且针对 <code>sm_90</code> 或更新架构编译，也会编译失败。</li>
+</ul>
+<p>使用 CDP1 和 CDP2 的函数可以在同一个上下文中同时加载和运行。CDP1 函数可以使用 CDP1 专属功能（例如 <code>cudaDeviceSynchronize</code>），CDP2 函数可以使用 CDP2 专属功能（例如尾部启动和 fire-and-forget 启动）。</p>
+<p>但 CDP1 函数不能启动 CDP2 函数，反之亦然。如果使用 CDP1 的函数调用图中包含使用 CDP2 的函数，或反过来，加载函数时会产生 <code>cudaErrorCdpVersionMismatch</code>。</p>
+<h2 id="12-6-旧版-cuda-动态并行-cdp1-legacy-cuda-dynamic-parallelism">12.6 旧版 CUDA 动态并行（CDP1）（Legacy CUDA Dynamic Parallelism）</h2>
+<p>上文介绍了 CDP2 版本。接下来的小节介绍旧版 CDP1 接口的执行环境、内存模型和编程接口。</p>
+<h2 id="12-6-1-执行环境与内存模型-execution-environment-and-memory-model-cdp1">12.6.1 执行环境与内存模型（Execution Environment and Memory Model，CDP1）</h2>
+<p>CDP1 与 CDP2 的执行环境概念大体相同，但存在重要差异：在 CDP1 中，CUDA Runtime 对象的可见范围以线程块为边界；执行流和事件通常不能跨线程块共享。CDP1 还支持旧版显式父子同步行为，但该功能从 CUDA 11.6 起弃用，并在针对 <code>compute_90+</code> 编译时移除，计划在未来版本中完全移除。</p>
+<h3 id="12-6-1-1-执行环境-execution-environment-cdp1">12.6.1.1 执行环境（Execution Environment，CDP1）</h3>
+<p>CUDA 执行模型基于线程、线程块和网格。内核函数定义在网格和线程块中由线程执行的程序；调用内核时，网格属性由 CUDA 特有的执行配置语法描述。动态并行将配置、启动新网格以及同步新网格的能力扩展到正在设备上运行的线程。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<h4 id="12-6-1-1-1-父网格与子网格-parent-and-child-grids-cdp1">12.6.1.1.1 父网格与子网格（Parent and Child Grids，CDP1）</h4>
+<p>配置并启动新网格的设备线程属于父网格，而由该调用创建的网格是子网格。子网格的调用与完成严格嵌套：父网格不会在其线程启动的所有子网格完成之前结束。即使启动线程没有显式等待子网格，运行时也会保证父网格和子网格之间的隐式同步。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<h4 id="12-6-1-1-2-cuda-原语的作用域-scope-of-cuda-primitives-cdp1">12.6.1.1.2 CUDA 原语的作用域（Scope of CUDA Primitives，CDP1）</h4>
+<p>在主机端和设备端，CUDA Runtime 都提供内核启动、等待已启动工作完成，以及通过执行流和事件跟踪启动依赖关系的 API。</p>
+<p>在主机系统中，进程内所有线程共享启动状态和引用执行流、事件的 CUDA 原语；不同进程彼此独立，不能共享 CUDA 对象。</p>
+<p>设备端也存在相似层次结构：已启动的内核和 CUDA 对象对同一线程块中的所有线程可见，但不同线程块之间相互独立。因此，一个线程创建的执行流可以被同一线程块内的其他线程使用，却不能与其他线程块中的线程共享。</p>
+<p>&lt;!-- Added section: 12.6.1 CDP1 execution environment and memory model --&gt;</p>
+<h1 id="第十二章续译-cdp1-执行环境与内存模型">第十二章续译：CDP1 执行环境与内存模型</h1>
+<blockquote>
+<p>对应原 PDF 第 350–355 页（原书印刷页码 334–339）。原书在多处指向前文 CDP2 章节；此处保留这些交叉引用，并翻译 CDP1 特有差异。</p>
+</blockquote>
+<h2 id="12-6-1-1-3-同步-synchronization-cdp1">12.6.1.1.3 同步（Synchronization，CDP1）</h2>
+<p>CDP1 中，CUDA Runtime 操作（包括内核启动）对同一线程块中的所有线程可见。因此，父网格中的某个线程可以对自己启动的网格、同一线程块中其他线程启动的网格，以及同一线程块中创建的执行流进行同步。</p>
+<p>只有当线程块中所有线程启动的所有子网格都完成后，该线程块才算执行完成。如果线程块中的所有线程在子网格启动完成前退出，运行时会自动触发同步操作。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<h2 id="12-6-1-1-4-执行流与事件-streams-and-events-cdp1">12.6.1.1.4 执行流与事件（Streams and Events，CDP1）</h2>
+<p>CDP1 的执行流和事件用于控制网格启动之间的依赖关系：同一执行流中的网格按顺序执行，事件可以在不同执行流之间建立依赖。设备端创建的执行流和事件也具有相同用途。</p>
+<p>在网格中创建的执行流和事件属于<strong>线程块作用域</strong>，在创建它们的线程块之外使用会导致未定义行为。线程块退出时，会隐式同步该线程块启动的所有工作，包括执行流中的工作，并解决相应依赖关系。在线程块作用域之外修改过的执行流，其操作行为未定义。</p>
+<p>主机端创建的执行流和事件在任何内核中使用都属于未定义行为；父网格创建的执行流和事件也不能在子网格中使用。</p>
+<h2 id="12-6-1-1-5-顺序与并发-ordering-and-concurrency-cdp1">12.6.1.1.5 顺序与并发（Ordering and Concurrency，CDP1）</h2>
+<p>CDP1 中设备端内核启动的顺序遵循 CUDA 执行流排序语义。同一线程块中，向同一执行流发起的所有内核启动都按顺序执行。如果同一线程块中的多个线程向同一执行流启动内核，流内顺序取决于线程调度，必要时可以使用 <code>__syncthreads()</code> 等同步原语控制。</p>
+<p>由于执行流由线程块内所有线程共享，隐式 NULL 执行流也由该线程块共享。如果多个线程块中的线程向隐式流启动内核，这些启动会按顺序执行。若希望并发，应使用显式具名执行流。</p>
+<p>动态并行让程序更容易表达并发，但不会增加 CUDA 执行模型中的并发保证。设备上的不同线程块之间不保证并发执行；父线程块与子网格之间也一样。父线程块启动子网格后，子网格不保证会在父线程块到达显式同步点（例如 <code>cudaDeviceSynchronize()</code>）之前开始执行。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<p>并发通常可能发生，但会随设备配置、应用负载和运行时调度而变化，因此依赖不同线程块之间必定并发执行是不安全的。</p>
+<h2 id="12-6-1-1-6-设备管理-device-management-cdp1">12.6.1.1.6 设备管理（Device Management，CDP1）</h2>
+<p>设备端运行时不支持多 GPU 管理，只能操作当前正在执行的设备。不过，可以查询系统中任意支持 CUDA 的设备的属性。</p>
+<h2 id="12-6-1-2-内存模型-memory-model-cdp1">12.6.1.2 内存模型（Memory Model，CDP1）</h2>
+<p>本节的总体内存模型与前文 CDP2 版本相同。父网格和子网格共享全局内存与常量内存存储，但具有独立的本地内存和共享内存。</p>
+<h3 id="12-6-1-2-1-一致性与连贯性-coherence-and-consistency-cdp1">12.6.1.2.1 一致性与连贯性（Coherence and Consistency，CDP1）</h3>
+<h4 id="12-6-1-2-1-1-全局内存-global-memory-cdp1">12.6.1.2.1.1 全局内存（Global Memory，CDP1）</h4>
+<p>父网格和子网格可以连贯地访问全局内存，但父级与子级之间的一致性保证较弱。子网格有两个时刻，其内存视图保证与父线程完全一致：子网格被父线程启动时，以及子网格完成后父线程通过同步 API 进行同步时。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<p>父线程在启动子网格之前执行的所有全局内存操作，对子网格都可见。子网格的所有内存操作，在父线程同步等待子网格完成后对父线程可见。</p>
+<pre><code class="language-cpp">__global__ void child_launch(int *data) {
+    data[threadIdx.x] = data[threadIdx.x] + 1;
+}
+
+__global__ void parent_launch(int *data) {
+    data[threadIdx.x] = threadIdx.x;
+    __syncthreads();
+
+    if (threadIdx.x == 0) {
+        child_launch&lt;&lt;&lt;1, 256&gt;&gt;&gt;(data);
+        cudaDeviceSynchronize();
+    }
+
+    __syncthreads();
+}
+
+void host_launch(int *data) {
+    parent_launch&lt;&lt;&lt;1, 256&gt;&gt;&gt;(data);
+}
+</code></pre>
+<p>示例中，子网格只保证看到启动前对 <code>data</code> 的修改。由于线程 0 启动子网格，子网格与父线程 0 的内存视图一致。第一个 <code>__syncthreads()</code> 确保子网格能看到 <code>data[0]=0</code>、<code>data[1]=1</code> 等值；如果没有它，只能保证 <code>data[0]</code> 可见。子网格返回后，线程 0 保证能看到子网格线程的修改；这些修改在第二个 <code>__syncthreads()</code> 后才对父网格其他线程可见。</p>
+<h4 id="12-6-1-2-1-2-零拷贝内存-zero-copy-memory-cdp1">12.6.1.2.1.2 零拷贝内存（Zero Copy Memory，CDP1）</h4>
+<p>零拷贝系统内存具有与全局内存相同的一致性和连贯性保证。内核不能分配或释放零拷贝内存，但可以使用主机程序传入的零拷贝内存指针。</p>
+<h4 id="12-6-1-2-1-3-常量内存-constant-memory-cdp1">12.6.1.2.1.3 常量内存（Constant Memory，CDP1）</h4>
+<p>常量内存不可变，设备端不能修改，即使是在父子网格启动之间也不行。所有 <code>__constant__</code> 变量的值必须在内核启动前由主机设置。子内核会自动继承父级的常量内存视图。</p>
+<p>在内核线程中获取常量内存对象地址的语义与其他 CUDA 程序相同；将该指针从父级传给子级或从子级传给父级也是支持的。</p>
+<h4 id="12-6-1-2-1-4-共享内存与本地内存-shared-and-local-memory-cdp1">12.6.1.2.1.4 共享内存与本地内存（Shared and Local Memory，CDP1）</h4>
+<p>共享内存和本地内存分别属于线程块和线程私有，父网格与子网格之间不可见，也不保持连贯。如果在所属作用域之外引用这些对象，行为未定义，并可能导致错误。</p>
+<p>NVIDIA 编译器会尝试在检测到共享内存或本地内存指针作为内核启动参数时发出警告。运行时可以使用 <code>__isGlobal()</code> 判断指针是否指向全局内存，从而确定它能否安全地传给子内核。</p>
+<p><code>cudaMemcpy*Async()</code> 或 <code>cudaMemset*Async()</code> 可能在设备端调用新的子内核，以保持执行流语义。因此，将共享内存或本地内存指针传给这些 API 是非法的，会返回错误。</p>
+<h4 id="12-6-1-2-1-5-本地内存-local-memory-cdp1">12.6.1.2.1.5 本地内存（Local Memory，CDP1）</h4>
+<p>本地内存是正在执行的线程私有存储，在线程外不可见。启动子内核时，不能将本地内存指针作为参数；子内核解引用该指针的结果未定义。</p>
+<pre><code class="language-cpp">int x_array[10]; // 在父线程的本地内存中创建
+child_launch&lt;&lt;&lt;1, 1&gt;&gt;&gt;(x_array); // 非法
+</code></pre>
+<p>传给子内核的数据应显式分配在全局内存堆中，例如使用 <code>cudaMalloc()</code>、<code>new()</code>，或在全局作用域声明 <code>__device__</code> 存储。</p>
+<h4 id="12-6-1-2-1-6-纹理内存-texture-memory-cdp1">12.6.1.2.1.6 纹理内存（Texture Memory，CDP1）</h4>
+<p>映射到纹理的全局内存区域，其写入与纹理读取之间不保持连贯性。纹理内存的连贯性会在子网格启动时以及子网格完成时建立。因此，子内核启动前对内存的写入会反映在子网格的纹理读取中；子网格的写入也会反映到父网格的纹理读取中，但前提是父级已经同步等待子网格完成。父级与子级并发访问时，可能读取到不一致的数据。</p>
+<p><strong>警告：</strong> 在父线程块中使用设备端 <code>cudaDeviceSynchronize()</code> 显式同步子内核已从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<p>&lt;!-- Added section: 12.6.2 CDP1 programming interface --&gt;</p>
+<h1 id="第十二章续译-cdp1-编程接口">第十二章续译：CDP1 编程接口</h1>
+<blockquote>
+<p>对应原 PDF 第 356–366 页（原书印刷页码 340–350）。原书在多处指向前文 CDP2 对应章节；此处保留交叉引用并说明 CDP1 特有差异。</p>
+</blockquote>
+<h2 id="12-6-2-编程接口-programming-interface-cdp1">12.6.2 编程接口（Programming Interface，CDP1）</h2>
+<h3 id="12-6-2-1-cuda-c-参考-cuda-c-reference-cdp1">12.6.2.1 CUDA C++ 参考（CUDA C++ Reference，CDP1）</h3>
+<h4 id="12-6-2-1-1-设备端内核启动-device-side-kernel-launch-cdp1">12.6.2.1.1 设备端内核启动（Device-Side Kernel Launch，CDP1）</h4>
+<p>设备端内核启动语法与前文 CDP2 版本相同，参见“设备端内核启动”。启动相对于发起线程异步返回；主机设置的全局设备配置和每内核配置会由设备端启动继承，设备端不能重新配置内核执行环境。</p>
+<h4 id="12-6-2-1-2-执行流-streams-cdp1">12.6.2.1.2 执行流（Streams，CDP1）</h4>
+<p>CDP1 支持具名执行流和隐式 NULL 执行流。执行流属于<strong>线程块作用域</strong>：由一个线程块创建的执行流可供该线程块中的其他线程使用，但不能跨线程块使用。将执行流句柄传到创建它的线程块之外会导致未定义行为。</p>
+<h5 id="12-6-2-1-2-1-隐式-null-执行流-the-implicit-null-stream-cdp1">12.6.2.1.2.1 隐式（NULL）执行流（The Implicit NULL Stream，CDP1）</h5>
+<p>设备端只有一个隐式、未命名的执行流，由同一线程块中的所有线程共享。它不会产生主机端 NULL 执行流的跨流屏障语义。</p>
+<h4 id="12-6-2-1-3-事件-events-cdp1">12.6.2.1.3 事件（Events，CDP1）</h4>
+<p>设备端事件可用于跨执行流建立依赖关系。事件属于创建它们的线程块作用域，不能在其他线程块或内核中使用。</p>
+<h4 id="12-6-2-1-4-同步-synchronization-cdp1">12.6.2.1.4 同步（Synchronization，CDP1）</h4>
+<p>CDP1 支持父线程块显式同步其启动的子网格，以等待这些子网格完成，并使子网格对全局内存的修改在同步后对父线程块可见。</p>
+<p><strong>警告：</strong> 设备端 <code>cudaDeviceSynchronize()</code> 从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<h5 id="12-6-2-1-4-1-线程块范围同步-block-wide-synchronization-cdp1">12.6.2.1.4.1 线程块范围同步（Block Wide Synchronization，CDP1）</h5>
+<pre><code class="language-cpp">cudaError_t cudaDeviceSynchronize(void);
+</code></pre>
+<p>该函数等待当前线程块中所有线程启动的所有子网格完成。为了确保线程块内同步行为正确，线程块中的所有线程都必须遵循相应的同步模式。调用后，子网格完成前的全局内存写入会对父线程块可见。</p>
+<p>该调用可能要求设备端运行时保存父线程块状态并引入额外开销，因此只应在确实需要在线程块结束前等待子网格时使用。线程块结束时，运行时会自动进行隐式同步。</p>
+<h4 id="12-6-2-1-5-12-6-2-1-8-其他接口">12.6.2.1.5–12.6.2.1.8 其他接口</h4>
+<p>设备端运行时不能切换当前设备，但可以查询其他 CUDA 设备的属性。主机创建的纹理和表面对象可以在设备代码中使用并传给子内核；设备端不能创建或销毁这些对象。旧式模块作用域纹理和表面不能用于设备端启动的子内核。</p>
+<p>共享内存可以声明为静态变量，也可以声明为由启动配置指定大小的 <code>extern</code> 变量，但不能将共享内存指针传给子内核，因为子网格不能访问父线程块的共享内存。设备符号可直接通过 <code>&amp;</code> 引用；<code>cudaMemcpyToSymbol()</code> 和 <code>cudaGetSymbolAddress()</code> 等符号 API 不受设备端运行时支持，且内核执行期间不能修改 <code>__constant__</code> 数据。</p>
+<p>设备端 API 错误按线程记录，可通过 <code>cudaGetLastError()</code> 获取。启动成功返回并不代表子网格已成功完成。底层启动设置 API 由运行时库提供，CUDA 编译器会将 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code> 语法转换为相应调用。</p>
+<h4 id="12-6-2-2-从-ptx-进行设备端启动-device-side-launch-from-ptx-cdp1">12.6.2.2 从 PTX 进行设备端启动（Device-side Launch from PTX，CDP1）</h4>
+<p>本节面向以 PTX 为目标语言的编译器实现者。设备端启动使用 <code>cudaLaunchDevice()</code> 和 <code>cudaGetParameterBuffer()</code>：前者使用参数缓冲区启动指定内核，后者提供满足大小和对齐要求的参数缓冲区。</p>
+<p>64 位地址下，PTX 声明与 CDP2 相同。32 位地址下，<code>cudaLaunchDevice()</code> 的参数使用 <code>.b32</code>：</p>
+<pre><code class="language-ptx">.extern .func(.param .b32 func_retval0) cudaLaunchDevice
+(
+    .param .b32 func,
+    .param .b32 parameterBuffer,
+    .param .align 4 .b8 gridDimension[12],
+    .param .align 4 .b8 blockDimension[12],
+    .param .b32 sharedMemSize,
+    .param .b32 stream
+);
+</code></pre>
+<p>32 位地址下，<code>cudaGetParameterBuffer()</code> 声明为：</p>
+<pre><code class="language-ptx">.extern .func(.param .b32 func_retval0) cudaGetParameterBuffer
+(
+    .param .b32 alignment,
+    .param .b32 size
+);
+</code></pre>
+<p>对应的 CUDA 声明位于 <code>cuda_device_runtime_api.h</code>，实现位于 <code>cudadevrt</code> 系统库。使用设备端内核启动功能的程序必须链接该库。当前实现返回的参数缓冲区按 64 字节对齐，并忽略 <code>alignment</code> 参数；为保持可移植性，仍建议传入所有参数所需的最大对齐值。</p>
+<p>参数不能重新排序，每个参数都必须满足对齐要求。参数缓冲区最大为 4 KB。</p>
+<h4 id="12-6-2-3-动态并行的工具包支持-toolkit-support-for-dynamic-parallelism-cdp1">12.6.2.3 动态并行的工具包支持（Toolkit Support for Dynamic Parallelism，CDP1）</h4>
+<h5 id="12-6-2-3-1-在-cuda-代码中包含设备端运行时-api-including-device-runtime-api-in-cuda-code-cdp1">12.6.2.3.1 在 CUDA 代码中包含设备端运行时 API（Including Device Runtime API in CUDA Code，CDP1）</h5>
+<p>设备端运行时 API 原型会在编译时自动包含，无需显式包含 <code>cuda_device_runtime_api.h</code>。</p>
+<h5 id="12-6-2-3-2-编译与链接-compiling-and-linking-cdp1">12.6.2.3.2 编译与链接（Compiling and Linking，CDP1）</h5>
+<p>使用 <code>nvcc</code> 编译和链接动态并行程序时，会自动链接静态设备端运行时库 <code>libcudadevrt</code>（Windows 为 <code>cudadevrt.lib</code>，Linux 为 <code>libcudadevrt.a</code>）。</p>
+<pre><code class="language-bash">nvcc -arch=sm_75 -rdc=true hello_world.cu -o hello -lcudadevrt
+nvcc -arch=sm_75 -dc hello_world.cu -o hello_world.o
+nvcc -arch=sm_75 -rdc=true hello_world.o -o hello -lcudadevrt
+</code></pre>
+<p>&lt;!-- Added section: 12.6.3 CDP1 guidelines and limits --&gt;</p>
+<h1 id="第十二章续译-cdp1-编程指南与实现限制">第十二章续译：CDP1 编程指南与实现限制</h1>
+<blockquote>
+<p>对应原 PDF 第 367–372 页（原书印刷页码 351–356）。对于与 CDP2 相同的内容，原书引用前文；此处保留该组织方式。</p>
+</blockquote>
+<h2 id="12-6-3-编程指南-programming-guidelines-cdp1">12.6.3 编程指南（Programming Guidelines，CDP1）</h2>
+<h3 id="12-6-3-1-基础-basics-cdp1">12.6.3.1 基础（Basics，CDP1）</h3>
+<p>设备端运行时是主机端运行时的功能子集，提供设备管理、内核启动、设备内存复制、执行流管理和事件管理等 API。其语法和语义与主机端 API 大体相同，例外情况见前文说明。</p>
+<p>CDP1 的 Hello World 示例会在启动子内核后显式等待其完成，再输出 <code>World!</code>：</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+__global__ void childKernel() { printf("Hello "); }
+
+__global__ void parentKernel() {
+    childKernel&lt;&lt;&lt;1,1&gt;&gt;&gt;();
+    if (cudaSuccess != cudaGetLastError()) return;
+    if (cudaSuccess != cudaDeviceSynchronize()) return;
+    printf("World!\n");
+}
+
+int main(int argc, char *argv[]) {
+    parentKernel&lt;&lt;&lt;1,1&gt;&gt;&gt;();
+    if (cudaSuccess != cudaGetLastError()) return 1;
+    if (cudaSuccess != cudaDeviceSynchronize()) return 2;
+    return 0;
+}
+</code></pre>
+<p>可使用以下命令编译：</p>
+<pre><code class="language-bash">nvcc -arch=sm_75 -rdc=true hello_world.cu -o hello -lcudadevrt
+</code></pre>
+<h3 id="12-6-3-2-性能-performance-cdp1">12.6.3.2 性能（Performance，CDP1）</h3>
+<h4 id="12-6-3-2-1-同步-synchronization-cdp1">12.6.3.2.1 同步（Synchronization，CDP1）</h4>
+<p><strong>警告：</strong> 设备端 <code>cudaDeviceSynchronize()</code> 从 CUDA 11.6 起弃用，在针对 <code>compute_90+</code> 编译时已移除，并计划在未来版本中完全移除。</p>
+<p>一个线程调用 <code>cudaDeviceSynchronize()</code> 可能影响同一线程块中其他线程的性能，即使其他线程没有自行调用该函数。一般而言，线程块结束时对所有子内核执行的隐式同步，比显式调用 <code>cudaDeviceSynchronize()</code> 更高效。因此，只有确实需要在线程块结束前等待子内核时，才建议显式调用。</p>
+<h4 id="12-6-3-2-2-启用动态并行的内核开销-dynamic-parallelism-enabled-kernel-overhead-cdp1">12.6.3.2.2 启用动态并行的内核开销（Dynamic-parallelism-enabled Kernel Overhead，CDP1）</h4>
+<p>控制动态启动的系统软件会对正在运行的内核引入额外开销，无论该内核是否自行启动其他内核。开销来自设备端运行时的执行跟踪和管理软件，可能降低性能。一般来说，只要应用程序链接设备端运行时库，就可能产生此开销。</p>
+<h3 id="12-6-3-3-实现限制与约束-implementation-restrictions-and-limitations-cdp1">12.6.3.3 实现限制与约束（Implementation Restrictions and Limitations，CDP1）</h3>
+<h4 id="12-6-3-3-1-运行时-runtime-cdp1">12.6.3.3.1 运行时（Runtime，CDP1）</h4>
+<h5 id="12-6-3-3-1-1-内存占用-memory-footprint-cdp1">12.6.3.3.1.1 内存占用（Memory Footprint，CDP1）</h5>
+<p>设备端运行时会为管理目的预留内存，包括用于显式同步子网格时保存父内核状态的内存，以及跟踪待处理网格启动的内存。可以通过配置减少这些预留，但会相应限制启动行为。</p>
+<p>原书指出，保守估计，每个可能调用 <code>cudaDeviceSynchronize()</code> 的父级代际，可能需要最多约 860 MB 的设备内存（具体取决于设备配置）；即使未全部使用，这些预留内存也可能无法供程序使用。</p>
+<h5 id="12-6-3-3-1-2-嵌套深度与同步深度-nesting-and-synchronization-depth-cdp1">12.6.3.3.1.2 嵌套深度与同步深度（Nesting and Synchronization Depth，CDP1）</h5>
+<p>一个内核可以启动另一个内核，后者又可继续启动内核。程序的总嵌套层数称为<strong>嵌套深度</strong>；显式同步子网格所达到的最深层级称为<strong>同步深度</strong>。通常同步深度比嵌套深度小 1，但如果程序不需要在所有层级调用 <code>cudaDeviceSynchronize()</code>，两者可能相差较大。</p>
+<p>最大嵌套深度为 24，但实际限制通常来自每增加一层所需的内存。任何会导致嵌套深度超过上限的启动都会失败。<code>cudaMemcpyAsync()</code> 也可能生成内核启动，因此同样可能受此限制影响。</p>
+<p>默认情况下，系统会为两个同步层级预留足够存储。可在主机端启动顶层内核之前，通过 <code>cudaDeviceSetLimit()</code> 设置 <code>cudaLimitDevRuntimeSyncDepth</code>。若在超过指定最大同步深度的位置调用 <code>cudaDeviceSynchronize()</code>，会返回错误。</p>
+<h5 id="12-6-3-3-1-3-待处理内核启动-pending-kernel-launches-cdp1">12.6.3.3.1.3 待处理内核启动（Pending Kernel Launches，CDP1）</h5>
+<p>内核启动后，其配置和参数数据会一直跟踪到内核完成，并存储在系统管理的启动池中。启动池包括固定大小的池和性能较低的虚拟化池。固定池满时，运行时会尝试使用虚拟化池跟踪新启动。固定池大小可由主机端 <code>cudaDeviceSetLimit()</code> 配合 <code>cudaLimitDevRuntimePendingLaunchCount</code> 设置。</p>
+<h5 id="12-6-3-3-1-4-配置选项-configuration-options-cdp1">12.6.3.3.1.4 配置选项（Configuration Options，CDP1）</h5>
+<p>设备端运行时资源由主机端 <code>cudaDeviceSetLimit()</code> 控制。必须在启动任何内核前设置这些限制，GPU 正在执行程序时不能修改。</p>
+<table>
+<thead>
+<tr>
+<th>限制</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cudaLimitDevRuntimeSyncDepth</code></td>
+<td>设置可调用 <code>cudaDeviceSynchronize()</code> 的最大深度。默认值为 2；超过限制的显式同步会返回 <code>cudaErrorLaunchMaxDepthExceeded</code>。</td>
+</tr>
+<tr>
+<td><code>cudaLimitDevRuntimePendingLaunchCount</code></td>
+<td>控制待处理启动的缓冲资源。固定池和虚拟化池均耗尽时，启动会失败，并将线程的最近错误设为 <code>cudaErrorLaunchPendingCountExceeded</code>。默认待处理启动数量为 2048。</td>
+</tr>
+<tr>
+<td><code>cudaLimitStackSize</code></td>
+<td>控制每个 GPU 线程的栈大小。驱动程序会按需增大栈，且不会在每次启动后自动恢复。可通过 <code>cudaDeviceSetLimit()</code> 设置，并通过 <code>cudaDeviceGetLimit()</code> 查询。</td>
+</tr>
+</tbody>
+</table>
+<h5 id="12-6-3-3-1-5-内存分配与生命周期-memory-allocation-and-lifetime-cdp1">12.6.3.3.1.5 内存分配与生命周期（Memory Allocation and Lifetime，CDP1）</h5>
+<p>主机和设备端的 <code>cudaMalloc()</code>、<code>cudaFree()</code> 语义不同：主机端分配从未使用的设备内存取得空间；设备端运行时则映射到设备端 <code>malloc()</code> 和 <code>free()</code>。设备端可分配总量受 <code>cudaLimitMallocHeapSize</code> 限制。主机端和设备端分配的指针不能交叉释放。</p>
+<h5 id="12-6-3-3-1-6-sm-id-与-warp-id-sm-id-and-warp-id-cdp1">12.6.3.3.1.6 SM ID 与 Warp ID（SM Id and Warp Id，CDP1）</h5>
+<p>PTX 中的 <code>%smid</code> 和 <code>%warpid</code> 是易变值。设备端运行时可能为更有效地管理资源而将线程块重新调度到不同 SM，因此不能假定它们在线程或线程块的生命周期内保持不变。</p>
+<h5 id="12-6-3-3-1-7-ecc-错误-ecc-errors-cdp1">12.6.3.3.1.7 ECC 错误（ECC Errors，CDP1）</h5>
+<p>CUDA 内核代码无法接收 ECC 错误通知。整个启动树完成后，主机端才会报告 ECC 错误。嵌套程序执行期间发生的 ECC 错误，可能触发异常，也可能继续执行，具体取决于错误类型和配置。</p>

@@ -1,0 +1,320 @@
+<h1 id="第-5-章-编程模型-programming-model">第 5 章 编程模型（Programming Model）</h1>
+<blockquote>
+<p>原文：<em>CUDA C++ Programming Guide, Release 12.8</em><br/>
+对应原书印刷页码：11--20（PDF 文件第 27--36 页）<br/>
+说明：CUDA API、类型、关键字和代码标识符保留英文原名。图 4–7 已从原 PDF 提取并插入到译文对应位置。</p>
+</blockquote>
+<blockquote>
+<p>说明：带小标题但没有编号的三级、四级标题为中文网页阅读新增；保留原书编号的小节不变。</p>
+</blockquote>
+<p>本章通过说明 CUDA 编程模型如何在 C++ 中体现，介绍其主要概念。关于 CUDA
+C++
+的详细说明，请参阅"编程接口"一章。本章及下一章使用的向量加法示例的完整代码，可在
+CUDA 示例 <code>vectorAdd</code> 中找到。</p>
+<h2 id="5-1-内核-kernels">5.1 内核（Kernels）</h2>
+<h3 id="内核函数的定义与执行方式">内核函数的定义与执行方式</h3>
+<p>CUDA C++ 扩展了 C++，允许程序员定义一种称为**内核（kernel）**的 C++
+函数。内核被调用时，会由 (N) 个不同的 CUDA 线程并行执行 (N) 次；普通 C++
+函数通常只执行一次。</p>
+<p>内核使用 <code>__global__</code> 声明说明符定义。一次内核调用所启动的 CUDA
+线程数量，通过新的 <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code>
+执行配置语法指定（参见"执行配置"）。执行内核的每个线程都会获得一个唯一的线程
+ID，可在内核内部通过内置变量访问。</p>
+<h3 id="向量加法示例">向量加法示例</h3>
+<p>下面的示例使用内置变量 <code>threadIdx</code>，将长度为 <code>N</code> 的向量 <code>A</code> 和 <code>B</code>
+相加，并把结果存入向量 <code>C</code>。</p>
+<pre><code class="language-cpp">// 内核定义
+__global__ void VecAdd(float* A, float* B, float* C)
+{
+    int i = threadIdx.x;
+    C[i] = A[i] + B[i];
+}
+
+int main()
+{
+    ...
+    // 使用 N 个线程调用内核
+    VecAdd&lt;&lt;&lt;1, N&gt;&gt;&gt;(A, B, C);
+    ...
+}
+</code></pre>
+<p>这里，执行 <code>VecAdd()</code> 的每个线程都完成一对元素的加法。</p>
+<h2 id="5-2-线程层次结构-thread-hierarchy">5.2 线程层次结构（Thread Hierarchy）</h2>
+<h3 id="线程索引与维度">线程索引与维度</h3>
+<p>为方便使用，<code>threadIdx</code>
+是一个由三个分量组成的向量。因此，线程可以使用一维、二维或三维线程索引来标识，并形成一维、二维或三维的线程块（thread
+block）。这为向量、矩阵或体数据等计算域中的元素分配计算任务提供了自然的方式。</p>
+<p>线程索引与线程 ID 之间的关系很直接：对于一维线程块，两者相同；对于大小为
+((D_x,D_y)) 的二维线程块，索引为 ((x,y)) 的线程，其线程 ID 为
+(x+yD_x)；对于大小为 ((D_x,D_y,D_z)) 的三维线程块，索引为 ((x,y,z))
+的线程，其线程 ID 为 (x+yD_x+zD_xD_y)。</p>
+<h3 id="二维矩阵加法">二维矩阵加法</h3>
+<p>例如，以下代码将两个大小为 (N<code>\times </code>{=tex}N) 的矩阵 <code>A</code> 和 <code>B</code>
+相加，并将结果存入矩阵 <code>C</code>。</p>
+<pre><code class="language-cpp">// 内核定义
+__global__ void MatAdd(float A[N][N], float B[N][N],
+                       float C[N][N])
+{
+    int i = threadIdx.x;
+    int j = threadIdx.y;
+    C[i][j] = A[i][j] + B[i][j];
+}
+
+int main()
+{
+    ...
+    // 使用一个包含 N * N * 1 个线程的线程块调用内核
+    int numBlocks = 1;
+    dim3 threadsPerBlock(N, N);
+    MatAdd&lt;&lt;&lt;numBlocks, threadsPerBlock&gt;&gt;&gt;(A, B, C);
+    ...
+}
+</code></pre>
+<h3 id="线程块数量与网格">线程块数量与网格</h3>
+<p>每个线程块中的线程数量存在上限，因为一个线程块的所有线程都需要驻留在同一个流式多处理器（SM）上，并共享该处理器有限的内存资源。在当前
+GPU 上，一个线程块最多可包含 1024 个线程。</p>
+<p>一个内核可以由多个形状相同的线程块执行。因此，线程总数等于每个线程块的线程数乘以线程块数量。</p>
+<p>线程块会被组织成一维、二维或三维的线程块网格（grid），如图 4
+所示。网格中的线程块数量通常由待处理数据的规模决定，而数据规模通常会超过系统中的处理器数量。</p>
+<p>在 <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code> 语法中，线程块数量和每个线程块的线程数量可以使用 <code>int</code> 或
+<code>dim3</code> 类型指定。上面的示例展示了如何指定二维线程块或网格。</p>
+<h3 id="网格-线程块与内置变量">网格、线程块与内置变量</h3>
+<p>网格中的每个线程块都有一个唯一的一维、二维或三维索引，可在内核内部通过内置变量
+<code>blockIdx</code> 访问。线程块的维度则可通过内置变量 <code>blockDim</code> 访问。将前面的
+<code>MatAdd()</code> 示例扩展为支持多个线程块后，代码如下。</p>
+<p><img alt="图 4：线程块网格" decoding="async" loading="lazy" src="/cuda/book/images/figure_04_grid_of_thread_blocks.png"/></p>
+<p><em>图 4：线程块网格（原 PDF 第 29 页）。</em></p>
+<pre><code class="language-cpp">// 内核定义
+__global__ void MatAdd(float A[N][N], float B[N][N],
+                       float C[N][N])
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    if (i &lt; N &amp;&amp; j &lt; N)
+        C[i][j] = A[i][j] + B[i][j];
+}
+
+int main()
+{
+    ...
+    // 内核调用
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks(N / threadsPerBlock.x,
+                   N / threadsPerBlock.y);
+    MatAdd&lt;&lt;&lt;numBlocks, threadsPerBlock&gt;&gt;&gt;(A, B, C);
+    ...
+}
+</code></pre>
+<p>这里选择的线程块大小为 (16<code>\times16</code>{=tex})，即 256
+个线程；在本例中，这个选择并非唯一，但属于常见配置。网格会创建足够多的线程块，使每个矩阵元素都对应一个线程，与之前的示例相同。为简化说明，本例假设网格每个维度的线程数都能被对应维度的线程块大小整除；实际上并不要求一定整除。</p>
+<h3 id="独立调度与线程块内同步">独立调度与线程块内同步</h3>
+<p>线程块必须能够独立执行。它们应当可以按任意顺序运行，可以并行执行，也可以串行执行。这一独立性要求允许系统以任意顺序、在任意数量的核心上调度线程块，如图
+3 所示；因此，程序员能够编写可随核心数量扩展的代码。</p>
+<p>线程块内的线程可以通过共享数据（使用<strong>共享内存</strong>）并同步执行来协作，从而协调内存访问。更具体地说，可以在内核中调用内置函数
+<code>__syncthreads()</code> 设置同步点。<code>__syncthreads()</code>
+充当屏障：线程块中的所有线程都必须到达该屏障，之后才能继续执行。"共享内存"一节会给出使用共享内存的示例。除
+<code>__syncthreads()</code> 外，<strong>Cooperative Groups API</strong>
+还提供了丰富的线程同步原语。</p>
+<p>为了高效协作，共享内存被设计为靠近每个处理器核心、延迟较低的内存（类似
+L1 缓存）；<code>__syncthreads()</code> 则应当是轻量级操作。</p>
+<h3 id="5-2-1-线程块集群-thread-block-clusters">5.2.1 线程块集群（Thread Block Clusters）</h3>
+<h4 id="集群的调度与可移植大小">集群的调度与可移植大小</h4>
+<p>从 NVIDIA 计算能力 9.0 开始，CUDA
+编程模型引入了一个可选的层次结构------<strong>线程块集群（thread block
+cluster）</strong>，由多个线程块组成。与线程块中的线程保证在同一个流式多处理器上共同调度类似，集群中的线程块也保证在
+GPU 的一个图形处理集群（GPU Processing Cluster，GPC）上共同调度。</p>
+<p>与线程块类似，集群也可以组织成一维、二维或三维网格，如图 5
+所示。集群中的线程块数量可以由用户指定。在 CUDA
+中，作为可移植的集群大小，最多支持每个集群 8
+个线程块。需要注意的是，如果 GPU 硬件或多实例
+GPU（MIG）配置过小，无法支持 8
+个多处理器，则最大集群大小会相应降低。较小配置的识别方式，以及支持超过 8
+个线程块集群大小的较大配置，取决于具体架构；可通过
+<code>cudaOccupancyMaxPotentialClusterSize</code> API 查询。</p>
+<p><img alt="图 5：线程块集群网格" decoding="async" loading="lazy" src="/cuda/book/images/figure_05_thread_block_clusters.png"/></p>
+<p><em>图 5：线程块集群网格（原 PDF 第 30 页）。</em></p>
+<p>注意：对于启用了集群支持的内核，为保持兼容性，<code>gridDim</code>
+变量仍以<strong>线程块数量</strong>表示网格维度。线程块在集群中的排名可通过 Cluster
+Group API 查询。</p>
+<h4 id="编译期指定集群大小">编译期指定集群大小</h4>
+<p>可以通过编译期内核属性 <code>__cluster_dims__(X,Y,Z)</code>，或通过 CUDA 内核启动
+API
+<code>cudaLaunchKernelEx</code>，为内核启用线程块集群。使用内核属性指定的集群大小在编译时固定，然后可以使用传统的
+<code>&lt;&lt;&lt;...&gt;&gt;&gt;</code>
+语法启动内核。如果内核使用了编译期集群大小，启动时就不能再修改集群大小。</p>
+<pre><code class="language-cpp">// 内核定义：编译期集群大小为 (2, 1, 1)
+__global__ void __cluster_dims__(2, 1, 1)
+cluster_kernel(float *input, float *output)
+{
+}
+
+int main()
+{
+    float *input, *output;
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks(N / threadsPerBlock.x, N / threadsPerBlock.y);
+
+    // 集群启动不会改变网格维度；网格仍按线程块数量枚举。
+    // 网格维度必须是集群大小的整数倍。
+    cluster_kernel&lt;&lt;&lt;numBlocks, threadsPerBlock&gt;&gt;&gt;(input, output);
+}
+</code></pre>
+<h4 id="在运行时配置集群">在运行时配置集群</h4>
+<p>也可以在运行时设置线程块集群大小，并通过 CUDA 内核启动 API
+<code>cudaLaunchKernelEx</code> 启动内核。以下示例展示如何使用可扩展 API
+启动集群内核。</p>
+<pre><code class="language-cpp">// 内核定义：不附加编译期属性
+__global__ void cluster_kernel(float *input, float *output)
+{
+}
+
+int main()
+{
+    float *input, *output;
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks(N / threadsPerBlock.x, N / threadsPerBlock.y);
+
+    // 使用运行时集群大小调用内核
+    {
+        cudaLaunchConfig_t config = {0};
+        // 网格维度仍按线程块数量枚举，且应为集群大小的整数倍。
+        config.gridDim = numBlocks;
+        config.blockDim = threadsPerBlock;
+
+        cudaLaunchAttribute attribute[1];
+        attribute[0].id = cudaLaunchAttributeClusterDimension;
+        attribute[0].val.clusterDim.x = 2;  // X 维度上的集群大小
+        attribute[0].val.clusterDim.y = 1;
+        attribute[0].val.clusterDim.z = 1;
+        config.attrs = attribute;
+        config.numAttrs = 1;
+
+        cudaLaunchKernelEx(&amp;config, cluster_kernel, input, output);
+    }
+}
+</code></pre>
+<h4 id="集群同步与分布式共享内存">集群同步与分布式共享内存</h4>
+<p>在计算能力为 9.0 的 GPU 上，集群中的所有线程块都保证共同调度在同一个 GPU
+处理集群（GPC）上，并可以通过 Cluster Group API 的 <code>cluster.sync()</code>
+执行硬件支持的同步。Cluster Group 还提供 <code>num_threads()</code> 和
+<code>num_blocks()</code>
+成员函数，分别查询集群组中的线程数和线程块数；<code>dim_threads()</code> 和
+<code>dim_blocks()</code> 则分别查询线程或线程块在集群组中的排名。</p>
+<p>属于同一个集群的线程块可以访问<strong>分布式共享内存（Distributed Shared
+Memory）</strong>。集群中的线程块能够对分布式共享内存中的任意地址执行读取、写入和原子操作。"分布式共享内存"一节会给出使用它执行直方图计算的示例。</p>
+<h2 id="5-3-内存层次结构-memory-hierarchy">5.3 内存层次结构（Memory Hierarchy）</h2>
+<h3 id="本地内存-共享内存与全局内存">本地内存、共享内存与全局内存</h3>
+<p>如图 6 所示，CUDA 线程在执行期间可以访问多个内存空间中的数据：</p>
+<ul>
+<li>每个线程都有自己的私有本地内存。</li>
+<li>每个线程块都有共享内存，线程块中的所有线程均可访问；其生命周期与线程块相同。</li>
+<li>线程块集群中的线程块可以对彼此的共享内存执行读取、写入和原子操作。</li>
+<li>所有线程都可以访问同一全局内存。</li>
+</ul>
+<h3 id="常量内存与纹理内存">常量内存与纹理内存</h3>
+<p>此外，还有两个所有线程均可访问的只读内存空间：<strong>常量内存</strong>和<strong>纹理内存</strong>。全局内存、常量内存和纹理内存针对不同的内存使用方式进行了优化（参见"设备内存访问"）。对于某些特定数据格式，纹理内存还提供不同的寻址模式和数据过滤功能（参见"纹理与表面内存"）。</p>
+<p>在同一个应用程序的多次内核启动之间，全局内存、常量内存和纹理内存中的数据都可以持续存在。</p>
+<p><img alt="图 6：内存层次结构" decoding="async" loading="lazy" src="/cuda/book/images/figure_06_memory_hierarchy.png"/></p>
+<p><em>图 6：内存层次结构（原 PDF 第 32 页）。</em></p>
+<h2 id="5-4-异构编程-heterogeneous-programming">5.4 异构编程（Heterogeneous Programming）</h2>
+<h3 id="主机与设备如何分工">主机与设备如何分工</h3>
+<p>如图 7 所示，CUDA 编程模型假设 CUDA
+线程在一个与主机（host）物理分离的设备（device）上执行，该设备作为运行
+C++ 程序的主机的协处理器。例如，内核在 GPU 上执行，而其余 C++ 程序在 CPU
+上执行。</p>
+<p>CUDA 编程模型还假设主机和设备分别在 DRAM
+中维护独立的内存空间，分别称为<strong>主机内存</strong>和<strong>设备内存</strong>。因此，程序通过调用
+CUDA
+运行时（详见"编程接口"）来管理内核可见的全局内存、常量内存和纹理内存空间，其中包括设备内存的分配、释放，以及主机内存与设备内存之间的数据传输。</p>
+<h3 id="统一内存的作用">统一内存的作用</h3>
+<p>**统一内存（Unified
+Memory）**提供托管内存，用于连接主机和设备的内存空间。系统中的所有 CPU
+和 GPU
+都可以访问托管内存，并将其视为具有共同地址空间的单一一致性内存映像。这项能力支持设备内存超额使用，并通过消除主机与设备之间显式复制数据的需要，大幅简化应用程序移植。统一内存的介绍见"统一内存编程"。</p>
+<p><img alt="图 7：异构编程" decoding="async" loading="lazy" src="/cuda/book/images/figure_07_heterogeneous_programming.png"/></p>
+<p><em>图 7：异构编程（原 PDF 第 34 页）。</em></p>
+<blockquote>
+<p>注意：串行代码在主机上执行，并行代码在设备上执行。</p>
+</blockquote>
+<h2 id="5-5-异步-simt-编程模型-asynchronous-simt-programming-model">5.5 异步 SIMT 编程模型（Asynchronous SIMT Programming Model）</h2>
+<h3 id="异步计算与数据搬运">异步计算与数据搬运</h3>
+<p>在 CUDA 编程模型中，线程是执行计算或内存操作的最低层次抽象。从基于
+NVIDIA Ampere GPU 架构的设备开始，CUDA
+编程模型通过异步编程模型为内存操作提供加速。异步编程模型定义了异步操作相对于
+CUDA 线程的行为。</p>
+<p>该模型定义了 CUDA 线程之间用于同步的**异步屏障（Asynchronous
+Barrier）**的行为，也解释并规定了如何使用 <code>cuda::memcpy_async</code>，在 GPU
+进行计算的同时从全局内存异步搬运数据。</p>
+<h3 id="5-5-1-异步操作-asynchronous-operations">5.5.1 异步操作（Asynchronous Operations）</h3>
+<p>异步操作是指由某个 CUDA
+线程发起、但仿佛由另一个线程异步执行的操作。在结构良好的程序中，一个或多个
+CUDA 线程会与该异步操作进行同步。发起异步操作的 CUDA
+线程不一定必须是执行同步的线程之一。</p>
+<h4 id="异步操作的同步机制">异步操作的同步机制</h4>
+<p>这样的异步线程（即"仿真线程"，as-if thread）始终与发起该异步操作的 CUDA
+线程相关联。异步操作使用一个同步对象来同步操作的完成。同步对象可以由用户显式管理（例如
+<code>cuda::memcpy_async</code>），也可以在库内部隐式管理（例如
+<code>cooperative_groups::memcpy_async</code>）。</p>
+<p>同步对象可以是 <code>cuda::barrier</code> 或
+<code>cuda::pipeline</code>。这些对象会在"异步屏障"和"使用 <code>cuda::pipeline</code>
+进行异步数据复制"中详细介绍。同步对象可以用于不同的线程作用域。<strong>作用域</strong>定义了哪些线程可以使用该同步对象与异步操作进行同步。CUDA
+C++ 提供以下线程作用域：</p>
+<hr/>
+<p>线程作用域                                  说明</p>
+<hr/>
+<p><code>cuda::thread_scope::thread_scope_thread</code>   只有发起异步操作的 CUDA 线程进行同步。</p>
+<p><code>cuda::thread_scope::thread_scope_block</code>    发起线程所在同一线程块中的任意线程或所有线程进行同步。</p>
+<p><code>cuda::thread_scope::thread_scope_device</code>   发起线程所在同一 GPU
+设备中的任意线程或所有线程进行同步。</p>
+<h2 id="cuda-thread-scope-thread-scope-system-发起线程所在同一系统中的任意-cuda-线程或-cpu-线程进行同步"><code>cuda::thread_scope::thread_scope_system</code>   发起线程所在同一系统中的任意 CUDA 线程或 CPU
+线程进行同步。</h2>
+<p>这些线程作用域是通过 CUDA 标准 C++ 库对标准 C++ 所作的扩展实现的。</p>
+<h2 id="5-6-计算能力-compute-capability">5.6 计算能力（Compute Capability）</h2>
+<h3 id="计算能力与-sm-版本">计算能力与 SM 版本</h3>
+<p>设备的计算能力由一个版本号表示，有时也称为其"SM 版本"。该版本号标识 GPU
+硬件支持的功能，应用程序可在运行时使用它来判断当前 GPU
+支持哪些硬件功能和指令。</p>
+<p>计算能力由主版本号 (X) 和次版本号 (Y) 组成，记为 (X.Y)。</p>
+<h3 id="主版本号-次版本号与-gpu-架构">主版本号、次版本号与 GPU 架构</h3>
+<p>主版本号相同的设备属于同一核心架构。基于 NVIDIA Hopper GPU
+架构的设备主版本号为 9；基于 NVIDIA Ampere GPU 架构的设备为 8；基于
+Volta 架构的设备为 7；基于 Pascal 架构的设备为 6；基于 Maxwell
+架构的设备为 5；基于 Kepler 架构的设备为 3。</p>
+<p>次版本号对应于核心架构的渐进式改进，其中可能包括新功能。Turing
+是计算能力为 7.5 的设备所采用的架构，它是在 Volta
+架构基础上的渐进式更新。</p>
+<p>"支持 CUDA 的 GPU"页面列出了所有支持 CUDA
+的设备及其计算能力；"计算能力"页面提供各计算能力版本的技术规格。</p>
+<blockquote>
+<p>注意：不要将某个 GPU 的计算能力版本与 CUDA 版本混淆。例如，CUDA
+7.5、CUDA 8 和 CUDA 9 指的是 CUDA 软件平台的版本，而不是 GPU
+的计算能力版本。</p>
+</blockquote>
+<p>CUDA 平台的新版本通常会在支持新 GPU
+架构的同时，增加与硬件代际无关的软件功能。平台版本也用于支持应用程序在多代
+GPU 架构上运行，包括未来推出的架构。</p>
+<p>自 CUDA 7.0 起，Tesla 架构不再受支持；自 CUDA 9.0 起，Fermi
+架构不再受支持。</p>
+<hr/>
+<h2 id="本章术语表">本章术语表</h2>
+<p>英文术语                        本章译法</p>
+<hr/>
+<p>kernel                          内核（CUDA kernel）
+thread                          线程
+thread block                    线程块
+grid                            网格
+thread hierarchy                线程层次结构
+thread block cluster            线程块集群
+streaming multiprocessor (SM)   流式多处理器（SM）
+shared memory                   共享内存
+distributed shared memory       分布式共享内存
+global memory                   全局内存
+host / device                   主机 / 设备
+Unified Memory                  统一内存
+asynchronous operation          异步操作
+asynchronous barrier            异步屏障
+compute capability              计算能力</p>
+<h2 id="图表与发布说明">图表与发布说明</h2>
+<p>本章所涉及的图 4--7 已从原 PDF 提取并插入；第 3 图位于第 3 章
+中的图像。正式接入阅读网站前，应逐一核对图号、图注和所在段落，并确保原图的使用符合适用的授权条款。代码示例保留
+CUDA 语法与 API 原名；发布前还应对照原 PDF 校验代码、公式和技术术语。</p>

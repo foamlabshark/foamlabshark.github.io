@@ -1,0 +1,105 @@
+<h1 id="第十八章-纹理读取-texture-fetching">第十八章 纹理读取（Texture Fetching）</h1>
+<blockquote>
+<p>对应原 PDF 第 483–486 页（原书印刷页码 467–470）。本章给出纹理函数根据纹理对象属性计算返回值的公式。保留数学表达式、原书图 35–37 及其相对路径。</p>
+</blockquote>
+<p>绑定到纹理对象的纹理表示为数组 <span class="cuda-math-inline">\(T\)</span>：</p>
+<ul>
+<li>一维纹理包含 <span class="cuda-math-inline">\(N\)</span> 个纹素（texel）；</li>
+<li>二维纹理包含 <span class="cuda-math-inline">\(N \times M\)</span> 个纹素；</li>
+<li>三维纹理包含 <span class="cuda-math-inline">\(N \times M \times L\)</span> 个纹素。</li>
+</ul>
+<p>纹理可以使用非归一化纹理坐标 <span class="cuda-math-inline">\(x\)</span>、<span class="cuda-math-inline">\(y\)</span>、<span class="cuda-math-inline">\(z\)</span> 读取，也可以使用归一化坐标 <span class="cuda-math-inline">\(x/N\)</span>、<span class="cuda-math-inline">\(y/M\)</span>、<span class="cuda-math-inline">\(z/L\)</span> 读取，具体方式见“纹理内存”一节。本章假定坐标位于有效范围内。对于超出范围的坐标，纹理内存一节说明了如何根据寻址模式将其重新映射到有效范围。</p>
+<h2 id="18-1-最近点采样-nearest-point-sampling">18.1 最近点采样（Nearest-Point Sampling）</h2>
+<p>在最近点采样过滤模式下，纹理读取返回的值为：</p>
+<ul>
+<li>
+<p>一维纹理：</p>
+<div class="cuda-math-display">\[
+  \operatorname{tex}(x)=T[i]
+  \]</div>
+</li>
+<li>
+<p>二维纹理：</p>
+<div class="cuda-math-display">\[
+  \operatorname{tex}(x,y)=T[i,j]
+  \]</div>
+</li>
+<li>
+<p>三维纹理：</p>
+<div class="cuda-math-display">\[
+  \operatorname{tex}(x,y,z)=T[i,j,k]
+  \]</div>
+</li>
+</ul>
+<p>其中：</p>
+<div class="cuda-math-display">\[
+i=\lfloor x\rfloor,\qquad
+j=\lfloor y\rfloor,\qquad
+k=\lfloor z\rfloor
+\]</div>
+<p>原书示例使用 <span class="cuda-math-inline">\(N=4\)</span> 的一维纹理说明最近点采样。</p>
+<p><em>图 35：最近点采样过滤模式（Nearest-Point Sampling Filtering Mode）。</em></p>
+<p><img alt="图 35：最近点采样过滤模式" decoding="async" loading="lazy" src="/cuda/book/images/figure_35_nearest_point_sampling.png"/></p>
+<p>对于整数纹理，可以选择将纹理读取返回的值重新映射到 <span class="cuda-math-inline">\([0.0,1.0]\)</span> 区间，详见“纹理内存”一节。</p>
+<h2 id="18-2-线性过滤-linear-filtering">18.2 线性过滤（Linear Filtering）</h2>
+<p>线性过滤<strong>仅适用于浮点纹理</strong>。它根据读取坐标周围的纹素值进行插值。</p>
+<h3 id="一维纹理-线性插值">一维纹理：线性插值</h3>
+<div class="cuda-math-display">\[
+\operatorname{tex}(x)=(1-\alpha)T[i]+\alpha T[i+1]
+\]</div>
+<h3 id="二维纹理-双线性插值">二维纹理：双线性插值</h3>
+<div class="cuda-math-display">\[
+\begin{aligned}
+\operatorname{tex}(x,y)={}&amp;(1-\alpha)(1-\beta)T[i,j]\\
+&amp;+\alpha(1-\beta)T[i+1,j]\\
+&amp;+(1-\alpha)\beta T[i,j+1]\\
+&amp;+\alpha\beta T[i+1,j+1]
+\end{aligned}
+\]</div>
+<h3 id="三维纹理-三线性插值">三维纹理：三线性插值</h3>
+<div class="cuda-math-display">\[
+\begin{aligned}
+\operatorname{tex}(x,y,z)={}&amp;(1-\alpha)(1-\beta)(1-\gamma)T[i,j,k]\\
+&amp;+\alpha(1-\beta)(1-\gamma)T[i+1,j,k]\\
+&amp;+(1-\alpha)\beta(1-\gamma)T[i,j+1,k]\\
+&amp;+\alpha\beta(1-\gamma)T[i+1,j+1,k]\\
+&amp;+(1-\alpha)(1-\beta)\gamma T[i,j,k+1]\\
+&amp;+\alpha(1-\beta)\gamma T[i+1,j,k+1]\\
+&amp;+(1-\alpha)\beta\gamma T[i,j+1,k+1]\\
+&amp;+\alpha\beta\gamma T[i+1,j+1,k+1]
+\end{aligned}
+\]</div>
+<p>其中，先将坐标平移半个纹素：</p>
+<div class="cuda-math-display">\[
+x_B=x-0.5,\qquad y_B=y-0.5,\qquad z_B=z-0.5
+\]</div>
+<p>然后计算整数纹素索引和插值权重：</p>
+<div class="cuda-math-display">\[
+\begin{aligned}
+i&amp;=\lfloor x_B\rfloor,&amp; \alpha&amp;=\operatorname{frac}(x_B),\\
+j&amp;=\lfloor y_B\rfloor,&amp; \beta&amp;=\operatorname{frac}(y_B),\\
+k&amp;=\lfloor z_B\rfloor,&amp; \gamma&amp;=\operatorname{frac}(z_B).
+\end{aligned}
+\]</div>
+<p>这里的 <span class="cuda-math-inline">\(\operatorname{frac}\)</span> 表示取小数部分。权重 <span class="cuda-math-inline">\(\alpha\)</span>、<span class="cuda-math-inline">\(\beta\)</span> 和 <span class="cuda-math-inline">\(\gamma\)</span> 使用 9 位定点格式存储，其中 8 位表示小数部分，因此数值 <span class="cuda-math-inline">\(1.0\)</span> 可以被精确表示。</p>
+<p>原书以 <span class="cuda-math-inline">\(N=4\)</span> 的一维纹理展示线性过滤。</p>
+<p><em>图 36：线性过滤模式（Linear Filtering Mode）。</em></p>
+<p><img alt="图 36：线性过滤模式" decoding="async" loading="lazy" src="/cuda/book/images/figure_36_linear_filtering.png"/></p>
+<h2 id="18-3-查表-table-lookup">18.3 查表（Table Lookup）</h2>
+<p>对于输入区间为 <span class="cuda-math-inline">\([0,R]\)</span> 的查表函数 <span class="cuda-math-inline">\(TL(x)\)</span>，可以利用纹理线性过滤实现：</p>
+<div class="cuda-math-display">\[
+TL(x)=\operatorname{tex}\left(\frac{N-1}{R}x+0.5\right)
+\]</div>
+<p>其中，<span class="cuda-math-inline">\(N\)</span> 是一维纹理中的纹素数量。该映射保证：</p>
+<div class="cuda-math-display">\[
+TL(0)=T[0],\qquad TL(R)=T[N-1].
+\]</div>
+<p>原书图示使用 <span class="cuda-math-inline">\(N=4\)</span> 的一维纹理，并展示 <span class="cuda-math-inline">\(R=4\)</span> 或 <span class="cuda-math-inline">\(R=1\)</span> 时利用纹理过滤实现查表的方式。</p>
+<p><em>图 37：使用线性过滤的一维查表（One-Dimensional Table Lookup Using Linear Filtering）。</em></p>
+<p><img alt="图 37：使用线性过滤的一维查表" decoding="async" loading="lazy" src="/cuda/book/images/figure_37_table_lookup.png"/></p>
+<h2 id="校对说明">校对说明</h2>
+<ol>
+<li>原 PDF 正文中的交叉引用写作图 32、图 33、图 34，但本 PDF 中对应图的实际图题编号分别显示为图 35、图 36、图 37。译稿按图题编号保存图片，并在正文中使用图题编号；该编号差异来自原文材料本身。</li>
+<li>原 PDF 的线性过滤一维公式连续重复列出两次。为避免重复干扰阅读，正文保留一次公式，并在此记录原文中的重复排版。</li>
+<li>本章公式依据原 PDF 第 483–485 页转录；正式发布前仍建议逐项与 NVIDIA CUDA C++ Programming Guide 12.8 原文核对。</li>
+</ol>

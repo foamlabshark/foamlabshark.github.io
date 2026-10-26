@@ -1,0 +1,385 @@
+<h1 id="第二十二章-统一内存编程-unified-memory-programming">第二十二章 统一内存编程（Unified Memory Programming）</h1>
+<blockquote>
+<p>对应原 PDF 第 541–571 页（原书印刷页码 525–555）。本章为第一轮工作译稿，CUDA 代码尚需逐例编译校验。</p>
+</blockquote>
+<p>本章适用于计算能力 5.0 及更高的设备，除非另有说明。计算能力低于 5.0 的设备请参阅相应旧版 CUDA Toolkit 文档。本章分为三个部分：统一内存概述、具有完整 CUDA 统一内存支持的设备，以及不具备完整支持的设备。</p>
+<h2 id="22-1-统一内存简介-unified-memory-introduction">22.1 统一内存简介（Unified Memory Introduction）</h2>
+<p>CUDA 统一内存为系统中的所有处理器提供：</p>
+<ul>
+<li><strong>统一的内存池：</strong> CPU、GPU 等处理器可以使用同一个指针值，通过各自原生的内存操作访问同一内存，包括指针解引用和原子操作。</li>
+<li><strong>并发访问：</strong> 系统中的处理器可以并发访问统一内存池。</li>
+</ul>
+<p>统一内存可以提高开发效率、改善性能并扩展应用功能。开发者不必分别为 CPU 和 GPU 分配内存，也不必总是使用 <code>cudaMemcpy*()</code> 手动复制数据；系统可以将数据迁移到最常访问它的处理器附近，并允许程序处理超过单块 GPU 显存容量的数据集。</p>
+<p>数据仍可能发生迁移，应用程序可以使用提示控制迁移策略，但这些提示不是保证正确性所必需的。数据的物理位置对程序不可见，也可能随时改变；无论数据位于何处，各处理器使用其虚拟地址访问数据时都应保持有效和一致。</p>
+<p>获取 CUDA 统一内存主要有两种方式：</p>
+<ul>
+<li><strong>系统分配内存（System-Allocated Memory）：</strong> 通过主机系统 API 分配，例如栈变量、全局/文件作用域变量、<code>malloc()</code>、<code>mmap()</code> 和线程局部变量。</li>
+<li><strong>CUDA 托管内存（CUDA Managed Memory）：</strong> 通过 <code>cudaMallocManaged()</code> 分配，或使用 <code>__managed__</code> 声明变量。</li>
+</ul>
+<h3 id="22-1-1-统一内存的系统要求-system-requirements-for-unified-memory">22.1.1 统一内存的系统要求（System Requirements for Unified Memory）</h3>
+<p><strong>表 28：统一内存支持级别概览</strong></p>
+<table>
+<thead>
+<tr>
+<th>支持级别</th>
+<th>设备属性要求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>完整支持：系统分配内存和 CUDA 托管内存均受支持</td>
+<td><code>pageableMemoryAccess = 1</code>；硬件加速支持还可能要求 <code>hostNativeAtomicSupported</code>、<code>pageableMemoryAccessUsesHostPageTables</code> 和 <code>directManagedMemAccessFromHost</code> 为 1</td>
+<td>见 22.2 节</td>
+</tr>
+<tr>
+<td>仅 CUDA 托管内存具有完整支持</td>
+<td><code>concurrentManagedAccess = 1</code> 且 <code>pageableMemoryAccess = 0</code></td>
+<td>见 22.3.1 节</td>
+</tr>
+<tr>
+<td>托管内存仅部分支持，不支持并发访问</td>
+<td><code>managedMemory = 1</code> 且 <code>concurrentManagedAccess = 0</code></td>
+<td>见 22.3.2 节</td>
+</tr>
+<tr>
+<td>Tegra 平台</td>
+<td>参见 Tegra 内存管理文档</td>
+<td>平台相关</td>
+</tr>
+<tr>
+<td>不支持统一内存</td>
+<td><code>managedMemory = 0</code></td>
+<td>不应使用统一内存</td>
+</tr>
+</tbody>
+</table>
+<p>在不支持统一内存的系统上使用统一内存，行为未定义。应用程序可通过 <code>cudaGetDeviceProperties()</code> 查询设备属性，判断当前系统的支持级别。</p>
+<ul>
+<li><strong><code>pageableMemoryAccess</code>：</strong> 为 1 表示系统分配内存和 CUDA 托管内存均支持统一内存访问。相关系统包括 NVIDIA Grace Hopper、IBM Power9 + Volta，以及启用 HMM 的现代 Linux 系统。</li>
+<li><strong>Linux HMM：</strong> 原文列出的要求包括特定版本的 Linux 6.1、6.2 或 6.3 及更高内核，计算能力至少为 7.5，并使用 535 或更高版本的开放内核模块 CUDA 驱动程序。</li>
+<li><strong><code>concurrentManagedAccess</code>：</strong> 在完整支持 CUDA 托管内存的系统上为 1；为 0 时表示托管内存只获得部分统一内存支持。</li>
+</ul>
+<h3 id="22-1-2-编程模型-programming-model">22.1.2 编程模型（Programming Model）</h3>
+<p>统一内存可以通过系统分配 API、<code>cudaMallocManaged()</code> 或 <code>__managed__</code> 变量获得。本章多数示例会分别展示托管内存和系统分配内存的使用方式。</p>
+<h4 id="22-1-2-1-系统分配内存-system-allocated-memory">22.1.2.1 系统分配内存（System-Allocated Memory）</h4>
+<p>在具有完整 CUDA 统一内存支持的系统上，<code>malloc()</code>、<code>mmap()</code>、C++ <code>new</code>、CPU 线程栈上的自动变量、线程局部变量和全局变量等都属于统一内存。某些分配采用**首次触碰（first touch）**方式：分配 API 先创建虚拟地址范围，线程首次访问时才分配物理内存。物理内存通常尽量放在首先访问它的处理器附近。</p>
+<pre><code class="language-cpp">__global__ void printme(char *str) {
+    printf("%s", str);
+}
+
+int main() {
+    char *s = (char*)malloc(100);
+    strncpy(s, "Hello Unified Memory\n", 99);
+    printme&lt;&lt;&lt;1, 1&gt;&gt;&gt;(s);
+    cudaDeviceSynchronize();
+    free(s);
+    return 0;
+}
+</code></pre>
+<p><code>cudaMemAdvise()</code> 和 <code>cudaMemPrefetchAsync()</code> 等提示与预取 API 也可用于系统分配内存。</p>
+<h4 id="22-1-2-2-cuda-托管内存分配-api-cudamallocmanaged">22.1.2.2 CUDA 托管内存分配 API：<code>cudaMallocManaged()</code></h4>
+<pre><code class="language-cpp">__host__ cudaError_t cudaMallocManaged(void **devPtr, size_t size);
+</code></pre>
+<p>该 API 分配 <code>size</code> 字节托管内存，并使 <code>devPtr</code> 指向该分配。托管内存使用 <code>cudaFree()</code> 释放。设备代码不能调用 <code>cudaMallocManaged()</code>。</p>
+<pre><code class="language-cpp">__global__ void printme(char *str) {
+    printf("%s", str);
+}
+
+int main() {
+    char *s;
+    cudaMallocManaged(&amp;s, 100);
+    strncpy(s, "Hello Unified Memory\n", 99);
+    printme&lt;&lt;&lt;1, 1&gt;&gt;&gt;(s);
+    cudaDeviceSynchronize();
+    cudaFree(s);
+    return 0;
+}
+</code></pre>
+<p>如果系统支持托管内存分配，但不具备完整支持，行为会因架构而异：计算能力 5.x 设备通常将托管分配放在 GPU 内存中；计算能力 6.x 及更高设备可采用类似系统分配 API 的首次触碰方式。</p>
+<h4 id="22-1-2-3-使用-managed-声明全局托管变量">22.1.2.3 使用 <code>__managed__</code> 声明全局托管变量</h4>
+<p><code>__managed__</code> 变量的行为类似于通过 <code>cudaMallocManaged()</code> 分配的内存。它使主机和设备能够交换全局变量数据，而不必手动分配或复制。</p>
+<pre><code class="language-cpp">__global__ void write_value(int* ptr, int v) {
+    *ptr = v;
+}
+__managed__ int value;
+
+int main() {
+    write_value&lt;&lt;&lt;1, 1&gt;&gt;&gt;(&amp;value, 1);
+    cudaDeviceSynchronize();
+    printf("value = %d\n", value);
+    return 0;
+}
+</code></pre>
+<p><code>__managed__</code> 隐含 <code>__device__</code>，因此也可写作 <code>__managed__ __device__</code>。<code>__constant__</code> 变量不能同时标记为 <code>__managed__</code>。正确使用托管变量需要有效的 CUDA 上下文；其 C++ 静态初始化等限制见第十七章。</p>
+<h4 id="22-1-2-4-统一内存与映射内存的区别-difference-between-unified-memory-and-mapped-memory">22.1.2.4 统一内存与映射内存的区别（Difference between Unified Memory and Mapped Memory）</h4>
+<p>CUDA 映射内存并不保证所有系统都支持所有类型的内存访问（例如原子操作）；统一内存可以提供更广泛的保证。映射内存保证可移植支持的操作范围较小，但可在比统一内存更多的系统上使用。</p>
+<h4 id="22-1-2-5-指针属性-pointer-attributes">22.1.2.5 指针属性（Pointer Attributes）</h4>
+<p>可调用 <code>cudaPointerGetAttributes()</code> 并检查 <code>cudaMemoryTypeManaged</code>，判断指针是否指向托管内存。通过 <code>cudaHostRegister()</code> 注册的系统分配内存通常返回 <code>cudaMemoryTypeHost</code>；CUDA 未注册的系统分配内存返回 <code>cudaMemoryTypeUnregistered</code>。这些属性描述内存如何分配或注册，而不表示其当前物理驻留位置。</p>
+<h4 id="22-1-2-6-运行时检测统一内存支持级别-runtime-detection">22.1.2.6 运行时检测统一内存支持级别（Runtime Detection）</h4>
+<pre><code class="language-cpp">int main() {
+    int d;
+    cudaGetDevice(&amp;d);
+    int pma = 0, cma = 0;
+    cudaDeviceGetAttribute(&amp;pma, cudaDevAttrPageableMemoryAccess, d);
+    cudaDeviceGetAttribute(&amp;cma, cudaDevAttrConcurrentManagedAccess, d);
+    printf("Full Unified Memory Support: %s\n", pma ? "YES" : "NO");
+    printf("CUDA Managed Memory with full support: %s\n", cma ? "YES" : "NO");
+    return 0;
+}
+</code></pre>
+<h4 id="22-1-2-7-gpu-内存超额使用-gpu-memory-oversubscription">22.1.2.7 GPU 内存超额使用（GPU Memory Oversubscription）</h4>
+<p>统一内存允许应用程序分配和共享比系统中任意单个处理器内存容量更大的数组，从而支持无法完全放入单块 GPU 的数据集进行核外（out-of-core）处理。</p>
+<h4 id="22-1-2-8-性能提示-performance-hints">22.1.2.8 性能提示（Performance Hints）</h4>
+<p>性能提示可用于所有统一内存；在具有完整统一内存支持的系统上，也可用于系统分配内存。提示不会改变应用程序语义，只会影响性能，因此可以在开发过程中随时添加或删除。提示本身有主机端开销，只有在性能收益足以抵消该开销时才值得使用。</p>
+<h5 id="22-1-2-8-1-数据预取-data-prefetching">22.1.2.8.1 数据预取（Data Prefetching）</h5>
+<p><code>cudaMemPrefetchAsync()</code> 是异步、按流排序的 API，可将数据迁移到更靠近指定处理器的位置。迁移会等待该流中此前的操作完成，并在该流后续操作开始前完成。</p>
+<pre><code class="language-cpp">cudaError_t cudaMemPrefetchAsync(
+    const void *devPtr, size_t count, int dstDevice, cudaStream_t stream);
+</code></pre>
+<p>地址范围 <code>[devPtr, devPtr + count)</code> 可迁移到 <code>dstDevice</code>；使用 <code>cudaCpuDeviceId</code> 时目标位置为 CPU。</p>
+<pre><code class="language-cpp">void test_prefetch_sam(cudaStream_t s) {
+    char *data = (char*)malloc(N);
+    init_data(data, N);
+    cudaMemPrefetchAsync(data, N, myGpuId, s);
+    mykernel&lt;&lt;&lt;(N + TPB - 1) / TPB, TPB, 0, s&gt;&gt;&gt;(data, N);
+    cudaMemPrefetchAsync(data, N, cudaCpuDeviceId, s);
+    cudaStreamSynchronize(s);
+    use_data(data, N);
+    free(data);
+}
+</code></pre>
+<p>对于托管内存，流程相同，只需使用 <code>cudaMallocManaged()</code> 分配并在最后调用 <code>cudaFree()</code>。</p>
+<h5 id="22-1-2-8-2-数据使用提示-data-usage-hints">22.1.2.8.2 数据使用提示（Data Usage Hints）</h5>
+<p><code>cudaMemAdvise()</code> 可提示系统如何访问指定内存范围：</p>
+<pre><code class="language-cpp">cudaError_t cudaMemAdvise(
+    const void *devPtr, size_t count, enum cudaMemoryAdvise advice, int device);
+</code></pre>
+<ul>
+<li><strong><code>cudaMemAdviseSetReadMostly</code>：</strong> 表示数据主要用于读取。系统可以在读取带宽与写入带宽之间进行权衡，例如复制只读数据供多块 GPU 读取，而不必迁移唯一副本。</li>
+<li><strong><code>cudaMemAdviseSetPreferredLocation</code>：</strong> 指定数据的首选物理位置。<code>device</code> 指定 GPU；传入 <code>cudaCpuDeviceId</code> 表示 CPU 内存。其他提示（例如预取）可能使数据暂时离开首选位置。</li>
+<li><strong><code>cudaMemAdviseSetAccessedBy</code>：</strong> 告知系统某个设备会频繁访问该数据，使系统可以判断是否应提前建立映射。它不指定驻留位置，可与首选位置提示组合使用。</li>
+</ul>
+<p>可分别使用 <code>cudaMemAdviseUnsetReadMostly</code>、<code>cudaMemAdviseUnsetPreferredLocation</code> 和 <code>cudaMemAdviseUnsetAccessedBy</code> 取消对应提示。</p>
+<h5 id="22-1-2-8-3-查询托管内存的数据使用属性-querying-data-usage-attributes">22.1.2.8.3 查询托管内存的数据使用属性（Querying Data Usage Attributes）</h5>
+<p><code>cudaMemRangeGetAttribute()</code> 可查询通过 <code>cudaMemAdvise()</code> 或 <code>cudaMemPrefetchAsync()</code> 设置的托管内存属性。查询范围必须属于 <code>cudaMallocManaged()</code> 分配或 <code>__managed__</code> 变量。可查询的属性包括：</p>
+<ul>
+<li><strong><code>cudaMemRangeAttributeReadMostly</code>：</strong> 整个范围均设置为 read-mostly 时返回 1，否则返回 0。</li>
+<li><strong><code>cudaMemRangeAttributePreferredLocation</code>：</strong> 返回 GPU 设备 ID、<code>cudaCpuDeviceId</code>，或表示未设置首选位置的 <code>cudaInvalidDeviceId</code>。实际驻留位置可能与首选位置不同。</li>
+<li><strong><code>cudaMemRangeAttributeAccessedBy</code>：</strong> 返回已设置访问提示的设备列表。</li>
+<li><strong><code>cudaMemRangeAttributeLastPrefetchLocation</code>：</strong> 返回最近一次显式预取请求的目标位置，不代表预取已经开始或完成。</li>
+</ul>
+<p>也可使用 <code>cudaMemRangeGetAttributes()</code> 一次查询多个属性。</p>
+<h2 id="22-2-具有完整-cuda-统一内存支持的设备-unified-memory-on-devices-with-full-support">22.2 具有完整 CUDA 统一内存支持的设备（Unified Memory on Devices with Full Support）</h2>
+<h3 id="22-2-1-系统分配内存-深入示例-system-allocated-memory-in-depth-examples">22.2.1 系统分配内存：深入示例（System-Allocated Memory: In-depth Examples）</h3>
+<p>在完整支持统一内存的系统上，设备可以访问与其交互的主机进程拥有的任意内存。下面的内核读取字符数组的前 8 个字符并打印：</p>
+<pre><code class="language-cpp">__global__ void kernel(const char* type, const char* data) {
+    static const int n_char = 8;
+    printf("%s - first %d characters: '", type, n_char);
+    for (int i = 0; i &lt; n_char; ++i) printf("%c", data[i]);
+    printf("'\n");
+}
+</code></pre>
+<p>系统分配内存可以来自 <code>malloc()</code>、栈变量、文件作用域静态变量、全局变量、外部变量或文件映射。以下为堆内存示例：</p>
+<pre><code class="language-cpp">void test_malloc() {
+    const char test_string[] = "Hello World";
+    char* heap_data = (char*)malloc(sizeof(test_string));
+    strncpy(heap_data, test_string, sizeof(test_string));
+    kernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;("malloc", heap_data);
+    cudaDeviceSynchronize();
+    free(heap_data);
+}
+</code></pre>
+<p>托管内存版本只需改用 <code>cudaMallocManaged()</code> 分配并用 <code>cudaFree()</code> 释放。对于栈变量、文件作用域变量和全局变量，只要将地址传给内核即可。外部变量甚至可以由完全不使用 CUDA 的第三方库创建和管理。</p>
+<p>GPU 只能通过指针访问栈变量、文件作用域变量和全局作用域变量。未标记为 <code>__managed__</code> 的主机全局变量不能在设备代码中直接引用，但在 <code>pageableMemoryAccess</code> 为 1 的系统上，可以获取其地址并将地址作为内核参数传入。</p>
+<pre><code class="language-cpp">int global_variable;
+
+__global__ void kernel(int* global_variable_addr) {
+    printf("%d\n", *global_variable_addr);
+}
+
+int main() {
+    kernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;(&amp;global_variable);
+    return 0;
+}
+</code></pre>
+<h4 id="22-2-1-1-由文件支持的统一内存-file-backed-unified-memory">22.2.1.1 由文件支持的统一内存（File-backed Unified Memory）</h4>
+<p>完整统一内存支持允许设备访问主机进程拥有的任意内存，因此设备也可以访问由文件支持的映射内存：</p>
+<pre><code class="language-cpp">void test_file_backed() {
+    int fd = open(INPUT_FILE_NAME, O_RDONLY);
+    struct stat file_stat;
+    fstat(fd, &amp;file_stat);
+    char* mapped = (char*)mmap(
+        0, file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    kernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;("file-backed", mapped);
+    cudaDeviceSynchronize();
+    munmap(mapped, file_stat.st_size);
+    close(fd);
+}
+</code></pre>
+<p>该方式也适用于内存支持的文件。若系统没有 <code>hostNativeAtomicSupported</code> 属性（包括启用了 Linux HMM 的系统），则不支持对文件支持的内存执行原子访问。</p>
+<h4 id="22-2-1-2-使用统一内存进行进程间通信-ipc">22.2.1.2 使用统一内存进行进程间通信（IPC）</h4>
+<p>统一内存 IPC 可能带来明显性能开销。CUDA IPC 不支持 CUDA 托管内存的句柄共享；但在完整统一内存支持系统上，系统分配内存支持 IPC。Linux 上可使用 <code>mmap()</code> 与 <code>MAP_SHARED</code>、POSIX IPC API 或 <code>memfd_create</code> 创建可共享的系统分配内存。此方法不能用于不同主机及其设备之间的内存共享。</p>
+<h3 id="22-2-2-性能调优-performance-tuning">22.2.2 性能调优（Performance Tuning）</h3>
+<p>统一内存性能调优需要了解系统分页机制、避免不必要的页错误、控制数据驻留位置，并考虑系统内存传输的粒度。提示可能改善性能，也可能因主机端开销而降低性能。</p>
+<h4 id="22-2-2-1-内存分页与页面大小-memory-paging-and-page-sizes">22.2.2.1 内存分页与页面大小（Memory Paging and Page Sizes）</h4>
+<p>统一内存系统使用虚拟地址空间：程序使用的虚拟地址映射到内存实际驻留的物理位置。CPU 和 GPU 都使用分页。</p>
+<ul>
+<li><strong>虚拟页：</strong> 操作系统为进程跟踪的固定大小连续虚拟内存块，可映射到物理内存。</li>
+<li><strong>物理页：</strong> 处理器内存管理单元（MMU）支持的固定大小连续物理内存块。</li>
+<li><strong>页表项（PTE）：</strong> 特定虚拟页大小下的一条虚拟地址到物理地址映射。</li>
+<li><strong>转换后备缓冲区（TLB）：</strong> 缓存地址转换结果的专用结构。</li>
+</ul>
+<p>原文指出，x86_64 CPU 使用 4 KiB 物理页；Arm CPU 根据型号支持多种页大小；NVIDIA GPU 也支持多种物理页大小，并倾向使用 2 MiB 或更大的页面。页面大小可能随未来硬件改变。</p>
+<h5 id="22-2-2-1-1-选择合适的页面大小-choosing-the-right-page-size">22.2.2.1.1 选择合适的页面大小（Choosing the Right Page Size）</h5>
+<p>较小页面减少虚拟内存碎片，但可能增加 TLB 未命中；较大页面可减少 TLB 未命中，却会增加碎片和整页迁移的开销，并可能造成延迟峰值。GPU 上 TLB 未命中的代价通常比 CPU 高得多，因此 GPU 线程随机访问大范围小页面统一内存时，性能可能显著下降。应在 TLB 效率、迁移成本与内存碎片之间权衡。这里讨论的是虚拟页大小，不应直接针对某种处理器的物理页大小进行调优。</p>
+<h5 id="22-2-2-1-2-cpu-与-gpu-页表-硬件一致性与软件一致性-hardware-coherency-vs-software-coherency">22.2.2.1.2 CPU 与 GPU 页表：硬件一致性与软件一致性（Hardware Coherency vs. Software Coherency）</h5>
+<p>本节将 CPU 和 GPU 共用页表的系统称为<strong>硬件一致性系统</strong>，将 CPU 与 GPU 分别维护页表的系统称为<strong>软件一致性系统</strong>。</p>
+<p>在 Grace Hopper 等硬件一致性系统上，CPU 和 GPU 逻辑上共用页表。GPU 访问系统分配内存时使用 CPU 建立的页表项；若页面较小，访问大范围内存可能产生大量 TLB 未命中。可参考大页配置相关内容，了解如何为系统分配内存使用更大的页面。</p>
+<p>在软件一致性系统中，处理器访问映射到另一处理器物理内存中的地址时，系统通常会触发页错误，以撤销旧所有者的映射、为请求处理器建立映射，并按需迁移物理页。迁移成本可能很高，且通常随页面大小增加。</p>
+<p>当 CPU 和 GPU 线程频繁并发访问同一页时，硬件一致性系统通常更有优势：无需通过页错误模拟一致性或迁移页面；一致性维护以缓存行为粒度进行，因此不同处理器访问同一页中的不同缓存行时，通常不会因整页迁移而产生争用。此差异会影响 CPU/GPU 原子更新，以及 CPU 与 GPU 线程相互发送信号的性能。</p>
+<h4 id="22-2-2-2-从主机直接访问统一内存-direct-unified-memory-access-from-host">22.2.2.2 从主机直接访问统一内存（Direct Unified Memory Access from Host）</h4>
+<p>某些设备支持主机对驻留在 GPU 上的统一内存执行硬件一致的读取、存储和原子访问，其设备属性 <code>cudaDevAttrDirectManagedMemAccessFromHost</code> 为 1。硬件一致性系统中的 NVLink 连接设备具备该能力。主机可直接访问 GPU 驻留内存，无需页错误和数据迁移。对 CUDA 托管内存，需要通过 <code>cudaMemAdviseSetAccessedBy</code> 并指定 <code>cudaCpuDeviceId</code>，以启用这种直接访问。</p>
+<pre><code class="language-cpp">__global__ void write(int *ret, int a, int b) {
+    ret[threadIdx.x] = a + b + threadIdx.x;
+}
+__global__ void append(int *ret, int a, int b) {
+    ret[threadIdx.x] += a + b + threadIdx.x;
+}
+</code></pre>
+<p>当 <code>directManagedMemAccessFromHost=1</code> 时，内核写入 GPU 驻留数据后，CPU 可直接读取，而无需将页面迁移到主机；随后 GPU 仍可直接访问该数据。当属性为 0 时，CPU 访问可能触发页错误并将页面迁移到主机，之后 GPU 再次访问时可能把页面迁回 GPU。</p>
+<h4 id="22-2-2-3-主机原生原子操作-host-native-atomics">22.2.2.3 主机原生原子操作（Host Native Atomics）</h4>
+<p>某些设备（包括通过 NVLink 连接的硬件一致性系统）支持对驻留在 CPU 内存中的数据执行硬件加速原子访问。其属性 <code>cudaDevAttrHostNativeAtomicSupported</code> 为 1，因此原子访问无需通过页错误模拟。</p>
+<h4 id="22-2-2-4-原子访问与同步原语-atomic-accesses-and-synchronization-primitives">22.2.2.4 原子访问与同步原语（Atomic Accesses and Synchronization Primitives）</h4>
+<p>统一内存支持主机线程和设备线程使用的原子操作，使它们能够并发协作并访问同一内存位置。CUDA C++ 提供 <code>cuda::atomic</code>、<code>cuda::atomic_ref</code>、<code>cuda::barrier</code> 和 <code>cuda::semaphore</code> 等异构同步原语。</p>
+<p>在没有 CPU/GPU 共用页表的系统上，设备对文件支持的主机内存执行原子访问不受支持。软件一致性系统上的其他统一内存原子访问也可能触发页错误并带来显著延迟。可通过 <code>nvidia-smi -q | grep "Atomic Caps Outbound"</code> 检查可能避免页错误的操作。硬件一致性系统的主机与设备原子操作无需通过页错误维持一致性，但仍可能因其他原因触发页错误。</p>
+<h4 id="22-2-2-5-统一内存上的-memcpy-memset-行为-memcpy-memset-behavior-with-unified-memory">22.2.2.5 统一内存上的 <code>Memcpy()</code> / <code>Memset()</code> 行为（Memcpy()/Memset() Behavior With Unified Memory）</h4>
+<p><code>cudaMemcpy*()</code> 和 <code>cudaMemset*()</code> 可以接受任意统一内存指针。对于 <code>cudaMemcpy*()</code>，<code>cudaMemcpyKind</code> 指定的方向是一种性能提示；如果任一参数是统一内存指针，该提示可能对性能产生较明显的影响。</p>
+<p>建议：</p>
+<ul>
+<li>已知统一内存的物理位置时，使用准确的 <code>cudaMemcpyKind</code> 提示；</li>
+<li>与不准确的提示相比，优先使用 <code>cudaMemcpyKindDefault</code>；</li>
+<li>使用已初始化的缓冲区，避免使用这些 API 初始化内存；</li>
+<li>如果两个指针都指向系统分配内存，应避免调用 <code>cudaMemcpy*()</code>，改用内核或 CPU 内存复制算法，例如 <code>std::memcpy()</code>。</li>
+</ul>
+<h2 id="22-3-不具备完整-cuda-统一内存支持的设备-unified-memory-on-devices-without-full-support">22.3 不具备完整 CUDA 统一内存支持的设备（Unified Memory on Devices without Full Support）</h2>
+<h3 id="22-3-1-仅支持-cuda-托管内存的设备">22.3.1 仅支持 CUDA 托管内存的设备</h3>
+<p>对于计算能力 6.x 或更高、但不支持可分页内存访问的设备，CUDA 托管内存仍得到完整支持并保持一致性。其编程模型和性能调优方式大体与 22.2 节相同，主要区别是不能使用系统分配器分配内存。因此，系统分配内存的深入示例以及硬件/软件一致性相关内容不适用于这类设备。</p>
+<h3 id="22-3-2-windows-或计算能力-5-x-设备上的统一内存">22.3.2 Windows 或计算能力 5.x 设备上的统一内存</h3>
+<p>计算能力低于 6.0 的设备或 Windows 平台支持 CUDA 托管内存 1.0，但数据迁移、一致性和内存超额使用能力有限。</p>
+<h4 id="22-3-2-1-数据迁移与一致性-data-migration-and-coherency">22.3.2.1 数据迁移与一致性（Data Migration and Coherency）</h4>
+<p>计算能力低于 6.0 的 GPU 不支持按需细粒度迁移托管数据。每次启动 GPU 内核时，系统通常必须先将所有托管内存迁移到 GPU 内存，以避免访问时发生页错误。</p>
+<p>计算能力 6.x 引入了 GPU 页错误机制，允许系统按需迁移页面，或将页面映射到 GPU 地址空间并通过 PCIe/NVLink 访问。统一内存是系统级的：GPU 和 CPU 都可以从 CPU 内存或系统中其他 GPU 的内存触发页错误并迁移页面。</p>
+<h4 id="22-3-2-2-gpu-内存超额使用-gpu-memory-oversubscription">22.3.2.2 GPU 内存超额使用（GPU Memory Oversubscription）</h4>
+<p>计算能力低于 6.0 的设备不能分配超过 GPU 物理内存容量的托管内存。</p>
+<h4 id="22-3-2-3-多-gpu-multi-gpu">22.3.2.3 多 GPU（Multi-GPU）</h4>
+<p>在计算能力低于 6.0 的系统上，托管分配会通过 GPU 的点对点（P2P）能力自动对系统中所有 GPU 可见。托管内存类似于通过 <code>cudaMalloc()</code> 分配的非托管内存：当前活动设备是物理分配所在的设备，其他 GPU 则可能通过 PCIe 以较低带宽访问该内存。</p>
+<p>在 Linux 上，如果程序使用的所有 GPU 都支持彼此 P2P，托管内存会分配在 GPU 内存中。若程序开始使用一块与已有托管分配所在 GPU 不支持 P2P 的设备，驱动程序可能将所有托管分配迁移到系统内存，之后所有 GPU 的访问都受到 PCIe 带宽限制。</p>
+<p>在 Windows 上，如果无法建立 P2P 映射（例如不同架构 GPU 之间），系统会退回到零拷贝内存。若程序只打算使用一块 GPU，可在启动前设置 <code>CUDA_VISIBLE_DEVICES</code> 限制可见 GPU，使托管分配能够放在该 GPU 内存中。</p>
+<p>Windows 用户还可以将 <code>CUDA_MANAGED_FORCE_DEVICE_ALLOC</code> 设为非零值，强制驱动程序使用设备内存作为物理存储。启用后，该进程中所有支持托管内存的设备都必须彼此兼容 P2P；若新设备与此前使用的设备不支持 P2P，即使调用过 <code>cudaDeviceReset()</code>，也可能返回 <code>cudaErrorInvalidDevice</code>。从 CUDA 8.0 开始，该环境变量在 Linux 上不起作用。</p>
+<h4 id="22-3-2-4-一致性与并发-coherency-and-concurrency">22.3.2.4 一致性与并发（Coherency and Concurrency）</h4>
+<p>计算能力低于 6.0 的设备不允许 CPU 与 GPU 同时访问托管内存，因为 GPU 内核活动期间无法保证一致性。</p>
+<h5 id="22-3-2-4-1-gpu-独占访问托管内存-gpu-exclusive-access-to-managed-memory">22.3.2.4.1 GPU 独占访问托管内存（GPU Exclusive Access to Managed Memory）</h5>
+<p>在 6.x 之前的 GPU 架构上，只要任何内核正在执行，GPU 就被视为独占访问所有托管数据，无论该内核是否实际使用这些数据。<code>cudaMemcpy*()</code> 或 <code>cudaMemset*()</code> 执行期间，系统也可能从主机或设备访问源/目标数据，因此会限制 CPU 并发访问。</p>
+<p>对于 <code>concurrentManagedAccess</code> 为 0 的设备，只要 GPU 处于活动状态，CPU 就不能访问任何托管分配或托管变量。即使 CPU 与 GPU 访问不同的托管分配，也可能因页面被视为对 CPU 不可访问而发生段错误。</p>
+<pre><code class="language-cpp">__device__ __managed__ int x, y = 2;
+__global__ void kernel() { x = 10; }
+
+int main() {
+    kernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;();
+    y = 20; // 不支持并发访问的 GPU 上会出错
+    cudaDeviceSynchronize();
+    return 0;
+}
+</code></pre>
+<p>必须在 CPU 访问托管数据前显式同步：</p>
+<pre><code class="language-cpp">int main() {
+    kernel&lt;&lt;&lt;1, 1&gt;&gt;&gt;();
+    cudaDeviceSynchronize();
+    y = 20; // 同步后访问有效
+    return 0;
+}
+</code></pre>
+<p>即使内核执行很快、在 CPU 访问前已经实际完成，仍然需要显式同步。若 GPU 活动期间通过 <code>cudaMallocManaged()</code> 或 <code>cuMemAllocManaged()</code> 动态分配内存，那么在后续工作启动或 GPU 同步之前，该内存的行为未指定；此期间 CPU 访问可能导致段错误。使用 <code>cudaMemAttachHost</code> 或 <code>CU_MEM_ATTACH_HOST</code> 标志分配的内存不受该规则影响。</p>
+<h5 id="22-3-2-4-2-显式同步与-gpu-的逻辑活动-explicit-synchronization-and-logical-gpu-activity">22.3.2.4.2 显式同步与 GPU 的逻辑活动（Explicit Synchronization and Logical GPU Activity）</h5>
+<p>统一内存根据<strong>逻辑活动</strong>判断 GPU 是否空闲。CUDA 编程模型不保证内核启动后会在某个特定时刻完成；只有主机执行同步调用后，才能保证相应工作已完成。</p>
+<p>可用于同步的调用包括：</p>
+<ul>
+<li><code>cudaDeviceSynchronize()</code>；</li>
+<li><code>cudaStreamSynchronize()</code>；</li>
+<li><code>cudaStreamQuery()</code>，前提是返回 <code>cudaSuccess</code>，且指定流是 GPU 上唯一仍在执行的流；</li>
+<li><code>cudaEventSynchronize()</code> 和 <code>cudaEventQuery()</code>，前提是该事件之后没有设备工作；</li>
+<li>文档明确保证与主机完全同步的 <code>cudaMemcpy()</code> 和 <code>cudaMemset()</code>。</li>
+</ul>
+<p>同步流或事件时，系统会沿流间依赖关系推断其他流的工作是否完成。依赖关系可以通过 <code>cudaStreamWaitEvent()</code> 建立，也可以由默认（NULL）流隐式建立。</p>
+<p>如果 GPU 上没有其他可能访问托管数据的活动流，CPU 可以在流回调函数内部访问托管数据。若回调后没有设备工作，也可以通过回调触发条件变量等机制完成同步；否则，CPU 访问只在回调执行期间有效。</p>
+<p>还需注意：</p>
+<ul>
+<li>GPU 活动期间，CPU 始终可以访问非托管的零拷贝数据。</li>
+<li>GPU 运行任何内核时都被视为活动状态，即使该内核不使用托管数据；除非 <code>concurrentManagedAccess</code> 为 1，否则 CPU 不得访问可能被内核使用的数据。</li>
+<li>不同 GPU 可以并发访问托管内存，限制与非托管多 GPU 访问相同。</li>
+<li>不同 GPU 内核可以并发访问托管数据，因此内核之间仍可能发生数据竞争。</li>
+</ul>
+<h5 id="22-3-2-4-3-使用流管理数据可见性与-cpu-gpu-并发访问-managing-data-visibility-and-concurrent-cpu-gpu-a">22.3.2.4.3 使用流管理数据可见性与 CPU/GPU 并发访问（Managing Data Visibility and Concurrent CPU + GPU Access with Streams）</h5>
+<p><code>cudaStreamAttachMemAsync()</code> 可将托管内存显式关联到某个 CUDA 流，使程序按流细化数据的可见性与访问约束：</p>
+<pre><code class="language-cpp">cudaError_t cudaStreamAttachMemAsync(
+    cudaStream_t stream, void *ptr, size_t length = 0, unsigned int flags = 0);
+</code></pre>
+<p>该函数将从 <code>ptr</code> 开始的内存区域关联到指定流。目前 <code>length</code> 必须为 0，表示整个区域。建立关联后，只要该流中的所有操作都已完成，CPU 就可以访问该区域，即使其他流仍在运行。这将 GPU 对托管区域的独占权，从整个 GPU 的活动状态细化为单个流的活动状态。</p>
+<p>如果分配没有关联到特定流，它默认对所有正在运行的内核可见。这是 <code>cudaMallocManaged()</code> 分配和 <code>__managed__</code> 变量的默认行为。将分配关联到某个流，意味着程序保证只有在该流中启动的内核会访问该数据；统一内存系统不会替程序检查这一保证，责任由程序员承担。该 API 通常还可启用数据传输优化。</p>
+<h5 id="22-3-2-4-4-流关联示例-stream-association-examples">22.3.2.4.4 流关联示例（Stream Association Examples）</h5>
+<pre><code class="language-cpp">__device__ __managed__ int x, y = 2;
+__global__ void kernel() { x = 10; }
+
+int main() {
+    cudaStream_t stream1;
+    cudaStreamCreate(&amp;stream1);
+    cudaStreamAttachMemAsync(stream1, &amp;y, 0, cudaMemAttachHost);
+    cudaDeviceSynchronize(); // 等待主机关联完成
+
+    kernel&lt;&lt;&lt;1, 1, 0, stream1&gt;&gt;&gt;();
+    y = 20; // 有效：y 已关联到主机可访问状态
+    return 0;
+}
+</code></pre>
+<p>显式将 <code>y</code> 关联到主机可访问状态后，CPU 可以访问它；但 GPU 内核若访问 <code>y</code>，结果将未定义。将 <code>x</code> 关联到某个流不会改变 <code>y</code> 的可见性。若 <code>y</code> 仍默认对所有流全局可见，而 GPU 内核可能访问它，则 CPU 在内核活动时访问 <code>y</code> 仍会出错。</p>
+<h5 id="22-3-2-4-5-多线程主机程序中的流关联-stream-attach-with-multithreaded-host-programs">22.3.2.4.5 多线程主机程序中的流关联（Stream Attach With Multithreaded Host Programs）</h5>
+<p>多线程程序通常为每个 CPU 线程创建专用 CUDA 流，避免 NULL 默认流在线程间引入依赖。托管数据默认对所有 GPU 流全局可见，可能造成线程之间相互干扰。因此，可将某个线程的托管分配关联到该线程自己的流，并通常在线程生命周期内保持该关联。</p>
+<pre><code class="language-cpp">void run_task(int *in, int *out, int length) {
+    cudaStream_t stream;
+    cudaStreamCreate(&amp;stream);
+
+    int *data;
+    cudaMallocManaged((void **)&amp;data, length, cudaMemAttachHost);
+    cudaStreamAttachMemAsync(stream, data);
+    cudaStreamSynchronize(stream);
+
+    for (int i = 0; i &lt; N; i++) {
+        transform&lt;&lt;&lt;100, 256, 0, stream&gt;&gt;&gt;(in, data, length);
+        cudaStreamSynchronize(stream);
+        host_process(data, length);
+        convert&lt;&lt;&lt;100, 256, 0, stream&gt;&gt;&gt;(out, data, length);
+    }
+
+    cudaStreamSynchronize(stream);
+    cudaStreamDestroy(stream);
+    cudaFree(data);
+}
+</code></pre>
+<p>该分配与流之间只需建立一次关联，之后即可由主机和设备反复使用数据，比显式复制更简单。</p>
+<h5 id="22-3-2-4-6-进阶主题-模块化程序与数据访问约束-advanced-topic-modular-programs-and-data-access-constrai">22.3.2.4.6 进阶主题：模块化程序与数据访问约束（Advanced Topic: Modular Programs and Data Access Constraints）</h5>
+<p>在 <code>cudaMallocManaged()</code> 中指定 <code>cudaMemAttachHost</code>，可使新分配的内存在初始状态下对设备端执行不可见；默认分配则对所有流中的 GPU 内核可见。这样可以避免内存分配完成后、尚未关联到专用流之前，意外受到其他线程内核执行的影响。</p>
+<p>若另一线程启动的内核正在运行，新分配可能被视为正在 GPU 上使用，进而影响当前线程在关联到自己的流之前从 CPU 访问该数据的能力。因此，为保证线程独立性，建议分配时使用 <code>cudaMemAttachHost</code>。</p>
+<p>替代方案是在分配关联到流后建立进程范围的线程屏障，确保所有线程完成关联后再启动内核；销毁流之前还需要第二次屏障，因为流销毁会使分配恢复默认可见性。<code>cudaMemAttachHost</code> 可以简化这一过程，并适用于无法插入全局屏障的情况。</p>
+<h5 id="22-3-2-4-7-与流关联的统一内存上的-memcpy-memset-行为">22.3.2.4.7 与流关联的统一内存上的 <code>Memcpy()</code> / <code>Memset()</code> 行为</h5>
+<p>对于 <code>concurrentManagedAccess</code> 未启用的设备，<code>cudaMemcpy*()</code> 和 <code>cudaMemset*()</code> 的行为遵循以下规则：</p>
+<ul>
+<li>指定 <code>cudaMemcpyHostTo*</code> 且源数据是统一内存时，如果源数据在复制流中可由主机保持一致地访问，则从主机访问；否则从设备访问。<code>cudaMemcpy*ToHost</code> 的统一内存目标也遵循类似规则。</li>
+<li>指定 <code>cudaMemcpyDeviceTo*</code> 且源数据是统一内存时，从设备访问；源数据必须能在复制流中由设备保持一致地访问，否则返回错误。<code>cudaMemcpy*ToDevice</code> 的统一内存目标也遵循类似规则。</li>
+<li>指定 <code>cudaMemcpyDefault</code> 时，如果统一内存不能在复制流中由设备保持一致地访问，或者其首选位置为 <code>cudaCpuDeviceId</code> 且能由主机保持一致地访问，则从主机访问；否则从设备访问。</li>
+<li>使用 <code>cudaMemset*()</code> 时，数据必须能在执行操作的流中由设备保持一致地访问，否则返回错误。</li>
+</ul>
+<p>当 <code>cudaMemcpy*()</code> 或 <code>cudaMemset*()</code> 从设备访问数据时，该操作所在流被视为 GPU 活动流。如果 <code>concurrentManagedAccess</code> 为 0，那么 CPU 在此期间访问与该流关联的数据或具有全局可见性的数据，会导致段错误。程序必须同步，确保操作完成后才由 CPU 访问相关数据。</p>
+<p>“在给定流中可由主机保持一致地访问”是指内存既不具有全局可见性，也没有关联到该流；“在给定流中可由设备保持一致地访问”则指内存具有全局可见性，或已关联到该流。</p>
+<h2 id="校对说明">校对说明</h2>
+<p>本章第一轮译稿覆盖 22.1–22.3.2.4.7。代码示例保留 CUDA API 与主要结构，但尚未在 CUDA 12.8 工具链中逐例编译验证。原文中的部分行为依赖具体设备属性、操作流和同步关系，正式发布前应逐项对照原文与对应版本 SDK 复核。</p>

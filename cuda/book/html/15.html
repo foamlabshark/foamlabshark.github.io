@@ -1,0 +1,368 @@
+<h1 id="第十五章-图内存节点-graph-memory-nodes">第十五章 图内存节点（Graph Memory Nodes）</h1>
+<blockquote>
+<p>对应原 PDF 第 397–410 页（原书印刷页码 381–394）。保留原书章节编号、CUDA API 名称、代码标识符和主要示例；原书图 31–34 已提取到 <code>images/</code>，并以相对路径引用。</p>
+</blockquote>
+<h2 id="15-1-简介-introduction">15.1 简介（Introduction）</h2>
+<p>图内存节点允许 CUDA Graph 创建并拥有内存分配。图内存节点遵循由 GPU 执行顺序决定的生命周期语义，这些语义规定了设备何时可以访问相应内存。它们使驱动程序能够管理内存复用，其生命周期规则与流有序内存分配 API <code>cudaMallocAsync</code> 和 <code>cudaFreeAsync</code> 一致；创建图时，也可以通过流捕获将这些 API 纳入图中。</p>
+<p>在图的整个生命周期内（包括重复实例化和多次启动），图分配的虚拟地址保持固定。这样，即使 CUDA 更换了底层物理内存，图内其他操作仍可直接引用这些地址，而不需要更新图。在同一个图中，如果不同分配的图执行生命周期不重叠，它们可能使用同一块底层物理内存。</p>
+<p>CUDA 也可以在多个图之间复用同一块物理内存，并依据 GPU 顺序的生命周期语义，将这块物理内存映射到不同图各自的虚拟地址。例如，不同图如果在同一个流中启动，CUDA 可以通过虚拟别名方式，让具有单图生命周期的分配复用相同的物理内存。</p>
+<h2 id="15-2-支持与兼容性-support-and-compatibility">15.2 支持与兼容性（Support and Compatibility）</h2>
+<p>图内存节点要求 CUDA 驱动程序版本至少为 11.4，并且 GPU 支持流有序内存分配器。下面的代码用于查询设备是否支持该功能。</p>
+<pre><code class="language-cpp">int driverVersion = 0;
+int deviceSupportsMemoryPools = 0;
+int deviceSupportsMemoryNodes = 0;
+
+cudaDriverGetVersion(&amp;driverVersion);
+
+if (driverVersion &gt;= 11020) {
+    // 避免在 cudaDeviceGetAttribute 中查询尚未定义的属性而返回错误。
+    cudaDeviceGetAttribute(
+        &amp;deviceSupportsMemoryPools,
+        cudaDevAttrMemoryPoolsSupported,
+        device);
+}
+
+deviceSupportsMemoryNodes =
+    (driverVersion &gt;= 11040) &amp;&amp; (deviceSupportsMemoryPools != 0);
+</code></pre>
+<p>将属性查询放在驱动版本检查中，可以避免在 11.0 和 11.1 驱动程序上返回 <code>cudaErrorInvalidValue</code>。需要注意，Compute Sanitizer 检测到 CUDA 返回错误码时会发出警告，因此在查询属性前检查版本可以避免此类警告。图内存节点仅受 11.4 及更新版本的驱动程序支持。</p>
+<h2 id="15-3-api-基础-api-fundamentals">15.3 API 基础（API Fundamentals）</h2>
+<p>图内存节点是表示内存分配或释放操作的图节点。为简化表述，分配内存的节点称为<strong>分配节点</strong>（allocation node），释放内存的节点称为<strong>释放节点</strong>（free node）。由分配节点创建的内存称为<strong>图分配</strong>（graph allocation）。</p>
+<p>在创建图分配节点时，CUDA 就会为该分配指定虚拟地址。虽然这些虚拟地址在分配节点的生命周期内保持固定，但分配内容不会在释放操作后继续保留，之后可能被访问其他分配的操作覆盖。</p>
+<p>每次图执行时，都可以认为图分配被重新创建。图分配的生命周期与分配节点本身的生命周期不同：它从 GPU 执行到达分配节点时开始，并在以下任一情况发生时结束：</p>
+<ul>
+<li>GPU 执行到达释放图节点；</li>
+<li>GPU 执行到达流中的 <code>cudaFreeAsync()</code> 调用；</li>
+<li>调用 <code>cudaFree()</code> 时立即结束。</li>
+</ul>
+<p><strong>注意：</strong> 销毁图不会自动释放仍然存活的图内存，即使销毁操作结束了分配节点本身的生命周期也是如此。之后必须在另一个图中释放该分配，或使用 <code>cudaFreeAsync()</code> / <code>cudaFree()</code> 释放。</p>
+<p>与其他图结构一样，图内存节点通过依赖边确定图内的执行顺序。程序必须保证访问图内存的操作：</p>
+<ul>
+<li>排在分配节点之后；</li>
+<li>排在释放该内存的操作之前。</li>
+</ul>
+<p>图分配的生命周期通常由 GPU 实际执行决定，而不是由 API 被调用或工作被提交的时刻决定。因此，图分配被称为遵循 <strong>GPU 顺序（GPU ordered）</strong>。</p>
+<h3 id="15-3-1-图节点-api-graph-node-apis">15.3.1 图节点 API（Graph Node APIs）</h3>
+<p>可以使用内存节点创建 API <code>cudaGraphAddMemAllocNode</code> 和 <code>cudaGraphAddMemFreeNode</code> 显式创建图内存节点。<code>cudaGraphAddMemAllocNode</code> 分配的地址通过传入的 <code>CUDA_MEM_ALLOC_NODE_PARAMS</code> 结构体中的 <code>dptr</code> 字段返回给用户。</p>
+<p>在分配图内部，所有使用图分配的操作都必须排在分配节点之后。类似地，任何释放节点都必须排在图内所有使用该分配的操作之后。<code>cudaGraphAddMemFreeNode</code> 用于创建释放节点。</p>
+<p>下图展示了一个包含分配节点和释放节点的示例图。内核节点 a、b、c 都位于分配节点之后、释放节点之前，因此可以访问该分配。内核节点 e 没有排在分配节点之后，因此不能安全地访问该内存。内核节点 d 没有排在释放节点之前，同样不能安全地访问该内存。</p>
+<p><em>图 31：包含内存分配、内核访问和释放节点的图。</em></p>
+<p><img alt="图 31：图内存节点及其依赖关系" decoding="async" loading="lazy" src="/cuda/book/images/figure_31_graph_memory_nodes.png"/></p>
+<p>以下代码建立了图中的依赖关系：</p>
+<pre><code class="language-cpp">// 创建图；新图初始为空。
+cudaGraphCreate(&amp;graph, 0);
+
+// 基本分配参数。
+cudaMemAllocNodeParams params = {};
+params.poolProps.allocType = cudaMemAllocationTypePinned;
+params.poolProps.location.type = cudaMemLocationTypeDevice;
+
+// 指定分配驻留在设备 0 上。
+params.poolProps.location.id = 0;
+params.bytesize = size;
+
+cudaGraphAddMemAllocNode(&amp;allocNode, graph, NULL, 0, &amp;params);
+nodeParams-&gt;kernelParams[0] = params.dptr;
+
+cudaGraphAddKernelNode(&amp;a, graph, &amp;allocNode, 1, &amp;nodeParams);
+cudaGraphAddKernelNode(&amp;b, graph, &amp;a, 1, &amp;nodeParams);
+cudaGraphAddKernelNode(&amp;c, graph, &amp;a, 1, &amp;nodeParams);
+
+cudaGraphNode_t dependencies[2];
+
+// 内核 b 和 c 使用该图分配，因此释放节点必须依赖它们。
+// b 依赖 a 已建立了间接依赖关系，所以释放节点不必再显式依赖 a。
+dependencies[0] = b;
+dependencies[1] = c;
+cudaGraphAddMemFreeNode(
+    &amp;freeNode, graph, dependencies, 2, params.dptr);
+
+// 释放节点不依赖内核 d，因此 d 不得访问已释放的图分配。
+cudaGraphAddKernelNode(&amp;d, graph, &amp;c, 1, &amp;nodeParams);
+
+// 节点 e 不依赖分配节点，因此也不得访问该分配。
+// 即使 freeNode 依赖节点 e，这条规则也不变。
+cudaGraphAddKernelNode(&amp;e, graph, NULL, 0, &amp;nodeParams);
+</code></pre>
+<h3 id="15-3-2-流捕获-stream-capture">15.3.2 流捕获（Stream Capture）</h3>
+<p>可以通过捕获相应的流有序分配和释放调用 <code>cudaMallocAsync</code> 与 <code>cudaFreeAsync</code> 来创建图内存节点。在这种情况下，被捕获分配 API 返回的虚拟地址可以由图中的其他操作使用。</p>
+<p>由于流有序依赖关系会被捕获到图中，对于编写正确的流代码，流有序分配 API 的顺序规则也会保证图内存节点与被捕获的流操作之间具有正确的依赖关系。</p>
+<p>下面的代码省略内核节点 d 和 e，以说明如何通过流捕获创建前图中的依赖关系：</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;dptr, size, stream1);
+kernel_A&lt;&lt;&lt;..., stream1&gt;&gt;&gt;(dptr, ...);
+
+// 分支到 stream2。
+cudaEventRecord(event1, stream1);
+cudaStreamWaitEvent(stream2, event1);
+
+kernel_B&lt;&lt;&lt;..., stream1&gt;&gt;&gt;(dptr, ...);
+
+// 事件依赖关系会转换为图依赖关系。
+// 因此，捕获 kernel_C 所创建的内核节点会依赖捕获
+// cudaMallocAsync 调用所创建的分配节点。
+kernel_C&lt;&lt;&lt;..., stream2&gt;&gt;&gt;(dptr, ...);
+
+// 将 stream2 汇合回原始流 stream1。
+cudaEventRecord(event2, stream2);
+cudaStreamWaitEvent(stream1, event2);
+
+// 释放节点依赖所有访问该内存的工作。
+cudaFreeAsync(dptr, stream1);
+
+// 在原始流中结束捕获。
+cudaStreamEndCapture(stream1, &amp;graph);
+</code></pre>
+<h3 id="15-3-3-在分配图之外访问和释放图内存-accessing-and-freeing-graph-memory-outside-of-the-allocating-gr">15.3.3 在分配图之外访问和释放图内存（Accessing and Freeing Graph Memory Outside of the Allocating Graph）</h3>
+<p>分配图不必负责释放其创建的图分配。如果图没有释放某项分配，该分配会在图执行结束后继续存在，并可供后续 CUDA 操作访问。</p>
+<p>只要通过 CUDA 事件或其他流排序机制，确保访问操作排在分配之后，就可以在另一个图中访问该分配，也可以通过流操作直接访问。之后可以使用普通的 <code>cudaFree</code> 或 <code>cudaFreeAsync</code> 释放它，也可以通过另一个包含相应释放节点的图释放，或者在下一次启动分配图时释放（前提是该图使用 <code>cudaGraphInstantiateFlagAutoFreeOnLaunch</code> 标志完成实例化）。</p>
+<p>内存被释放后再访问属于非法操作。必须通过图依赖、CUDA 事件和其他流排序机制，保证释放操作排在所有访问该内存的操作之后。</p>
+<p><strong>注意：</strong> 不同图分配可能共享底层物理内存，因此必须考虑“虚拟别名支持”一节中的一致性和连贯性规则。简单来说，释放操作必须排在完整设备操作（例如计算内核或内存复制）完成之后。仅依靠设备操作内部的“带外”同步（例如，访问图内存的计算内核通过内存握手进行同步），不足以保证图内存写入与释放操作之间的顺序关系。</p>
+<p>下面几种示例分别通过同一流、不同流之间的事件，以及嵌入分配图和释放图中的事件节点，建立正确的顺序关系。</p>
+<p><strong>通过同一流建立顺序：</strong></p>
+<pre><code class="language-cpp">void *dptr;
+cudaGraphAddMemAllocNode(&amp;allocNode, allocGraph, NULL, 0, &amp;params);
+dptr = params.dptr;
+
+cudaGraphInstantiate(&amp;allocGraphExec, allocGraph, NULL, NULL, 0);
+cudaGraphLaunch(allocGraphExec, stream);
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(dptr, ...);
+cudaFreeAsync(dptr, stream);
+</code></pre>
+<p><strong>通过记录和等待 CUDA 事件建立顺序：</strong></p>
+<pre><code class="language-cpp">void *dptr;
+
+// 分配图的内容。
+cudaGraphAddMemAllocNode(&amp;allocNode, allocGraph, NULL, 0, &amp;params);
+dptr = params.dptr;
+
+// 消费/释放图的内容。
+nodeParams-&gt;kernelParams[0] = params.dptr;
+cudaGraphAddKernelNode(&amp;a, graph, NULL, 0, &amp;nodeParams);
+cudaGraphAddMemFreeNode(&amp;freeNode, freeGraph, &amp;a, 1, dptr);
+
+cudaGraphInstantiate(&amp;allocGraphExec, allocGraph, NULL, NULL, 0);
+cudaGraphInstantiate(&amp;freeGraphExec, freeGraph, NULL, NULL, 0);
+cudaGraphLaunch(allocGraphExec, allocStream);
+
+// 让 stream2 依赖分配操作。
+// 注意：也可以通过同步该流来建立依赖关系。
+cudaEventRecord(allocEvent, allocStream);
+cudaStreamWaitEvent(stream2, allocEvent);
+
+kernel&lt;&lt;&lt;..., stream2&gt;&gt;&gt;(dptr, ...);
+
+// 建立 stream3 与内存使用操作之间的依赖关系。
+cudaEventRecord(streamUseDoneEvent, stream2);
+cudaStreamWaitEvent(stream3, streamUseDoneEvent);
+
+// 此时可以安全地启动释放图；该图也可以访问这块内存。
+cudaGraphLaunch(freeGraphExec, stream3);
+</code></pre>
+<p><strong>通过图中的外部事件节点建立顺序：</strong></p>
+<pre><code class="language-cpp">void *dptr;
+cudaEvent_t allocEvent;          // 指示分配何时可以使用。
+cudaEvent_t streamUseDoneEvent;  // 指示流操作何时完成对分配的使用。
+
+// 分配图：包含事件记录节点。
+cudaGraphAddMemAllocNode(&amp;allocNode, allocGraph, NULL, 0, &amp;params);
+dptr = params.dptr;
+
+// 此事件记录节点依赖分配节点。
+cudaGraphAddEventRecordNode(
+    &amp;recordNode, allocGraph, &amp;allocNode, 1, allocEvent);
+cudaGraphInstantiate(&amp;allocGraphExec, allocGraph, NULL, NULL, 0);
+
+// 消费/释放图：包含事件等待节点。
+cudaGraphAddEventWaitNode(
+    &amp;streamUseDoneEventNode, waitAndFreeGraph, NULL, 0,
+    streamUseDoneEvent);
+cudaGraphAddEventWaitNode(
+    &amp;allocReadyEventNode, waitAndFreeGraph, NULL, 0, allocEvent);
+
+nodeParams-&gt;kernelParams[0] = params.dptr;
+
+// allocReadyEventNode 为消费图中的内存使用操作建立与分配节点的顺序关系。
+cudaGraphAddKernelNode(
+    &amp;kernelNode, waitAndFreeGraph, &amp;allocReadyEventNode, 1, &amp;nodeParams);
+
+// 释放节点必须排在外部和内部所有使用操作之后。
+// 因此它必须同时依赖 kernelNode 和 streamUseDoneEventNode。
+dependencies[0] = kernelNode;
+dependencies[1] = streamUseDoneEventNode;
+cudaGraphAddMemFreeNode(
+    &amp;freeNode, waitAndFreeGraph, dependencies, 2, dptr);
+
+cudaGraphInstantiate(&amp;waitAndFreeGraphExec, waitAndFreeGraph, NULL, NULL, 0);
+cudaGraphLaunch(allocGraphExec, allocStream);
+
+// stream2 等待分配图中的事件节点，从而满足顺序要求。
+cudaStreamWaitEvent(stream2, allocEvent);
+kernel&lt;&lt;&lt;..., stream2&gt;&gt;&gt;(dptr, ...);
+cudaEventRecord(streamUseDoneEvent, stream2);
+
+// waitAndFreeGraphExec 中的事件等待节点会建立必要依赖，
+// 防止 stream2 中的内核在执行顺序上位于释放节点之后却仍访问该分配。
+cudaGraphLaunch(waitAndFreeGraphExec, stream3);
+</code></pre>
+<h3 id="15-3-4-cudagraphinstantiateflagautofreeonlaunch">15.3.4 <code>cudaGraphInstantiateFlagAutoFreeOnLaunch</code></h3>
+<p>通常，如果一个图仍有未释放的内存分配，CUDA 会阻止它再次启动，因为在同一地址上重复分配可能导致内存泄漏。</p>
+<p>如果实例化图时指定 <code>cudaGraphInstantiateFlagAutoFreeOnLaunch</code> 标志，就可以在图仍持有未释放分配的情况下再次启动。此时，每次启动都会自动插入对未释放分配的异步释放操作。</p>
+<p>自动释放启动对于“单生产者、多消费者”算法很有用。每次迭代中，生产者图创建若干分配；之后根据运行时条件，由不同的消费者集合访问这些分配。由于消费者集合会变化，消费者本身无法安全地释放分配，因为后续消费者可能还需要访问它们。启用启动时自动释放后，启动循环不必跟踪生产者图的分配；相关信息只需保留在生产者图自身的创建和销毁逻辑中。总体而言，该标志简化了原本必须在每次重新启动图之前释放其全部分配的算法。</p>
+<p><strong>注意：</strong> <code>cudaGraphInstantiateFlagAutoFreeOnLaunch</code> 不会改变图销毁时的行为。为避免内存泄漏，应用程序仍必须显式释放未释放的内存，即使图是使用该标志实例化的。</p>
+<p>以下示例展示如何使用该标志简化单生产者、多消费者算法：</p>
+<pre><code class="language-cpp">// 创建生产者图：分配内存并填充数据。
+cudaStreamBeginCapture(cudaStreamPerThread, cudaStreamCaptureModeGlobal);
+cudaMallocAsync(&amp;data1, blocks * threads, cudaStreamPerThread);
+cudaMallocAsync(&amp;data2, blocks * threads, cudaStreamPerThread);
+produce&lt;&lt;&lt;blocks, threads, 0, cudaStreamPerThread&gt;&gt;&gt;(data1, data2);
+...
+cudaStreamEndCapture(cudaStreamPerThread, &amp;graph);
+
+cudaGraphInstantiateWithFlags(
+    &amp;producer, graph, cudaGraphInstantiateFlagAutoFreeOnLaunch);
+cudaGraphDestroy(graph);
+
+// 创建第一个消费者图：捕获异步库调用。
+cudaStreamBeginCapture(cudaStreamPerThread, cudaStreamCaptureModeGlobal);
+consumerFromLibrary(data1, cudaStreamPerThread);
+cudaStreamEndCapture(cudaStreamPerThread, &amp;graph);
+cudaGraphInstantiateWithFlags(&amp;consumer1, graph, 0); // 常规实例化
+cudaGraphDestroy(graph);
+
+// 创建第二个消费者图。
+cudaStreamBeginCapture(cudaStreamPerThread, cudaStreamCaptureModeGlobal);
+consume2&lt;&lt;&lt;blocks, threads, 0, cudaStreamPerThread&gt;&gt;&gt;(data2);
+...
+cudaStreamEndCapture(cudaStreamPerThread, &amp;graph);
+cudaGraphInstantiateWithFlags(&amp;consumer2, graph, 0);
+cudaGraphDestroy(graph);
+
+// 循环启动。
+bool launchConsumer2 = false;
+do {
+    cudaGraphLaunch(producer, myStream);
+    cudaGraphLaunch(consumer1, myStream);
+    if (launchConsumer2) {
+        cudaGraphLaunch(consumer2, myStream);
+    }
+} while (determineAction(&amp;launchConsumer2));
+
+cudaFreeAsync(data1, myStream);
+cudaFreeAsync(data2, myStream);
+
+cudaGraphExecDestroy(producer);
+cudaGraphExecDestroy(consumer1);
+cudaGraphExecDestroy(consumer2);
+</code></pre>
+<h2 id="15-4-优化的内存复用-optimized-memory-reuse">15.4 优化的内存复用（Optimized Memory Reuse）</h2>
+<p>CUDA 通过两种方式复用内存：</p>
+<ul>
+<li><strong>图内虚拟内存和物理内存复用：</strong> 与流有序分配器类似，根据虚拟地址分配情况进行复用。</li>
+<li><strong>图之间的物理内存复用：</strong> 通过虚拟别名实现，不同图可以将各自唯一的虚拟地址映射到同一块物理内存。</li>
+</ul>
+<h3 id="15-4-1-图内的地址复用-address-reuse-within-a-graph">15.4.1 图内的地址复用（Address Reuse within a Graph）</h3>
+<p>如果不同分配的生命周期互不重叠，CUDA 可以为它们分配相同的虚拟地址范围，以便在图内复用地址。由于虚拟地址可能被复用，因此生命周期不重叠的不同分配，其指针值也不保证唯一。</p>
+<p>下图展示了添加一个新的分配节点 2：由于它依赖于节点 1 释放地址，因此可以复用节点 1 释放的地址。</p>
+<p><em>图 32：新增分配节点 2，并复用前一节点释放的地址。</em></p>
+<p><img alt="图 32：图内地址复用示例" decoding="async" loading="lazy" src="/cuda/book/images/figure_32_graph_memory_address_reuse.png"/></p>
+<p>下图展示添加新的分配节点 4 的情况。新分配节点 4 不依赖释放节点 2，因此不能复用与分配节点 2 相关的地址。如果分配节点 2 复用了释放节点 1 释放的地址，那么新的分配节点 3 就必须使用新的地址。</p>
+<p><em>图 33：由于缺少依赖关系，新分配节点不能复用仍可能被使用的地址。</em></p>
+<p><img alt="图 33：依赖关系对图内地址复用的限制" decoding="async" loading="lazy" src="/cuda/book/images/figure_33_graph_memory_address_reuse_dependency.png"/></p>
+<h3 id="15-4-2-物理内存管理与共享-physical-memory-management-and-sharing">15.4.2 物理内存管理与共享（Physical Memory Management and Sharing）</h3>
+<p>CUDA 负责在 GPU 执行顺序到达分配节点之前，将物理内存映射到对应的虚拟地址。</p>
+<p>为了降低内存占用和映射开销，如果多个图不会同时运行，CUDA 可以让它们的不同分配复用同一块物理内存。不过，如果物理页同时绑定到多个正在执行的图，或者绑定到仍有未释放分配的图，就不能复用这些物理页。</p>
+<p>CUDA 可以在图实例化、启动或执行期间的任意时刻更新物理内存映射。为了避免仍然存活的图分配指向同一物理内存，CUDA 也可能在之后的图启动之间插入同步。</p>
+<p>与任何“分配—释放—再分配”的模式一样，如果程序在分配生命周期之外访问指针，错误访问可能会悄悄读取或写入另一个分配正在使用的数据，即使该分配的虚拟地址是唯一的。可以使用 Compute Sanitizer 工具检测此类错误。</p>
+<p>下图展示在同一流中顺序启动多个图的情况。此例中，每个图都会释放自己分配的所有内存。由于同一流中的图不会并发执行，CUDA 可以并且应当使用相同的物理内存来满足这些分配。</p>
+<p><em>图 34：在同一流中顺序启动的图可以复用相同物理内存。</em></p>
+<p><img alt="图 34：顺序启动的图复用物理内存" decoding="async" loading="lazy" src="/cuda/book/images/figure_34_sequential_graph_memory_reuse.png"/></p>
+<h2 id="15-5-性能注意事项-performance-considerations">15.5 性能注意事项（Performance Considerations）</h2>
+<p>当多个图在同一流中启动时，CUDA 会尝试为它们分配相同的物理内存，因为这些图的执行不会重叠。作为一种优化，图的物理映射会在多次启动之间保留，以避免重新映射的开销。</p>
+<p>如果之后以可能与其他图执行重叠的方式启动某个图（例如，将其放到另一个流中启动），CUDA 就必须执行一定程度的重新映射，因为并发图必须使用不同的物理内存，以避免数据损坏。</p>
+<p>在 CUDA 中，图内存重新映射通常可能由以下操作引起：</p>
+<ul>
+<li>更改图启动所在的流；</li>
+<li>对图内存池执行 trim 操作，显式释放未使用的内存（见“物理内存占用”）；</li>
+<li>当另一个图仍有未释放的分配映射到相同内存时，再次启动当前图，这会导致在重新启动前重新映射内存。</li>
+</ul>
+<p>重新映射必须按照执行顺序进行，并且必须等该图之前的执行完成后再进行，否则可能解除仍在使用的内存映射。由于存在这种顺序依赖，而且映射操作会调用操作系统，因此映射可能带来相对较高的开销。</p>
+<p>应用程序可以通过始终将包含分配内存节点的图启动到同一个流中，避免这部分成本。</p>
+<h3 id="15-5-1-首次启动与-cudagraphupload-first-launch-cudagraphupload">15.5.1 首次启动与 <code>cudaGraphUpload</code>（First Launch / cudaGraphUpload）</h3>
+<p>图实例化期间无法分配或映射物理内存，因为此时尚不知道图将在哪个流中执行。因此，映射会在图启动时完成。</p>
+<p>调用 <code>cudaGraphUpload</code> 可以将物理内存分配开销从实际启动过程中分离出来：该调用会立即完成该图所需的映射，并将图与上传所用的流关联起来。如果之后在同一个流中启动该图，就不需要额外的重新映射。</p>
+<p>如果上传图和启动图使用不同的流，其行为类似于切换启动流，很可能会导致重新映射。此外，其他不相关的内存池管理操作也可以从空闲流中取走内存，从而抵消上传操作带来的好处。</p>
+<h2 id="15-6-物理内存占用-physical-memory-footprint">15.6 物理内存占用（Physical Memory Footprint）</h2>
+<p>异步分配的内存池管理机制意味着：销毁一个包含内存节点的图，即使该图中的分配都已释放，也不会立即将物理内存归还操作系统供其他进程使用。</p>
+<p>若要显式将物理内存释放回操作系统，应用程序应使用 <code>cudaDeviceGraphMemTrim</code> API。该 API 会解除映射，并释放图内存节点预留但当前没有在使用的物理内存。尚未释放的分配，以及已排程或正在运行的图，都被视为正在使用物理内存，因此不会受到 trim 操作影响。</p>
+<p>调用 trim API 可以让其他内存分配 API、应用程序或进程使用这些物理内存；但被 trim 的图下一次启动时，CUDA 需要重新分配并重新映射内存。</p>
+<p>注意，<code>cudaDeviceGraphMemTrim</code> 操作的内存池与 <code>cudaMemPoolTrimTo()</code> 不同。图内存池不会暴露给流有序内存分配器。</p>
+<p>应用程序可以通过 <code>cudaDeviceGetGraphMemAttribute</code> 查询图内存占用情况：</p>
+<ul>
+<li>查询 <code>cudaGraphMemAttrReservedMemCurrent</code>，会返回当前进程中由驱动程序为图分配预留的物理内存量；</li>
+<li>查询 <code>cudaGraphMemAttrUsedMemCurrent</code>，会返回当前至少被一个图映射的物理内存量。</li>
+</ul>
+<p>这两个属性都可以用于跟踪 CUDA 是否为某个分配图获取了新的物理内存，也有助于评估共享机制节省了多少内存。</p>
+<h2 id="15-7-对等访问-peer-access">15.7 对等访问（Peer Access）</h2>
+<p>可以将图分配配置为允许多个 GPU 访问，此时 CUDA 会按需将这些分配映射到对等 GPU。</p>
+<p>CUDA 允许需要不同映射的图分配复用同一虚拟地址。当这种情况发生时，该地址范围会映射到这些分配所需的所有 GPU。这意味着某个分配有时可能获得超出创建时请求范围的对等访问权限；但依赖这些额外映射仍然属于错误用法。</p>
+<h3 id="15-7-1-使用图节点-api-设置对等访问-peer-access-with-graph-node-apis">15.7.1 使用图节点 API 设置对等访问（Peer Access with Graph Node APIs）</h3>
+<p><code>cudaGraphAddMemAllocNode</code> API 接受节点参数结构体中 <code>accessDescs</code> 数组字段所指定的映射请求。嵌入其中的 <code>poolProps.location</code> 结构体用于指定该分配的驻留设备。默认认为分配所在的 GPU 需要访问该分配，因此应用程序无需在 <code>accessDescs</code> 数组中为驻留设备额外添加条目。</p>
+<pre><code class="language-cpp">cudaMemAllocNodeParams params = {};
+params.poolProps.allocType = cudaMemAllocationTypePinned;
+params.poolProps.location.type = cudaMemLocationTypeDevice;
+
+// 指定分配驻留在设备 1 上。
+params.poolProps.location.id = 1;
+params.bytesize = size;
+
+// 创建驻留在设备 1、且可由设备 1 访问的分配。
+cudaGraphAddMemAllocNode(&amp;allocNode, graph, NULL, 0, &amp;params);
+
+cudaMemAccessDesc accessDescs[2];
+
+// accessDescs 的基本设置。
+// 该分配节点 API 只支持 ReadWrite 权限和 Device 位置。
+accessDescs[0].flags = cudaMemAccessFlagsProtReadWrite;
+accessDescs[0].location.type = cudaMemLocationTypeDevice;
+accessDescs[1].flags = cudaMemAccessFlagsProtReadWrite;
+accessDescs[1].location.type = cudaMemLocationTypeDevice;
+
+// 请求设备 0 和设备 2 的访问权限。
+// 设备 1 是驻留设备，其访问权限隐式包含在内。
+accessDescs[0].location.id = 0;
+accessDescs[1].location.id = 2;
+
+params.accessDescCount = 2;
+params.accessDescs = accessDescs;
+
+// 创建驻留在设备 1、且设备 0、1、2 均可访问的分配。
+// 设备 0 和 2 来自描述符，设备 1 来自驻留设备设置。
+cudaGraphAddMemAllocNode(&amp;allocNode, graph, NULL, 0, &amp;params);
+</code></pre>
+<h3 id="15-7-2-使用流捕获设置对等访问-peer-access-with-stream-capture">15.7.2 使用流捕获设置对等访问（Peer Access with Stream Capture）</h3>
+<p>在流捕获过程中，分配节点会记录捕获时分配池的对等可访问性。</p>
+<p>在捕获 <code>cudaMallocFromPoolAsync</code> 调用之后，再更改该分配池的对等访问权限，不会影响图为该分配建立的映射。</p>
+<pre><code class="language-cpp">// 基本访问描述符设置。
+// 分配节点 API 只支持 ReadWrite 权限和 Device 位置。
+accessDesc.flags = cudaMemAccessFlagsProtReadWrite;
+accessDesc.location.type = cudaMemLocationTypeDevice;
+accessDesc.location.id = 1;
+
+// 假设 memPool 驻留在设备 0，且最初仅对设备 0 可访问。
+cudaStreamBeginCapture(stream);
+cudaMallocAsync(&amp;dptr1, size, memPool, stream);
+cudaStreamEndCapture(stream, &amp;graph1);
+
+cudaMemPoolSetAccess(memPool, &amp;accessDesc, 1);
+
+cudaStreamBeginCapture(stream);
+cudaMallocAsync(&amp;dptr2, size, memPool, stream);
+cudaStreamEndCapture(stream, &amp;graph2);
+</code></pre>
+<p>为 <code>dptr1</code> 分配内存的图节点只会保留设备 0 的可访问性，即使此时 <code>memPool</code> 已经允许设备 1 访问。为 <code>dptr2</code> 分配内存的图节点则会同时具有设备 0 和设备 1 的可访问性，因为创建该分配节点时，内存池已经设置为对这两台设备可访问。</p>
+<hr/>
+<h2 id="校对提示-非原书正文">校对提示（非原书正文）</h2>
+<ul>
+<li>原 PDF 的跨流事件示例中出现 <code>cudaStreamRecordEvent(streamUseDoneEvent, stream2)</code> 这一写法；常见 CUDA Runtime API 名称为 <code>cudaEventRecord(event, stream)</code>。本工作稿中的示例按常见形式整理，正式发布前需逐项核对 CUDA 12.8 原文与 SDK。</li>
+<li>本章代码示例尚未在 CUDA 12.8 SDK 环境中编译测试，不能直接视为可编译的完整程序。</li>
+</ul>

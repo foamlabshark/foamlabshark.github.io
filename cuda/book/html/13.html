@@ -1,0 +1,309 @@
+<h1 id="第十三章-虚拟内存管理-virtual-memory-management">第十三章 虚拟内存管理（Virtual Memory Management）</h1>
+<blockquote>
+<p>对应原 PDF 第 373–382 页（原书印刷页码 357–366）。保留原书章节编号、CUDA Driver API 名称、代码标识符与代码结构。本章原文没有独立编号插图，主要内容由说明文字、代码示例和 API 流程组成。</p>
+</blockquote>
+<h2 id="13-1-简介-introduction">13.1 简介（Introduction）</h2>
+<p>虚拟内存管理 API 使应用程序能够直接管理 CUDA 提供的统一虚拟地址空间，并将物理内存映射到 GPU 可访问的虚拟地址。这组 API 从 CUDA 10.2 开始引入，还提供了与其他进程以及 OpenGL、Vulkan 等图形 API 进行互操作的新方式，并允许应用程序选择设备支持的新型内存属性。</p>
+<p>传统 CUDA 编程模型中的内存分配调用（例如 <code>cudaMalloc()</code>）会返回一个指向 GPU 内存的地址。该地址可用于 CUDA API，也可在设备内核中使用。但分配完成后，内存大小不能直接根据需求调整。若要扩大分配，用户必须显式分配更大的缓冲区、从原分配复制数据、释放旧缓冲区，并继续跟踪新地址。这往往会降低性能并提高应用程序的峰值内存使用量。换言之，传统接口提供了类似 <code>malloc</code> 的 GPU 内存分配方式，却没有与之配套的 <code>realloc</code>。</p>
+<p>虚拟内存管理 API 将“地址”和“内存”这两个概念分离，使应用程序能够独立管理二者。应用程序可以按需要将内存映射到虚拟地址范围，也可以解除映射。</p>
+<p>使用 <code>cudaEnablePeerAccess</code> 启用对等设备内存访问时，所有既有及后续的用户分配都会映射到目标对等设备。这会让用户为所有 <code>cudaMalloc</code> 分配支付映射开销，而实际应用通常只需要与另一台设备共享少量分配，并不需要将所有分配映射到所有设备。虚拟内存管理允许应用程序明确选择哪些分配可供目标设备访问。</p>
+<p>CUDA 虚拟内存管理 API 为 GPU 内存管理提供细粒度控制，允许用户：</p>
+<ul>
+<li>将来自不同设备的内存放置到连续的虚拟地址（VA）范围中；</li>
+<li>使用特定于平台的机制，在进程之间共享内存；</li>
+<li>在支持相关功能的设备上选择使用新型内存类型。</li>
+</ul>
+<p>虚拟内存管理编程模型提供以下内存分配能力：</p>
+<ol>
+<li>分配物理内存；</li>
+<li>保留虚拟地址范围；</li>
+<li>将已分配内存映射到虚拟地址范围；</li>
+<li>控制已映射范围的访问权限。</li>
+</ol>
+<p>本节所述 API 要求系统支持统一虚拟寻址（UVA）。</p>
+<h2 id="13-2-查询支持情况-query-for-support">13.2 查询支持情况（Query for Support）</h2>
+<p>在尝试使用虚拟内存管理 API 前，应用程序必须确认目标设备支持 CUDA 虚拟内存管理。以下代码查询该功能是否受支持：</p>
+<pre><code class="language-cpp">int deviceSupportsVmm;
+CUresult result = cuDeviceGetAttribute(
+    &amp;deviceSupportsVmm,
+    CU_DEVICE_ATTRIBUTE_VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED,
+    device);
+
+if (deviceSupportsVmm != 0) {
+    // device 支持虚拟内存管理
+}
+</code></pre>
+<p>如果 <code>deviceSupportsVmm</code> 非零，则表示相应设备支持虚拟内存管理。</p>
+<h2 id="13-3-分配物理内存-allocating-physical-memory">13.3 分配物理内存（Allocating Physical Memory）</h2>
+<p>使用虚拟内存管理 API 分配内存的第一步，是创建一块用于支撑该分配的物理内存。应用程序通过 <code>cuMemCreate</code> 分配物理内存。该函数创建的分配尚未映射到任何设备或主机地址空间。</p>
+<p>函数使用 <code>CUmemGenericAllocationHandle</code> 描述待分配内存的属性，例如分配所在的位置、是否需要与其他进程或图形 API 共享，以及待分配内存的物理属性。用户必须确保分配大小符合相应粒度的对齐要求。可通过 <code>cuMemGetAllocationGranularity</code> 查询分配所需的粒度。</p>
+<pre><code class="language-cpp">CUmemGenericAllocationHandle allocatePhysicalMemory(int device, size_t size) {
+    CUmemAllocationProp prop = {};
+    prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
+    prop.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    prop.location.id = device;
+
+    size_t granularity = 0;
+    cuMemGetAllocationGranularity(
+        &amp;granularity, &amp;prop, CU_MEM_ALLOC_GRANULARITY_MINIMUM);
+
+    // 确保 size 满足分配粒度要求。
+    size_t padded_size = ROUND_UP(size, granularity);
+
+    // 分配物理内存。
+    CUmemGenericAllocationHandle allocHandle;
+    cuMemCreate(&amp;allocHandle, padded_size, &amp;prop, 0);
+    return allocHandle;
+}
+</code></pre>
+<p><code>cuMemCreate</code> 分配的内存由其返回的 <code>CUmemGenericAllocationHandle</code> 标识。这与 <code>cudaMalloc</code> 风格的分配不同：后者直接返回 GPU 内存指针，可由设备内核访问。通过 <code>cuMemCreate</code> 得到的内存，在完成映射前不能直接用于普通内存访问；除使用 <code>cuMemGetAllocationPropertiesFromHandle</code> 查询属性外，不能对其执行常规内存操作。</p>
+<p>若要让该内存可访问，应用程序必须先将它映射到通过 <code>cuMemAddressReserve</code> 保留的虚拟地址范围，并为该范围设置适当的访问权限。分配完成后，应用程序应使用 <code>cuMemRelease</code> 释放该物理内存分配。</p>
+<h3 id="13-3-1-可共享的内存分配-shareable-memory-allocations">13.3.1 可共享的内存分配（Shareable Memory Allocations）</h3>
+<p>通过 <code>cuMemCreate</code>，用户可以在分配时告知 CUDA，某个内存分配将用于进程间通信（IPC）或图形互操作。具体做法是设置 <code>CUmemAllocationProp::requestedHandleTypes</code>，并选择平台对应的句柄类型。</p>
+<p>在 Windows 上，如果 <code>CUmemAllocationProp::requestedHandleTypes</code> 设置为 <code>CU_MEM_HANDLE_TYPE_WIN32</code>，还必须在 <code>CUmemAllocationProp::win32HandleMetaData</code> 中指定 <code>LPSECURITYATTRIBUTES</code> 属性。该安全属性用于定义导出的分配可以转移到哪些其他进程。</p>
+<p>CUDA 虚拟内存管理 API 不支持使用旧式 IPC 内存函数处理这些分配，而是提供基于操作系统专用句柄的新进程间通信机制。应用程序可通过 <code>cuMemExportToShareableHandle</code> 获取与分配对应的操作系统句柄，再使用操作系统原生的进程间通信机制传递句柄。接收进程应调用 <code>cuMemImportFromShareableHandle</code> 导入该分配。</p>
+<p>尝试导出 <code>cuMemCreate</code> 分配的内存前，用户必须先查询设备是否支持所请求的句柄类型。以下代码展示了平台相关的查询方式：</p>
+<pre><code class="language-cpp">int deviceSupportsIpcHandle;
+
+#if defined(__linux__)
+cuDeviceGetAttribute(
+    &amp;deviceSupportsIpcHandle,
+    CU_DEVICE_ATTRIBUTE_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR_SUPPORTED,
+    device);
+#else
+cuDeviceGetAttribute(
+    &amp;deviceSupportsIpcHandle,
+    CU_DEVICE_ATTRIBUTE_HANDLE_TYPE_WIN32_HANDLE_SUPPORTED,
+    device);
+#endif
+</code></pre>
+<p>随后应根据平台正确设置 <code>CUmemAllocationProp::requestedHandleTypes</code>：</p>
+<pre><code class="language-cpp">#if defined(__linux__)
+prop.requestedHandleTypes = CU_MEM_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR;
+#else
+prop.requestedHandleTypes = CU_MEM_HANDLE_TYPE_WIN32;
+prop.win32HandleMetaData = /* Windows 专用的 LPSECURITYATTRIBUTES 属性 */;
+#endif
+</code></pre>
+<p><code>memMapIpcDrv</code> 示例可用作通过虚拟内存管理分配实现 IPC 的参考。</p>
+<h3 id="13-3-2-内存类型-memory-type">13.3.2 内存类型（Memory Type）</h3>
+<p>在 CUDA 10.2 之前，应用程序无法通过用户可控的方式分配某些设备支持的特殊类型内存。使用 <code>cuMemCreate</code> 后，应用程序可以通过 <code>CUmemAllocationProp::allocFlags</code> 指定内存类型要求，从而选择使用特定内存功能。应用程序还必须确认分配所在设备支持所请求的内存类型。</p>
+<h4 id="13-3-2-1-可压缩内存-compressible-memory">13.3.2.1 可压缩内存（Compressible Memory）</h4>
+<p>可压缩内存可以加速访问具有非结构化稀疏性或其他可压缩数据模式的数据。根据正在处理的数据，压缩可能减少 DRAM 带宽占用、L2 读取带宽占用和 L2 容量消耗。</p>
+<p>如果设备支持计算数据压缩（Compute Data Compression），应用程序可以通过将 <code>CUmemAllocationProp::allocFlags::compressionType</code> 设置为 <code>CU_MEM_ALLOCATION_COMP_GENERIC</code>，选择分配可压缩内存。用户必须通过设备属性 <code>CU_DEVICE_ATTRIBUTE_GENERIC_COMPRESSION_SUPPORTED</code> 查询设备是否支持计算数据压缩：</p>
+<pre><code class="language-cpp">int compressionSupported = 0;
+cuDeviceGetAttribute(
+    &amp;compressionSupported,
+    CU_DEVICE_ATTRIBUTE_GENERIC_COMPRESSION_SUPPORTED,
+    device);
+</code></pre>
+<p>在支持计算数据压缩的设备上，必须在分配时明确启用该属性：</p>
+<pre><code class="language-cpp">prop.allocFlags.compressionType = CU_MEM_ALLOCATION_COMP_GENERIC;
+</code></pre>
+<p>由于硬件资源有限等原因，即使提出了可压缩内存请求，实际分配也不一定具有压缩属性。因此，用户应使用 <code>cuMemGetAllocationPropertiesFromHandle</code> 查询已分配内存的属性，并检查其压缩类型：</p>
+<pre><code class="language-cpp">CUmemAllocationProp allocationProp = {};
+cuMemGetAllocationPropertiesFromHandle(&amp;allocationProp, allocationHandle);
+
+if (allocationProp.allocFlags.compressionType ==
+    CU_MEM_ALLOCATION_COMP_GENERIC) {
+    // 已获得具有可压缩属性的内存分配
+}
+</code></pre>
+<h2 id="13-4-保留虚拟地址范围-reserving-a-virtual-address-range">13.4 保留虚拟地址范围（Reserving a Virtual Address Range）</h2>
+<p>虚拟内存管理将地址与内存分离，因此应用程序必须先保留一段能够容纳 <code>cuMemCreate</code> 所分配内存的地址范围。保留范围的大小至少应等于用户计划放入其中的所有物理内存分配大小之和。</p>
+<p>应用程序可以通过向 <code>cuMemAddressReserve</code> 传入适当参数来保留虚拟地址范围。返回的地址范围本身并未关联任何设备或主机物理内存。保留的虚拟地址范围可以映射到系统中任意设备所属的内存块，因此，连续的 VA 范围可以由来自不同设备的内存共同支撑。</p>
+<p>应用程序应使用 <code>cuMemAddressFree</code> 将虚拟地址范围归还给 CUDA。调用该函数之前，必须先解除整个 VA 范围内的所有映射。这些函数在概念上类似于 Linux 的 <code>mmap</code>/<code>munmap</code>，或 Windows 的 <code>VirtualAlloc</code>/<code>VirtualFree</code>。</p>
+<pre><code class="language-cpp">CUdeviceptr ptr;
+// ptr 保存所保留虚拟地址范围的起始地址。
+CUresult result = cuMemAddressReserve(
+    &amp;ptr, size, 0, 0, 0); // alignment = 0 表示使用默认对齐
+</code></pre>
+<h2 id="13-5-虚拟别名支持-virtual-aliasing-support">13.5 虚拟别名支持（Virtual Aliasing Support）</h2>
+<p>虚拟内存管理 API 允许通过多次调用 <code>cuMemMap</code>，将同一个内存分配映射到多个不同的虚拟地址，从而创建多个虚拟映射或“代理”（proxy）。这种机制称为<strong>虚拟别名（virtual aliasing）</strong>。</p>
+<p>除 PTX ISA 另有说明外，在写入设备操作（例如 grid 启动、内存复制或内存设置操作等）完成之前，通过某个代理写入的内容，与同一物理内存的其他代理之间被视为不一致、也不连贯。写入设备操作之前已经存在于 GPU 上、但在写入操作完成后才读取的 grid，也会被视为具有不一致且不连贯的代理视图。</p>
+<p>例如，假设设备指针 <code>A</code> 和 <code>B</code> 是同一内存分配的虚拟别名，下面的代码行为未定义：</p>
+<pre><code class="language-cpp">__global__ void foo(char *A, char *B) {
+    *A = 0x1;
+    printf("%d\n", *B);
+    // 未定义行为！
+    // *B 可能是先前的值，也可能是中间状态的某个值。
+}
+</code></pre>
+<p>如果两个内核按顺序执行（通过执行流或事件建立顺序），则以下行为有定义：</p>
+<pre><code class="language-cpp">__global__ void foo1(char *A) {
+    *A = 0x1;
+}
+
+__global__ void foo2(char *B) {
+    printf("%d\n", *B);
+    // 若 foo2 等待 foo1 完成后才启动，
+    // 则 *B == *A == 0x1。
+}
+
+cudaMemcpyAsync(B, input, size, stream1);
+// 允许在设备操作边界处使用别名。
+foo1&lt;&lt;&lt;1, 1, 0, stream1&gt;&gt;&gt;(A);
+
+cudaEventRecord(event, stream1);
+cudaStreamWaitEvent(stream2, event);
+foo2&lt;&lt;&lt;1, 1, 0, stream2&gt;&gt;&gt;(B);
+
+cudaStreamWaitEvent(stream3, event);
+cudaMemcpyAsync(output, B, size, stream3);
+// foo2 和 cudaMemcpy 都是读取操作，二者都等待写入 A 的 foo1 完成。
+</code></pre>
+<p>如果必须在同一个内核中通过不同代理访问同一分配，可以在两次访问之间使用 <code>fence.proxy.alias</code>。这样，上面的例子可通过内联 PTX 汇编改为有定义的行为：</p>
+<pre><code class="language-cpp">__global__ void foo(char *A, char *B) {
+    *A = 0x1;
+    asm volatile ("fence.proxy.alias;" ::: "memory");
+    printf("%d\n", *B);
+    // *B == *A == 0x1
+}
+</code></pre>
+<h2 id="13-6-映射内存-mapping-memory">13.6 映射内存（Mapping Memory）</h2>
+<p>前面两节分别介绍了物理内存分配和虚拟地址范围保留，它们体现了虚拟内存管理 API 中“内存”与“地址”的分离。要让分配的内存真正可用，用户必须先将其放入地址空间。需要使用 <code>cuMemMap</code>，把通过 <code>cuMemAddressReserve</code> 得到的地址范围与通过 <code>cuMemCreate</code> 或 <code>cuMemImportFromShareableHandle</code> 得到的物理分配关联起来。</p>
+<p>只要预留了足够大的地址空间，用户就可以将多个设备上的内存分配映射到连续的虚拟地址范围。若要将物理分配与地址范围解除关联，应使用 <code>cuMemUnmap</code> 解除映射。</p>
+<p>只要确保不会在已经映射的 VA 范围上重复创建映射，用户就可以多次将内存映射到同一地址范围，或解除映射后再重新映射。</p>
+<pre><code class="language-cpp">CUdeviceptr ptr;
+// ptr：此前通过 cuMemAddressReserve 保留的地址范围中的地址。
+// allocHandle：此前调用 cuMemCreate 得到的句柄。
+CUresult result = cuMemMap(ptr, size, 0, allocHandle, 0);
+</code></pre>
+<h2 id="13-7-控制访问权限-controlling-access-rights">13.7 控制访问权限（Controlling Access Rights）</h2>
+<p>虚拟内存管理 API 允许应用程序使用访问控制机制，显式保护虚拟地址范围。仅通过 <code>cuMemMap</code> 将分配映射到某段地址范围，并不会自动使该地址可访问；如果 CUDA 内核访问了尚未设置访问权限的地址，程序可能崩溃。</p>
+<p>用户必须调用 <code>cuMemSetAccess</code>，明确允许或限制特定设备访问已映射的地址范围。以下函数为指定设备设置读写权限：</p>
+<pre><code class="language-cpp">void setAccessOnDevice(int device, CUdeviceptr ptr, size_t size) {
+    CUmemAccessDesc accessDesc = {};
+    accessDesc.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    accessDesc.location.id = device;
+    accessDesc.flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+
+    // 使该地址范围可访问。
+    cuMemSetAccess(ptr, size, &amp;accessDesc, 1);
+}
+</code></pre>
+<p>虚拟内存管理所提供的访问控制机制，使用户可以明确选择要与系统中其他对等设备共享的分配。前面提到，<code>cudaEnablePeerAccess</code> 会强制将所有既有和未来的 <code>cudaMalloc</code> 分配映射到目标对等设备。这样虽然方便，但对于关注性能的应用程序，映射所有分配会产生开销。虚拟内存管理允许以分配为粒度设置访问权限，从而用较小开销建立对等映射。</p>
+<p><code>vectorAddMMAP</code> 示例可作为使用虚拟内存管理 API 的参考。</p>
+<h2 id="13-8-fabric-memory-fabric-内存">13.8 Fabric Memory（Fabric 内存）</h2>
+<p>CUDA 12.4 引入了新的虚拟内存管理分配句柄类型 <code>CU_MEM_HANDLE_TYPE_FABRIC</code>。在受支持的平台上，并且 NVIDIA IMEX 守护进程正在运行时，该句柄类型不仅允许在节点内使用 MPI 等任意通信机制共享分配，还允许跨节点共享。</p>
+<p>这使多节点 NVLINK 系统中的 GPU 能够映射同一 NVLINK Fabric 中其他 GPU 的内存，即使这些 GPU 位于不同节点，也能扩大基于 NVLINK 的多 GPU 编程规模。</p>
+<h3 id="13-8-1-查询支持情况-query-for-support">13.8.1 查询支持情况（Query for Support）</h3>
+<p>尝试使用 Fabric Memory 前，应用程序必须确认目标设备支持它。以下代码查询 Fabric Memory 支持情况：</p>
+<pre><code class="language-cpp">int deviceSupportsFabricMem;
+CUresult result = cuDeviceGetAttribute(
+    &amp;deviceSupportsFabricMem,
+    CU_DEVICE_ATTRIBUTE_HANDLE_TYPE_FABRIC_SUPPORTED,
+    device);
+
+if (deviceSupportsFabricMem != 0) {
+    // device 支持 Fabric Memory
+}
+</code></pre>
+<p>除使用 <code>CU_MEM_HANDLE_TYPE_FABRIC</code> 作为句柄类型、且不需要通过操作系统原生机制交换可共享句柄外，Fabric Memory 的使用方式与其他分配句柄类型没有区别。</p>
+<h2 id="13-9-多播支持-multicast-support">13.9 多播支持（Multicast Support）</h2>
+<p>多播对象管理 API 允许应用程序创建多播对象。结合前文介绍的虚拟内存管理 API，在支持的、通过 NVSWITCH 连接的 NVLINK GPU 上，应用程序可以利用 NVLINK SHARP。</p>
+<p>NVLINK SHARP 允许 CUDA 应用程序利用 Fabric 内计算，加速 NVSWITCH 所连接 GPU 之间的广播和归约等操作。为实现这一点，多台通过 NVLINK 连接的 GPU 会组成一个<strong>多播团队（Multicast Team）</strong>，并由团队中的每台 GPU 使用物理内存为同一个多播对象提供后备存储。因此，一个包含 N 台 GPU 的多播团队会有 N 份物理副本，每份副本都位于一台参与 GPU 的本地内存中。通过多播对象映射执行的 <code>multimem</code> PTX 指令会作用于该多播对象的所有副本。</p>
+<p>要使用多播对象，应用程序需要：</p>
+<ol>
+<li>查询是否支持多播；</li>
+<li>使用 <code>cuMulticastCreate</code> 创建多播句柄；</li>
+<li>将多播句柄共享给控制参与多播团队中各 GPU 的所有进程。可使用前文介绍的 <code>cuMemExportToShareableHandle</code>；</li>
+<li>使用 <code>cuMulticastAddDevice</code> 将所有参与 GPU 加入多播团队；</li>
+<li>对每台参与 GPU，使用前文介绍的 <code>cuMemCreate</code> 分配物理内存，并将其绑定到多播句柄。必须先把所有设备加入多播团队，然后才能在任何设备上绑定内存；</li>
+<li>保留地址范围、映射多播句柄，并像普通单播映射一样设置访问权限。单播和多播映射可以指向同一物理内存；若同一物理内存存在多个映射，应遵循“虚拟别名支持”一节所述的一致性要求；</li>
+<li>使用多播映射对应的 <code>multimem</code> PTX 指令。</li>
+</ol>
+<p>Multi GPU Programming Models GitHub 仓库中的 <code>multi_node_p2p</code> 示例提供了使用 Fabric Memory 和多播对象利用 NVLINK SHARP 的完整示例。需要注意，该示例主要面向 NCCL 或 NVSHMEM 等库的开发者，用于展示 NVSHMEM 等更高层编程模型如何在多节点 NVLINK 域内部工作。一般应用开发者通常应优先使用更高层的 MPI、NCCL 或 NVSHMEM 接口，而不是直接使用这些 API。</p>
+<h3 id="13-9-1-查询支持情况-query-for-support">13.9.1 查询支持情况（Query for Support）</h3>
+<p>尝试使用多播对象前，应用程序必须确认目标设备支持该功能。以下代码查询设备是否支持多播对象：</p>
+<pre><code class="language-cpp">int deviceSupportsMultiCast;
+CUresult result = cuDeviceGetAttribute(
+    &amp;deviceSupportsMultiCast,
+    CU_DEVICE_ATTRIBUTE_MULTICAST_SUPPORTED,
+    device);
+
+if (deviceSupportsMultiCast != 0) {
+    // device 支持多播对象
+}
+</code></pre>
+<h3 id="13-9-2-分配多播对象-allocating-multicast-objects">13.9.2 分配多播对象（Allocating Multicast Objects）</h3>
+<p>可以使用 <code>cuMulticastCreate</code> 创建多播对象：</p>
+<pre><code class="language-cpp">CUmemGenericAllocationHandle createMCHandle(int numDevices, size_t size) {
+    CUmemAllocationProp mcProp = {};
+    mcProp.numDevices = numDevices;
+    mcProp.handleTypes = CU_MEM_HANDLE_TYPE_FABRIC;
+    // 单节点系统也可使用 CU_MEM_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR。
+
+    size_t granularity = 0;
+    cuMulticastGetGranularity(
+        &amp;granularity, &amp;mcProp, CU_MEM_ALLOC_GRANULARITY_MINIMUM);
+
+    // 确保 size 满足分配粒度要求。
+    size_t padded_size = ROUND_UP(size, granularity);
+    mcProp.size = padded_size;
+
+    // 创建多播对象；此时尚未关联设备，也没有关联物理内存。
+    CUmemGenericAllocationHandle mcHandle;
+    cuMulticastCreate(&amp;mcHandle, &amp;mcProp);
+    return mcHandle;
+}
+</code></pre>
+<h3 id="13-9-3-向多播对象添加设备-add-devices-to-multicast-objects">13.9.3 向多播对象添加设备（Add Devices to Multicast Objects）</h3>
+<p>可使用 <code>cuMulticastAddDevice</code> 将设备加入多播团队：</p>
+<pre><code class="language-cpp">cuMulticastAddDevice(&amp;mcHandle, device);
+</code></pre>
+<p>在将任何设备的内存绑定到多播对象之前，必须先在控制所有参与设备的各个进程中完成这一步。</p>
+<h3 id="13-9-4-将内存绑定到多播对象-bind-memory-to-multicast-objects">13.9.4 将内存绑定到多播对象（Bind Memory to Multicast Objects）</h3>
+<p>创建多播对象并将所有参与设备添加到对象后，必须为每台设备使用 <code>cuMemCreate</code> 分配的物理内存提供后备存储：</p>
+<pre><code class="language-cpp">cuMulticastBindMem(
+    mcHandle, mcOffset, memHandle, memOffset, size, 0 /* flags */);
+</code></pre>
+<h3 id="13-9-5-使用多播映射-use-multicast-mappings">13.9.5 使用多播映射（Use Multicast Mappings）</h3>
+<p>若要在 CUDA C++ 中使用多播映射，必须通过内联 PTX 汇编使用 <code>multimem</code> PTX 指令。下面的示例在一个内核中对所有多播副本执行原子归约，并通过单播映射上的原子加载等待所有参与者到达。</p>
+<pre><code class="language-cpp">__global__ void all_reduce_norm_barrier_kernel(
+    float* l2_norm,
+    float* partial_l2_norm_mc,
+    unsigned int* arrival_counter_uc,
+    unsigned int* arrival_counter_mc,
+    const unsigned int expected_count) {
+
+    assert(1 == blockDim.x * blockDim.y * blockDim.z *
+                gridDim.x * gridDim.y * gridDim.z);
+
+    float l2_norm_sum = 0.0;
+
+#if __CUDA_ARCH__ &gt;= 900
+    // 对所有副本执行原子归约。
+    // 概念上相当于：
+    // __threadfence_system(); atomicAdd_system(arrival_counter_mc, 1);
+    asm volatile (
+        "multimem.red.release.sys.global.add.u32 [%0], %1;"
+        :: "l"(arrival_counter_mc), "n"(1) : "memory");
+
+    // 在同一物理内存的多播（mc）与单播（uc）访问之间建立栅栏。
+    // fence.proxy 用于对可能经由不同代理发生的内存访问建立顺序；
+    // .alias 代理类型指通过虚拟别名地址访问同一内存位置。
+    asm volatile ("fence.proxy.alias;" ::: "memory");
+
+    // 通过带 acquire 顺序的单播映射自旋等待，直到所有对等参与者
+    // 都在本轮到达。所有 rank 还必须在本内核之后到达另一个屏障，
+    // 防止较慢 rank 尚未完成时，下一轮的到达操作提前解除等待。
+    cuda::atomic_ref&lt;unsigned int, cuda::thread_scope_system&gt;
+        ac(arrival_counter_uc);
+    while (expected_count &gt; ac.load(cuda::memory_order_acquire)) {}
+
+    // 从所有副本执行原子加载归约。该操作本身不提供内存顺序，
+    // 因此可以使用 relaxed。
+    asm volatile (
+        "multimem.ld_reduce.relaxed.sys.global.add.f32 %0, [%1];"
+        : "=f"(l2_norm_sum)
+        : "l"(partial_l2_norm_mc)
+        : "memory");
+#else
+#error "ERROR: multimem instructions require compute capability 9.0 or larger."
+#endif
+
+    *l2_norm = std::sqrt(l2_norm_sum);
+}
+</code></pre>
+<p>本示例要求计算能力为 9.0 或更高，因为使用了 <code>multimem</code> 指令。多播与单播映射指向同一内存时，必须通过 <code>fence.proxy.alias</code> 在两种访问代理之间建立适当顺序。</p>

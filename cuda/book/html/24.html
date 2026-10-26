@@ -1,0 +1,159 @@
+<h1 id="第二十四章-扩展-gpu-内存-extended-gpu-memory-egm">第二十四章 扩展 GPU 内存（Extended GPU Memory，EGM）</h1>
+<blockquote>
+<p>对应原 PDF 第 577–582 页（原书印刷页码 561–566）。保留 CUDA 类型、API、内存位置标识符和代码结构。</p>
+</blockquote>
+<p>扩展 GPU 内存（EGM）利用高带宽 NVLink-C2C，使单节点系统中的 GPU 能够高效访问系统内的全部内存。EGM 面向 CPU-GPU 集成式 NVIDIA 系统，通过物理内存分配，使配置中的任意 GPU 线程都能访问这些资源。EGM 可让所有 GPU 以 GPU-GPU NVLink 或 NVLink-C2C 所提供的速度访问相应内存。</p>
+<p>在该配置中，本地内存访问通过高带宽 NVLink-C2C 进行；远程内存访问则通过 GPU NVLink，在某些情况下也会使用 NVLink-C2C。借助 EGM，GPU 线程能够访问所有可用内存资源，包括 CPU 附属内存和通过 NVSwitch Fabric 访问的 HBM3。</p>
+<h2 id="24-1-准备知识-preliminaries">24.1 准备知识（Preliminaries）</h2>
+<p>在介绍 EGM 的 API 变化前，本节先介绍支持的系统拓扑、标识符分配、虚拟内存管理的前提条件，以及 EGM 使用的 CUDA 类型。</p>
+<h3 id="24-1-1-egm-平台-系统拓扑-egm-platforms-system-topology">24.1.1 EGM 平台：系统拓扑（EGM Platforms: System Topology）</h3>
+<p>目前 EGM 可用于三种平台：</p>
+<ol>
+<li><strong>单节点、单 GPU：</strong> 包含基于 Arm 的 CPU、CPU 附属内存和一块 GPU；CPU 与 GPU 之间通过高带宽 C2C（Chip-to-Chip，芯片间互连）连接。</li>
+<li><strong>单节点、多 GPU：</strong> 由四个单节点、单 GPU 平台完全互连构成。</li>
+<li><strong>多节点、单 GPU：</strong> 由两个或更多单节点、多插槽系统组成。</li>
+</ol>
+<p><strong>注意：</strong> 使用 cgroups 限制可用设备会阻断 EGM 路由并造成性能问题。应使用 <code>CUDA_VISIBLE_DEVICES</code> 控制可见设备。</p>
+<h3 id="24-1-2-socket-标识符-含义与获取方式-socket-identifiers">24.1.2 Socket 标识符：含义与获取方式（Socket Identifiers）</h3>
+<p>NUMA（非统一内存访问）是多处理器系统采用的一种内存架构：系统内存划分为多个节点，每个节点拥有自己的处理器和内存。操作系统会为每个节点分配唯一标识符，即 <code>numaID</code>。</p>
+<p>EGM 使用操作系统分配的 NUMA 节点标识符。该标识符不同于 GPU 设备序号，并与最接近的主机节点关联。可以使用 <code>cuDeviceGetAttribute()</code> 和 <code>CU_DEVICE_ATTRIBUTE_HOST_NUMA_ID</code> 获取主机节点 ID：</p>
+<pre><code class="language-cpp">int numaId;
+cuDeviceGetAttribute(
+    &amp;numaId, CU_DEVICE_ATTRIBUTE_HOST_NUMA_ID, deviceOrdinal);
+</code></pre>
+<h3 id="24-1-3-分配器与-egm-支持-allocators-and-egm-support">24.1.3 分配器与 EGM 支持（Allocators and EGM Support）</h3>
+<p>将系统内存映射为 EGM 不会带来额外性能问题；事实上，映射为 EGM 后，访问远端插槽的系统内存可能更快，因为 EGM 流量会通过 NVLink 路由。目前支持使用具有适当位置类型和 NUMA 标识符的 <code>cuMemCreate()</code> 和 <code>cudaMemPoolCreate()</code> 分配器。</p>
+<h3 id="24-1-4-对现有-api-的内存管理扩展-memory-management-extensions-to-current-apis">24.1.4 对现有 API 的内存管理扩展（Memory Management Extensions to Current APIs）</h3>
+<p>目前，EGM 内存可通过虚拟内存管理（<code>cuMemCreate()</code>）或流有序内存（<code>cudaMemPoolCreate()</code>）分配器映射。用户负责分配物理内存，并将其映射到所有相关插槽的虚拟地址空间。</p>
+<p><strong>注意：</strong> 多节点、单 GPU 平台需要进程间通信（IPC）；详情参见 CUDA 编程指南的 IPC 章节。建议同时阅读 CUDA 编程指南第十章和第十一章，以了解相关内存管理机制。</p>
+<p>CUDA 为相关 API 增加了新的位置类型，使其能够使用类似 NUMA 节点的标识符表达分配位置：</p>
+<table>
+<thead>
+<tr>
+<th>CUDA 类型</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CU_MEM_LOCATION_TYPE_HOST_NUMA</code></td>
+<td>用于 <code>cuMemCreate()</code> 的 <code>CUmemAllocationProp</code></td>
+</tr>
+<tr>
+<td><code>cudaMemLocationTypeHostNuma</code></td>
+<td>用于 <code>cudaMemPoolCreate()</code> 的 <code>cudaMemPoolProps</code></td>
+</tr>
+</tbody>
+</table>
+<p>NUMA 专用 CUDA 类型的更多信息，参见 Driver API 和 Runtime 数据类型文档。</p>
+<h2 id="24-2-使用-egm-接口-using-the-egm-interface">24.2 使用 EGM 接口（Using the EGM Interface）</h2>
+<h3 id="24-2-1-单节点-单-gpu-single-node-single-gpu">24.2.1 单节点、单 GPU（Single-Node, Single-GPU）</h3>
+<p>可以使用现有的任意 CUDA 主机分配器或系统分配内存，利用高带宽 C2C。对用户而言，本地访问的行为与普通主机分配相同。内存分配器和页面大小的更多调优建议，参见 CUDA 调优指南。</p>
+<h3 id="24-2-2-单节点-多-gpu-single-node-multi-gpu">24.2.2 单节点、多 GPU（Single-Node, Multi-GPU）</h3>
+<p>在多 GPU 系统中，用户需要提供主机内存的放置位置信息。EGM 使用 NUMA 节点 ID 表达这一信息。可通过 <code>cuDeviceGetAttribute()</code> 获取 GPU 最近的 NUMA 节点 ID，然后使用虚拟内存管理 API 或 CUDA 内存池分配和管理 EGM 内存。</p>
+<h4 id="24-2-2-1-使用-vmm-api-using-vmm-apis">24.2.2.1 使用 VMM API（Using VMM APIs）</h4>
+<p>使用虚拟内存管理 API 分配内存时，第一步是创建用于支撑该分配的物理内存块。EGM 分配必须显式设置位置类型为 <code>CU_MEM_LOCATION_TYPE_HOST_NUMA</code>，并将 <code>numaID</code> 设为位置 ID。分配大小还必须符合平台要求的粒度。</p>
+<pre><code class="language-cpp">CUmemAllocationProp prop{};
+prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
+prop.location.type = CU_MEM_LOCATION_TYPE_HOST_NUMA;
+prop.location.id = numaId;
+
+size_t granularity = 0;
+cuMemGetAllocationGranularity(
+    &amp;granularity, &amp;prop, MEM_ALLOC_GRANULARITY_MINIMUM);
+size_t padded_size = ROUND_UP(size, granularity);
+
+CUmemGenericAllocationHandle allocHandle;
+cuMemCreate(&amp;allocHandle, padded_size, &amp;prop, 0);
+</code></pre>
+<p>物理内存分配完成后，保留虚拟地址范围并将其映射到分配句柄；这些步骤与普通 VMM 分配相同：</p>
+<pre><code class="language-cpp">CUdeviceptr dptr;
+cuMemAddressReserve(&amp;dptr, padded_size, 0, 0, 0);
+cuMemMap(dptr, padded_size, 0, allocHandle, 0);
+</code></pre>
+<p>最后必须显式设置映射地址范围的访问权限，否则访问该地址可能导致程序崩溃。位置描述符需要分别指定主机 NUMA 节点和 GPU，使两者都具有读写权限：</p>
+<pre><code class="language-cpp">CUmemAccessDesc accessDesc[2]{};
+accessDesc[0].location.type = CU_MEM_LOCATION_TYPE_HOST_NUMA;
+accessDesc[0].location.id = numaId;
+accessDesc[0].flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+
+accessDesc[1].location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+accessDesc[1].location.id = currentDev;
+accessDesc[1].flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+
+cuMemSetAccess(dptr, size, accessDesc, 2);
+</code></pre>
+<h4 id="24-2-2-2-使用-cuda-内存池-using-cuda-memory-pool">24.2.2.2 使用 CUDA 内存池（Using CUDA Memory Pool）</h4>
+<p>可以在某个节点上创建内存池，再向对等设备授予访问权限。必须显式将位置类型设为 <code>cudaMemLocationTypeHostNuma</code>，并将 <code>numaId</code> 作为位置标识符。</p>
+<pre><code class="language-cpp">cudaSetDevice(homeDevice);
+cudaMemPoolProps props{};
+props.allocType = cudaMemAllocationTypePinned;
+props.location.type = cudaMemLocationTypeHostNuma;
+props.location.id = numaId;
+cudaMemPoolCreate(&amp;memPool, &amp;props);
+</code></pre>
+<p>若要启用直接连接的对等访问，可以使用现有的 <code>cudaMemPoolSetAccess()</code> API：</p>
+<pre><code class="language-cpp">cudaMemAccessDesc desc{};
+desc.flags = cudaMemAccessFlagsProtReadWrite;
+desc.location.type = cudaMemLocationTypeDevice;
+desc.location.id = accessingDevice;
+cudaMemPoolSetAccess(memPool, &amp;desc, 1);
+</code></pre>
+<p>创建内存池并设置访问权限后，可将该池设为驻留设备的当前内存池，再使用 <code>cudaMallocAsync()</code> 分配内存：</p>
+<pre><code class="language-cpp">cudaDeviceSetMemPool(residentDevice, memPool);
+cudaMallocAsync(&amp;ptr, size, memPool, stream);
+</code></pre>
+<p><strong>注意：</strong> EGM 使用 2 MiB 页面。因此，访问非常大的分配时，用户可能遇到更多 TLB 未命中。</p>
+<h3 id="24-2-3-多节点-单-gpu-multi-node-single-gpu">24.2.3 多节点、单 GPU（Multi-Node, Single-GPU）</h3>
+<p>除内存分配外，远程对等访问不需要 EGM 专用修改，而是遵循 CUDA IPC 协议。用户使用 <code>cuMemCreate()</code> 分配内存时，必须设置 <code>CU_MEM_LOCATION_TYPE_HOST_NUMA</code> 和相应的 <code>numaID</code>，并将请求句柄类型设为 <code>CU_MEM_HANDLE_TYPE_FABRIC</code>。</p>
+<p>在节点 A 上创建物理分配：</p>
+<pre><code class="language-cpp">CUmemAllocationProp prop{};
+prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
+prop.requestedHandleTypes = CU_MEM_HANDLE_TYPE_FABRIC;
+prop.location.type = CU_MEM_LOCATION_TYPE_HOST_NUMA;
+prop.location.id = numaId;
+
+size_t granularity = 0;
+cuMemGetAllocationGranularity(
+    &amp;granularity, &amp;prop, MEM_ALLOC_GRANULARITY_MINIMUM);
+size_t padded_size = ROUND_UP(size, granularity);
+size_t page_size = ...;
+assert(padded_size % page_size == 0);
+
+CUmemGenericAllocationHandle allocHandle;
+cuMemCreate(&amp;allocHandle, padded_size, &amp;prop, 0);
+</code></pre>
+<p>然后将句柄导出，以便通过 TCP/IP 发送给节点 B：</p>
+<pre><code class="language-cpp">cuMemExportToShareableHandle(
+    &amp;fabricHandle, allocHandle, CU_MEM_HANDLE_TYPE_FABRIC, 0);
+// 通过 TCP/IP 将 fabricHandle 发送到节点 B。
+</code></pre>
+<p>节点 B 接收句柄后，使用 <code>cuMemImportFromShareableHandle()</code> 导入：</p>
+<pre><code class="language-cpp">CUmemGenericAllocationHandle allocHandle;
+cuMemImportFromShareableHandle(
+    &amp;allocHandle, &amp;fabricHandle, CU_MEM_HANDLE_TYPE_FABRIC);
+</code></pre>
+<p>导入后，可像普通 VMM 分配一样保留地址空间并映射：</p>
+<pre><code class="language-cpp">size_t granularity = 0;
+cuMemGetAllocationGranularity(
+    &amp;granularity, &amp;prop, MEM_ALLOC_GRANULARITY_MINIMUM);
+size_t padded_size = ROUND_UP(size, granularity);
+size_t page_size = ...;
+assert(padded_size % page_size == 0);
+
+CUdeviceptr dptr;
+cuMemAddressReserve(&amp;dptr, padded_size, 0, 0, 0);
+cuMemMap(dptr, padded_size, 0, allocHandle, 0);
+</code></pre>
+<p>最后，为节点 B 上的本地 GPU 设置访问权限。以下示例为八块本地 GPU 授予读写权限：</p>
+<pre><code class="language-cpp">// 允许本地 8 块 GPU 访问位于节点 A 的 EGM 内存。
+CUmemAccessDesc accessDesc[8];
+for (int i = 0; i &lt; 8; i++) {
+    accessDesc[i].location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    accessDesc[i].location.id = i;
+    accessDesc[i].flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+}
+cuMemSetAccess(dptr, size, accessDesc, 8);
+</code></pre>
+<h2 id="校对说明">校对说明</h2>
+<p>本章为第一轮译稿。EGM 的位置类型、NUMA 标识符、Fabric 句柄和跨节点映射流程已保留；示例尚未在支持 EGM 的硬件环境中编译或运行验证。</p>

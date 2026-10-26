@@ -1,0 +1,1102 @@
+<h1 id="第十六章-数学函数-mathematical-functions">第十六章 数学函数（Mathematical Functions）</h1>
+<blockquote>
+<p>对应原 PDF 第 411–424 页（原书印刷页码 395–408）。本章是参考资料，重点保留函数名、误差范围、适用条件和表格数值。ULP 表示“最后一位的单位”（Unit in the Last Place）。</p>
+</blockquote>
+<p>设备代码中支持的数学函数包括 C/C++ 标准库中的部分数学函数，以及仅能在设备代码中使用的内建函数。本章在适用时给出这些函数的精度信息，并使用 ULP 量化误差。关于 ULP 的定义，可参阅 Jean-Michel Muller 的论文 <em>On the definition of ulp(x)</em>，RR-5504，LIP RR-2005-09，INRIA，LIP，2005，第 16 页。</p>
+<p>设备代码中的数学函数不会设置全局 <code>errno</code> 变量，也不会通过浮点异常报告错误。因此，如果应用程序需要错误诊断机制，用户应自行检查函数的输入和输出。用户也有责任确保指针参数有效。不得向数学函数传入未初始化参数，否则可能导致未定义行为；这些函数会内联到用户程序中，因此也会受到编译器优化的影响。</p>
+<h2 id="16-1-标准函数-standard-functions">16.1 标准函数（Standard Functions）</h2>
+<p>本节中的函数可用于主机代码和设备代码。本节给出每个函数在设备端执行时的误差范围；如果主机系统没有提供相应函数，也会给出主机端执行时的误差范围。</p>
+<p>这些误差范围基于大量但并非穷尽的测试，因此并不构成有保证的误差上限。</p>
+<h3 id="单精度浮点函数-single-precision-floating-point-functions">单精度浮点函数（Single-Precision Floating-Point Functions）</h3>
+<p>加法和乘法符合 IEEE 标准，因此最大误差为 0.5 ULP。</p>
+<p>将单精度浮点操作数舍入为整数、且结果仍为单精度浮点数时，推荐使用 <code>rintf()</code> 而不是 <code>roundf()</code>。原因是设备端的 <code>roundf()</code> 会映射为 4 条指令，而 <code>rintf()</code> 只映射为一条指令。<code>truncf()</code>、<code>ceilf()</code> 和 <code>floorf()</code> 也各自只映射为一条指令。</p>
+<p><strong>表 15：单精度数学标准库函数的最大 ULP 误差。</strong></p>
+<p>最大误差是 CUDA 库函数返回结果与按“舍入到最近值、遇中间值舍入到偶数”模式正确舍入得到的单精度结果之间的 ULP 差值的绝对值。</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>最大 ULP 误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x + y</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x * y</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x / y</code></td>
+<td>当计算能力 ≥ 2 且使用 <code>-prec-div=true</code> 编译时为 0；否则全范围为 2</td>
+</tr>
+<tr>
+<td><code>1 / x</code></td>
+<td>当计算能力 ≥ 2 且使用 <code>-prec-div=true</code> 编译时为 0；否则全范围为 1</td>
+</tr>
+<tr>
+<td><code>rsqrtf(x)</code></td>
+<td>2（全范围）；仅当编译器将 <code>1 / sqrtf(x)</code> 转换为 <code>rsqrtf(x)</code> 时适用</td>
+</tr>
+<tr>
+<td><code>sqrtf(x)</code></td>
+<td>使用 <code>-prec-sqrt=true</code> 编译时为 0；否则，计算能力 ≥ 5.2 时为 1，较旧架构为 3</td>
+</tr>
+<tr>
+<td><code>cbrtf(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>rcbrtf(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>hypotf(x, y)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>rhypotf(x, y)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>norm3df(x, y, z)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>rnorm3df(x, y, z)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>norm4df(x, y, z, t)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>rnorm4df(x, y, z, t)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>normf(dim, arr)</code></td>
+<td>无法提供误差界限：使用快速算法，舍入误差会造成精度损失</td>
+</tr>
+<tr>
+<td><code>rnormf(dim, arr)</code></td>
+<td>无法提供误差界限：使用快速算法，舍入误差会造成精度损失</td>
+</tr>
+<tr>
+<td><code>expf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>exp2f(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>exp10f(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>expm1f(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>logf(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log2f(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log10f(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>log1pf(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>sinf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>cosf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>tanf(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>sincosf(x, sptr, cptr)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>sinpif(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>cospif(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>sincospif(x, sptr, cptr)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>asinf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>acosf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>atanf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>atan2f(y, x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>sinhf(x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>coshf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>tanhf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>asinhf(x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>acoshf(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>atanhf(x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>powf(x, y)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>erff(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>erfcf(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>erfinvf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>erfcinvf(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>erfcxf(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>normcdff(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>normcdfinvf(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>lgammaf(x)</code></td>
+<td>在区间 <code>-10.001 … -2.264</code> 之外为 6；区间内误差更大</td>
+</tr>
+<tr>
+<td><code>tgammaf(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>fmaf(x, y, z)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>frexpf(x, exp)</code></td>
+<td>0（全范围）</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>最大 ULP 误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ldexpf(x, exp)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>scalbnf(x, n)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>scalblnf(x, l)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>logbf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>ilogbf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>j0f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 9；否则最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>j1f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 9；否则最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>jnf(n, x)</code></td>
+<td>当 <span class="cuda-math-inline">\(n = 128\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>y0f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 9；否则最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>y1f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 9；否则最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>ynf(n, x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; n\)</span> 时为 <span class="cuda-math-inline">\(\lceil 2 + 2.5n \rceil\)</span>；否则最大绝对误差为 <span class="cuda-math-inline">\(2.2 \times 10^{-6}\)</span></td>
+</tr>
+<tr>
+<td><code>cyl_bessel_i0f(x)</code></td>
+<td>6（全范围）</td>
+</tr>
+<tr>
+<td><code>cyl_bessel_i1f(x)</code></td>
+<td>6（全范围）</td>
+</tr>
+<tr>
+<td><code>fmodf(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>remainderf(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>remquof(x, y, iptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>modff(x, iptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>fdimf(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>truncf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>roundf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>rintf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>nearbyintf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>ceilf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>floorf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>lrintf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>lroundf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>llrintf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>llroundf(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="双精度浮点函数-double-precision-floating-point-functions">双精度浮点函数（Double-Precision Floating-Point Functions）</h3>
+<p>将双精度浮点操作数舍入为整数、且结果仍为双精度浮点数时，推荐使用 <code>rint()</code> 而不是 <code>round()</code>。原因是设备端的 <code>round()</code> 会映射为 5 条指令，而 <code>rint()</code> 只映射为一条指令。<code>trunc()</code>、<code>ceil()</code> 和 <code>floor()</code> 也各自只映射为一条指令。</p>
+<p><strong>表 16：双精度数学标准库函数的最大 ULP 误差。</strong></p>
+<p>最大误差是 CUDA 库函数返回结果与按“舍入到最近值、遇中间值舍入到偶数”模式正确舍入得到的双精度结果之间的 ULP 差值的绝对值。</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>最大 ULP 误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x + y</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x * y</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x / y</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>1 / x</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>sqrt(x)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>rsqrt(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>cbrt(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>rcbrt(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>hypot(x, y)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>rhypot(x, y)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>norm3d(x, y, z)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>rnorm3d(x, y, z)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>norm4d(x, y, z, t)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>rnorm4d(x, y, z, t)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>norm(dim, arr)</code></td>
+<td>无法提供误差界限：使用快速算法，舍入误差会造成精度损失</td>
+</tr>
+<tr>
+<td><code>rnorm(dim, arr)</code></td>
+<td>无法提供误差界限：使用快速算法，舍入误差会造成精度损失</td>
+</tr>
+<tr>
+<td><code>exp(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>exp2(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>exp10(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>expm1(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log2(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log10(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>log1p(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>sin(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>cos(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>tan(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>sincos(x, sptr, cptr)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>sinpi(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>cospi(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>sincospi(x, sptr, cptr)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>asin(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>acos(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>atan(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>atan2(y, x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>sinh(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>cosh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>tanh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>asinh(x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>acosh(x)</code></td>
+<td>3（全范围）</td>
+</tr>
+<tr>
+<td><code>atanh(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>pow(x, y)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>erf(x)</code></td>
+<td>2（全范围）</td>
+</tr>
+<tr>
+<td><code>erfc(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>erfinv(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>erfcinv(x)</code></td>
+<td>6（全范围）</td>
+</tr>
+<tr>
+<td><code>erfcx(x)</code></td>
+<td>4（全范围）</td>
+</tr>
+<tr>
+<td><code>normcdf(x)</code></td>
+<td>5（全范围）</td>
+</tr>
+<tr>
+<td><code>normcdfinv(x)</code></td>
+<td>8（全范围）</td>
+</tr>
+<tr>
+<td><code>lgamma(x)</code></td>
+<td>在区间 <code>-23.0001 … -2.2637</code> 之外为 4；区间内误差更大</td>
+</tr>
+<tr>
+<td><code>tgamma(x)</code></td>
+<td>10（全范围）</td>
+</tr>
+<tr>
+<td><code>fma(x, y, z)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>frexp(x, exp)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>ldexp(x, exp)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>scalbn(x, n)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>scalbln(x, l)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>logb(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>ilogb(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>j0(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 7；否则最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>j1(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 7；否则最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>jn(n, x)</code></td>
+<td>当 <span class="cuda-math-inline">\(n = 128\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>y0(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 7；否则最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>y1(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &lt; 8\)</span> 时为 7；否则最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>yn(n, x)</code></td>
+<td>当 <span class="cuda-math-inline">\(|x| &gt; 1.5n\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(5 \times 10^{-12}\)</span></td>
+</tr>
+<tr>
+<td><code>cyl_bessel_i0(x)</code></td>
+<td>6（全范围）</td>
+</tr>
+<tr>
+<td><code>cyl_bessel_i1(x)</code></td>
+<td>6（全范围）</td>
+</tr>
+<tr>
+<td><code>fmod(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>remainder(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>remquo(x, y, iptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>modf(x, iptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>fdim(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>trunc(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>round(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>rint(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>nearbyint(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>ceil(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>floor(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>lrint(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>lround(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>llrint(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>llround(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="四精度浮点函数-quad-precision-floating-point-functions">四精度浮点函数（Quad-Precision Floating-Point Functions）</h3>
+<p>目前，四精度数学函数仅适用于计算能力为 10.0 及以上的设备。由于具体实现方式的限制，设备代码对 <code>__float128</code> 和 <code>_Float128</code> 类型的支持也仅限于某些主机平台组合，详见“主机编译器扩展”一节。</p>
+<p><strong>表 17：四精度数学标准库函数的最大 ULP 误差。</strong></p>
+<p>最大误差是 CUDA 库函数返回结果与按“舍入到最近值、遇中间值舍入到偶数”模式正确舍入得到的四精度结果之间的 ULP 差值的绝对值。</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>最大 ULP 误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x + y</code> / <code>__nv_fp128_add(x, y)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x - y</code> / <code>__nv_fp128_sub(x, y)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x * y</code> / <code>__nv_fp128_mul(x, y)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>x / y</code> / <code>__nv_fp128_div(x, y)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_sqrt(x)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fma(x, y, z)</code></td>
+<td>0（IEEE-754，舍入到最近值、遇中间值舍入到偶数）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_sin(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_cos(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_tan(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_asin(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_acos(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_atan(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_exp(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_exp2(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_exp10(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_expm1(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_log(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_log2(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_log10(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_log1p(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_pow(x, y)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_sinh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_cosh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_tanh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_asinh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_acosh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_atanh(x)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_hypot(x, y)</code></td>
+<td>1（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_ceil(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_trunc(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_floor(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_round(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_rint(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fabs(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_copysign(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fmax(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fmin(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fdim(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_fmod(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_remainder(x, y)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_frexp(x, nptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_modf(x, iptr)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_ldexp(x, exp)</code></td>
+<td>0（全范围）</td>
+</tr>
+<tr>
+<td><code>__nv_fp128_ilogb(x)</code></td>
+<td>0（全范围）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="16-2-内建函数-intrinsic-functions">16.2 内建函数（Intrinsic Functions）</h2>
+<p>本节中的函数只能用于设备代码。</p>
+<p>其中包括一些精度较低但速度更快的标准函数版本。它们通常在原函数名前加双下划线，例如 <code>__sinf(x)</code>。这些函数映射到更少的原生指令，因此执行速度更快。</p>
+<p>编译器选项 <code>-use_fast_math</code> 会强制将表 18 中列出的函数编译为对应的内建函数。除了降低相关函数的精度外，这个选项还可能改变某些特殊情况的处理方式。更稳妥的做法是，只在性能收益明确、并且能够接受精度下降或特殊情况处理方式改变的地方，选择性地将数学函数调用替换为内建函数调用。</p>
+<p><strong>表 18：受 <code>-use_fast_math</code> 影响的函数。</strong></p>
+<table>
+<thead>
+<tr>
+<th>运算符/函数</th>
+<th>对应设备函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x / y</code></td>
+<td><code>__fdividef(x, y)</code></td>
+</tr>
+<tr>
+<td><code>sinf(x)</code></td>
+<td><code>__sinf(x)</code></td>
+</tr>
+<tr>
+<td><code>cosf(x)</code></td>
+<td><code>__cosf(x)</code></td>
+</tr>
+<tr>
+<td><code>tanf(x)</code></td>
+<td><code>__tanf(x)</code></td>
+</tr>
+<tr>
+<td><code>sincosf(x, sptr, cptr)</code></td>
+<td><code>__sincosf(x, sptr, cptr)</code></td>
+</tr>
+<tr>
+<td><code>logf(x)</code></td>
+<td><code>__logf(x)</code></td>
+</tr>
+<tr>
+<td><code>log2f(x)</code></td>
+<td><code>__log2f(x)</code></td>
+</tr>
+<tr>
+<td><code>log10f(x)</code></td>
+<td><code>__log10f(x)</code></td>
+</tr>
+<tr>
+<td><code>expf(x)</code></td>
+<td><code>__expf(x)</code></td>
+</tr>
+<tr>
+<td><code>exp10f(x)</code></td>
+<td><code>__exp10f(x)</code></td>
+</tr>
+<tr>
+<td><code>powf(x, y)</code></td>
+<td><code>__powf(x, y)</code></td>
+</tr>
+<tr>
+<td><code>tanhf(x)</code></td>
+<td><code>__tanhf(x)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="单精度浮点函数-single-precision-floating-point-functions-2">单精度浮点函数（Single-Precision Floating-Point Functions）</h3>
+<p><code>__fadd_[rn,rz,ru,rd]()</code> 和 <code>__fmul_[rn,rz,ru,rd]()</code> 分别映射为加法和乘法操作，编译器绝不会将它们合并为 FMAD 指令。相比之下，由 <code>*</code> 和 <code>+</code> 运算符生成的加法与乘法，经常会被合并为 FMAD 指令。</p>
+<p>函数名带有以下后缀时，表示使用相应的舍入模式：</p>
+<ul>
+<li><code>_rn</code>：舍入到最近值，遇中间值舍入到偶数；</li>
+<li><code>_rz</code>：向零舍入；</li>
+<li><code>_ru</code>：向上舍入，即朝正无穷方向；</li>
+<li><code>_rd</code>：向下舍入，即朝负无穷方向。</li>
+</ul>
+<p>浮点除法的精度取决于代码使用 <code>-prec-div=false</code> 还是 <code>-prec-div=true</code> 编译。使用 <code>-prec-div=false</code> 时，普通除法运算符 <code>/</code> 与 <code>__fdividef(x, y)</code> 的精度相同；但当 <span class="cuda-math-inline">\(2^{126} &lt; |y| &lt; 2^{128}\)</span> 时，<code>__fdividef(x, y)</code> 返回 0，而 <code>/</code> 运算符仍会返回符合表 19 所述精度的结果。</p>
+<p>此外，当 <span class="cuda-math-inline">\(2^{126} &lt; |y| &lt; 2^{128}\)</span> 且 <code>x</code> 为无穷大时，<code>__fdividef(x, y)</code> 会因计算中出现“无穷大乘以零”而返回 NaN；而 <code>/</code> 运算符会返回无穷大。</p>
+<p>另一方面，如果使用 <code>-prec-div=true</code> 编译，或者完全不指定 <code>-prec-div</code> 选项（默认值为 <code>true</code>），则 <code>/</code> 运算符符合 IEEE 标准。</p>
+<p><strong>表 19：单精度浮点内建函数（CUDA Runtime 库支持及其对应误差界限）。</strong></p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>误差界限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__fadd_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fsub_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fmul_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fmaf_[rn,rz,ru,rd](x, y, z)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__frcp_[rn,rz,ru,rd](x)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fsqrt_[rn,rz,ru,rd](x)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__frsqrt_rn(x)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fdiv_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fdividef(x, y)</code></td>
+<td>当 <span class="cuda-math-inline">\(|y| \in [2^{-126}, 2^{126}]\)</span> 时，最大 ULP 误差为 2</td>
+</tr>
+<tr>
+<td><code>__expf(x)</code></td>
+<td>最大 ULP 误差为 <span class="cuda-math-inline">\(2 + \lfloor |1.173x| \rfloor\)</span></td>
+</tr>
+<tr>
+<td><code>__exp10f(x)</code></td>
+<td>最大 ULP 误差为 <span class="cuda-math-inline">\(2 + \lfloor |2.97x| \rfloor\)</span></td>
+</tr>
+<tr>
+<td><code>__logf(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(x \in [0.5, 2]\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2^{-21.41}\)</span>；否则最大 ULP 误差为 3</td>
+</tr>
+<tr>
+<td><code>__log2f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(x \in [0.5, 2]\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2^{-22}\)</span>；否则最大 ULP 误差为 2</td>
+</tr>
+<tr>
+<td><code>__log10f(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(x \in [0.5, 2]\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2^{-24}\)</span>；否则最大 ULP 误差为 3</td>
+</tr>
+<tr>
+<td><code>__sinf(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(x \in [-\pi, \pi]\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2^{-21.41}\)</span>；其他范围误差更大</td>
+</tr>
+<tr>
+<td><code>__cosf(x)</code></td>
+<td>当 <span class="cuda-math-inline">\(x \in [-\pi, \pi]\)</span> 时，最大绝对误差为 <span class="cuda-math-inline">\(2^{-21.19}\)</span>；其他范围误差更大</td>
+</tr>
+<tr>
+<td><code>__sincosf(x, sptr, cptr)</code></td>
+<td>与 <code>__sinf(x)</code> 和 <code>__cosf(x)</code> 的误差界限相同</td>
+</tr>
+<tr>
+<td><code>__tanf(x)</code></td>
+<td>根据其实现 <code>__sinf(x) * (1 / __cosf(x))</code> 推导</td>
+</tr>
+<tr>
+<td><code>__powf(x, y)</code></td>
+<td>根据其实现 <code>exp2f(y * __log2f(x))</code> 推导</td>
+</tr>
+<tr>
+<td><code>__tanhf(x)</code></td>
+<td>当前实现的最大相对误差为 <span class="cuda-math-inline">\(2^{-11}\)</span>。即使编译器设置 <code>-ftz=true</code>，该快速内建函数的次正规结果也不会被刷新为零。仅适用于计算能力至少为 7.5 的设备；其他设备默认使用常规 <code>tanhf()</code> 的行为</td>
+</tr>
+</tbody>
+</table>
+<h3 id="双精度浮点函数-double-precision-floating-point-functions-2">双精度浮点函数（Double-Precision Floating-Point Functions）</h3>
+<p><code>__dadd_rn()</code> 和 <code>__dmul_rn()</code> 分别映射为加法和乘法操作，编译器绝不会将它们合并为 FMAD 指令。相比之下，由 <code>*</code> 和 <code>+</code> 运算符生成的加法与乘法，经常会被合并为 FMAD 指令。</p>
+<p><strong>表 20：双精度浮点内建函数（CUDA Runtime 库支持及其对应误差界限）。</strong></p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>误差界限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__dadd_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__dsub_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__dmul_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__fma_[rn,rz,ru,rd](x, y, z)</code></td>
+<td>符合 IEEE 标准</td>
+</tr>
+<tr>
+<td><code>__ddiv_[rn,rz,ru,rd](x, y)</code></td>
+<td>符合 IEEE 标准；要求计算能力大于 2</td>
+</tr>
+<tr>
+<td><code>__drcp_[rn,rz,ru,rd](x)</code></td>
+<td>符合 IEEE 标准；要求计算能力大于 2</td>
+</tr>
+<tr>
+<td><code>__dsqrt_[rn,rz,ru,rd](x)</code></td>
+<td>符合 IEEE 标准；要求计算能力大于 2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="本章术语与阅读提示">本章术语与阅读提示</h2>
+<ul>
+<li><strong>ULP（Unit in the Last Place）：</strong> 最后一位的单位，是衡量浮点计算结果与正确舍入结果之间差异的常用方式。</li>
+<li><strong>最大 ULP 误差：</strong> 表示测试范围内的最大误差；标准函数表中的数值基于大量但非穷尽的测试，并非对所有输入都作出形式化保证。</li>
+<li><strong><code>-use_fast_math</code>：</strong> 会让表 18 中的部分标准数学函数转为更快的内建函数；使用前应确认应用能接受相应的精度和特殊值处理差异。</li>
+<li><strong>舍入后缀：</strong> <code>_rn</code>、<code>_rz</code>、<code>_ru</code> 和 <code>_rd</code> 分别表示舍入到最近偶数、向零、向正无穷和向负无穷。</li>
+</ul>
+<h2 id="校对说明">校对说明</h2>
+<p>本章数值表按原 PDF 第 412–424 页转录，函数名与 CUDA 标识符保持英文。表 15–20 的误差界限应在正式发布前再次逐项与 NVIDIA CUDA C++ Programming Guide 12.8 核对；本工作稿尚未通过自动或人工逐项技术审校。</p>
