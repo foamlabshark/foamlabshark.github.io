@@ -1,0 +1,909 @@
+<h1 id="第十一章-协作组-cooperative-groups">第十一章 协作组（Cooperative Groups）</h1>
+<h2 id="11-1-简介-introduction">11.1 简介（Introduction）</h2>
+<p>Cooperative Groups 是 CUDA 9 引入的 CUDA 编程模型扩展，用于组织能够相互通信的线程组。它允许开发者明确表达线程通信的粒度，从而设计更丰富、更高效的并行分解方式。</p>
+<p>过去，CUDA 编程模型主要通过一个简单构造实现协作线程同步：线程块中所有线程共同使用 <code>__syncthreads()</code> 屏障。然而，程序员往往希望以其他粒度定义和同步线程组，以提高性能、设计灵活性，并通过“集体”组级函数接口实现软件复用。</p>
+<p>为了表达更广泛的并行交互模式，许多注重性能的程序员曾自行编写不安全的原语，在单个 warp 内或同一 GPU 上多个线程块之间进行同步。虽然这些方式有时能带来性能提升，但也产生了越来越多脆弱、难以编写、调优和跨 GPU 世代维护的代码。Cooperative Groups 通过提供安全且面向未来的机制，解决了这一问题。</p>
+<h2 id="11-2-cooperative-groups-的新增内容-what-s-new-in-cooperative-groups">11.2 Cooperative Groups 的新增内容（What’s New in Cooperative Groups）</h2>
+<h3 id="11-2-1-cuda-12-2">11.2.1 CUDA 12.2</h3>
+<ul>
+<li>为 <code>grid_group</code> 和 <code>thread_block</code> 添加了 <code>barrier_arrive</code> 与 <code>barrier_wait</code> 成员函数。</li>
+</ul>
+<h3 id="11-2-2-cuda-12-1">11.2.2 CUDA 12.1</h3>
+<ul>
+<li>新增 <code>invoke_one</code> 和 <code>invoke_one_broadcast</code> API。</li>
+</ul>
+<h3 id="11-2-3-cuda-12-0">11.2.3 CUDA 12.0</h3>
+<p>以下实验性 API 已移入正式命名空间：</p>
+<ul>
+<li>CUDA 11.7 中新增的异步 reduce 和 scan 更新；</li>
+<li>CUDA 11.1 中新增的大小大于 32 的 <code>thread_block_tile</code>；</li>
+<li>对计算能力为 8.0 及以上的设备，创建大尺寸 tile 不再要求提供 <code>block_tile_memory</code> 对象。</li>
+</ul>
+<h2 id="11-3-编程模型概念-programming-model-concept">11.3 编程模型概念（Programming Model Concept）</h2>
+<p>Cooperative Groups 编程模型描述 CUDA 线程块内部以及线程块之间的同步模式。它既允许应用程序定义自己的线程组，也提供相应的同步接口。该模型还提供新的内核启动 API，通过施加特定限制，保证同步能够正确工作。</p>
+<p>这些原语支持新的 CUDA 协作并行模式，包括生产者/消费者并行、机会式并行，以及整个 grid 的全局同步。</p>
+<p>Cooperative Groups 编程模型包含以下要素：</p>
+<ul>
+<li>表示协作线程组的数据类型；</li>
+<li>获取由 CUDA 启动 API 隐式定义的线程组的操作，例如线程块；</li>
+<li>将已有线程组划分为新线程组的集体操作；</li>
+<li>用于数据移动和处理的集体算法，例如 <code>memcpy_async</code>、<code>reduce</code> 和 <code>scan</code>；</li>
+<li>同步组内所有线程的操作；</li>
+<li>检查线程组属性的操作；</li>
+<li>暴露低层、针对特定线程组且通常由硬件加速的集体操作。</li>
+</ul>
+<p>Cooperative Groups 的核心概念，是使用对象显式表示属于某个组的线程集合。将线程组作为一等程序对象，可以改善软件组合性：集体函数可以接收一个显式对象，表示哪些线程参与操作。这也让程序员意图更加清晰，避免基于架构假设的脆弱代码、不必要地限制编译器优化，并提升与新一代 GPU 的兼容性。</p>
+<p>为了获得高效代码，最好使用专门化的线程组；使用通用类型可能失去大量编译期优化。应将线程组对象按引用传递给需要这些线程协作执行的函数。</p>
+<p>Cooperative Groups 要求 CUDA 9.0 或更高版本。使用时包含以下头文件：</p>
+<pre><code class="language-cpp">// 主头文件兼容 C++11 之前的标准；集体算法头文件要求 C++11。
+#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/memcpy_async.h&gt; // 可选：异步复制
+#include &lt;cooperative_groups/reduce.h&gt;        // 可选：reduce
+#include &lt;cooperative_groups/scan.h&gt;          // 可选：scan
+</code></pre>
+<p>然后使用 Cooperative Groups 命名空间：</p>
+<pre><code class="language-cpp">using namespace cooperative_groups;
+// 或使用别名，避免集体算法污染当前命名空间。
+namespace cg = cooperative_groups;
+</code></pre>
+<p>代码可以像普通 CUDA 程序一样使用 <code>nvcc</code> 编译。但如果要使用 <code>memcpy_async</code>、<code>reduce</code> 或 <code>scan</code>，且主机编译器默认语言标准低于 C++11，则必须在命令行添加 <code>--std=c++11</code>。</p>
+<h3 id="11-3-1-组合示例-composition-example">11.3.1 组合示例（Composition Example）</h3>
+<p>以下示例尝试执行线程块范围的求和归约。传统写法中，函数内部有一个隐藏约束：线程块中的所有线程都必须调用 <code>sum()</code>，否则 <code>__syncthreads()</code> 可能无法正确工作。</p>
+<pre><code class="language-cpp">__device__ int sum(int *x, int n) {
+    // ...
+    __syncthreads();
+    return total;
+}
+
+__global__ void parallel_kernel(float *x) {
+    // 整个线程块都必须调用 sum。
+    sum(x, n);
+}
+</code></pre>
+<p>更好的写法是显式传入代表参与线程组的对象：</p>
+<pre><code class="language-cpp">__device__ int sum(const thread_block&amp; g, int *x, int n) {
+    // ...
+    g.sync();
+    return total;
+}
+
+__global__ void parallel_kernel(...) {
+    thread_block tb = this_thread_block();
+    sum(tb, x, n);
+}
+</code></pre>
+<h2 id="11-4-线程组类型-group-types">11.4 线程组类型（Group Types）</h2>
+<h3 id="11-4-1-隐式线程组-implicit-groups">11.4.1 隐式线程组（Implicit Groups）</h3>
+<p>隐式线程组表示内核的启动配置。无论内核如何编写，它始终具有固定数量的线程、线程块和线程块维度，以及单个 grid 和其维度。如果使用多设备协作启动 API，还可以包含多个 grid（每台设备一个 grid）。</p>
+<p>这些组是进一步划分为更细粒度线程组的起点。细粒度组通常由硬件加速，并更适合开发者所解决的问题。</p>
+<p>虽然可以在代码任意位置创建隐式线程组对象，但这样做有风险。创建隐式线程组句柄是一个集体操作，组内所有线程都必须参与。如果只在部分线程能到达的条件分支中创建句柄，可能导致死锁或数据损坏。因此，建议尽早创建隐式线程组句柄（最好在发生任何分支之前），并在整个内核中复用。句柄必须在声明时初始化（没有默认构造函数），也不建议复制构造。</p>
+<h4 id="11-4-1-1-线程块组-thread-block-group">11.4.1.1 线程块组（Thread Block Group）</h4>
+<p>Cooperative Groups 引入 <code>thread_block</code> 数据类型，在内核中显式表示线程块。</p>
+<pre><code class="language-cpp">class thread_block;
+thread_block g = this_thread_block();
+</code></pre>
+<p>主要成员函数如下：</p>
+<table>
+<thead>
+<tr>
+<th>成员函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sync()</code></td>
+<td>同步组内线程，等价于 <code>g.barrier_arrive()</code> 后调用 <code>g.barrier_wait()</code></td>
+</tr>
+<tr>
+<td><code>barrier_arrive()</code></td>
+<td>到达线程块屏障并返回 token，之后需传给 <code>barrier_wait()</code></td>
+</tr>
+<tr>
+<td><code>barrier_wait(thread_block::arrival_token&amp;&amp; t)</code></td>
+<td>等待线程块屏障，参数为 <code>barrier_arrive()</code> 返回的右值引用 token</td>
+</tr>
+<tr>
+<td><code>thread_rank()</code></td>
+<td>调用线程在 <code>[0, num_threads)</code> 中的 rank</td>
+</tr>
+<tr>
+<td><code>group_index()</code></td>
+<td>线程块在 grid 中的三维索引</td>
+</tr>
+<tr>
+<td><code>thread_index()</code></td>
+<td>线程在线程块中的三维索引</td>
+</tr>
+<tr>
+<td><code>dim_threads()</code></td>
+<td>启动时线程块的线程维度</td>
+</tr>
+<tr>
+<td><code>num_threads()</code></td>
+<td>组中的线程总数</td>
+</tr>
+<tr>
+<td><code>size()</code></td>
+<td><code>num_threads()</code> 的旧别名</td>
+</tr>
+<tr>
+<td><code>group_dim()</code></td>
+<td><code>dim_threads()</code> 的旧别名</td>
+</tr>
+</tbody>
+</table>
+<p>示例：线程块中由线程 0 将全局内存中的整数加载到共享内存，然后同步，让所有线程都能安全使用该值。</p>
+<pre><code class="language-cpp">__global__ void kernel(int *globalInput) {
+    __shared__ int x;
+    thread_block g = this_thread_block();
+
+    if (g.thread_rank() == 0)
+        x = (*globalInput);
+
+    g.sync(); // 等价于 __syncthreads()
+}
+</code></pre>
+<p>组中的所有线程都必须参与集体操作，否则行为未定义。<code>thread_block</code> 类型派生自更通用的 <code>thread_group</code>，后者可表示更广泛的线程组。</p>
+<h4 id="11-4-1-2-集群组-cluster-group">11.4.1.2 集群组（Cluster Group）</h4>
+<p><code>cluster_group</code> 表示单个线程块集群中的所有线程，详见“线程块集群”。这些 API 适用于计算能力为 9.0 及以上的硬件。在这些设备上，如果启动的 grid 不使用 cluster，相关 API 会假定集群大小为 1×1×1。</p>
+<pre><code class="language-cpp">class cluster_group;
+cluster_group g = this_cluster();
+</code></pre>
+<p>主要成员函数包括：</p>
+<ul>
+<li><code>sync()</code>：同步组内线程；</li>
+<li><code>barrier_arrive()</code>：到达 cluster 屏障并返回 token；</li>
+<li><code>barrier_wait(cluster_group::arrival_token&amp;&amp; t)</code>：等待 cluster 屏障；</li>
+<li><code>thread_rank()</code>：调用线程在组内的 rank；</li>
+<li><code>block_rank()</code>：调用线程块在 cluster 中的 rank；</li>
+<li><code>num_threads()</code>、<code>num_blocks()</code>：组内线程数和线程块数；</li>
+<li><code>dim_threads()</code>、<code>dim_blocks()</code>：cluster 的线程维度和线程块维度；</li>
+<li><code>block_index()</code>：调用线程块在 cluster 中的三维索引；</li>
+<li><code>query_shared_rank(const void *addr)</code>：查询某个共享内存地址所属的线程块 rank；</li>
+<li><code>map_shared_rank(T *addr, int rank)</code>：获取 cluster 中指定线程块共享内存变量的地址；</li>
+<li><code>size()</code>：<code>num_threads()</code> 的旧别名。</li>
+</ul>
+<h4 id="11-4-1-3-grid-组-grid-group">11.4.1.3 Grid 组（Grid Group）</h4>
+<p><code>grid_group</code> 表示单个 grid 中启动的所有线程。除 <code>sync()</code> 外，其他 API 始终可用；若要跨整个 grid 同步，则必须使用 cooperative launch API。</p>
+<pre><code class="language-cpp">class grid_group;
+grid_group g = this_grid();
+</code></pre>
+<p>主要成员函数包括：</p>
+<ul>
+<li><code>is_valid()</code>：返回该 grid group 是否能够执行同步；</li>
+<li><code>sync()</code>：同步组内线程；</li>
+<li><code>barrier_arrive()</code> 与 <code>barrier_wait(grid_group::arrival_token&amp;&amp; t)</code>：到达并等待 grid 屏障；</li>
+<li><code>thread_rank()</code>、<code>block_rank()</code>、<code>cluster_rank()</code>：调用线程、线程块和 cluster 在 grid 中的 rank；</li>
+<li><code>num_threads()</code>、<code>num_blocks()</code>、<code>num_clusters()</code>：线程、线程块和 cluster 总数；</li>
+<li><code>dim_blocks()</code>、<code>dim_clusters()</code>：grid 的线程块维度和 cluster 维度；</li>
+<li><code>block_index()</code>、<code>cluster_index()</code>：当前线程块和 cluster 在 grid 中的三维索引；</li>
+<li><code>size()</code>：<code>num_threads()</code> 的旧别名；</li>
+<li><code>group_dim()</code>：<code>dim_blocks()</code> 的旧别名。</li>
+</ul>
+<h4 id="11-4-1-4-多-grid-组-multi-grid-group">11.4.1.4 多 Grid 组（Multi Grid Group）</h4>
+<p><code>multi_grid_group</code> 表示通过多设备协作启动在多台设备上启动的所有线程。必须使用对应的多设备协作启动 API，才能通过 <code>this_multi_grid()</code> 构造该对象。</p>
+<pre><code class="language-cpp">// 内核必须通过多设备协作 API 启动。
+multi_grid_group g = this_multi_grid();
+</code></pre>
+<p>主要成员函数包括 <code>is_valid()</code>、<code>sync()</code>、<code>num_threads()</code>、<code>thread_rank()</code>、<code>grid_rank()</code> 和 <code>num_grids()</code>。其中 <code>size()</code> 是 <code>num_threads()</code> 的旧别名。</p>
+<p><strong>弃用说明：</strong> 从 CUDA 11.3 起，<code>multi_grid_group</code> 已针对所有设备弃用。</p>
+<p>&lt;!-- Added section: 11.4.2 Explicit Groups --&gt;</p>
+<h1 id="第十一章续译-显式线程组-explicit-groups">第十一章续译：显式线程组（Explicit Groups）</h1>
+<h2 id="11-4-2-显式线程组-explicit-groups">11.4.2 显式线程组（Explicit Groups）</h2>
+<h3 id="11-4-2-1-线程块-tile-thread-block-tile">11.4.2.1 线程块 Tile（Thread Block Tile）</h3>
+<p><code>thread_block_tile</code> 是模板化的 tile 组。其大小在编译期通过模板参数指定，因此有机会生成更高效的代码。</p>
+<pre><code class="language-cpp">template &lt;unsigned int Size, typename ParentT = void&gt;
+class thread_block_tile;
+
+template &lt;unsigned int Size, typename ParentT&gt;
+thread_block_tile&lt;Size, ParentT&gt;
+tiled_partition(const ParentT&amp; g);
+</code></pre>
+<p><code>Size</code> 必须是 2 的幂，且不大于 1024。对于计算能力为 7.5 及以下的硬件，创建大小超过 32 的 tile 需要额外步骤，详见本节后面的说明。</p>
+<p><code>ParentT</code> 表示该组从哪个父组划分而来。它通常自动推导；如果设置为 <code>void</code>，父组信息会存储在组句柄中，而不是类型中。</p>
+<p>主要成员函数包括：</p>
+<ul>
+<li><code>sync()</code>：同步组内线程；</li>
+<li><code>num_threads()</code>、<code>thread_rank()</code>：线程总数与调用线程 rank；</li>
+<li><code>meta_group_size()</code>：从父组划分出的 tile 组总数；</li>
+<li><code>meta_group_rank()</code>：当前 tile 在这些组中的线性 rank；</li>
+<li><code>shfl()</code>、<code>shfl_up()</code>、<code>shfl_down()</code>、<code>shfl_xor()</code>：warp 洗牌操作；</li>
+<li><code>any()</code>、<code>all()</code>、<code>ballot()</code>：warp 投票操作；</li>
+<li><code>match_any()</code>、<code>match_all()</code>：warp 匹配操作。</li>
+</ul>
+<p>对于 <code>shfl</code>、<code>shfl_up</code>、<code>shfl_down</code> 和 <code>shfl_xor</code>，若使用 C++11 或更高标准，可以传入任意类型对象，但该类型必须可平凡复制。对于 tile 大小不超过 32 的情况，<code>sizeof(T)</code> 不得超过 32；更大 tile 则不得超过 8。<code>shfl_up</code>、<code>shfl_down</code> 和 <code>shfl_xor</code> 仅适用于大小不超过 32 的 tile；<code>ballot</code>、<code>match_any</code> 和 <code>match_all</code> 也仅适用于不超过 32 的 tile。</p>
+<p>对于计算能力为 7.5 及以下的硬件，大小超过 32 的 tile 需要少量额外内存，可使用 <code>cooperative_groups::block_tile_memory</code> 结构，并将其放在共享内存或全局内存中：</p>
+<pre><code class="language-cpp">template &lt;unsigned int MaxBlockSize = 1024&gt;
+struct block_tile_memory;
+</code></pre>
+<p><code>MaxBlockSize</code> 指定当前线程块的最大线程数，可在内核只使用较小线程块时减少 <code>block_tile_memory</code> 的共享内存占用。该对象需要传给 <code>cooperative_groups::this_thread_block()</code>，这样返回的 <code>thread_block</code> 才能继续划分为大小超过 32 的 tile。此构造是集体操作，线程块中的所有线程都必须调用。</p>
+<p>示例：</p>
+<pre><code class="language-cpp">// 创建两个 tile 组，大小分别为 32 和 4。
+// tile4 的父组类型编码在类型中；tile32 则将来源保存在句柄中。
+thread_block block = this_thread_block();
+thread_block_tile&lt;32&gt; tile32 = tiled_partition&lt;32&gt;(block);
+thread_block_tile&lt;4, thread_block&gt; tile4 = tiled_partition&lt;4&gt;(block);
+</code></pre>
+<p>下面示例展示如何在所有计算能力上创建 128 线程的 tile。计算能力 8.0 及以上的设备可以省略 <code>block_tile_memory</code>。</p>
+<pre><code class="language-cpp">__global__ void kernel(...) {
+    // 为 thread_block_tile 预留共享内存，并声明线程块最大为 256 线程。
+    __shared__ block_tile_memory&lt;256&gt; shared;
+    thread_block thb = this_thread_block(shared);
+
+    // 创建包含 128 个线程的 tile。
+    auto tile = tiled_partition&lt;128&gt;(thb);
+    // ...
+}
+</code></pre>
+<h4 id="11-4-2-1-1-warp-同步代码模式-warp-synchronous-code-pattern">11.4.2.1.1 Warp 同步代码模式（Warp-Synchronous Code Pattern）</h4>
+<p>过去，开发者可能会编写隐式假设 warp 大小固定的 warp 同步代码。现在应显式指定所需的 warp 大小。</p>
+<pre><code class="language-cpp">__global__ void cooperative_kernel(...) {
+    // 获取当前线程块组。
+    thread_block my_block = this_thread_block();
+
+    // 将线程块划分为 32 线程的相邻 tile，每个 tile 对应一个 warp。
+    auto my_tile = tiled_partition&lt;32&gt;(my_block);
+
+    // 只有每个线程块中的第一个 32 线程 tile 会执行此操作。
+    if (my_tile.meta_group_rank() == 0) {
+        // ...
+        my_tile.sync();
+    }
+}
+</code></pre>
+<h4 id="11-4-2-1-2-单线程组-single-thread-group">11.4.2.1.2 单线程组（Single Thread Group）</h4>
+<p>可以通过 <code>this_thread()</code> 获取表示当前线程的组：</p>
+<pre><code class="language-cpp">thread_block_tile&lt;1&gt; this_thread();
+</code></pre>
+<p>例如，下面的 <code>memcpy_async</code> API 使用 <code>thread_group</code>，将一个整数从源地址复制到目标地址：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/memcpy_async.h&gt;
+
+cooperative_groups::memcpy_async(
+    cooperative_groups::this_thread(), dest, src, sizeof(int));
+</code></pre>
+<p>更详细的 <code>this_thread()</code> 异步复制示例见“使用 <code>cuda::pipeline</code> 的单阶段异步数据复制”和“使用 <code>cuda::pipeline</code> 的多阶段异步数据复制”。</p>
+<h3 id="11-4-2-2-合并线程组-coalesced-groups">11.4.2.2 合并线程组（Coalesced Groups）</h3>
+<p>在 CUDA 的 SIMT 架构中，多处理器在硬件层面以每组 32 个线程（warp）的方式执行线程。如果程序中的数据相关条件分支使同一个 warp 中的线程发生发散，那么 warp 会串行执行各条分支路径，并禁用不在当前路径上的线程。当前路径中保持活动的线程称为合并线程（coalesced threads）。</p>
+<p>Cooperative Groups 提供发现并创建包含所有合并线程的线程组的功能。</p>
+<p>通过 <code>coalesced_threads()</code> 构造组句柄是一种机会式操作。它会返回调用时刻的活动线程集合，但不保证具体返回哪些线程（只要它们是活动的），也不保证这些线程在后续执行中一直保持合并状态。执行集体操作时，这些线程会重新聚合，但操作结束后仍可能再次发散。</p>
+<pre><code class="language-cpp">class coalesced_group;
+coalesced_group active = coalesced_threads();
+</code></pre>
+<p>主要成员函数包括：</p>
+<ul>
+<li><code>sync()</code>：同步组内线程；</li>
+<li><code>num_threads()</code>、<code>thread_rank()</code>：组内线程数和调用线程 rank；</li>
+<li><code>meta_group_size()</code>：从父组划分出的组数量。如果组是通过 <code>coalesced_threads()</code> 查询活动线程集合创建的，则值为 1；</li>
+<li><code>meta_group_rank()</code>：当前组在线性组集合中的 rank。若组是通过查询活动线程创建的，则始终为 0；</li>
+<li><code>shfl()</code>、<code>shfl_up()</code>、<code>shfl_down()</code>：warp 洗牌操作；</li>
+<li><code>any()</code>、<code>all()</code>、<code>ballot()</code>：warp 投票操作；</li>
+<li><code>match_any()</code>、<code>match_all()</code>：warp 匹配操作；</li>
+<li><code>size()</code>：<code>num_threads()</code> 的旧别名。</li>
+</ul>
+<p>在 C++11 或更高标准下，<code>shfl</code>、<code>shfl_up</code> 和 <code>shfl_down</code> 可以处理任意类型，但类型必须可平凡复制，且 <code>sizeof(T) &lt;= 32</code>。</p>
+<p>示例：假设某个分支中，每个 warp 只有第 2、第 4 和第 8 个线程处于活动状态。在该分支中调用 <code>coalesced_threads()</code>，就会为每个 warp 创建一个包含三个线程的组，其 rank 为 0–2。</p>
+<pre><code class="language-cpp">__global__ void kernel(int *globalInput) {
+    // 假设 globalInput 指示线程 2、4、8 负责处理数据。
+    if (threadIdx.x == *globalInput) {
+        coalesced_group active = coalesced_threads();
+        // active 的线程 rank 为 0–2。
+        active.sync();
+    }
+}
+</code></pre>
+<h4 id="11-4-2-2-1-发现模式-discovery-pattern">11.4.2.2.1 发现模式（Discovery Pattern）</h4>
+<p>开发者经常需要处理当前活动线程集合。此时不应假设哪些线程会在场，而应使用实际参与的线程。</p>
+<p>以下示例将 warp 中多个线程的原子递增聚合为一次原子操作。传统写法如下：</p>
+<pre><code class="language-cpp">{
+    unsigned int writemask = __activemask();
+    unsigned int total = __popc(writemask);
+    unsigned int prefix = __popc(writemask &amp; __lanemask_lt());
+
+    // 找到编号最低的活动 lane。
+    int elected_lane = __ffs(writemask) - 1;
+    int base_offset = 0;
+
+    if (prefix == 0)
+        base_offset = atomicAdd(p, total);
+
+    base_offset = __shfl_sync(writemask, base_offset, elected_lane);
+    int thread_offset = prefix + base_offset;
+    return thread_offset;
+}
+</code></pre>
+<p>使用 Cooperative Groups 后，可以改写为：</p>
+<pre><code class="language-cpp">{
+    cg::coalesced_group g = cg::coalesced_threads();
+    int prev;
+
+    if (g.thread_rank() == 0)
+        prev = atomicAdd(p, g.num_threads());
+
+    prev = g.thread_rank() + g.shfl(prev, 0);
+    return prev;
+}
+</code></pre>
+<p>这样可以显式使用当前活动线程组，并由该组中的一个线程执行聚合后的原子递增。</p>
+<p>&lt;!-- Added section: 11.5 Group Partitioning through 11.6.2.2 --&gt;</p>
+<h1 id="第十一章续译-线程组划分与集体操作">第十一章续译：线程组划分与集体操作</h1>
+<blockquote>
+<p>对应原 PDF 第 308–313 页（原书印刷页码 292–297）。</p>
+</blockquote>
+<h2 id="11-5-线程组划分-group-partitioning">11.5 线程组划分（Group Partitioning）</h2>
+<h3 id="11-5-1-tiled-partition">11.5.1 <code>tiled_partition</code></h3>
+<pre><code class="language-cpp">template &lt;unsigned int Size, typename ParentT&gt;
+thread_block_tile&lt;Size, ParentT&gt; tiled_partition(const ParentT&amp; g);
+
+thread_group tiled_partition(
+    const thread_group&amp; parent, unsigned int tilesz);
+</code></pre>
+<p><code>tiled_partition</code> 是集体操作，会将父线程组划分为一维、行主序排列的子组。生成的子组数量为 <code>size(parent) / tilesz</code>，因此父组大小必须能够被 tile 大小整除。允许的父组类型为 <code>thread_block</code> 或 <code>thread_block_tile</code>。</p>
+<p>该实现可能使调用线程等待，直到父组中的所有成员都调用该操作。原生硬件支持的大小为 1、2、4、8、16 和 32，并且 <code>cg::size(parent)</code> 必须大于 <code>Size</code>。模板版本的 <code>tiled_partition</code> 还支持 64、128、256 和 512 的大小，但计算能力为 7.5 及以下的设备需要额外步骤，详见“线程块 Tile”。</p>
+<p>代码生成要求：最低计算能力 5.0；tile 大小大于 32 时要求 C++11。</p>
+<p>示例：</p>
+<pre><code class="language-cpp">thread_block block = this_thread_block();
+thread_block_tile&lt;32&gt; tile32 = tiled_partition&lt;32&gt;(block);
+
+// 将每个 32 线程组继续划分为 4 线程组。
+auto tile4 = tiled_partition&lt;4&gt;(tile32);
+// 或使用通用组接口：
+// thread_group tile4 = tiled_partition(tile32, 4);
+</code></pre>
+<p>如果添加以下语句：</p>
+<pre><code class="language-cpp">if (tile4.thread_rank() == 0)
+    printf("Hello from tile4 rank 0\\n");
+</code></pre>
+<p>那么线程块中每四个线程就会有一个线程输出一行，即线程块中 rank 为 0、4、8、12 等的线程。</p>
+<h3 id="11-5-2-labeled-partition">11.5.2 <code>labeled_partition</code></h3>
+<pre><code class="language-cpp">template &lt;typename Label&gt;
+coalesced_group labeled_partition(
+    const coalesced_group&amp; g, Label label);
+
+template &lt;unsigned int Size, typename Label&gt;
+coalesced_group labeled_partition(
+    const thread_block_tile&lt;Size&gt;&amp; g, Label label);
+</code></pre>
+<p><code>labeled_partition</code> 是集体操作，会将父组划分为多个一维子组，并确保每个子组内的线程处于合并状态。实现会评估 <code>label</code>，并将具有相同标签值的线程分到同一组。<code>Label</code> 可以是任意整数类型。</p>
+<p>该实现可能使调用线程等待，直到父组中的所有成员都调用该操作。注意：该功能仍在评估中，未来可能发生轻微变化。</p>
+<p>代码生成要求：最低计算能力 7.0，C++11。</p>
+<h3 id="11-5-3-binary-partition">11.5.3 <code>binary_partition</code></h3>
+<pre><code class="language-cpp">coalesced_group binary_partition(
+    const coalesced_group&amp; g, bool pred);
+
+template &lt;unsigned int Size&gt;
+coalesced_group binary_partition(
+    const thread_block_tile&lt;Size&gt;&amp; g, bool pred);
+</code></pre>
+<p><code>binary_partition()</code> 是集体操作，会根据谓词将父组划分为多个一维子组，并确保每个子组内的线程处于合并状态。具有相同谓词值的线程会被分配到同一组。它是 <code>labeled_partition()</code> 的特化版本，标签只能为 0 或 1。</p>
+<p>该实现可能使调用线程等待，直到父组中的所有成员都调用该操作。注意：该功能仍在评估中，未来可能发生轻微变化。</p>
+<p>代码生成要求：最低计算能力 7.0，C++11。</p>
+<p>示例：将一个 32 线程 tile 划分为奇数和偶数两个子组：</p>
+<pre><code class="language-cpp">__global__ void oddEven(int *inputArr) {
+    auto block = cg::this_thread_block();
+    auto tile32 = cg::tiled_partition&lt;32&gt;(block);
+
+    // inputArr 中存储随机整数。
+    int elem = inputArr[block.thread_rank()];
+
+    // elem &amp; 1 为真与为假的线程被分到不同子组。
+    auto subtile = cg::binary_partition(tile32, (elem &amp; 1));
+}
+</code></pre>
+<h2 id="11-6-线程组集体操作-group-collectives">11.6 线程组集体操作（Group Collectives）</h2>
+<p>Cooperative Groups 库提供一组可由线程组执行的集体操作。完成这些操作需要指定组内所有线程参与。除非参数说明明确允许不同值，否则组内所有线程在相应的集体调用中必须为对应参数传入相同的值；否则行为未定义。</p>
+<h3 id="11-6-1-同步-synchronization">11.6.1 同步（Synchronization）</h3>
+<h4 id="11-6-1-1-barrier-arrive-与-barrier-wait">11.6.1.1 <code>barrier_arrive</code> 与 <code>barrier_wait</code></h4>
+<pre><code class="language-cpp">T::arrival_token T::barrier_arrive();
+void T::barrier_wait(T::arrival_token&amp;&amp;);
+</code></pre>
+<p><code>barrier_arrive</code> 和 <code>barrier_wait</code> 提供与 <code>cuda::barrier</code> 类似的同步 API。Cooperative Groups 会自动初始化组屏障，但这些集体操作有额外限制：每个阶段中，组内所有线程都必须各自到达并等待一次。</p>
+<p>当组调用 <code>barrier_arrive()</code> 后，在通过 <code>barrier_wait()</code> 观察到屏障阶段完成之前，不能对同一组调用其他集体操作或再次到达屏障，否则行为未定义。等待中的线程可以在组内所有线程都调用 <code>barrier_arrive()</code> 后、其他线程尚未调用 <code>barrier_wait()</code> 时提前解除阻塞。</p>
+<p>组类型 <code>T</code> 可以是任意隐式组。这样，线程在 arrive 后、wait 前可以执行独立工作，从而隐藏部分同步延迟。<code>barrier_arrive()</code> 返回的 arrival token 必须传给对应的 <code>barrier_wait()</code>；token 在此过程中会被消费，不能重复用于其他 wait 调用。</p>
+<p>以下示例使用 arrive/wait 同步 cluster 内共享内存的初始化：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+using namespace cooperative_groups;
+
+__device__ void init_shared_data(const thread_block&amp; block, int *data);
+__device__ void local_processing(const thread_block&amp; block);
+__device__ void process_shared_data(const thread_block&amp; block, int *data);
+
+__global__ void cluster_kernel() {
+    extern __shared__ int array[];
+    auto cluster = this_cluster();
+    auto block = this_thread_block();
+
+    // 初始化本线程块的共享状态。
+    init_shared_data(block, &amp;array[0]);
+
+    // 通知 cluster 中其他线程块：本块已启动且数据已初始化。
+    auto token = cluster.barrier_arrive();
+
+    // 执行本地计算，隐藏同步延迟。
+    local_processing(block);
+
+    // 映射 cluster 中下一个线程块的共享内存。
+    int *dsmem = cluster.map_shared_rank(
+        &amp;array[0],
+        (cluster.block_rank() + 1) % cluster.num_blocks());
+
+    // 确保其他线程块已启动并初始化共享数据后，再访问 dsmem。
+    cluster.barrier_wait(std::move(token));
+
+    process_shared_data(block, dsmem);
+    cluster.sync();
+}
+</code></pre>
+<h4 id="11-6-1-2-sync">11.6.1.2 <code>sync</code></h4>
+<pre><code class="language-cpp">static void T::sync();
+
+template &lt;typename T&gt;
+void sync(T&amp; group);
+</code></pre>
+<p><code>sync</code> 会同步指定组中的线程。所有现有组类型都支持同步，因此 <code>T</code> 可以是任意现有组类型。它既可以作为组类型的成员函数调用，也可以作为接收组对象的自由函数调用。</p>
+<p>如果组类型为 <code>grid_group</code> 或 <code>multi_grid_group</code>，内核必须使用相应的 cooperative launch API 启动。该操作等价于：</p>
+<pre><code class="language-cpp">T.barrier_wait(T.barrier_arrive());
+</code></pre>
+<h3 id="11-6-2-数据传输-data-transfer">11.6.2 数据传输（Data Transfer）</h3>
+<h4 id="11-6-2-1-memcpy-async">11.6.2.1 <code>memcpy_async</code></h4>
+<p><code>memcpy_async</code> 是组范围的集体复制操作，利用硬件加速支持，从全局内存向共享内存发起非阻塞内存事务。它会通过单个 pipeline 阶段，将指定数量的字节或元素从源复制到目标。</p>
+<p>为了获得最佳性能，共享内存和全局内存地址都应按 16 字节对齐。虽然一般情况下该 API 表示复制，但只有在源为全局内存、目标为共享内存，且双方都满足 16、8 或 4 字节对齐时，复制才可能异步执行。异步复制的数据只能在调用 <code>wait</code> 或 <code>wait_prior</code>、确认对应阶段已完成后读取。</p>
+<p>为了高效重叠数据传输与执行，通常需要在等待和处理第 N 个请求的同时，启动第 N+1 个 <code>memcpy_async</code> 请求。可以使用基于阶段的 <code>wait_prior</code> 集体操作。</p>
+<p><strong>用法 1：按字节数复制</strong></p>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyElem, typename TyShape&gt;
+void memcpy_async(
+    const TyGroup &amp;group,
+    TyElem *__restrict__ dst,
+    const TyElem *__restrict__ src,
+    const TyShape &amp;shape);
+</code></pre>
+<p>复制 <code>shape</code> 指定的字节数。</p>
+<p><strong>用法 2：按布局复制元素</strong></p>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyElem,
+          typename TyDstLayout, typename TySrcLayout&gt;
+void memcpy_async(
+    const TyGroup &amp;group,
+    TyElem *__restrict__ dst,
+    const TyDstLayout &amp;dstLayout,
+    const TyElem *__restrict__ src,
+    const TySrcLayout &amp;srcLayout);
+</code></pre>
+<p>复制 <code>min(dstLayout, srcLayout)</code> 个元素。如果布局类型是 <code>cuda::aligned_size_t&lt;N&gt;</code>，两者必须指定相同的对齐值。</p>
+<p><strong>勘误：</strong> CUDA 11.1 引入的、同时接受源和目标布局的 <code>memcpy_async</code> API，要求布局以元素而非字节为单位。元素类型由 <code>TyElem</code> 推导，元素大小为 <code>sizeof(TyElem)</code>。如果使用 <code>cuda::aligned_size_t&lt;N&gt;</code>，则指定的元素数量乘以 <code>sizeof(TyElem)</code> 必须是 <code>N</code> 的倍数；建议使用 <code>std::byte</code> 或 <code>char</code> 作为元素类型。</p>
+<p>如果复制形状或布局是 <code>cuda::aligned_size_t&lt;N&gt;</code> 类型，则对齐保证至少为 <code>min(16, N)</code>。此时，<code>dst</code> 和 <code>src</code> 指针都必须按 N 字节对齐，复制的字节数也必须是 N 的倍数。</p>
+<p>代码生成要求：最低计算能力 5.0；要实现异步操作则要求计算能力 8.0；使用 C++11，并包含 <code>&lt;cooperative_groups/memcpy_async.h&gt;</code>。</p>
+<p>示例：将全局内存中的数据分批复制到有限大小的共享内存缓冲区中处理：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/memcpy_async.h&gt;
+namespace cg = cooperative_groups;
+
+__global__ void kernel(int* global_data) {
+    cg::thread_block tb = cg::this_thread_block();
+    const size_t elementsPerThreadBlock = 16 * 1024;
+    const size_t elementsInShared = 128;
+    __shared__ int local_smem[elementsInShared];
+
+    size_t copy_count;
+    size_t index = 0;
+    while (index &lt; elementsPerThreadBlock) {
+        cg::memcpy_async(
+            tb, local_smem, elementsInShared,
+            global_data + index, elementsPerThreadBlock - index);
+        copy_count = min(elementsInShared, elementsPerThreadBlock - index);
+        cg::wait(tb);
+        // 使用 local_smem 进行计算。
+        index += copy_count;
+    }
+}
+</code></pre>
+<h4 id="11-6-2-2-wait-与-wait-prior">11.6.2.2 <code>wait</code> 与 <code>wait_prior</code></h4>
+<pre><code class="language-cpp">template &lt;typename TyGroup&gt;
+void wait(TyGroup&amp; group);
+
+template &lt;unsigned int NumStages, typename TyGroup&gt;
+void wait_prior(TyGroup&amp; group);
+</code></pre>
+<p><code>wait</code> 和 <code>wait_prior</code> 集体操作用于等待 <code>memcpy_async</code> 复制完成。<code>wait</code> 会阻塞调用线程，直到此前的所有复制完成。<code>wait_prior</code> 允许最近的 <code>NumStages</code> 个复制仍未完成，并等待其余较早的复制完成。若总共请求了 N 次复制，它会等待前 <code>N - NumStages</code> 次完成，最后 <code>NumStages</code> 次可能仍在进行。</p>
+<p>两者都会同步指定的线程组。代码生成要求：最低计算能力 5.0；异步执行要求计算能力 8.0；使用 C++11，并包含 <code>&lt;cooperative_groups/memcpy_async.h&gt;</code>。</p>
+<p>双阶段流水线示例：启动阶段 N 的复制时，可以等待并处理阶段 N−1 的数据。</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/memcpy_async.h&gt;
+namespace cg = cooperative_groups;
+
+__global__ void kernel(int* global_data) {
+    cg::thread_block tb = cg::this_thread_block();
+    const size_t elementsPerThreadBlock = 16 * 1024 + 64;
+    const size_t elementsInShared = 128;
+
+    __align__(16) __shared__ int local_smem[2][elementsInShared];
+    int stage = 0;
+
+    // 先启动一个复制请求。
+    size_t copy_count = elementsInShared;
+    size_t index = copy_count;
+    cg::memcpy_async(tb, local_smem[stage], elementsInShared,
+                     global_data, elementsPerThreadBlock - index);
+
+    while (index &lt; elementsPerThreadBlock) {
+        // 启动下一次复制。
+        cg::memcpy_async(tb, local_smem[stage ^ 1], elementsInShared,
+                         global_data + index,
+                         elementsPerThreadBlock - index);
+
+        // 等待前一个请求完成。
+        cg::wait_prior&lt;1&gt;(tb);
+
+        // 此时可以处理 local_smem[stage]。
+        // ...
+
+        copy_count = min(elementsInShared,
+                         elementsPerThreadBlock - index);
+        index += copy_count;
+
+        // 如果处理代码可能让线程提前继续运行，此处可能需要 cg::sync(tb)。
+        stage ^= 1;
+    }
+
+    cg::wait(tb);
+    // 最后一个 local_smem[stage] 可在此处理。
+}
+</code></pre>
+<p>&lt;!-- Added section: 11.6.3 through 11.6.4.1 --&gt;</p>
+<h1 id="第十一章续译-归约-扫描与执行控制">第十一章续译：归约、扫描与执行控制</h1>
+<blockquote>
+<p>对应原 PDF 第 314–322 页（原书印刷页码 298–306）。</p>
+</blockquote>
+<h2 id="11-6-3-数据处理-data-manipulation">11.6.3 数据处理（Data Manipulation）</h2>
+<h3 id="11-6-3-1-reduce">11.6.3.1 <code>reduce</code></h3>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyArg, typename TyOp&gt;
+auto reduce(const TyGroup&amp; group, TyArg&amp;&amp; val, TyOp&amp;&amp; op)
+    -&gt; decltype(op(val, val));
+</code></pre>
+<p><code>reduce</code> 对指定组中每个线程提供的数据执行归约。计算能力为 8.0 及以上的设备可以对加法、最小值、最大值以及逻辑 AND、OR、XOR 使用硬件加速；较旧架构则使用软件实现。硬件只对 4 字节类型加速。</p>
+<ul>
+<li><code>group</code>：支持 <code>coalesced_group</code> 和 <code>thread_block_tile</code>。</li>
+<li><code>val</code>：必须可平凡复制；对 <code>coalesced_group</code> 和大小不超过 32 的 tile，<code>sizeof(T)</code> 不超过 32；对更大的 tile，<code>sizeof(T)</code> 不超过 8；并且需要支持所用函数对象要求的算术或比较运算。</li>
+<li><code>op</code>：支持 <code>plus()</code>、<code>less()</code>、<code>greater()</code>、<code>bit_and()</code>、<code>bit_xor()</code> 和 <code>bit_or()</code>。这些对象必须显式构造，例如 <code>plus&lt;int&gt;()</code>。也支持 lambda 和其他可调用对象。</li>
+</ul>
+<p>不同线程可以为 <code>val</code> 传入不同值。</p>
+<h4 id="异步归约">异步归约</h4>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyArg,
+          typename TyAtomic, typename TyOp&gt;
+void reduce_update_async(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyArg&amp;&amp; val, TyOp&amp;&amp; op);
+
+template &lt;typename TyGroup, typename TyArg,
+          typename TyAtomic, typename TyOp&gt;
+void reduce_store_async(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyArg&amp;&amp; val, TyOp&amp;&amp; op);
+
+template &lt;typename TyGroup, typename TyArg, typename TyOp&gt;
+void reduce_store_async(
+    const TyGroup&amp; group, TyArg* ptr, TyArg&amp;&amp; val, TyOp&amp;&amp; op);
+</code></pre>
+<p>这些 <code>_async</code> API 会异步计算归约结果，并由参与线程之一将结果存储到指定位置或更新指定目标，而不是向每个线程返回结果。要观察其效果，必须同步调用组，或同步包含该组的更大线程组。</p>
+<ul>
+<li>对于原子存储或更新版本，<code>atomic</code> 可以是 CUDA C++ 标准库中的 <code>cuda::atomic</code> 或 <code>cuda::atomic_ref</code>。归约结果会根据 <code>op</code> 原子地更新该对象，例如使用 <code>cg::plus()</code> 时会将结果原子相加。原子对象的值类型必须与 <code>TyArg</code> 一致；原子作用域必须包含组中的所有线程。如果多个组并发使用同一个原子对象，其作用域必须覆盖所有相关线程。原子更新采用 relaxed 内存顺序。</li>
+<li>对于指针存储版本，归约结果会以弱存储方式写入目标指针。</li>
+</ul>
+<p>代码生成要求：最低计算能力 5.0；硬件加速要求计算能力 8.0；使用 C++11，并包含 <code>&lt;cooperative_groups/reduce.h&gt;</code>。</p>
+<p>示例：计算整数向量的近似标准差：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/reduce.h&gt;
+namespace cg = cooperative_groups;
+
+__device__ int std_dev(
+    const cg::thread_block_tile&lt;32&gt;&amp; tile, int *vec, int length) {
+    int thread_sum = 0;
+    for (int i = tile.thread_rank(); i &lt; length; i += tile.num_threads())
+        thread_sum += vec[i];
+
+    int avg = cg::reduce(tile, thread_sum, cg::plus&lt;int&gt;()) / length;
+
+    int thread_diffs_sum = 0;
+    for (int i = tile.thread_rank(); i &lt; length; i += tile.num_threads()) {
+        int diff = vec[i] - avg;
+        thread_diffs_sum += diff * diff;
+    }
+
+    float diff_sum = static_cast&lt;float&gt;(
+        cg::reduce(tile, thread_diffs_sum, cg::plus&lt;int&gt;())) / length;
+    return static_cast&lt;int&gt;(sqrtf(diff_sum));
+}
+</code></pre>
+<p>线程块范围的归约示例：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/reduce.h&gt;
+namespace cg = cooperative_groups;
+
+__device__ void block_reduce(
+    const int* A, int count,
+    cuda::atomic&lt;int, cuda::thread_scope_block&gt;&amp; total_sum) {
+    auto block = cg::this_thread_block();
+    auto tile = cg::tiled_partition&lt;32&gt;(block);
+    int thread_sum = 0;
+
+    for (int i = block.thread_rank(); i &lt; count; i += block.size())
+        thread_sum += A[i];
+
+    cg::reduce_update_async(tile, total_sum,
+                            thread_sum, cg::plus&lt;int&gt;());
+    block.sync();
+}
+</code></pre>
+<h3 id="11-6-3-2-归约运算符-reduce-operators">11.6.3.2 归约运算符（Reduce Operators）</h3>
+<p>以下函数对象可用于归约：</p>
+<pre><code class="language-cpp">namespace cooperative_groups {
+    template &lt;typename Ty&gt; struct plus;
+    template &lt;typename Ty&gt; struct less;
+    template &lt;typename Ty&gt; struct greater;
+    template &lt;typename Ty&gt; struct bit_and;
+    template &lt;typename Ty&gt; struct bit_xor;
+    template &lt;typename Ty&gt; struct bit_or;
+}
+</code></pre>
+<p>这些对象为编译器提供可在编译期识别的信息，以便在计算能力 8.0 及以上的设备上选择硬件指令：</p>
+<ul>
+<li><code>cg::plus</code>：使用 <code>operator+</code> 返回两值之和；</li>
+<li><code>cg::less</code>：返回两值中较小的值，而不是布尔值；</li>
+<li><code>cg::greater</code>：返回两值中较大的值，而不是布尔值；</li>
+<li><code>cg::bit_and</code>、<code>cg::bit_xor</code>、<code>cg::bit_or</code>：分别返回按位与、异或和或的结果。</li>
+</ul>
+<p>例如，<code>cg::plus&lt;int&gt;</code> 可使用硬件归约内建函数；<code>cg::plus&lt;float&gt;</code> 不匹配相应加速路径，会使用基于 shuffle 的归约。向量和自定义类型也可能需要定义相应运算符；lambda 和其他函数对象无法用于编译期派发，通常会采用基于 shuffle 的实现。</p>
+<h3 id="11-6-3-3-inclusive-scan-与-exclusive-scan">11.6.3.3 <code>inclusive_scan</code> 与 <code>exclusive_scan</code></h3>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyVal, typename TyFn&gt;
+auto inclusive_scan(const TyGroup&amp; group, TyVal&amp;&amp; val, TyFn&amp;&amp; op)
+    -&gt; decltype(op(val, val));
+template &lt;typename TyGroup, typename TyVal&gt;
+TyVal inclusive_scan(const TyGroup&amp; group, TyVal&amp;&amp; val);
+
+template &lt;typename TyGroup, typename TyVal, typename TyFn&gt;
+auto exclusive_scan(const TyGroup&amp; group, TyVal&amp;&amp; val, TyFn&amp;&amp; op)
+    -&gt; decltype(op(val, val));
+template &lt;typename TyGroup, typename TyVal&gt;
+TyVal exclusive_scan(const TyGroup&amp; group, TyVal&amp;&amp; val);
+</code></pre>
+<p>这两个函数对组内线程提供的数据执行扫描。<code>exclusive_scan</code> 的结果只归约 rank 低于当前线程的线程数据；<code>inclusive_scan</code> 还包括当前线程自己的值。</p>
+<p>有效组类型为 <code>coalesced_group</code> 和 <code>thread_block_tile</code>。<code>val</code> 的类型必须可平凡复制，且大小限制与 <code>reduce</code> 相同。不同线程可以传入不同值。可使用 <code>plus()</code>、<code>less()</code>、<code>greater()</code>、<code>bit_and()</code>、<code>bit_xor()</code> 和 <code>bit_or()</code> 等函数对象，也可以使用 lambda 或其他可调用对象。省略 <code>op</code> 时，默认使用 <code>cg::plus&lt;TyVal&gt;()</code>。</p>
+<h4 id="scan-更新">Scan 更新</h4>
+<pre><code class="language-cpp">template &lt;typename TyGroup, typename TyAtomic,
+          typename TyVal, typename TyFn&gt;
+auto inclusive_scan_update(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyVal&amp;&amp; val, TyFn&amp;&amp; op)
+    -&gt; decltype(op(val, val));
+
+template &lt;typename TyGroup, typename TyAtomic, typename TyVal&gt;
+TyVal inclusive_scan_update(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyVal&amp;&amp; val);
+
+template &lt;typename TyGroup, typename TyAtomic,
+          typename TyVal, typename TyFn&gt;
+auto exclusive_scan_update(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyVal&amp;&amp; val, TyFn&amp;&amp; op)
+    -&gt; decltype(op(val, val));
+
+template &lt;typename TyGroup, typename TyAtomic, typename TyVal&gt;
+TyVal exclusive_scan_update(
+    const TyGroup&amp; group, TyAtomic&amp; atomic, TyVal&amp;&amp; val);
+</code></pre>
+<p><code>*_scan_update</code> 额外接收一个 <code>atomic</code> 参数，可以是 CUDA C++ 标准库的 <code>cuda::atomic</code> 或 <code>cuda::atomic_ref</code>。这些 API 只在相应平台和设备支持这些类型时可用。它们会根据 <code>op</code>，用组内所有线程输入值的归约结果更新原子对象。每个线程将原子对象的旧值与自己的扫描结果组合后返回。</p>
+<p>原子对象的值类型必须与 <code>TyVal</code> 一致，作用域必须包含组内所有线程；若多个组并发使用同一个原子对象，作用域必须覆盖所有相关组。原子更新使用 relaxed 内存顺序。</p>
+<p>代码生成要求：最低计算能力 5.0，使用 C++11，并包含 <code>&lt;cooperative_groups/scan.h&gt;</code>。</p>
+<p>示例：对 8 线程 tile 执行包含自身的扫描：</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/scan.h&gt;
+namespace cg = cooperative_groups;
+
+__global__ void kernel() {
+    auto thread_block = cg::this_thread_block();
+    auto tile = cg::tiled_partition&lt;8&gt;(thread_block);
+    unsigned int val = cg::inclusive_scan(tile, tile.thread_rank());
+    printf("%u: %u\\n", tile.thread_rank(), val);
+}
+</code></pre>
+<p>每个 8 线程组的扫描结果依次为 <code>0, 1, 3, 6, 10, 15, 21, 28</code>。</p>
+<h4 id="使用-exclusive-scan-的流压缩">使用 <code>exclusive_scan</code> 的流压缩</h4>
+<p><code>exclusive_scan</code> 可用于流压缩：每个线程先统计本地输入中满足谓词的元素数，再通过扫描得到其输出起始位置，并将满足条件的元素写入输出数组。</p>
+<pre><code class="language-cpp">template&lt;typename Group, typename Data, typename TyFn&gt;
+__device__ int stream_compaction(
+    Group &amp;g, Data *input, int count, TyFn&amp;&amp; test_fn, Data *output) {
+    int per_thread = count / g.num_threads();
+    int thread_start = min(g.thread_rank() * per_thread, count);
+    int my_count = min(per_thread, count - thread_start);
+
+    int i = thread_start;
+    while (i &lt; my_count + thread_start) {
+        if (test_fn(input[i])) {
+            i++;
+        } else {
+            my_count--;
+            input[i] = input[my_count + thread_start];
+        }
+    }
+
+    int my_idx = cg::exclusive_scan(g, my_count);
+    for (i = 0; i &lt; my_count; ++i)
+        output[my_idx + i] = input[thread_start + i];
+
+    return g.shfl(my_idx + my_count, g.num_threads() - 1);
+}
+</code></pre>
+<h4 id="使用-exclusive-scan-update-动态分配缓冲区空间">使用 <code>exclusive_scan_update</code> 动态分配缓冲区空间</h4>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cooperative_groups/scan.h&gt;
+namespace cg = cooperative_groups;
+
+__device__ int calculate_buffer_space_needed(
+    cg::thread_block_tile&lt;32&gt;&amp; tile) {
+    return tile.thread_rank() % 2 + 1;
+}
+__device__ int my_thread_data(int i) { return i; }
+
+__global__ void kernel() {
+    __shared__ extern int buffer[];
+    __shared__ cuda::atomic&lt;int, cuda::thread_scope_block&gt; buffer_used;
+
+    auto block = cg::this_thread_block();
+    auto tile = cg::tiled_partition&lt;32&gt;(block);
+    buffer_used = 0;
+    block.sync();
+
+    int buf_needed = calculate_buffer_space_needed(tile);
+    int buf_offset =
+        cg::exclusive_scan_update(tile, buffer_used, buf_needed);
+
+    for (int i = 0; i &lt; buf_needed; ++i)
+        buffer[buf_offset + i] = my_thread_data(i);
+
+    block.sync();
+}
+</code></pre>
+<h3 id="11-6-4-执行控制-execution-control">11.6.4 执行控制（Execution Control）</h3>
+<h4 id="11-6-4-1-invoke-one-与-invoke-one-broadcast">11.6.4.1 <code>invoke_one</code> 与 <code>invoke_one_broadcast</code></h4>
+<pre><code class="language-cpp">template&lt;typename Group, typename Fn, typename... Args&gt;
+void invoke_one(const Group&amp; group, Fn&amp;&amp; fn, Args&amp;&amp;... args);
+
+template&lt;typename Group, typename Fn, typename... Args&gt;
+auto invoke_one_broadcast(const Group&amp; group, Fn&amp;&amp; fn, Args&amp;&amp;... args)
+    -&gt; decltype(fn(args...));
+</code></pre>
+<p><code>invoke_one</code> 会从调用组中任意选择一个线程，由该线程使用给定参数调用 <code>fn</code>。<code>invoke_one_broadcast</code> 还会将调用结果分发给组内所有线程并返回。</p>
+<p>调用组可以在执行 <code>fn</code> 前后与被选中的线程同步。因此，传入的函数体内部不允许与调用组中的其他线程通信，否则无法保证前向进展；与调用组外的线程通信则允许。线程选择机制不保证确定性。</p>
+<p>计算能力为 9.0 及以上的设备在使用显式组类型时，可能通过硬件加速选择线程。<code>invoke_one</code> 支持所有组类型；<code>invoke_one_broadcast</code> 支持 <code>coalesced_group</code> 和 <code>thread_block_tile</code>。</p>
+<p>对于 <code>invoke_one_broadcast</code>，返回类型必须可平凡复制。对 <code>coalesced_group</code> 和大小不超过 32 的 tile，类型大小不得超过 32；更大的 tile 则不得超过 8。</p>
+<p>代码生成要求：最低计算能力 5.0；硬件加速要求计算能力 9.0；使用 C++11。</p>
+<p>示例：使用 <code>invoke_one_broadcast</code> 重写聚合原子递增：</p>
+<pre><code class="language-cpp">#include &lt;cooperative_groups.h&gt;
+#include &lt;cuda/atomic&gt;
+namespace cg = cooperative_groups;
+
+template&lt;cuda::thread_scope Scope&gt;
+__device__ unsigned int atomicAddOneRelaxed(
+    cuda::atomic&lt;unsigned int, Scope&gt;&amp; atomic) {
+    auto g = cg::coalesced_threads();
+    auto prev = cg::invoke_one_broadcast(g, [&amp;]() {
+        return atomic.fetch_add(g.num_threads(),
+                                cuda::memory_order_relaxed);
+    });
+    return prev + g.thread_rank();
+}
+</code></pre>
+<p>&lt;!-- Added section: 11.7 through 11.8 --&gt;</p>
+<h1 id="第十一章续译-grid-同步与多设备同步">第十一章续译：Grid 同步与多设备同步</h1>
+<blockquote>
+<p>对应原 PDF 第 322–325 页（原书印刷页码 306–309）。</p>
+</blockquote>
+<h2 id="11-7-grid-同步-grid-synchronization">11.7 Grid 同步（Grid Synchronization）</h2>
+<p>在 Cooperative Groups 引入之前，CUDA 编程模型只允许在线程块完成内核时进行线程块间同步。内核边界会隐式使状态失效，并可能带来性能影响。</p>
+<p>例如，某些应用包含大量小内核，每个内核代表处理流水线的一个阶段。当前 CUDA 编程模型要求使用内核边界，确保前一阶段的线程块已经生成数据，后一阶段的线程块才能消费数据。如果能够提供 grid 范围的线程块间同步，应用程序就可以重构为持久线程块，让线程块在某个阶段完成时直接在设备上同步。</p>
+<p>在内核中跨整个 grid 同步，只需使用 <code>grid.sync()</code>：</p>
+<pre><code class="language-cpp">grid_group grid = this_grid();
+grid.sync();
+</code></pre>
+<p>启动内核时必须使用 CUDA Runtime 的 <code>cudaLaunchCooperativeKernel</code> API 或对应的 CUDA Driver API，而不能使用普通的 <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code> 执行配置语法。</p>
+<p>为了保证 GPU 上的线程块能够同时驻留，启动的线程块数量必须仔细选择。例如，可以启动与 SM 数量相同的线程块：</p>
+<pre><code class="language-cpp">int dev = 0;
+cudaDeviceProp deviceProp;
+cudaGetDeviceProperties(&amp;deviceProp, dev);
+
+// 初始化后启动。
+cudaLaunchCooperativeKernel(
+    (void*)my_kernel, deviceProp.multiProcessorCount,
+    numThreads, args);
+</code></pre>
+<p>也可以使用占用率计算器，计算每个 SM 能够同时驻留多少线程块，以最大化 GPU 利用率：</p>
+<pre><code class="language-cpp">int numBlocksPerSm = 0;
+int numThreads = 128;
+cudaDeviceProp deviceProp;
+cudaGetDeviceProperties(&amp;deviceProp, dev);
+
+cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+    &amp;numBlocksPerSm, my_kernel, numThreads, 0);
+
+// 使用默认流启动，并传入内核参数。
+void *kernelArgs[] = { /* 添加内核参数 */ };
+dim3 dimBlock(numThreads, 1, 1);
+dim3 dimGrid(deviceProp.multiProcessorCount * numBlocksPerSm, 1, 1);
+
+cudaLaunchCooperativeKernel(
+    (void*)my_kernel, dimGrid, dimBlock, kernelArgs);
+</code></pre>
+<p>建议先查询设备是否支持 cooperative launch：</p>
+<pre><code class="language-cpp">int dev = 0;
+int supportsCoopLaunch = 0;
+cudaDeviceGetAttribute(
+    &amp;supportsCoopLaunch, cudaDevAttrCooperativeLaunch, dev);
+</code></pre>
+<p>如果设备 0 支持该属性，则 <code>supportsCoopLaunch</code> 会被设为 1。该功能只支持计算能力为 6.0 及以上的设备，并且还要求满足以下平台条件之一：</p>
+<ul>
+<li>Linux 平台且未启用 MPS；</li>
+<li>Linux 平台启用 MPS，且设备计算能力为 7.0 或更高；</li>
+<li>最新版本的 Windows 平台。</li>
+</ul>
+<h2 id="11-8-多设备同步-multi-device-synchronization">11.8 多设备同步（Multi-Device Synchronization）</h2>
+<p>若要通过 Cooperative Groups 实现多设备同步，必须使用 CUDA API <code>cudaLaunchCooperativeKernelMultiDevice</code>。与传统 CUDA API 不同，该 API 允许单个主机线程在多台设备上启动同一个内核。</p>
+<p>除 <code>cudaLaunchCooperativeKernel</code> 的限制和保证外，该 API 还有以下语义：</p>
+<ul>
+<li><strong>原子启动：</strong> 如果 API 调用成功，则指定数量的线程块会在所有目标设备上启动。</li>
+<li><strong>内核必须相同：</strong> 通过该 API 启动的函数必须相同。驱动程序不会显式检查，因为这在很大程度上不可行，应用程序有责任确保一致。</li>
+<li><strong>每台设备只能出现一次：</strong> 提供的 <code>cudaLaunchParams</code> 中，不能有两个条目映射到同一设备。</li>
+<li><strong>计算能力必须相同：</strong> 所有目标设备必须具有相同的计算能力主版本号和次版本号。</li>
+<li><strong>启动配置必须相同：</strong> 所有设备上的线程块大小、网格大小和每个网格的共享内存大小必须一致。因此，每台设备能够启动的最大线程块数会受到 SM 数量最少的设备限制。</li>
+<li><strong>设备全局变量独立实例化：</strong> 所启动模块中的用户定义 <code>__device__</code>、<code>__constant__</code> 和 <code>__managed__</code> 全局变量会在每台设备上分别实例化，应用程序负责正确初始化它们。</li>
+</ul>
+<p><strong>弃用说明：</strong> <code>cudaLaunchCooperativeKernelMultiDevice</code> 已从 CUDA 11.3 起针对所有设备弃用。替代方案示例可参阅多设备共轭梯度样例。</p>
+<p>为获得最佳多设备同步性能，应对所有参与设备启用对等访问，可使用 <code>cuCtxEnablePeerAccess</code> 或 <code>cudaDeviceEnablePeerAccess</code>。</p>
+<p>启动参数应使用结构体数组定义，每台设备对应一个元素，再调用 <code>cudaLaunchCooperativeKernelMultiDevice</code>。</p>
+<pre><code class="language-cpp">cudaDeviceProp deviceProp;
+cudaGetDeviceCount(&amp;numGpus);
+
+// 每台设备的启动参数。
+cudaLaunchParams *launchParams =
+    (cudaLaunchParams*)malloc(sizeof(cudaLaunchParams) * numGpus);
+cudaStream_t *streams =
+    (cudaStream_t*)malloc(sizeof(cudaStream_t) * numGpus);
+
+// 启动时会复制内核参数。
+// 也可以为每台设备分别提供参数副本，但内核函数签名和名称必须一致。
+void *kernelArgs[] = { /* 添加内核参数 */ };
+
+for (int i = 0; i &lt; numGpus; i++) {
+    cudaSetDevice(i);
+    // 每台设备使用独立流；也可以使用各设备的默认 NULL 流。
+    cudaStreamCreate(&amp;streams[i]);
+
+    // 可循环启用其他设备的对等访问，以获得更快的屏障实现。
+}
+
+// 所有设备计算能力和启动配置必须一致，因此可查询设备 0。
+cudaGetDeviceProperties(&amp;deviceProp, 0);
+dim3 dimBlock(numThreads, 1, 1);
+dim3 dimGrid(deviceProp.multiProcessorCount, 1, 1);
+
+for (int i = 0; i &lt; numGpus; i++) {
+    launchParams[i].func = (void*)my_kernel;
+    launchParams[i].gridDim = dimGrid;
+    launchParams[i].blockDim = dimBlock;
+    launchParams[i].sharedMem = 0;
+    launchParams[i].stream = streams[i];
+    launchParams[i].args = kernelArgs;
+}
+
+cudaLaunchCooperativeKernelMultiDevice(launchParams, numGpus);
+</code></pre>
+<p>设备端代码与 grid 范围同步非常相似：</p>
+<pre><code class="language-cpp">multi_grid_group multi_grid = this_multi_grid();
+multi_grid.sync();
+</code></pre>
+<p>不过，代码必须使用分离编译方式构建，即向 <code>nvcc</code> 传递 <code>-rdc=true</code>。</p>
+<p>建议先查询设备是否支持多设备 cooperative launch：</p>
+<pre><code class="language-cpp">int dev = 0;
+int supportsMdCoopLaunch = 0;
+cudaDeviceGetAttribute(
+    &amp;supportsMdCoopLaunch,
+    cudaDevAttrCooperativeMultiDeviceLaunch, dev);
+</code></pre>
+<p>如果设备 0 支持该属性，则 <code>supportsMdCoopLaunch</code> 会被设为 1。该功能只支持计算能力为 6.0 及以上的设备，并且要求运行在未启用 MPS 的 Linux 平台，或运行在设备处于 TCC 模式的当前版本 Windows 上。</p>
+<p>更多信息请参阅 <code>cudaLaunchCooperativeKernelMultiDevice</code> API 文档。</p>

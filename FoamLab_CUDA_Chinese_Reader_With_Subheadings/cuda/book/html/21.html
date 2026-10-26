@@ -1,0 +1,150 @@
+<h1 id="第二十一章-cuda-环境变量-cuda-environment-variables">第二十一章 CUDA 环境变量（CUDA Environment Variables）</h1>
+<blockquote>
+<p>对应原 PDF 第 533–540 页（原书印刷页码 517–524）。本章将环境变量按用途分类，并保留变量名、允许值、默认值和平台限制。</p>
+</blockquote>
+<p>下表列出 CUDA 环境变量。与多进程服务（MPS）有关的环境变量，见《GPU 部署与管理指南》中“多进程服务”一节。</p>
+<h2 id="21-1-设备枚举与属性-device-enumeration-and-properties">21.1 设备枚举与属性（Device Enumeration and Properties）</h2>
+<h3 id="cuda-visible-devices"><code>CUDA_VISIBLE_DEVICES</code></h3>
+<ul>
+<li><strong>取值：</strong> 以逗号分隔的 GPU 标识符序列。支持 MIG 的设备可使用 <code>MIG-&lt;GPU-UUID&gt;/&lt;GPU instance ID&gt;/&lt;compute instance ID&gt;</code> 格式。</li>
+<li><strong>说明：</strong> GPU 标识符可以是整数索引，也可以是 UUID 字符串。GPU UUID 应使用与 <code>nvidia-smi</code> 相同的格式，例如 <code>GPU-8932f937-d72c-4106-c12f-20bd9faed9f6</code>。为方便起见，也允许使用 UUID 的缩写，只需提供足够长的前缀，以便在目标系统中唯一标识 GPU。</li>
+</ul>
+<p>例如，如果没有其他 GPU 具有相同前缀，可以使用 <code>CUDA_VISIBLE_DEVICES=GPU-8932f937</code> 指定上述 GPU。只有序列中列出的设备对 CUDA 应用可见，并且会按序列中的顺序枚举。如果某个索引无效，则只有它之前的设备可见。</p>
+<ul>
+<li>设置为 <code>2,1</code> 时，设备 0 不可见，设备 2 会先于设备 1 被枚举。</li>
+<li>设置为 <code>0,2,-1,1</code> 时，设备 0 和设备 2 可见，设备 1 不可见。</li>
+</ul>
+<p>MIG 标识符以 <code>MIG</code> 开头，GPU UUID 的格式与 <code>nvidia-smi</code> 显示的格式相同，例如 <code>MIG-GPU-8932f937-d72c-4106-c12f-20bd9faed9f6/1/2</code>。目前只支持枚举单个 MIG 实例。</p>
+<h3 id="cuda-managed-force-device-alloc"><code>CUDA_MANAGED_FORCE_DEVICE_ALLOC</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 强制驱动程序将所有托管内存分配放置在设备内存中。</li>
+</ul>
+<h3 id="cuda-device-order"><code>CUDA_DEVICE_ORDER</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>FASTEST_FIRST</code> 或 <code>PCI_BUS_ID</code>，默认值为 <code>FASTEST_FIRST</code>。</li>
+<li><strong>说明：</strong>
+<ul>
+<li><code>FASTEST_FIRST</code>：使用简单的启发式规则，按设备速度从快到慢枚举可用设备。</li>
+<li><code>PCI_BUS_ID</code>：按 PCI 总线 ID 的升序排列设备。</li>
+</ul>
+</li>
+</ul>
+<h2 id="21-2-编译-compilation">21.2 编译（Compilation）</h2>
+<h3 id="cuda-cache-disable"><code>CUDA_CACHE_DISABLE</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 控制即时编译（JIT）的缓存。设为 <code>1</code> 时禁用缓存；设为 <code>0</code> 时启用缓存。禁用后，二进制代码不会写入缓存，也不会从缓存中读取。</li>
+</ul>
+<h3 id="cuda-cache-path"><code>CUDA_CACHE_PATH</code></h3>
+<ul>
+<li><strong>取值：</strong> 文件路径。</li>
+<li><strong>说明：</strong> 指定即时编译器缓存二进制代码的目录。默认路径为：
+<ul>
+<li>Windows：<code>%APPDATA%\NVIDIA\ComputeCache</code></li>
+<li>Linux：<code>~/.nv/ComputeCache</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cuda-cache-maxsize"><code>CUDA_CACHE_MAXSIZE</code></h3>
+<ul>
+<li><strong>取值：</strong> 整数，单位为字节。桌面/服务器平台默认值为 <code>1073741824</code>（1 GiB）；嵌入式平台默认值为 <code>268435456</code>（256 MiB）；最大值为 <code>4294967296</code>（4 GiB）。</li>
+<li><strong>说明：</strong> 指定即时编译器缓存的大小。超过缓存大小的二进制代码不会被缓存。如果需要为较新的二进制代码腾出空间，缓存会淘汰较旧的代码。</li>
+</ul>
+<h3 id="cuda-force-ptx-jit"><code>CUDA_FORCE_PTX_JIT</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，强制设备驱动程序忽略应用程序中嵌入的二进制代码，改为即时编译嵌入的 PTX 代码。如果某个内核没有嵌入 PTX 代码，则加载失败。</li>
+</ul>
+<p>该变量可用于验证应用程序是否嵌入 PTX，以及 PTX 的即时编译是否按预期工作，从而检查应用程序对未来架构的前向兼容性。</p>
+<h3 id="cuda-disable-ptx-jit"><code>CUDA_DISABLE_PTX_JIT</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，禁用嵌入 PTX 代码的即时编译，改为使用应用程序中兼容的二进制代码。如果内核没有嵌入二进制代码，或二进制代码是为不兼容的架构编译的，则加载失败。</li>
+</ul>
+<p>该变量可用于验证应用程序是否为每个内核提供了兼容的 SASS 代码（见“二进制兼容性”）。</p>
+<h3 id="cuda-force-jit"><code>CUDA_FORCE_JIT</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，强制驱动程序忽略应用程序中嵌入的二进制代码，并改为即时编译嵌入的 PTX 代码。如果内核没有嵌入 PTX 代码，则加载失败。该变量可用于验证 PTX 是否已嵌入应用程序，以及即时编译是否按预期工作，以检查应用程序对未来架构的前向兼容性。</li>
+</ul>
+<p>对于嵌入的 PTX，可以通过设置 <code>CUDA_FORCE_PTX_JIT=0</code> 覆盖此行为。</p>
+<h3 id="cuda-disable-jit"><code>CUDA_DISABLE_JIT</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，禁用嵌入 PTX 代码的即时编译，改为使用应用程序中兼容的二进制代码。如果内核没有嵌入二进制代码，或二进制代码是为不兼容的架构编译的，则加载失败。该变量可用于验证每个内核是否包含兼容的 SASS 代码。</li>
+</ul>
+<p>对于嵌入的 PTX，可以通过设置 <code>CUDA_DISABLE_PTX_JIT=0</code> 覆盖此行为。</p>
+<h2 id="21-3-执行-execution">21.3 执行（Execution）</h2>
+<h3 id="cuda-launch-blocking"><code>CUDA_LAUNCH_BLOCKING</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时禁用异步内核启动；设为 <code>0</code> 时允许异步内核启动。</li>
+</ul>
+<h3 id="cuda-device-max-connections"><code>CUDA_DEVICE_MAX_CONNECTIONS</code></h3>
+<ul>
+<li><strong>取值：</strong> 1 到 32，默认值为 8。</li>
+<li><strong>说明：</strong> 设置主机到每台计算能力 3.5 及更高设备的计算引擎与复制引擎并发连接数（工作队列数）。</li>
+</ul>
+<h3 id="cuda-device-max-copy-connections"><code>CUDA_DEVICE_MAX_COPY_CONNECTIONS</code></h3>
+<ul>
+<li><strong>取值：</strong> 1 到 32，默认值为 8。</li>
+<li><strong>说明：</strong> 设置主机到每台计算能力 8.0 及更高设备的每个异步复制引擎的复制引擎并发连接数（工作队列数）。如果同时设置 <code>CUDA_DEVICE_MAX_CONNECTIONS</code> 和 <code>CUDA_DEVICE_MAX_COPY_CONNECTIONS</code>，则 <code>CUDA_DEVICE_MAX_CONNECTIONS</code> 所设置的复制连接数会被覆盖。</li>
+</ul>
+<h3 id="cuda-auto-boost"><code>CUDA_AUTO_BOOST</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>。</li>
+<li><strong>说明：</strong> 覆盖 <code>nvidia-smi</code> 的 <code>--auto-boost-default</code> 选项设置的自动提升行为。如果应用程序通过该环境变量请求的行为与 <code>nvidia-smi</code> 设置不同，且当前 GPU 上没有其他应用程序成功请求不同的行为，则会遵循此请求；否则会忽略该请求。</li>
+</ul>
+<h3 id="cuda-scale-launch-queues"><code>CUDA_SCALE_LAUNCH_QUEUES</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>"0.25x"</code>、<code>"0.5x"</code>、<code>"2x"</code> 或 <code>"4x"</code>。</li>
+<li><strong>说明：</strong> 按固定倍数缩放可用于提交工作任务的队列大小。</li>
+</ul>
+<h2 id="21-4-cuda-gdb-linux-平台">21.4 <code>cuda-gdb</code>（Linux 平台）</h2>
+<h3 id="cuda-device-waits-on-exception"><code>CUDA_DEVICE_WAITS_ON_EXCEPTION</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，设备发生异常后 CUDA 应用程序会暂停，允许调试器附加到进程并进一步调试。</li>
+</ul>
+<h2 id="21-5-mps-服务-linux-平台">21.5 MPS 服务（Linux 平台）</h2>
+<h3 id="cuda-device-default-persisting-l2-cache-percentage-limit"><code>CUDA_DEVICE_DEFAULT_PERSISTING_L2_CACHE_PERCENTAGE_LIMIT</code></h3>
+<ul>
+<li><strong>取值：</strong> 百分比，范围为 0–100，默认值为 0。</li>
+<li><strong>说明：</strong> 计算能力 8.x 设备允许预留一部分 L2 缓存，用于持续驻留（persisting）的全局内存访问。使用 CUDA MPS 服务时，只能通过此环境变量控制预留大小，并且必须在启动 CUDA MPS 控制守护进程之前设置。例如，应在运行 <code>nvidia-cuda-mps-control -d</code> 之前设置该变量。</li>
+</ul>
+<h2 id="21-6-模块加载-module-loading">21.6 模块加载（Module Loading）</h2>
+<h3 id="cuda-module-loading"><code>CUDA_MODULE_LOADING</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>DEFAULT</code>、<code>LAZY</code> 或 <code>EAGER</code>，默认值为 <code>LAZY</code>。</li>
+<li><strong>说明：</strong> 指定应用程序的模块加载模式。
+<ul>
+<li><code>EAGER</code>：调用相应的 <code>cuModuleLoad*</code> 和 <code>cuLibraryLoad*</code> API 时，会完整加载 cubin、fatbin 或 PTX 文件中的所有内核和数据。</li>
+<li><code>LAZY</code>：延迟加载特定内核，直到通过 <code>cuModuleGetFunction()</code> 或 <code>cuKernelGetFunction()</code> 获取 <code>CUfunc</code> 句柄时才加载；cubin 中的数据会在加载该 cubin 中的第一个内核时，或首次访问该 cubin 中的变量时加载。</li>
+</ul>
+</li>
+</ul>
+<p>默认行为可能在未来的 CUDA 版本中改变。</p>
+<h3 id="cuda-module-data-loading"><code>CUDA_MODULE_DATA_LOADING</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>DEFAULT</code>、<code>LAZY</code> 或 <code>EAGER</code>，默认值为 <code>LAZY</code>。</li>
+<li><strong>说明：</strong> 指定应用程序的数据加载模式。
+<ul>
+<li><code>EAGER</code>：调用相应的 <code>cuLibraryLoad*</code> API 时，将 cubin、fatbin 或 PTX 文件中的所有数据完整加载到内存。该设置不会影响内核的 <code>LAZY</code> 或 <code>EAGER</code> 加载方式。</li>
+<li><code>LAZY</code>：将数据加载延迟到需要相应句柄时。</li>
+</ul>
+</li>
+</ul>
+<p>如果未设置该环境变量，数据加载行为将继承自 <code>CUDA_MODULE_LOADING</code>。默认行为可能在未来的 CUDA 版本中改变。</p>
+<h2 id="21-7-预加载依赖库-pre-loading-dependent-libraries">21.7 预加载依赖库（Pre-loading Dependent Libraries）</h2>
+<h3 id="cuda-force-preload-libraries"><code>CUDA_FORCE_PRELOAD_LIBRARIES</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>，默认值为 <code>0</code>。</li>
+<li><strong>说明：</strong> 设为 <code>1</code> 时，强制驱动程序在初始化期间预加载 NVVM 和 PTX 即时编译所需的库。这样会增加内存占用，并延长 CUDA 驱动程序初始化时间。设置此变量可避免涉及多个 CUDA 线程的某些死锁情况。</li>
+</ul>
+<h2 id="21-8-cuda-graphs">21.8 CUDA Graphs</h2>
+<h3 id="cuda-graphs-use-node-priority"><code>CUDA_GRAPHS_USE_NODE_PRIORITY</code></h3>
+<ul>
+<li><strong>取值：</strong> <code>0</code> 或 <code>1</code>。</li>
+<li><strong>说明：</strong> 覆盖实例化图时的 <code>cudaGraphInstantiateFlagUseNodePriority</code> 标志。设为 <code>1</code> 时，所有图实例化都会设置该标志；设为 <code>0</code> 时，所有图实例化都会清除该标志。</li>
+</ul>

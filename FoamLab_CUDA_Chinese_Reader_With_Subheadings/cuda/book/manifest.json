@@ -1,0 +1,5453 @@
+{
+  "title": "CUDA C++ 编程指南（CUDA 12.8）",
+  "status": "非正式机器辅助译稿，技术审校中",
+  "revision": "v34",
+  "chapterCount": 25,
+  "chapters": [
+    {
+      "number": 1,
+      "slug": "cuda-01",
+      "title": "第 1 章 使用 GPU 的优势",
+      "displayTitle": "第 1 章 使用 GPU 的优势",
+      "html": "/cuda/book/html/01.html",
+      "toc": [
+        {
+          "id": "gpu-与-cpu-的性能差异",
+          "level": 2,
+          "text": "GPU 与 CPU 的性能差异"
+        },
+        {
+          "id": "cpu-和-gpu-的设计目标",
+          "level": 2,
+          "text": "CPU 和 GPU 的设计目标"
+        },
+        {
+          "id": "通过并行计算隐藏内存延迟",
+          "level": 2,
+          "text": "通过并行计算隐藏内存延迟"
+        },
+        {
+          "id": "cpu-与-gpu-的协同",
+          "level": 2,
+          "text": "CPU 与 GPU 的协同"
+        }
+      ],
+      "charCount": 1046
+    },
+    {
+      "number": 2,
+      "slug": "cuda-02",
+      "title": "第 2 章 CUDA：通用并行计算平台与编程模型",
+      "displayTitle": "第 2 章 CUDA：通用并行计算平台与编程模型",
+      "html": "/cuda/book/html/02.html",
+      "toc": [
+        {
+          "id": "cuda-平台的诞生",
+          "level": 2,
+          "text": "CUDA 平台的诞生"
+        },
+        {
+          "id": "cuda-的编程语言与接口支持",
+          "level": 2,
+          "text": "CUDA 的编程语言与接口支持"
+        }
+      ],
+      "charCount": 502
+    },
+    {
+      "number": 3,
+      "slug": "cuda-03",
+      "title": "第 3 章 可扩展的编程模型",
+      "displayTitle": "第 3 章 可扩展的编程模型",
+      "html": "/cuda/book/html/03.html",
+      "toc": [
+        {
+          "id": "多核与众核计算带来的编程挑战",
+          "level": 2,
+          "text": "多核与众核计算带来的编程挑战"
+        },
+        {
+          "id": "三个核心抽象-线程组-共享内存-屏障同步",
+          "level": 2,
+          "text": "三个核心抽象：线程组、共享内存、屏障同步"
+        },
+        {
+          "id": "从子问题划分到线程块调度",
+          "level": 2,
+          "text": "从子问题划分到线程块调度"
+        },
+        {
+          "id": "并行模型的可扩展性",
+          "level": 2,
+          "text": "并行模型的可扩展性"
+        }
+      ],
+      "charCount": 1049
+    },
+    {
+      "number": 4,
+      "slug": "cuda-04",
+      "title": "第 4 章 文档结构",
+      "displayTitle": "第 4 章 文档结构",
+      "html": "/cuda/book/html/04.html",
+      "toc": [
+        {
+          "id": "全书章节安排",
+          "level": 2,
+          "text": "全书章节安排"
+        }
+      ],
+      "charCount": 1216
+    },
+    {
+      "number": 5,
+      "slug": "cuda-05",
+      "title": "第 5 章 编程模型（Programming Model）",
+      "displayTitle": "第 5 章 编程模型（Programming Model）",
+      "html": "/cuda/book/html/05.html",
+      "toc": [
+        {
+          "id": "5-1-内核-kernels",
+          "level": 2,
+          "text": "5.1 内核（Kernels）"
+        },
+        {
+          "id": "内核函数的定义与执行方式",
+          "level": 3,
+          "text": "内核函数的定义与执行方式"
+        },
+        {
+          "id": "向量加法示例",
+          "level": 3,
+          "text": "向量加法示例"
+        },
+        {
+          "id": "5-2-线程层次结构-thread-hierarchy",
+          "level": 2,
+          "text": "5.2 线程层次结构（Thread Hierarchy）"
+        },
+        {
+          "id": "线程索引与维度",
+          "level": 3,
+          "text": "线程索引与维度"
+        },
+        {
+          "id": "二维矩阵加法",
+          "level": 3,
+          "text": "二维矩阵加法"
+        },
+        {
+          "id": "线程块数量与网格",
+          "level": 3,
+          "text": "线程块数量与网格"
+        },
+        {
+          "id": "网格-线程块与内置变量",
+          "level": 3,
+          "text": "网格、线程块与内置变量"
+        },
+        {
+          "id": "独立调度与线程块内同步",
+          "level": 3,
+          "text": "独立调度与线程块内同步"
+        },
+        {
+          "id": "5-2-1-线程块集群-thread-block-clusters",
+          "level": 3,
+          "text": "5.2.1 线程块集群（Thread Block Clusters）"
+        },
+        {
+          "id": "集群的调度与可移植大小",
+          "level": 4,
+          "text": "集群的调度与可移植大小"
+        },
+        {
+          "id": "编译期指定集群大小",
+          "level": 4,
+          "text": "编译期指定集群大小"
+        },
+        {
+          "id": "在运行时配置集群",
+          "level": 4,
+          "text": "在运行时配置集群"
+        },
+        {
+          "id": "集群同步与分布式共享内存",
+          "level": 4,
+          "text": "集群同步与分布式共享内存"
+        },
+        {
+          "id": "5-3-内存层次结构-memory-hierarchy",
+          "level": 2,
+          "text": "5.3 内存层次结构（Memory Hierarchy）"
+        },
+        {
+          "id": "本地内存-共享内存与全局内存",
+          "level": 3,
+          "text": "本地内存、共享内存与全局内存"
+        },
+        {
+          "id": "常量内存与纹理内存",
+          "level": 3,
+          "text": "常量内存与纹理内存"
+        },
+        {
+          "id": "5-4-异构编程-heterogeneous-programming",
+          "level": 2,
+          "text": "5.4 异构编程（Heterogeneous Programming）"
+        },
+        {
+          "id": "主机与设备如何分工",
+          "level": 3,
+          "text": "主机与设备如何分工"
+        },
+        {
+          "id": "统一内存的作用",
+          "level": 3,
+          "text": "统一内存的作用"
+        },
+        {
+          "id": "5-5-异步-simt-编程模型-asynchronous-simt-programming-model",
+          "level": 2,
+          "text": "5.5 异步 SIMT 编程模型（Asynchronous SIMT Programming Model）"
+        },
+        {
+          "id": "异步计算与数据搬运",
+          "level": 3,
+          "text": "异步计算与数据搬运"
+        },
+        {
+          "id": "5-5-1-异步操作-asynchronous-operations",
+          "level": 3,
+          "text": "5.5.1 异步操作（Asynchronous Operations）"
+        },
+        {
+          "id": "异步操作的同步机制",
+          "level": 4,
+          "text": "异步操作的同步机制"
+        },
+        {
+          "id": "cuda-thread-scope-thread-scope-system-发起线程所在同一系统中的任意-cuda-线程或-cpu-线程进行同步",
+          "level": 2,
+          "text": "cuda::thread_scope::thread_scope_system 发起线程所在同一系统中的任意 CUDA 线程或 CPU\n线程进行同步。"
+        },
+        {
+          "id": "5-6-计算能力-compute-capability",
+          "level": 2,
+          "text": "5.6 计算能力（Compute Capability）"
+        },
+        {
+          "id": "计算能力与-sm-版本",
+          "level": 3,
+          "text": "计算能力与 SM 版本"
+        },
+        {
+          "id": "主版本号-次版本号与-gpu-架构",
+          "level": 3,
+          "text": "主版本号、次版本号与 GPU 架构"
+        },
+        {
+          "id": "本章术语表",
+          "level": 2,
+          "text": "本章术语表"
+        },
+        {
+          "id": "图表与发布说明",
+          "level": 2,
+          "text": "图表与发布说明"
+        }
+      ],
+      "charCount": 10246
+    },
+    {
+      "number": 6,
+      "slug": "cuda-06",
+      "title": "第 6 章 编程接口（Programming Interface）",
+      "displayTitle": "第 6 章 编程接口（Programming Interface）",
+      "html": "/cuda/book/html/06.html",
+      "toc": [
+        {
+          "id": "6-1-使用-nvcc-编译-compilation-with-nvcc",
+          "level": 2,
+          "text": "6.1 使用 NVCC 编译（Compilation with NVCC）"
+        },
+        {
+          "id": "6-1-1-编译工作流程-compilation-workflow",
+          "level": 3,
+          "text": "6.1.1 编译工作流程（Compilation Workflow）"
+        },
+        {
+          "id": "6-1-1-1-离线编译-offline-compilation",
+          "level": 4,
+          "text": "6.1.1.1 离线编译（Offline Compilation）"
+        },
+        {
+          "id": "6-1-1-2-即时编译-just-in-time-compilation",
+          "level": 4,
+          "text": "6.1.1.2 即时编译（Just-in-Time Compilation）"
+        },
+        {
+          "id": "6-1-2-二进制兼容性-binary-compatibility",
+          "level": 3,
+          "text": "6.1.2 二进制兼容性（Binary Compatibility）"
+        },
+        {
+          "id": "6-1-3-ptx-兼容性-ptx-compatibility",
+          "level": 3,
+          "text": "6.1.3 PTX 兼容性（PTX Compatibility）"
+        },
+        {
+          "id": "6-1-4-应用程序兼容性-application-compatibility",
+          "level": 3,
+          "text": "6.1.4 应用程序兼容性（Application Compatibility）"
+        },
+        {
+          "id": "6-1-5-c-兼容性-c-compatibility",
+          "level": 3,
+          "text": "6.1.5 C++ 兼容性（C++ Compatibility）"
+        },
+        {
+          "id": "6-1-6-64-位兼容性-64-bit-compatibility",
+          "level": 3,
+          "text": "6.1.6 64 位兼容性（64-Bit Compatibility）"
+        },
+        {
+          "id": "6-2-cuda-运行时-cuda-runtime",
+          "level": 2,
+          "text": "6.2 CUDA 运行时（CUDA Runtime）"
+        },
+        {
+          "id": "6-2-1-初始化-initialization",
+          "level": 3,
+          "text": "6.2.1 初始化（Initialization）"
+        },
+        {
+          "id": "6-2-2-设备内存-device-memory",
+          "level": 3,
+          "text": "6.2.2 设备内存（Device Memory）"
+        },
+        {
+          "id": "线性内存与-cuda-数组",
+          "level": 4,
+          "text": "线性内存与 CUDA 数组"
+        },
+        {
+          "id": "一维向量内存分配与数据传输",
+          "level": 4,
+          "text": "一维向量内存分配与数据传输"
+        },
+        {
+          "id": "二维与三维线性内存分配",
+          "level": 4,
+          "text": "二维与三维线性内存分配"
+        },
+        {
+          "id": "通过运行时-api-访问全局变量与符号",
+          "level": 4,
+          "text": "通过运行时 API 访问全局变量与符号"
+        },
+        {
+          "id": "6-2-3-设备内存的-l2-访问管理-device-memory-l2-access-management",
+          "level": 3,
+          "text": "6.2.3 设备内存的 L2 访问管理（Device Memory L2 Access Management）"
+        },
+        {
+          "id": "6-2-3-1-为持久访问预留-l2-缓存-l2-cache-set-aside-for-persisting-accesses",
+          "level": 4,
+          "text": "6.2.3.1 为持久访问预留 L2 缓存（L2 Cache Set-Aside for Persisting Accesses）"
+        },
+        {
+          "id": "6-2-3-2-持久访问的-l2-策略-l2-policy-for-persisting-accesses",
+          "level": 4,
+          "text": "6.2.3.2 持久访问的 L2 策略（L2 Policy for Persisting Accesses）"
+        },
+        {
+          "id": "6-2-3-3-l2-访问属性-l2-access-properties",
+          "level": 4,
+          "text": "6.2.3.3 L2 访问属性（L2 Access Properties）"
+        },
+        {
+          "id": "6-2-3-4-l2-持久性示例-l2-persistence-example",
+          "level": 4,
+          "text": "6.2.3.4 L2 持久性示例（L2 Persistence Example）"
+        },
+        {
+          "id": "6-2-3-5-将-l2-访问属性重置为普通状态-reset-l2-access-to-normal",
+          "level": 4,
+          "text": "6.2.3.5 将 L2 访问属性重置为普通状态（Reset L2 Access to Normal）"
+        },
+        {
+          "id": "6-2-3-6-管理-l2-预留缓存的利用率-manage-utilization-of-l2-set-aside-cache",
+          "level": 4,
+          "text": "6.2.3.6 管理 L2 预留缓存的利用率（Manage Utilization of L2 Set-Aside Cache）"
+        },
+        {
+          "id": "6-2-3-7-查询-l2-缓存属性-query-l2-cache-properties",
+          "level": 4,
+          "text": "6.2.3.7 查询 L2 缓存属性（Query L2 Cache Properties）"
+        },
+        {
+          "id": "6-2-3-8-控制持久访问的-l2-预留容量-control-l2-cache-set-aside-size-for-persisting-memory-access",
+          "level": 4,
+          "text": "6.2.3.8 控制持久访问的 L2 预留容量（Control L2 Cache Set-Aside Size for Persisting Memory Access）"
+        },
+        {
+          "id": "6-2-4-共享内存-shared-memory",
+          "level": 3,
+          "text": "6.2.4 共享内存（Shared Memory）"
+        },
+        {
+          "id": "共享内存的作用",
+          "level": 4,
+          "text": "共享内存的作用"
+        },
+        {
+          "id": "不使用共享内存的矩阵乘法",
+          "level": 4,
+          "text": "不使用共享内存的矩阵乘法"
+        },
+        {
+          "id": "使用共享内存的分块矩阵乘法",
+          "level": 4,
+          "text": "使用共享内存的分块矩阵乘法"
+        },
+        {
+          "id": "分块矩阵乘法的完整示例",
+          "level": 4,
+          "text": "分块矩阵乘法的完整示例"
+        },
+        {
+          "id": "6-2-5-分布式共享内存-distributed-shared-memory",
+          "level": 3,
+          "text": "6.2.5 分布式共享内存（Distributed Shared Memory）"
+        },
+        {
+          "id": "工作原理与生命周期",
+          "level": 4,
+          "text": "工作原理与生命周期"
+        },
+        {
+          "id": "用分布式共享内存计算直方图",
+          "level": 4,
+          "text": "用分布式共享内存计算直方图"
+        },
+        {
+          "id": "根据直方图大小配置集群",
+          "level": 4,
+          "text": "根据直方图大小配置集群"
+        },
+        {
+          "id": "6-2-6-页锁定主机内存-page-locked-host-memory",
+          "level": 3,
+          "text": "6.2.6 页锁定主机内存（Page-Locked Host Memory）"
+        },
+        {
+          "id": "什么是页锁定内存",
+          "level": 4,
+          "text": "什么是页锁定内存"
+        },
+        {
+          "id": "页锁定内存带来的优势",
+          "level": 4,
+          "text": "页锁定内存带来的优势"
+        },
+        {
+          "id": "6-2-6-1-可移植内存-portable-memory",
+          "level": 4,
+          "text": "6.2.6.1 可移植内存（Portable Memory）"
+        },
+        {
+          "id": "6-2-6-2-写合并内存-write-combining-memory",
+          "level": 4,
+          "text": "6.2.6.2 写合并内存（Write-Combining Memory）"
+        },
+        {
+          "id": "6-2-6-3-映射内存-mapped-memory",
+          "level": 4,
+          "text": "6.2.6.3 映射内存（Mapped Memory）"
+        },
+        {
+          "id": "直接访问主机内存的优势",
+          "level": 5,
+          "text": "直接访问主机内存的优势"
+        },
+        {
+          "id": "同步要求与使用限制",
+          "level": 5,
+          "text": "同步要求与使用限制"
+        },
+        {
+          "id": "6-2-7-内存同步域-memory-synchronization-domains",
+          "level": 3,
+          "text": "6.2.7 内存同步域（Memory Synchronization Domains）"
+        },
+        {
+          "id": "6-2-7-1-内存栅栏干扰-memory-fence-interference",
+          "level": 4,
+          "text": "6.2.7.1 内存栅栏干扰（Memory Fence Interference）"
+        },
+        {
+          "id": "6-2-7-2-使用同步域隔离流量-isolating-traffic-with-domains",
+          "level": 4,
+          "text": "6.2.7.2 使用同步域隔离流量（Isolating Traffic with Domains）"
+        },
+        {
+          "id": "6-2-7-3-在-cuda-中使用同步域-using-domains-in-cuda",
+          "level": 4,
+          "text": "6.2.7.3 在 CUDA 中使用同步域（Using Domains in CUDA）"
+        },
+        {
+          "id": "示例-在远程逻辑域中启动内核",
+          "level": 5,
+          "text": "示例：在远程逻辑域中启动内核"
+        },
+        {
+          "id": "示例-为执行流设置映射",
+          "level": 5,
+          "text": "示例：为执行流设置映射"
+        },
+        {
+          "id": "示例-不同执行流映射到不同物理域",
+          "level": 5,
+          "text": "示例：不同执行流映射到不同物理域"
+        },
+        {
+          "id": "6-2-8-异步并发执行-asynchronous-concurrent-execution",
+          "level": 3,
+          "text": "6.2.8 异步并发执行（Asynchronous Concurrent Execution）"
+        },
+        {
+          "id": "6-2-8-1-主机与设备之间的并发执行-concurrent-execution-between-host-and-device",
+          "level": 4,
+          "text": "6.2.8.1 主机与设备之间的并发执行（Concurrent Execution between Host and Device）"
+        },
+        {
+          "id": "6-2-8-2-并发内核执行-concurrent-kernel-execution",
+          "level": 4,
+          "text": "6.2.8.2 并发内核执行（Concurrent Kernel Execution）"
+        },
+        {
+          "id": "6-2-8-3-数据传输与内核执行的重叠-overlap-of-data-transfer-and-kernel-execution",
+          "level": 4,
+          "text": "6.2.8.3 数据传输与内核执行的重叠（Overlap of Data Transfer and Kernel Execution）"
+        },
+        {
+          "id": "6-2-8-4-并发数据传输-concurrent-data-transfers",
+          "level": 4,
+          "text": "6.2.8.4 并发数据传输（Concurrent Data Transfers）"
+        },
+        {
+          "id": "6-2-8-5-执行流-streams",
+          "level": 4,
+          "text": "6.2.8.5 执行流（Streams）"
+        },
+        {
+          "id": "6-2-8-5-1-创建与销毁执行流-creation-and-destruction-of-streams",
+          "level": 5,
+          "text": "6.2.8.5.1 创建与销毁执行流（Creation and Destruction of Streams）"
+        },
+        {
+          "id": "6-2-8-5-2-默认执行流-default-stream",
+          "level": 5,
+          "text": "6.2.8.5.2 默认执行流（Default Stream）"
+        },
+        {
+          "id": "6-2-8-5-3-显式同步-explicit-synchronization",
+          "level": 5,
+          "text": "6.2.8.5.3 显式同步（Explicit Synchronization）"
+        },
+        {
+          "id": "6-2-8-5-4-隐式同步-implicit-synchronization",
+          "level": 5,
+          "text": "6.2.8.5.4 隐式同步（Implicit Synchronization）"
+        },
+        {
+          "id": "6-2-8-5-5-重叠行为-overlapping-behavior",
+          "level": 5,
+          "text": "6.2.8.5.5 重叠行为（Overlapping Behavior）"
+        },
+        {
+          "id": "6-2-8-5-6-主机函数-回调-host-functions-callbacks",
+          "level": 5,
+          "text": "6.2.8.5.6 主机函数（回调）（Host Functions / Callbacks）"
+        },
+        {
+          "id": "6-2-8-5-7-执行流优先级-stream-priorities",
+          "level": 5,
+          "text": "6.2.8.5.7 执行流优先级（Stream Priorities）"
+        },
+        {
+          "id": "6-2-8-6-程序化依赖启动与同步-programmatic-dependent-launch-and-synchronization",
+          "level": 4,
+          "text": "6.2.8.6 程序化依赖启动与同步（Programmatic Dependent Launch and Synchronization）"
+        },
+        {
+          "id": "6-2-8-6-1-背景-background",
+          "level": 5,
+          "text": "6.2.8.6.1 背景（Background）"
+        },
+        {
+          "id": "6-2-8-6-2-api-说明-api-description",
+          "level": 5,
+          "text": "6.2.8.6.2 API 说明（API Description）"
+        },
+        {
+          "id": "6-2-8-6-3-在-cuda-graph-中使用-use-in-cuda-graphs",
+          "level": 5,
+          "text": "6.2.8.6.3 在 CUDA Graph 中使用（Use in CUDA Graphs）"
+        },
+        {
+          "id": "6-2-8-7-cuda-图-cuda-graphs",
+          "level": 2,
+          "text": "6.2.8.7 CUDA 图（CUDA Graphs）"
+        },
+        {
+          "id": "6-2-8-7-1-图结构-graph-structure",
+          "level": 2,
+          "text": "6.2.8.7.1 图结构（Graph Structure）"
+        },
+        {
+          "id": "6-2-8-7-1-1-节点类型-node-types",
+          "level": 3,
+          "text": "6.2.8.7.1.1 节点类型（Node Types）"
+        },
+        {
+          "id": "6-2-8-7-1-2-边数据-edge-data",
+          "level": 3,
+          "text": "6.2.8.7.1.2 边数据（Edge Data）"
+        },
+        {
+          "id": "6-2-8-7-2-使用图-api-创建图-creating-a-graph-using-graph-apis",
+          "level": 2,
+          "text": "6.2.8.7.2 使用图 API 创建图（Creating a Graph Using Graph APIs）"
+        },
+        {
+          "id": "6-2-8-7-3-使用执行流捕获创建图-creating-a-graph-using-stream-capture",
+          "level": 2,
+          "text": "6.2.8.7.3 使用执行流捕获创建图（Creating a Graph Using Stream Capture）"
+        },
+        {
+          "id": "6-2-8-7-3-1-跨执行流依赖与事件-cross-stream-dependencies-and-events",
+          "level": 3,
+          "text": "6.2.8.7.3.1 跨执行流依赖与事件（Cross-stream Dependencies and Events）"
+        },
+        {
+          "id": "6-2-8-7-3-2-禁止和未处理的操作-prohibited-and-unhandled-operations",
+          "level": 3,
+          "text": "6.2.8.7.3.2 禁止和未处理的操作（Prohibited and Unhandled Operations）"
+        },
+        {
+          "id": "6-2-8-7-3-3-捕获失效-invalidation",
+          "level": 3,
+          "text": "6.2.8.7.3.3 捕获失效（Invalidation）"
+        },
+        {
+          "id": "6-2-8-7-4-cuda-用户对象-cuda-user-objects",
+          "level": 2,
+          "text": "6.2.8.7.4 CUDA 用户对象（CUDA User Objects）"
+        },
+        {
+          "id": "6-2-8-7-5-更新已实例化的图-updating-instantiated-graphs",
+          "level": 2,
+          "text": "6.2.8.7.5 更新已实例化的图（Updating Instantiated Graphs）"
+        },
+        {
+          "id": "6-2-8-7-5-1-图更新的限制-graph-update-limitations",
+          "level": 3,
+          "text": "6.2.8.7.5.1 图更新的限制（Graph Update Limitations）"
+        },
+        {
+          "id": "6-2-8-7-5-2-整体图更新-whole-graph-update",
+          "level": 3,
+          "text": "6.2.8.7.5.2 整体图更新（Whole Graph Update）"
+        },
+        {
+          "id": "6-2-8-7-5-3-单个节点更新-individual-node-update",
+          "level": 3,
+          "text": "6.2.8.7.5.3 单个节点更新（Individual Node Update）"
+        },
+        {
+          "id": "本批术语表",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对与图片说明",
+          "level": 2,
+          "text": "校对与图片说明"
+        },
+        {
+          "id": "6-2-8-7-5-4-单个节点启用-individual-node-enable",
+          "level": 2,
+          "text": "6.2.8.7.5.4 单个节点启用（Individual Node Enable）"
+        },
+        {
+          "id": "6-2-8-7-6-使用图-api-using-graph-apis",
+          "level": 2,
+          "text": "6.2.8.7.6 使用图 API（Using Graph APIs）"
+        },
+        {
+          "id": "6-2-8-7-7-设备端图启动-device-graph-launch",
+          "level": 2,
+          "text": "6.2.8.7.7 设备端图启动（Device Graph Launch）"
+        },
+        {
+          "id": "6-2-8-7-7-1-创建设备图-device-graph-creation",
+          "level": 3,
+          "text": "6.2.8.7.7.1 创建设备图（Device Graph Creation）"
+        },
+        {
+          "id": "6-2-8-7-7-2-设备图的要求-device-graph-requirements",
+          "level": 3,
+          "text": "6.2.8.7.7.2 设备图的要求（Device Graph Requirements）"
+        },
+        {
+          "id": "6-2-8-7-7-3-将设备图上传到设备-device-graph-upload",
+          "level": 3,
+          "text": "6.2.8.7.7.3 将设备图上传到设备（Device Graph Upload）"
+        },
+        {
+          "id": "6-2-8-7-7-4-更新设备图-device-graph-update",
+          "level": 3,
+          "text": "6.2.8.7.7.4 更新设备图（Device Graph Update）"
+        },
+        {
+          "id": "6-2-8-7-7-5-设备端启动-device-launch",
+          "level": 3,
+          "text": "6.2.8.7.7.5 设备端启动（Device Launch）"
+        },
+        {
+          "id": "6-2-8-7-7-6-设备端启动模式-device-launch-modes",
+          "level": 3,
+          "text": "6.2.8.7.7.6 设备端启动模式（Device Launch Modes）"
+        },
+        {
+          "id": "6-2-8-7-7-7-发起后不等待的启动-fire-and-forget-launch",
+          "level": 3,
+          "text": "6.2.8.7.7.7 发起后不等待的启动（Fire and Forget Launch）"
+        },
+        {
+          "id": "6-2-8-7-7-8-图的执行环境-graph-execution-environments",
+          "level": 3,
+          "text": "6.2.8.7.7.8 图的执行环境（Graph Execution Environments）"
+        },
+        {
+          "id": "6-2-8-7-7-9-尾部启动-tail-launch",
+          "level": 3,
+          "text": "6.2.8.7.7.9 尾部启动（Tail Launch）"
+        },
+        {
+          "id": "6-2-8-7-7-10-尾部自启动-tail-self-launch",
+          "level": 3,
+          "text": "6.2.8.7.7.10 尾部自启动（Tail Self-launch）"
+        },
+        {
+          "id": "6-2-8-7-7-11-兄弟启动-sibling-launch",
+          "level": 3,
+          "text": "6.2.8.7.7.11 兄弟启动（Sibling Launch）"
+        },
+        {
+          "id": "6-2-8-7-8-条件图节点-conditional-graph-nodes",
+          "level": 2,
+          "text": "6.2.8.7.8 条件图节点（Conditional Graph Nodes）"
+        },
+        {
+          "id": "6-2-8-7-8-1-条件句柄-conditional-handles",
+          "level": 3,
+          "text": "6.2.8.7.8.1 条件句柄（Conditional Handles）"
+        },
+        {
+          "id": "本批术语表-2",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "图片与校对说明",
+          "level": 2,
+          "text": "图片与校对说明"
+        },
+        {
+          "id": "6-2-8-7-8-2-条件节点内部图的要求-conditional-node-body-graph-requirements",
+          "level": 2,
+          "text": "6.2.8.7.8.2 条件节点内部图的要求（Conditional Node Body Graph Requirements）"
+        },
+        {
+          "id": "6-2-8-7-8-3-条件-if-节点-conditional-if-nodes",
+          "level": 2,
+          "text": "6.2.8.7.8.3 条件 IF 节点（Conditional IF Nodes）"
+        },
+        {
+          "id": "6-2-8-7-8-4-条件-while-节点-conditional-while-nodes",
+          "level": 2,
+          "text": "6.2.8.7.8.4 条件 WHILE 节点（Conditional WHILE Nodes）"
+        },
+        {
+          "id": "6-2-8-8-事件-events",
+          "level": 2,
+          "text": "6.2.8.8 事件（Events）"
+        },
+        {
+          "id": "6-2-8-8-1-创建和销毁事件-creation-and-destruction-of-events",
+          "level": 3,
+          "text": "6.2.8.8.1 创建和销毁事件（Creation and Destruction of Events）"
+        },
+        {
+          "id": "6-2-8-8-2-经过时间-elapsed-time",
+          "level": 3,
+          "text": "6.2.8.8.2 经过时间（Elapsed Time）"
+        },
+        {
+          "id": "6-2-8-9-同步调用-synchronous-calls",
+          "level": 2,
+          "text": "6.2.8.9 同步调用（Synchronous Calls）"
+        },
+        {
+          "id": "6-2-9-多设备系统-multi-device-system",
+          "level": 2,
+          "text": "6.2.9 多设备系统（Multi-Device System）"
+        },
+        {
+          "id": "6-2-9-1-枚举设备-device-enumeration",
+          "level": 3,
+          "text": "6.2.9.1 枚举设备（Device Enumeration）"
+        },
+        {
+          "id": "6-2-9-2-选择设备-device-selection",
+          "level": 3,
+          "text": "6.2.9.2 选择设备（Device Selection）"
+        },
+        {
+          "id": "6-2-9-3-执行流与事件的行为-stream-and-event-behavior",
+          "level": 3,
+          "text": "6.2.9.3 执行流与事件的行为（Stream and Event Behavior）"
+        },
+        {
+          "id": "6-2-9-4-对等设备内存访问-peer-to-peer-memory-access",
+          "level": 3,
+          "text": "6.2.9.4 对等设备内存访问（Peer-to-Peer Memory Access）"
+        },
+        {
+          "id": "6-2-9-4-1-linux-上的-iommu-iommu-on-linux",
+          "level": 4,
+          "text": "6.2.9.4.1 Linux 上的 IOMMU（IOMMU on Linux）"
+        },
+        {
+          "id": "6-2-9-5-对等设备内存复制-peer-to-peer-memory-copy",
+          "level": 3,
+          "text": "6.2.9.5 对等设备内存复制（Peer-to-Peer Memory Copy）"
+        },
+        {
+          "id": "6-2-10-统一虚拟地址空间-unified-virtual-address-space",
+          "level": 2,
+          "text": "6.2.10 统一虚拟地址空间（Unified Virtual Address Space）"
+        },
+        {
+          "id": "6-2-11-进程间通信-interprocess-communication",
+          "level": 2,
+          "text": "6.2.11 进程间通信（Interprocess Communication）"
+        },
+        {
+          "id": "6-2-12-错误检查-error-checking",
+          "level": 2,
+          "text": "6.2.12 错误检查（Error Checking）"
+        },
+        {
+          "id": "6-2-13-调用栈-call-stack",
+          "level": 2,
+          "text": "6.2.13 调用栈（Call Stack）"
+        },
+        {
+          "id": "6-2-14-纹理与表面内存-texture-and-surface-memory",
+          "level": 2,
+          "text": "6.2.14 纹理与表面内存（Texture and Surface Memory）"
+        },
+        {
+          "id": "6-2-14-1-纹理内存-texture-memory",
+          "level": 3,
+          "text": "6.2.14.1 纹理内存（Texture Memory）"
+        },
+        {
+          "id": "纹理资源与维数",
+          "level": 4,
+          "text": "纹理资源与维数"
+        },
+        {
+          "id": "纹理元素类型与读取模式",
+          "level": 4,
+          "text": "纹理元素类型与读取模式"
+        },
+        {
+          "id": "纹理坐标是否归一化",
+          "level": 4,
+          "text": "纹理坐标是否归一化"
+        },
+        {
+          "id": "寻址模式-addressing-mode",
+          "level": 4,
+          "text": "寻址模式（Addressing Mode）"
+        },
+        {
+          "id": "过滤模式-filtering-mode",
+          "level": 4,
+          "text": "过滤模式（Filtering Mode）"
+        },
+        {
+          "id": "本批术语表-3",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "图片与校对说明-2",
+          "level": 2,
+          "text": "图片与校对说明"
+        },
+        {
+          "id": "6-2-14-1-1-纹理对象-api-texture-object-api",
+          "level": 2,
+          "text": "6.2.14.1.1 纹理对象 API（Texture Object API）"
+        },
+        {
+          "id": "6-2-14-1-2-16-位浮点纹理-16-bit-floating-point-textures",
+          "level": 2,
+          "text": "6.2.14.1.2 16 位浮点纹理（16-Bit Floating-Point Textures）"
+        },
+        {
+          "id": "6-2-14-1-3-分层纹理-layered-textures",
+          "level": 2,
+          "text": "6.2.14.1.3 分层纹理（Layered Textures）"
+        },
+        {
+          "id": "6-2-14-1-4-立方体贴图纹理-cubemap-textures",
+          "level": 2,
+          "text": "6.2.14.1.4 立方体贴图纹理（Cubemap Textures）"
+        },
+        {
+          "id": "6-2-14-1-5-分层立方体贴图纹理-cubemap-layered-textures",
+          "level": 2,
+          "text": "6.2.14.1.5 分层立方体贴图纹理（Cubemap Layered Textures）"
+        },
+        {
+          "id": "6-2-14-1-6-纹理聚集读取-texture-gather",
+          "level": 2,
+          "text": "6.2.14.1.6 纹理聚集读取（Texture Gather）"
+        },
+        {
+          "id": "6-2-14-2-表面内存-surface-memory",
+          "level": 2,
+          "text": "6.2.14.2 表面内存（Surface Memory）"
+        },
+        {
+          "id": "6-2-14-2-1-表面对象-api-surface-object-api",
+          "level": 3,
+          "text": "6.2.14.2.1 表面对象 API（Surface Object API）"
+        },
+        {
+          "id": "6-2-14-2-2-立方体贴图表面-cubemap-surfaces",
+          "level": 3,
+          "text": "6.2.14.2.2 立方体贴图表面（Cubemap Surfaces）"
+        },
+        {
+          "id": "6-2-14-2-3-分层立方体贴图表面-cubemap-layered-surfaces",
+          "level": 3,
+          "text": "6.2.14.2.3 分层立方体贴图表面（Cubemap Layered Surfaces）"
+        },
+        {
+          "id": "6-2-14-3-cuda-数组-cuda-arrays",
+          "level": 2,
+          "text": "6.2.14.3 CUDA 数组（CUDA Arrays）"
+        },
+        {
+          "id": "6-2-14-4-读写一致性-read-write-coherency",
+          "level": 2,
+          "text": "6.2.14.4 读写一致性（Read/Write Coherency）"
+        },
+        {
+          "id": "6-2-15-图形互操作-graphics-interoperability",
+          "level": 2,
+          "text": "6.2.15 图形互操作（Graphics Interoperability）"
+        },
+        {
+          "id": "6-2-15-1-opengl-互操作-opengl-interoperability",
+          "level": 3,
+          "text": "6.2.15.1 OpenGL 互操作（OpenGL Interoperability）"
+        },
+        {
+          "id": "表面对象复制示例-主机端代码",
+          "level": 4,
+          "text": "表面对象复制示例：主机端代码"
+        },
+        {
+          "id": "opengl-互操作示例-动态更新顶点缓冲区",
+          "level": 4,
+          "text": "OpenGL 互操作示例：动态更新顶点缓冲区"
+        },
+        {
+          "id": "6-2-15-2-direct3d-互操作-direct3d-interoperability",
+          "level": 2,
+          "text": "6.2.15.2 Direct3D 互操作（Direct3D Interoperability）"
+        },
+        {
+          "id": "6-2-15-2-1-direct3d-9-版本-direct3d-9-version",
+          "level": 3,
+          "text": "6.2.15.2.1 Direct3D 9 版本（Direct3D 9 Version）"
+        },
+        {
+          "id": "6-2-15-2-2-direct3d-10-版本-direct3d-10-version",
+          "level": 3,
+          "text": "6.2.15.2.2 Direct3D 10 版本（Direct3D 10 Version）"
+        },
+        {
+          "id": "6-2-15-2-3-direct3d-11-版本-direct3d-11-version",
+          "level": 3,
+          "text": "6.2.15.2.3 Direct3D 11 版本（Direct3D 11 Version）"
+        },
+        {
+          "id": "6-2-15-3-sli-互操作-sli-interoperability",
+          "level": 3,
+          "text": "6.2.15.3 SLI 互操作（SLI Interoperability）"
+        },
+        {
+          "id": "6-2-16-外部资源互操作-external-resource-interoperability",
+          "level": 2,
+          "text": "6.2.16 外部资源互操作（External Resource Interoperability）"
+        },
+        {
+          "id": "6-2-16-1-vulkan-互操作-vulkan-interoperability",
+          "level": 3,
+          "text": "6.2.16.1 Vulkan 互操作（Vulkan Interoperability）"
+        },
+        {
+          "id": "6-2-16-1-1-匹配设备-uuid-matching-device-uuids",
+          "level": 4,
+          "text": "6.2.16.1.1 匹配设备 UUID（Matching Device UUIDs）"
+        },
+        {
+          "id": "6-2-16-1-2-导入内存对象-importing-memory-objects",
+          "level": 4,
+          "text": "6.2.16.1.2 导入内存对象（Importing Memory Objects）"
+        },
+        {
+          "id": "本批术语表-4",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "6-2-16-1-3-将缓冲区映射到已导入的内存对象-mapping-buffers-onto-imported-memory-objects",
+          "level": 2,
+          "text": "6.2.16.1.3 将缓冲区映射到已导入的内存对象（Mapping Buffers onto Imported Memory Objects）"
+        },
+        {
+          "id": "6-2-16-1-4-将-mipmapped-array-映射到已导入的内存对象-mapping-mipmapped-arrays-onto-imported-memor",
+          "level": 2,
+          "text": "6.2.16.1.4 将 mipmapped array 映射到已导入的内存对象（Mapping Mipmapped Arrays onto Imported Memory Objects）"
+        },
+        {
+          "id": "vulkan-图像格式转换为-cuda-通道格式",
+          "level": 3,
+          "text": "Vulkan 图像格式转换为 CUDA 通道格式"
+        },
+        {
+          "id": "vulkan-图像视图类型转换为-cuda-extent",
+          "level": 3,
+          "text": "Vulkan 图像视图类型转换为 CUDA extent"
+        },
+        {
+          "id": "vulkan-图像使用标志转换为-cuda-array-标志",
+          "level": 3,
+          "text": "Vulkan 图像使用标志转换为 CUDA array 标志"
+        },
+        {
+          "id": "6-2-16-1-5-导入同步对象-importing-synchronization-objects",
+          "level": 2,
+          "text": "6.2.16.1.5 导入同步对象（Importing Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-1-6-对导入的同步对象发出信号和等待-signaling-waiting-on-imported-synchronization-objects",
+          "level": 2,
+          "text": "6.2.16.1.6 对导入的同步对象发出信号和等待（Signaling/Waiting on Imported Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-2-opengl-互操作-opengl-interoperability",
+          "level": 2,
+          "text": "6.2.16.2 OpenGL 互操作（OpenGL Interoperability）"
+        },
+        {
+          "id": "6-2-16-3-direct3d-12-互操作-direct3d-12-interoperability",
+          "level": 2,
+          "text": "6.2.16.3 Direct3D 12 互操作（Direct3D 12 Interoperability）"
+        },
+        {
+          "id": "6-2-16-3-1-匹配设备-luid-matching-device-luids",
+          "level": 3,
+          "text": "6.2.16.3.1 匹配设备 LUID（Matching Device LUIDs）"
+        },
+        {
+          "id": "6-2-16-3-2-导入内存对象-importing-memory-objects",
+          "level": 3,
+          "text": "6.2.16.3.2 导入内存对象（Importing Memory Objects）"
+        },
+        {
+          "id": "6-2-16-3-3-将缓冲区映射到已导入的内存对象-mapping-buffers-onto-imported-memory-objects",
+          "level": 3,
+          "text": "6.2.16.3.3 将缓冲区映射到已导入的内存对象（Mapping Buffers onto Imported Memory Objects）"
+        },
+        {
+          "id": "6-2-16-3-4-将-mipmapped-array-映射到已导入的内存对象-mapping-mipmapped-arrays-onto-imported-memor",
+          "level": 3,
+          "text": "6.2.16.3.4 将 mipmapped array 映射到已导入的内存对象（Mapping Mipmapped Arrays onto Imported Memory Objects）"
+        },
+        {
+          "id": "dxgi-格式转换为-cuda-通道格式",
+          "level": 4,
+          "text": "DXGI 格式转换为 CUDA 通道格式"
+        },
+        {
+          "id": "本批术语表-5",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-2",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "6-2-16-3-4-续-dxgi-格式-资源维度与-cuda-数组标志",
+          "level": 2,
+          "text": "6.2.16.3.4（续）DXGI 格式、资源维度与 CUDA 数组标志"
+        },
+        {
+          "id": "将-direct3d-12-资源维度转换为-cuda-extent",
+          "level": 4,
+          "text": "将 Direct3D 12 资源维度转换为 CUDA extent"
+        },
+        {
+          "id": "将-direct3d-12-资源标志转换为-cuda-mipmapped-array-标志",
+          "level": 4,
+          "text": "将 Direct3D 12 资源标志转换为 CUDA mipmapped array 标志"
+        },
+        {
+          "id": "6-2-16-3-5-导入同步对象-importing-synchronization-objects",
+          "level": 2,
+          "text": "6.2.16.3.5 导入同步对象（Importing Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-3-6-对导入的同步对象发出信号和等待-signaling-waiting-on-imported-synchronization-objects",
+          "level": 2,
+          "text": "6.2.16.3.6 对导入的同步对象发出信号和等待（Signaling/Waiting on Imported Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-4-direct3d-11-互操作-direct3d-11-interoperability",
+          "level": 2,
+          "text": "6.2.16.4 Direct3D 11 互操作（Direct3D 11 Interoperability）"
+        },
+        {
+          "id": "6-2-16-4-1-匹配设备-luid-matching-device-luids",
+          "level": 3,
+          "text": "6.2.16.4.1 匹配设备 LUID（Matching Device LUIDs）"
+        },
+        {
+          "id": "6-2-16-4-2-导入内存对象-importing-memory-objects",
+          "level": 3,
+          "text": "6.2.16.4.2 导入内存对象（Importing Memory Objects）"
+        },
+        {
+          "id": "6-2-16-4-3-将缓冲区映射到已导入的内存对象-mapping-buffers-onto-imported-memory-objects",
+          "level": 3,
+          "text": "6.2.16.4.3 将缓冲区映射到已导入的内存对象（Mapping Buffers onto Imported Memory Objects）"
+        },
+        {
+          "id": "6-2-16-4-4-将-mipmapped-array-映射到已导入的内存对象-mapping-mipmapped-arrays-onto-imported-memor",
+          "level": 3,
+          "text": "6.2.16.4.4 将 mipmapped array 映射到已导入的内存对象（Mapping Mipmapped Arrays onto Imported Memory Objects）"
+        },
+        {
+          "id": "direct3d-11-dxgi-格式转换",
+          "level": 4,
+          "text": "Direct3D 11 DXGI 格式转换"
+        },
+        {
+          "id": "direct3d-11-资源维度转换为-cuda-extent",
+          "level": 4,
+          "text": "Direct3D 11 资源维度转换为 CUDA extent"
+        },
+        {
+          "id": "将-direct3d-11-资源标志转换为-cuda-mipmapped-array-标志",
+          "level": 4,
+          "text": "将 Direct3D 11 资源标志转换为 CUDA mipmapped array 标志"
+        },
+        {
+          "id": "6-2-16-4-5-导入同步对象-importing-synchronization-objects",
+          "level": 3,
+          "text": "6.2.16.4.5 导入同步对象（Importing Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-4-6-对导入的同步对象发出信号和等待-signaling-waiting-on-imported-synchronization-objects",
+          "level": 3,
+          "text": "6.2.16.4.6 对导入的同步对象发出信号和等待（Signaling/Waiting on Imported Synchronization Objects）"
+        },
+        {
+          "id": "本批术语表-6",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-3",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "6-2-16-4-6-续-对导入的同步对象发出信号和等待",
+          "level": 2,
+          "text": "6.2.16.4.6（续）对导入的同步对象发出信号和等待"
+        },
+        {
+          "id": "6-2-16-5-nvidia-软件通信接口互操作-nvidia-software-communication-interface-interoperability-nv",
+          "level": 2,
+          "text": "6.2.16.5 NVIDIA 软件通信接口互操作（NVIDIA Software Communication Interface Interoperability，NvSci）"
+        },
+        {
+          "id": "6-2-16-5-1-导入内存对象-importing-memory-objects",
+          "level": 3,
+          "text": "6.2.16.5.1 导入内存对象（Importing Memory Objects）"
+        },
+        {
+          "id": "6-2-16-5-2-将缓冲区映射到已导入的内存对象-mapping-buffers-onto-imported-memory-objects",
+          "level": 3,
+          "text": "6.2.16.5.2 将缓冲区映射到已导入的内存对象（Mapping Buffers onto Imported Memory Objects）"
+        },
+        {
+          "id": "6-2-16-5-3-将-mipmapped-array-映射到已导入的内存对象-mapping-mipmapped-arrays-onto-imported-memor",
+          "level": 3,
+          "text": "6.2.16.5.3 将 mipmapped array 映射到已导入的内存对象（Mapping Mipmapped Arrays onto Imported Memory Objects）"
+        },
+        {
+          "id": "6-2-16-5-4-导入同步对象-importing-synchronization-objects",
+          "level": 3,
+          "text": "6.2.16.5.4 导入同步对象（Importing Synchronization Objects）"
+        },
+        {
+          "id": "6-2-16-5-5-对导入的同步对象发出信号和等待-signaling-waiting-on-imported-synchronization-objects",
+          "level": 3,
+          "text": "6.2.16.5.5 对导入的同步对象发出信号和等待（Signaling/Waiting on Imported Synchronization Objects）"
+        },
+        {
+          "id": "6-3-版本管理与兼容性-versioning-and-compatibility",
+          "level": 2,
+          "text": "6.3 版本管理与兼容性（Versioning and Compatibility）"
+        },
+        {
+          "id": "6-4-计算模式-compute-modes",
+          "level": 2,
+          "text": "6.4 计算模式（Compute Modes）"
+        },
+        {
+          "id": "6-5-显示模式切换-mode-switches",
+          "level": 2,
+          "text": "6.5 显示模式切换（Mode Switches）"
+        },
+        {
+          "id": "6-6-windows-的-tesla-计算集群模式-tesla-compute-cluster-mode-for-windows",
+          "level": 2,
+          "text": "6.6 Windows 的 Tesla 计算集群模式（Tesla Compute Cluster Mode for Windows）"
+        },
+        {
+          "id": "本批术语表-7",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-4",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 166740
+    },
+    {
+      "number": 7,
+      "slug": "cuda-07",
+      "title": "硬件实现（Hardware Implementation）",
+      "displayTitle": "第七章 硬件实现（Hardware Implementation）",
+      "html": "/cuda/book/html/07.html",
+      "toc": [
+        {
+          "id": "7-1-simt-架构-simt-architecture",
+          "level": 2,
+          "text": "7.1 SIMT 架构（SIMT Architecture）"
+        },
+        {
+          "id": "7-2-硬件多线程-hardware-multithreading",
+          "level": 2,
+          "text": "7.2 硬件多线程（Hardware Multithreading）"
+        }
+      ],
+      "charCount": 3208
+    },
+    {
+      "number": 8,
+      "slug": "cuda-08",
+      "title": "性能指南（Performance Guidelines）",
+      "displayTitle": "第八章 性能指南（Performance Guidelines）",
+      "html": "/cuda/book/html/08.html",
+      "toc": [
+        {
+          "id": "8-1-整体性能优化策略-overall-performance-optimization-strategies",
+          "level": 2,
+          "text": "8.1 整体性能优化策略（Overall Performance Optimization Strategies）"
+        },
+        {
+          "id": "8-2-最大化利用率-maximize-utilization",
+          "level": 2,
+          "text": "8.2 最大化利用率（Maximize Utilization）"
+        },
+        {
+          "id": "8-2-1-应用程序层面-application-level",
+          "level": 3,
+          "text": "8.2.1 应用程序层面（Application Level）"
+        },
+        {
+          "id": "8-2-2-设备层面-device-level",
+          "level": 3,
+          "text": "8.2.2 设备层面（Device Level）"
+        },
+        {
+          "id": "8-2-3-多处理器层面-multiprocessor-level",
+          "level": 3,
+          "text": "8.2.3 多处理器层面（Multiprocessor Level）"
+        },
+        {
+          "id": "8-2-3-1-占用率计算器-occupancy-calculator",
+          "level": 4,
+          "text": "8.2.3.1 占用率计算器（Occupancy Calculator）"
+        },
+        {
+          "id": "8-3-最大化内存吞吐量-maximize-memory-throughput",
+          "level": 2,
+          "text": "8.3 最大化内存吞吐量（Maximize Memory Throughput）"
+        },
+        {
+          "id": "8-3-最大化内存吞吐量-maximize-memory-throughput-2",
+          "level": 2,
+          "text": "8.3 最大化内存吞吐量（Maximize Memory Throughput）"
+        },
+        {
+          "id": "8-3-1-主机与设备之间的数据传输-data-transfer-between-host-and-device",
+          "level": 3,
+          "text": "8.3.1 主机与设备之间的数据传输（Data Transfer between Host and Device）"
+        },
+        {
+          "id": "8-3-2-设备内存访问-device-memory-accesses",
+          "level": 3,
+          "text": "8.3.2 设备内存访问（Device Memory Accesses）"
+        },
+        {
+          "id": "全局内存-global-memory",
+          "level": 4,
+          "text": "全局内存（Global Memory）"
+        },
+        {
+          "id": "大小与对齐要求-size-and-alignment-requirement",
+          "level": 5,
+          "text": "大小与对齐要求（Size and Alignment Requirement）"
+        },
+        {
+          "id": "二维数组-two-dimensional-arrays",
+          "level": 5,
+          "text": "二维数组（Two-Dimensional Arrays）"
+        },
+        {
+          "id": "本地内存-local-memory",
+          "level": 4,
+          "text": "本地内存（Local Memory）"
+        },
+        {
+          "id": "共享内存-shared-memory",
+          "level": 4,
+          "text": "共享内存（Shared Memory）"
+        },
+        {
+          "id": "常量内存-constant-memory",
+          "level": 4,
+          "text": "常量内存（Constant Memory）"
+        },
+        {
+          "id": "纹理与表面内存-texture-and-surface-memory",
+          "level": 4,
+          "text": "纹理与表面内存（Texture and Surface Memory）"
+        },
+        {
+          "id": "8-4-最大化指令吞吐量-maximize-instruction-throughput",
+          "level": 2,
+          "text": "8.4 最大化指令吞吐量（Maximize Instruction Throughput）"
+        },
+        {
+          "id": "8-4-1-算术指令-arithmetic-instructions",
+          "level": 3,
+          "text": "8.4.1 算术指令（Arithmetic Instructions）"
+        },
+        {
+          "id": "单精度浮点除法-single-precision-floating-point-division",
+          "level": 4,
+          "text": "单精度浮点除法（Single-Precision Floating-Point Division）"
+        },
+        {
+          "id": "单精度浮点倒数平方根-single-precision-floating-point-reciprocal-square-root",
+          "level": 4,
+          "text": "单精度浮点倒数平方根（Single-Precision Floating-Point Reciprocal Square Root）"
+        },
+        {
+          "id": "单精度浮点平方根-single-precision-floating-point-square-root",
+          "level": 4,
+          "text": "单精度浮点平方根（Single-Precision Floating-Point Square Root）"
+        },
+        {
+          "id": "正弦与余弦-sine-and-cosine",
+          "level": 4,
+          "text": "正弦与余弦（Sine and Cosine）"
+        },
+        {
+          "id": "本批术语表",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "正弦与余弦-参数约化-sine-and-cosine-argument-reduction",
+          "level": 4,
+          "text": "正弦与余弦：参数约化（Sine and Cosine: Argument Reduction）"
+        },
+        {
+          "id": "整数算术-integer-arithmetic",
+          "level": 4,
+          "text": "整数算术（Integer Arithmetic）"
+        },
+        {
+          "id": "半精度算术-half-precision-arithmetic",
+          "level": 4,
+          "text": "半精度算术（Half Precision Arithmetic）"
+        },
+        {
+          "id": "类型转换-type-conversion",
+          "level": 4,
+          "text": "类型转换（Type Conversion）"
+        },
+        {
+          "id": "8-4-2-控制流指令-control-flow-instructions",
+          "level": 3,
+          "text": "8.4.2 控制流指令（Control Flow Instructions）"
+        },
+        {
+          "id": "8-4-3-同步指令-synchronization-instruction",
+          "level": 3,
+          "text": "8.4.3 同步指令（Synchronization Instruction）"
+        },
+        {
+          "id": "8-5-尽量减少内存抖动-minimize-memory-thrashing",
+          "level": 2,
+          "text": "8.5 尽量减少内存抖动（Minimize Memory Thrashing）"
+        },
+        {
+          "id": "第八章术语表",
+          "level": 2,
+          "text": "第八章术语表"
+        },
+        {
+          "id": "校对说明-2",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 17809
+    },
+    {
+      "number": 9,
+      "slug": "cuda-09",
+      "title": "支持 CUDA 的 GPU（CUDA-Enabled GPUs）",
+      "displayTitle": "第九章 支持 CUDA 的 GPU（CUDA-Enabled GPUs）",
+      "html": "/cuda/book/html/09.html",
+      "toc": [],
+      "charCount": 184
+    },
+    {
+      "number": 10,
+      "slug": "cuda-10",
+      "title": "C++ 语言扩展（C++ Language Extensions）",
+      "displayTitle": "第十章 C++ 语言扩展（C++ Language Extensions）",
+      "html": "/cuda/book/html/10.html",
+      "toc": [
+        {
+          "id": "10-1-函数执行空间说明符-function-execution-space-specifiers",
+          "level": 2,
+          "text": "10.1 函数执行空间说明符（Function Execution Space Specifiers）"
+        },
+        {
+          "id": "10-1-1-global",
+          "level": 3,
+          "text": "10.1.1 __global__"
+        },
+        {
+          "id": "10-1-2-device",
+          "level": 3,
+          "text": "10.1.2 __device__"
+        },
+        {
+          "id": "10-1-3-host",
+          "level": 3,
+          "text": "10.1.3 __host__"
+        },
+        {
+          "id": "10-1-4-未定义行为-undefined-behavior",
+          "level": 3,
+          "text": "10.1.4 未定义行为（Undefined Behavior）"
+        },
+        {
+          "id": "10-1-5-noinline-和-forceinline",
+          "level": 3,
+          "text": "10.1.5 __noinline__ 和 __forceinline__"
+        },
+        {
+          "id": "10-1-6-inline-hint",
+          "level": 3,
+          "text": "10.1.6 __inline_hint__"
+        },
+        {
+          "id": "10-2-变量内存空间说明符-variable-memory-space-specifiers",
+          "level": 2,
+          "text": "10.2 变量内存空间说明符（Variable Memory Space Specifiers）"
+        },
+        {
+          "id": "10-2-1-device",
+          "level": 3,
+          "text": "10.2.1 __device__"
+        },
+        {
+          "id": "10-2-2-constant",
+          "level": 3,
+          "text": "10.2.2 __constant__"
+        },
+        {
+          "id": "10-2-3-shared",
+          "level": 3,
+          "text": "10.2.3 __shared__"
+        },
+        {
+          "id": "10-2-4-grid-constant",
+          "level": 3,
+          "text": "10.2.4 __grid_constant__"
+        },
+        {
+          "id": "10-2-5-managed",
+          "level": 3,
+          "text": "10.2.5 __managed__"
+        },
+        {
+          "id": "10-2-6-restrict",
+          "level": 3,
+          "text": "10.2.6 __restrict__"
+        },
+        {
+          "id": "10-3-内置向量类型-built-in-vector-types",
+          "level": 2,
+          "text": "10.3 内置向量类型（Built-in Vector Types）"
+        },
+        {
+          "id": "10-3-1-char-short-int-long-longlong-float-double",
+          "level": 3,
+          "text": "10.3.1 char 、 short 、 int 、 long 、 longlong 、 float 、 double"
+        },
+        {
+          "id": "10-3-2-dim3",
+          "level": 3,
+          "text": "10.3.2 dim3"
+        },
+        {
+          "id": "10-4-内置变量-built-in-variables",
+          "level": 2,
+          "text": "10.4 内置变量（Built-in Variables）"
+        },
+        {
+          "id": "10-4-1-griddim",
+          "level": 3,
+          "text": "10.4.1 gridDim"
+        },
+        {
+          "id": "10-4-2-blockidx",
+          "level": 3,
+          "text": "10.4.2 blockIdx"
+        },
+        {
+          "id": "10-4-3-blockdim",
+          "level": 3,
+          "text": "10.4.3 blockDim"
+        },
+        {
+          "id": "10-4-4-threadidx",
+          "level": 3,
+          "text": "10.4.4 threadIdx"
+        },
+        {
+          "id": "10-4-5-warpsize",
+          "level": 3,
+          "text": "10.4.5 warpSize"
+        },
+        {
+          "id": "10-5-内存栅栏函数-memory-fence-functions",
+          "level": 2,
+          "text": "10.5 内存栅栏函数（Memory Fence Functions）"
+        },
+        {
+          "id": "threadfence-block",
+          "level": 3,
+          "text": "__threadfence_block()"
+        },
+        {
+          "id": "threadfence",
+          "level": 3,
+          "text": "__threadfence()"
+        },
+        {
+          "id": "threadfence-system",
+          "level": 3,
+          "text": "__threadfence_system()"
+        },
+        {
+          "id": "threadfence-system-续",
+          "level": 3,
+          "text": "__threadfence_system() （续）"
+        },
+        {
+          "id": "使用内存栅栏协调线程间数据-示例",
+          "level": 4,
+          "text": "使用内存栅栏协调线程间数据（示例）"
+        },
+        {
+          "id": "10-6-同步函数-synchronization-functions",
+          "level": 2,
+          "text": "10.6 同步函数（Synchronization Functions）"
+        },
+        {
+          "id": "syncthreads",
+          "level": 3,
+          "text": "__syncthreads()"
+        },
+        {
+          "id": "syncthreads-count",
+          "level": 3,
+          "text": "__syncthreads_count()"
+        },
+        {
+          "id": "syncthreads-and",
+          "level": 3,
+          "text": "__syncthreads_and()"
+        },
+        {
+          "id": "syncthreads-or",
+          "level": 3,
+          "text": "__syncthreads_or()"
+        },
+        {
+          "id": "syncwarp",
+          "level": 3,
+          "text": "__syncwarp()"
+        },
+        {
+          "id": "10-7-数学函数-mathematical-functions",
+          "level": 2,
+          "text": "10.7 数学函数（Mathematical Functions）"
+        },
+        {
+          "id": "10-8-纹理函数-texture-functions",
+          "level": 2,
+          "text": "10.8 纹理函数（Texture Functions）"
+        },
+        {
+          "id": "10-8-1-纹理对象-api-texture-object-api",
+          "level": 3,
+          "text": "10.8.1 纹理对象 API（Texture Object API）"
+        },
+        {
+          "id": "10-8-1-1-tex1dfetch",
+          "level": 4,
+          "text": "10.8.1.1 tex1Dfetch()"
+        },
+        {
+          "id": "10-8-1-2-tex1d",
+          "level": 4,
+          "text": "10.8.1.2 tex1D()"
+        },
+        {
+          "id": "10-8-1-3-tex1dlod",
+          "level": 4,
+          "text": "10.8.1.3 tex1DLod()"
+        },
+        {
+          "id": "10-8-1-4-tex1dgrad",
+          "level": 4,
+          "text": "10.8.1.4 tex1DGrad()"
+        },
+        {
+          "id": "10-8-1-5-tex2d",
+          "level": 4,
+          "text": "10.8.1.5 tex2D()"
+        },
+        {
+          "id": "10-8-1-6-稀疏-cuda-数组的-tex2d",
+          "level": 4,
+          "text": "10.8.1.6 稀疏 CUDA 数组的 tex2D()"
+        },
+        {
+          "id": "10-8-1-7-tex2dgather",
+          "level": 4,
+          "text": "10.8.1.7 tex2Dgather()"
+        },
+        {
+          "id": "10-8-1-8-稀疏-cuda-数组的-tex2dgather",
+          "level": 4,
+          "text": "10.8.1.8 稀疏 CUDA 数组的 tex2Dgather()"
+        },
+        {
+          "id": "10-8-1-9-tex2dgrad",
+          "level": 4,
+          "text": "10.8.1.9 tex2DGrad()"
+        },
+        {
+          "id": "10-8-1-10-稀疏-cuda-数组的-tex2dgrad",
+          "level": 4,
+          "text": "10.8.1.10 稀疏 CUDA 数组的 tex2DGrad()"
+        },
+        {
+          "id": "10-8-1-11-tex2dlod",
+          "level": 4,
+          "text": "10.8.1.11 tex2DLod()"
+        },
+        {
+          "id": "10-8-1-12-稀疏-cuda-数组的-tex2dlod",
+          "level": 4,
+          "text": "10.8.1.12 稀疏 CUDA 数组的 tex2DLod()"
+        },
+        {
+          "id": "10-8-1-13-tex3d",
+          "level": 4,
+          "text": "10.8.1.13 tex3D()"
+        },
+        {
+          "id": "10-8-1-14-稀疏-cuda-数组的-tex3d",
+          "level": 4,
+          "text": "10.8.1.14 稀疏 CUDA 数组的 tex3D()"
+        },
+        {
+          "id": "10-8-1-15-tex3dlod",
+          "level": 4,
+          "text": "10.8.1.15 tex3DLod()"
+        },
+        {
+          "id": "10-8-1-16-稀疏-cuda-数组的-tex3dlod",
+          "level": 4,
+          "text": "10.8.1.16 稀疏 CUDA 数组的 tex3DLod()"
+        },
+        {
+          "id": "10-8-1-17-tex3dgrad",
+          "level": 4,
+          "text": "10.8.1.17 tex3DGrad()"
+        },
+        {
+          "id": "10-8-1-18-稀疏-cuda-数组的-tex3dgrad",
+          "level": 4,
+          "text": "10.8.1.18 稀疏 CUDA 数组的 tex3DGrad()"
+        },
+        {
+          "id": "10-8-1-19-tex1dlayered",
+          "level": 4,
+          "text": "10.8.1.19 tex1DLayered()"
+        },
+        {
+          "id": "10-8-1-20-tex1dlayeredlod",
+          "level": 4,
+          "text": "10.8.1.20 tex1DLayeredLod()"
+        },
+        {
+          "id": "10-8-1-21-tex1dlayeredgrad",
+          "level": 4,
+          "text": "10.8.1.21 tex1DLayeredGrad()"
+        },
+        {
+          "id": "10-8-1-22-tex2dlayered",
+          "level": 4,
+          "text": "10.8.1.22 tex2DLayered()"
+        },
+        {
+          "id": "10-8-1-23-稀疏-cuda-数组的-tex2dlayered",
+          "level": 4,
+          "text": "10.8.1.23 稀疏 CUDA 数组的 tex2DLayered()"
+        },
+        {
+          "id": "10-8-1-24-tex2dlayeredlod",
+          "level": 4,
+          "text": "10.8.1.24 tex2DLayeredLod()"
+        },
+        {
+          "id": "10-8-1-25-稀疏-cuda-数组的-tex2dlayeredlod",
+          "level": 4,
+          "text": "10.8.1.25 稀疏 CUDA 数组的 tex2DLayeredLod()"
+        },
+        {
+          "id": "10-8-1-26-tex2dlayeredgrad",
+          "level": 4,
+          "text": "10.8.1.26 tex2DLayeredGrad()"
+        },
+        {
+          "id": "10-8-1-27-稀疏-cuda-数组的-tex2dlayeredgrad",
+          "level": 4,
+          "text": "10.8.1.27 稀疏 CUDA 数组的 tex2DLayeredGrad()"
+        },
+        {
+          "id": "10-8-1-28-texcubemap",
+          "level": 4,
+          "text": "10.8.1.28 texCubemap()"
+        },
+        {
+          "id": "10-8-1-29-texcubemapgrad",
+          "level": 4,
+          "text": "10.8.1.29 texCubemapGrad()"
+        },
+        {
+          "id": "10-8-1-30-texcubemaplod",
+          "level": 4,
+          "text": "10.8.1.30 texCubemapLod()"
+        },
+        {
+          "id": "10-8-1-31-texcubemaplayered",
+          "level": 4,
+          "text": "10.8.1.31 texCubemapLayered()"
+        },
+        {
+          "id": "10-8-1-32-texcubemaplayeredgrad",
+          "level": 4,
+          "text": "10.8.1.32 texCubemapLayeredGrad()"
+        },
+        {
+          "id": "10-8-1-33-texcubemaplayeredlod",
+          "level": 4,
+          "text": "10.8.1.33 texCubemapLayeredLod()"
+        },
+        {
+          "id": "本批术语表",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-9-表面函数-surface-functions",
+          "level": 2,
+          "text": "10.9 表面函数（Surface Functions）"
+        },
+        {
+          "id": "10-9-1-表面对象-api-surface-object-api",
+          "level": 3,
+          "text": "10.9.1 表面对象 API（Surface Object API）"
+        },
+        {
+          "id": "10-9-1-1-surf1dread",
+          "level": 4,
+          "text": "10.9.1.1 surf1Dread()"
+        },
+        {
+          "id": "10-9-1-2-surf1dwrite",
+          "level": 4,
+          "text": "10.9.1.2 surf1Dwrite()"
+        },
+        {
+          "id": "10-9-1-3-surf2dread",
+          "level": 4,
+          "text": "10.9.1.3 surf2Dread()"
+        },
+        {
+          "id": "10-9-1-4-surf2dwrite",
+          "level": 4,
+          "text": "10.9.1.4 surf2Dwrite()"
+        },
+        {
+          "id": "10-9-1-5-surf3dread",
+          "level": 4,
+          "text": "10.9.1.5 surf3Dread()"
+        },
+        {
+          "id": "10-9-1-6-surf3dwrite",
+          "level": 4,
+          "text": "10.9.1.6 surf3Dwrite()"
+        },
+        {
+          "id": "10-9-1-7-surf1dlayeredread",
+          "level": 4,
+          "text": "10.9.1.7 surf1DLayeredread()"
+        },
+        {
+          "id": "10-9-1-8-surf1dlayeredwrite",
+          "level": 4,
+          "text": "10.9.1.8 surf1DLayeredwrite()"
+        },
+        {
+          "id": "10-9-1-9-surf2dlayeredread",
+          "level": 4,
+          "text": "10.9.1.9 surf2DLayeredread()"
+        },
+        {
+          "id": "10-9-1-10-surf2dlayeredwrite",
+          "level": 4,
+          "text": "10.9.1.10 surf2DLayeredwrite()"
+        },
+        {
+          "id": "10-9-1-11-surfcubemapread",
+          "level": 4,
+          "text": "10.9.1.11 surfCubemapread()"
+        },
+        {
+          "id": "10-9-1-12-surfcubemapwrite",
+          "level": 4,
+          "text": "10.9.1.12 surfCubemapwrite()"
+        },
+        {
+          "id": "10-9-1-13-surfcubemaplayeredread",
+          "level": 4,
+          "text": "10.9.1.13 surfCubemapLayeredread()"
+        },
+        {
+          "id": "10-9-1-14-surfcubemaplayeredwrite",
+          "level": 4,
+          "text": "10.9.1.14 surfCubemapLayeredwrite()"
+        },
+        {
+          "id": "10-10-只读数据缓存加载函数-read-only-data-cache-load-function",
+          "level": 2,
+          "text": "10.10 只读数据缓存加载函数（Read-Only Data Cache Load Function）"
+        },
+        {
+          "id": "10-11-使用缓存提示的加载函数-load-functions-using-cache-hints",
+          "level": 2,
+          "text": "10.11 使用缓存提示的加载函数（Load Functions Using Cache Hints）"
+        },
+        {
+          "id": "10-12-使用缓存提示的存储函数-store-functions-using-cache-hints",
+          "level": 2,
+          "text": "10.12 使用缓存提示的存储函数（Store Functions Using Cache Hints）"
+        },
+        {
+          "id": "10-13-时间函数-time-function",
+          "level": 2,
+          "text": "10.13 时间函数（Time Function）"
+        },
+        {
+          "id": "本批术语表-2",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-2",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-14-原子函数-atomic-functions",
+          "level": 2,
+          "text": "10.14 原子函数（Atomic Functions）"
+        },
+        {
+          "id": "cuda-12-8-的内存顺序与线程作用域原子内建函数",
+          "level": 3,
+          "text": "CUDA 12.8 的内存顺序与线程作用域原子内建函数"
+        },
+        {
+          "id": "10-14-1-算术函数-arithmetic-functions",
+          "level": 2,
+          "text": "10.14.1 算术函数（Arithmetic Functions）"
+        },
+        {
+          "id": "10-14-1-1-atomicadd",
+          "level": 3,
+          "text": "10.14.1.1 atomicAdd()"
+        },
+        {
+          "id": "10-14-1-2-atomicsub",
+          "level": 3,
+          "text": "10.14.1.2 atomicSub()"
+        },
+        {
+          "id": "10-14-1-3-atomicexch",
+          "level": 3,
+          "text": "10.14.1.3 atomicExch()"
+        },
+        {
+          "id": "10-14-1-4-atomicmin",
+          "level": 3,
+          "text": "10.14.1.4 atomicMin()"
+        },
+        {
+          "id": "10-14-1-5-atomicmax",
+          "level": 3,
+          "text": "10.14.1.5 atomicMax()"
+        },
+        {
+          "id": "10-14-1-6-atomicinc",
+          "level": 3,
+          "text": "10.14.1.6 atomicInc()"
+        },
+        {
+          "id": "10-14-1-7-atomicdec",
+          "level": 3,
+          "text": "10.14.1.7 atomicDec()"
+        },
+        {
+          "id": "10-14-1-8-atomiccas",
+          "level": 3,
+          "text": "10.14.1.8 atomicCAS()"
+        },
+        {
+          "id": "10-14-1-9-nv-atomic-exchange",
+          "level": 3,
+          "text": "10.14.1.9 __nv_atomic_exchange()"
+        },
+        {
+          "id": "10-14-1-10-nv-atomic-exchange-n",
+          "level": 3,
+          "text": "10.14.1.10 __nv_atomic_exchange_n()"
+        },
+        {
+          "id": "10-14-1-11-nv-atomic-compare-exchange",
+          "level": 3,
+          "text": "10.14.1.11 __nv_atomic_compare_exchange()"
+        },
+        {
+          "id": "10-14-1-12-nv-atomic-compare-exchange-n",
+          "level": 3,
+          "text": "10.14.1.12 __nv_atomic_compare_exchange_n()"
+        },
+        {
+          "id": "10-14-1-13-nv-atomic-fetch-add-与-nv-atomic-add",
+          "level": 3,
+          "text": "10.14.1.13 __nv_atomic_fetch_add() 与 __nv_atomic_add()"
+        },
+        {
+          "id": "10-14-1-14-nv-atomic-fetch-sub-与-nv-atomic-sub",
+          "level": 3,
+          "text": "10.14.1.14 __nv_atomic_fetch_sub() 与 __nv_atomic_sub()"
+        },
+        {
+          "id": "10-14-1-15-nv-atomic-fetch-min-与-nv-atomic-min",
+          "level": 3,
+          "text": "10.14.1.15 __nv_atomic_fetch_min() 与 __nv_atomic_min()"
+        },
+        {
+          "id": "10-14-1-16-nv-atomic-fetch-max-与-nv-atomic-max",
+          "level": 3,
+          "text": "10.14.1.16 __nv_atomic_fetch_max() 与 __nv_atomic_max()"
+        },
+        {
+          "id": "10-14-2-位运算函数-bitwise-functions",
+          "level": 2,
+          "text": "10.14.2 位运算函数（Bitwise Functions）"
+        },
+        {
+          "id": "10-14-2-1-atomicand",
+          "level": 3,
+          "text": "10.14.2.1 atomicAnd()"
+        },
+        {
+          "id": "10-14-2-2-atomicor",
+          "level": 3,
+          "text": "10.14.2.2 atomicOr()"
+        },
+        {
+          "id": "10-14-2-3-atomicxor",
+          "level": 3,
+          "text": "10.14.2.3 atomicXor()"
+        },
+        {
+          "id": "本批术语表-3",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-3",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-14-2-4-nv-atomic-fetch-or-与-nv-atomic-or",
+          "level": 2,
+          "text": "10.14.2.4 __nv_atomic_fetch_or() 与 __nv_atomic_or()"
+        },
+        {
+          "id": "10-14-2-5-nv-atomic-fetch-xor-与-nv-atomic-xor",
+          "level": 2,
+          "text": "10.14.2.5 __nv_atomic_fetch_xor() 与 __nv_atomic_xor()"
+        },
+        {
+          "id": "10-14-2-6-nv-atomic-fetch-and-与-nv-atomic-and",
+          "level": 2,
+          "text": "10.14.2.6 __nv_atomic_fetch_and() 与 __nv_atomic_and()"
+        },
+        {
+          "id": "10-14-3-其他原子函数-other-atomic-functions",
+          "level": 2,
+          "text": "10.14.3 其他原子函数（Other Atomic Functions）"
+        },
+        {
+          "id": "10-14-3-1-nv-atomic-load",
+          "level": 3,
+          "text": "10.14.3.1 __nv_atomic_load()"
+        },
+        {
+          "id": "10-14-3-2-nv-atomic-load-n",
+          "level": 3,
+          "text": "10.14.3.2 __nv_atomic_load_n()"
+        },
+        {
+          "id": "10-14-3-3-nv-atomic-store",
+          "level": 3,
+          "text": "10.14.3.3 __nv_atomic_store()"
+        },
+        {
+          "id": "10-14-3-4-nv-atomic-store-n",
+          "level": 3,
+          "text": "10.14.3.4 __nv_atomic_store_n()"
+        },
+        {
+          "id": "10-14-3-5-nv-atomic-thread-fence",
+          "level": 3,
+          "text": "10.14.3.5 __nv_atomic_thread_fence()"
+        },
+        {
+          "id": "10-15-地址空间谓词函数-address-space-predicate-functions",
+          "level": 2,
+          "text": "10.15 地址空间谓词函数（Address Space Predicate Functions）"
+        },
+        {
+          "id": "10-15-1-isglobal",
+          "level": 3,
+          "text": "10.15.1 __isGlobal()"
+        },
+        {
+          "id": "10-15-2-isshared",
+          "level": 3,
+          "text": "10.15.2 __isShared()"
+        },
+        {
+          "id": "10-15-3-isconstant",
+          "level": 3,
+          "text": "10.15.3 __isConstant()"
+        },
+        {
+          "id": "10-15-4-isgridconstant",
+          "level": 3,
+          "text": "10.15.4 __isGridConstant()"
+        },
+        {
+          "id": "10-15-5-islocal",
+          "level": 3,
+          "text": "10.15.5 __isLocal()"
+        },
+        {
+          "id": "10-16-地址空间转换函数-address-space-conversion-functions",
+          "level": 2,
+          "text": "10.16 地址空间转换函数（Address Space Conversion Functions）"
+        },
+        {
+          "id": "10-16-1-cvta-generic-to-global",
+          "level": 3,
+          "text": "10.16.1 __cvta_generic_to_global()"
+        },
+        {
+          "id": "10-16-2-cvta-generic-to-shared",
+          "level": 3,
+          "text": "10.16.2 __cvta_generic_to_shared()"
+        },
+        {
+          "id": "10-16-3-cvta-generic-to-constant",
+          "level": 3,
+          "text": "10.16.3 __cvta_generic_to_constant()"
+        },
+        {
+          "id": "10-16-4-cvta-generic-to-local",
+          "level": 3,
+          "text": "10.16.4 __cvta_generic_to_local()"
+        },
+        {
+          "id": "10-16-5-cvta-global-to-generic",
+          "level": 3,
+          "text": "10.16.5 __cvta_global_to_generic()"
+        },
+        {
+          "id": "10-16-6-cvta-shared-to-generic",
+          "level": 3,
+          "text": "10.16.6 __cvta_shared_to_generic()"
+        },
+        {
+          "id": "10-16-7-cvta-constant-to-generic",
+          "level": 3,
+          "text": "10.16.7 __cvta_constant_to_generic()"
+        },
+        {
+          "id": "10-16-8-cvta-local-to-generic",
+          "level": 3,
+          "text": "10.16.8 __cvta_local_to_generic()"
+        },
+        {
+          "id": "10-17-alloca-函数-alloca-function",
+          "level": 2,
+          "text": "10.17 alloca() 函数（Alloca Function）"
+        },
+        {
+          "id": "10-17-1-函数原型-synopsis",
+          "level": 3,
+          "text": "10.17.1 函数原型（Synopsis）"
+        },
+        {
+          "id": "10-17-2-描述-description",
+          "level": 3,
+          "text": "10.17.2 描述（Description）"
+        },
+        {
+          "id": "10-17-3-示例-example",
+          "level": 3,
+          "text": "10.17.3 示例（Example）"
+        },
+        {
+          "id": "10-18-编译器优化提示函数-compiler-optimization-hint-functions",
+          "level": 2,
+          "text": "10.18 编译器优化提示函数（Compiler Optimization Hint Functions）"
+        },
+        {
+          "id": "10-18-1-builtin-assume-aligned",
+          "level": 3,
+          "text": "10.18.1 __builtin_assume_aligned()"
+        },
+        {
+          "id": "10-18-2-builtin-assume",
+          "level": 3,
+          "text": "10.18.2 __builtin_assume()"
+        },
+        {
+          "id": "10-18-3-assume",
+          "level": 3,
+          "text": "10.18.3 __assume()"
+        },
+        {
+          "id": "10-18-4-builtin-expect",
+          "level": 3,
+          "text": "10.18.4 __builtin_expect()"
+        },
+        {
+          "id": "10-18-5-builtin-unreachable",
+          "level": 3,
+          "text": "10.18.5 __builtin_unreachable()"
+        },
+        {
+          "id": "10-18-6-限制-restrictions",
+          "level": 3,
+          "text": "10.18.6 限制（Restrictions）"
+        },
+        {
+          "id": "10-19-warp-投票函数-warp-vote-functions",
+          "level": 2,
+          "text": "10.19 Warp 投票函数（Warp Vote Functions）"
+        },
+        {
+          "id": "10-20-warp-匹配函数-warp-match-functions",
+          "level": 2,
+          "text": "10.20 Warp 匹配函数（Warp Match Functions）"
+        },
+        {
+          "id": "10-20-1-函数原型-synopsis",
+          "level": 3,
+          "text": "10.20.1 函数原型（Synopsis）"
+        },
+        {
+          "id": "10-20-2-描述-description",
+          "level": 3,
+          "text": "10.20.2 描述（Description）"
+        },
+        {
+          "id": "10-21-warp-归约函数-warp-reduce-functions",
+          "level": 2,
+          "text": "10.21 Warp 归约函数（Warp Reduce Functions）"
+        },
+        {
+          "id": "10-21-1-函数原型-synopsis",
+          "level": 3,
+          "text": "10.21.1 函数原型（Synopsis）"
+        },
+        {
+          "id": "10-21-2-描述-description",
+          "level": 3,
+          "text": "10.21.2 描述（Description）"
+        },
+        {
+          "id": "10-22-warp-洗牌函数-warp-shuffle-functions",
+          "level": 2,
+          "text": "10.22 Warp 洗牌函数（Warp Shuffle Functions）"
+        },
+        {
+          "id": "10-22-1-函数原型-synopsis",
+          "level": 3,
+          "text": "10.22.1 函数原型（Synopsis）"
+        },
+        {
+          "id": "10-22-2-描述-description",
+          "level": 3,
+          "text": "10.22.2 描述（Description）"
+        },
+        {
+          "id": "10-22-3-示例-examples",
+          "level": 3,
+          "text": "10.22.3 示例（Examples）"
+        },
+        {
+          "id": "10-22-3-1-在整个-warp-中广播单个值",
+          "level": 4,
+          "text": "10.22.3.1 在整个 warp 中广播单个值"
+        },
+        {
+          "id": "10-22-3-2-在每个-8-线程子分区内执行包含自身的加法扫描",
+          "level": 4,
+          "text": "10.22.3.2 在每个 8 线程子分区内执行包含自身的加法扫描"
+        },
+        {
+          "id": "10-22-3-3-在一个-warp-内执行归约",
+          "level": 4,
+          "text": "10.22.3.3 在一个 warp 内执行归约"
+        },
+        {
+          "id": "10-23-纳秒休眠函数-nanosleep-function",
+          "level": 2,
+          "text": "10.23 纳秒休眠函数（Nanosleep Function）"
+        },
+        {
+          "id": "10-23-1-函数原型-synopsis",
+          "level": 3,
+          "text": "10.23.1 函数原型（Synopsis）"
+        },
+        {
+          "id": "10-23-2-描述-description",
+          "level": 3,
+          "text": "10.23.2 描述（Description）"
+        },
+        {
+          "id": "10-23-3-示例-example",
+          "level": 3,
+          "text": "10.23.3 示例（Example）"
+        },
+        {
+          "id": "本批术语表-4",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-4",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-24-warp-矩阵函数-warp-matrix-functions",
+          "level": 2,
+          "text": "10.24 Warp 矩阵函数（Warp Matrix Functions）"
+        },
+        {
+          "id": "10-24-1-描述-description",
+          "level": 3,
+          "text": "10.24.1 描述（Description）"
+        },
+        {
+          "id": "fragment",
+          "level": 4,
+          "text": "fragment"
+        },
+        {
+          "id": "load-matrix-sync",
+          "level": 4,
+          "text": "load_matrix_sync"
+        },
+        {
+          "id": "store-matrix-sync",
+          "level": 4,
+          "text": "store_matrix_sync"
+        },
+        {
+          "id": "fill-fragment",
+          "level": 4,
+          "text": "fill_fragment"
+        },
+        {
+          "id": "mma-sync",
+          "level": 4,
+          "text": "mma_sync"
+        },
+        {
+          "id": "10-24-2-替代浮点格式-alternate-floating-point",
+          "level": 3,
+          "text": "10.24.2 替代浮点格式（Alternate Floating Point）"
+        },
+        {
+          "id": "nv-bfloat16",
+          "level": 4,
+          "text": "__nv_bfloat16"
+        },
+        {
+          "id": "tf32",
+          "level": 4,
+          "text": "tf32"
+        },
+        {
+          "id": "10-24-3-双精度-double-precision",
+          "level": 3,
+          "text": "10.24.3 双精度（Double Precision）"
+        },
+        {
+          "id": "10-24-4-子字节操作-sub-byte-operations",
+          "level": 3,
+          "text": "10.24.4 子字节操作（Sub-byte Operations）"
+        },
+        {
+          "id": "bmma-sync",
+          "level": 4,
+          "text": "bmma_sync"
+        },
+        {
+          "id": "10-24-5-限制-restrictions",
+          "level": 3,
+          "text": "10.24.5 限制（Restrictions）"
+        },
+        {
+          "id": "10-24-6-元素类型与矩阵尺寸-element-types-and-matrix-sizes",
+          "level": 2,
+          "text": "10.24.6 元素类型与矩阵尺寸（Element Types and Matrix Sizes）"
+        },
+        {
+          "id": "10-24-7-示例-example",
+          "level": 3,
+          "text": "10.24.7 示例（Example）"
+        },
+        {
+          "id": "10-25-dpx",
+          "level": 2,
+          "text": "10.25 DPX"
+        },
+        {
+          "id": "10-25-1-示例-examples",
+          "level": 3,
+          "text": "10.25.1 示例（Examples）"
+        },
+        {
+          "id": "三个有符号-32-位整数的最大值-并应用-relu",
+          "level": 4,
+          "text": "三个有符号 32 位整数的最大值，并应用 ReLU"
+        },
+        {
+          "id": "两个有符号-32-位整数之和-另一个-32-位整数与零的最大值-relu",
+          "level": 4,
+          "text": "两个有符号 32 位整数之和、另一个 32 位整数与零的最大值（ReLU）"
+        },
+        {
+          "id": "两个无符号-32-位整数的最小值-并确定哪个值更小",
+          "level": 4,
+          "text": "两个无符号 32 位整数的最小值，并确定哪个值更小"
+        },
+        {
+          "id": "三对无符号-16-位整数的最大值",
+          "level": 4,
+          "text": "三对无符号 16 位整数的最大值"
+        },
+        {
+          "id": "本批术语表-5",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-5",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-26-异步屏障-asynchronous-barrier",
+          "level": 2,
+          "text": "10.26 异步屏障（Asynchronous Barrier）"
+        },
+        {
+          "id": "10-26-1-简单同步模式-simple-synchronization-pattern",
+          "level": 3,
+          "text": "10.26.1 简单同步模式（Simple Synchronization Pattern）"
+        },
+        {
+          "id": "10-26-2-时间拆分与同步的五个阶段-temporal-splitting-and-five-stages-of-synchronization",
+          "level": 3,
+          "text": "10.26.2 时间拆分与同步的五个阶段（Temporal Splitting and Five Stages of Synchronization）"
+        },
+        {
+          "id": "10-26-3-引导初始化-预期到达计数与参与机制-bootstrap-initialization-expected-arrival-count-and-partici",
+          "level": 3,
+          "text": "10.26.3 引导初始化、预期到达计数与参与机制（Bootstrap Initialization, Expected Arrival Count, and Participation）"
+        },
+        {
+          "id": "10-26-4-屏障阶段-到达-倒计时-完成与重置-a-barrier-s-phase-arrival-countdown-completion-and-reset",
+          "level": 3,
+          "text": "10.26.4 屏障阶段：到达、倒计时、完成与重置（A Barrier’s Phase: Arrival, Countdown, Completion, and Reset）"
+        },
+        {
+          "id": "10-26-5-空间分区-又称-warp-专门化-spatial-partitioning-warp-specialization",
+          "level": 2,
+          "text": "10.26.5 空间分区（又称 Warp 专门化）（Spatial Partitioning / Warp Specialization）"
+        },
+        {
+          "id": "10-26-6-提前退出-退出参与-early-exit-dropping-out-of-participation",
+          "level": 2,
+          "text": "10.26.6 提前退出（退出参与）（Early Exit / Dropping out of Participation）"
+        },
+        {
+          "id": "10-26-7-完成函数-completion-function",
+          "level": 2,
+          "text": "10.26.7 完成函数（Completion Function）"
+        },
+        {
+          "id": "10-26-8-内存屏障原语接口-memory-barrier-primitives-interface",
+          "level": 2,
+          "text": "10.26.8 内存屏障原语接口（Memory Barrier Primitives Interface）"
+        },
+        {
+          "id": "10-26-8-1-数据类型-data-types",
+          "level": 3,
+          "text": "10.26.8.1 数据类型（Data Types）"
+        },
+        {
+          "id": "10-26-8-2-内存屏障原语-api-memory-barrier-primitives-api",
+          "level": 3,
+          "text": "10.26.8.2 内存屏障原语 API（Memory Barrier Primitives API）"
+        },
+        {
+          "id": "10-27-异步数据复制-asynchronous-data-copies",
+          "level": 2,
+          "text": "10.27 异步数据复制（Asynchronous Data Copies）"
+        },
+        {
+          "id": "10-27-1-memcpy-async-api",
+          "level": 3,
+          "text": "10.27.1 memcpy_async API"
+        },
+        {
+          "id": "10-27-2-复制与计算模式-通过共享内存暂存数据-copy-and-compute-pattern-staging-data-through-shared-memor",
+          "level": 3,
+          "text": "10.27.2 复制与计算模式：通过共享内存暂存数据（Copy and Compute Pattern — Staging Data Through Shared Memory）"
+        },
+        {
+          "id": "10-27-3-不使用-memcpy-async-without-memcpy-async",
+          "level": 2,
+          "text": "10.27.3 不使用 memcpy_async （Without memcpy_async）"
+        },
+        {
+          "id": "10-27-4-使用-memcpy-async-with-memcpy-async",
+          "level": 2,
+          "text": "10.27.4 使用 memcpy_async （With memcpy_async）"
+        },
+        {
+          "id": "10-27-5-使用-cuda-barrier-的异步数据复制-asynchronous-data-copies-using-cuda-barrier",
+          "level": 2,
+          "text": "10.27.5 使用 cuda::barrier 的异步数据复制（Asynchronous Data Copies using cuda::barrier）"
+        },
+        {
+          "id": "10-27-6-memcpy-async-的性能指导-performance-guidance-for-memcpy-async",
+          "level": 2,
+          "text": "10.27.6 memcpy_async 的性能指导（Performance Guidance for memcpy_async）"
+        },
+        {
+          "id": "10-27-6-1-对齐-alignment",
+          "level": 3,
+          "text": "10.27.6.1 对齐（Alignment）"
+        },
+        {
+          "id": "10-27-6-2-可平凡复制类型-trivially-copyable",
+          "level": 3,
+          "text": "10.27.6.2 可平凡复制类型（Trivially Copyable）"
+        },
+        {
+          "id": "10-27-6-3-warp-纠缠-commit-warp-entanglement-commit",
+          "level": 3,
+          "text": "10.27.6.3 Warp 纠缠——Commit（Warp Entanglement - Commit）"
+        },
+        {
+          "id": "10-27-6-4-warp-纠缠-wait-warp-entanglement-wait",
+          "level": 3,
+          "text": "10.27.6.4 Warp 纠缠——Wait（Warp Entanglement - Wait）"
+        },
+        {
+          "id": "10-27-6-5-warp-纠缠-arrive-on-warp-entanglement-arrive-on",
+          "level": 3,
+          "text": "10.27.6.5 Warp 纠缠——Arrive-On（Warp Entanglement - Arrive-On）"
+        },
+        {
+          "id": "10-27-6-6-保持-commit-和-arrive-on-操作收敛-keep-commit-and-arrive-on-operations-converged",
+          "level": 3,
+          "text": "10.27.6.6 保持 Commit 和 Arrive-On 操作收敛（Keep Commit and Arrive-On Operations Converged）"
+        },
+        {
+          "id": "10-28-使用-cuda-pipeline-的异步数据复制-asynchronous-data-copies-using-cuda-pipeline",
+          "level": 2,
+          "text": "10.28 使用 cuda::pipeline 的异步数据复制（Asynchronous Data Copies using cuda::pipeline）"
+        },
+        {
+          "id": "10-28-1-使用-cuda-pipeline-的单阶段异步数据复制-single-stage-asynchronous-data-copies",
+          "level": 3,
+          "text": "10.28.1 使用 cuda::pipeline 的单阶段异步数据复制（Single-Stage Asynchronous Data Copies）"
+        },
+        {
+          "id": "10-28-2-使用-cuda-pipeline-的多阶段异步数据复制-multi-stage-asynchronous-data-copies",
+          "level": 2,
+          "text": "10.28.2 使用 cuda::pipeline 的多阶段异步数据复制（Multi-Stage Asynchronous Data Copies）"
+        },
+        {
+          "id": "10-28-2-续-统一循环与专门化生产者-消费者",
+          "level": 2,
+          "text": "10.28.2（续）统一循环与专门化生产者/消费者"
+        },
+        {
+          "id": "10-28-3-pipeline-接口-pipeline-interface",
+          "level": 2,
+          "text": "10.28.3 Pipeline 接口（Pipeline Interface）"
+        },
+        {
+          "id": "10-28-4-pipeline-原语接口-pipeline-primitives-interface",
+          "level": 2,
+          "text": "10.28.4 Pipeline 原语接口（Pipeline Primitives Interface）"
+        },
+        {
+          "id": "10-28-4-1-memcpy-async-原语-memcpy-async-primitive",
+          "level": 3,
+          "text": "10.28.4.1 memcpy_async 原语（memcpy_async Primitive）"
+        },
+        {
+          "id": "10-28-4-2-commit-原语-commit-primitive",
+          "level": 3,
+          "text": "10.28.4.2 Commit 原语（Commit Primitive）"
+        },
+        {
+          "id": "10-28-4-3-wait-原语-wait-primitive",
+          "level": 3,
+          "text": "10.28.4.3 Wait 原语（Wait Primitive）"
+        },
+        {
+          "id": "10-28-4-4-arrive-on-屏障原语-arrive-on-barrier-primitive",
+          "level": 3,
+          "text": "10.28.4.4 Arrive-On 屏障原语（Arrive On Barrier Primitive）"
+        },
+        {
+          "id": "10-29-使用张量内存加速器-tma-进行异步数据复制-asynchronous-data-copies-using-the-tensor-memory-acceler",
+          "level": 2,
+          "text": "10.29 使用张量内存加速器（TMA）进行异步数据复制（Asynchronous Data Copies using the Tensor Memory Accelerator）"
+        },
+        {
+          "id": "10-29-1-使用-tma-传输一维数组-using-tma-to-transfer-one-dimensional-arrays",
+          "level": 2,
+          "text": "10.29.1 使用 TMA 传输一维数组（Using TMA to transfer one-dimensional arrays）"
+        },
+        {
+          "id": "屏障初始化",
+          "level": 3,
+          "text": "屏障初始化"
+        },
+        {
+          "id": "tma-读取",
+          "level": 3,
+          "text": "TMA 读取"
+        },
+        {
+          "id": "屏障等待",
+          "level": 3,
+          "text": "屏障等待"
+        },
+        {
+          "id": "共享内存写入与同步",
+          "level": 3,
+          "text": "共享内存写入与同步"
+        },
+        {
+          "id": "tma-写入与同步",
+          "level": 3,
+          "text": "TMA 写入与同步"
+        },
+        {
+          "id": "10-29-2-使用-tma-传输多维数组-using-tma-to-transfer-multi-dimensional-arrays",
+          "level": 2,
+          "text": "10.29.2 使用 TMA 传输多维数组（Using TMA to transfer multi-dimensional arrays）"
+        },
+        {
+          "id": "driver-api-获取-cutensormapencodetiled-函数指针",
+          "level": 3,
+          "text": "Driver API：获取 cuTensorMapEncodeTiled 函数指针"
+        },
+        {
+          "id": "创建-tensor-map",
+          "level": 3,
+          "text": "创建 tensor map"
+        },
+        {
+          "id": "从主机传输到设备-host-to-device-transfer",
+          "level": 3,
+          "text": "从主机传输到设备（Host-to-device transfer）"
+        },
+        {
+          "id": "使用-tensor-map",
+          "level": 3,
+          "text": "使用 tensor map"
+        },
+        {
+          "id": "尺寸与跨度-size-and-stride",
+          "level": 3,
+          "text": "尺寸与跨度（Size and stride）"
+        },
+        {
+          "id": "10-29-2-1-多维-tma-的-ptx-封装函数-multi-dimensional-tma-ptx-wrappers",
+          "level": 3,
+          "text": "10.29.2.1 多维 TMA 的 PTX 封装函数（Multi-dimensional TMA PTX wrappers）"
+        },
+        {
+          "id": "10-29-3-tma-swizzle-tma-数据重排",
+          "level": 2,
+          "text": "10.29.3 TMA Swizzle（TMA 数据重排）"
+        },
+        {
+          "id": "10-29-3-1-示例-矩阵转置-example-matrix-transpose",
+          "level": 3,
+          "text": "10.29.3.1 示例：矩阵转置（Example “Matrix Transpose”）"
+        },
+        {
+          "id": "10-29-3-2-swizzle-模式-the-swizzle-modes",
+          "level": 3,
+          "text": "10.29.3.2 Swizzle 模式（The Swizzle Modes）"
+        },
+        {
+          "id": "swizzle-模式的指针偏移计算",
+          "level": 4,
+          "text": "Swizzle 模式的指针偏移计算"
+        },
+        {
+          "id": "本批术语表-6",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-6",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-30-在设备端编码-tensor-map-encoding-a-tensor-map-on-device",
+          "level": 2,
+          "text": "10.30 在设备端编码 Tensor Map（Encoding a Tensor Map on Device）"
+        },
+        {
+          "id": "10-30-1-在设备端编码和修改-tensor-map-device-side-encoding-and-modification",
+          "level": 3,
+          "text": "10.30.1 在设备端编码和修改 Tensor Map（Device-side Encoding and Modification）"
+        },
+        {
+          "id": "10-30-2-使用修改后的-tensor-map-usage-of-a-modified-tensor-map",
+          "level": 3,
+          "text": "10.30.2 使用修改后的 Tensor Map（Usage of a Modified Tensor Map）"
+        },
+        {
+          "id": "10-30-3-使用-driver-api-创建模板-tensor-map-creating-a-template-tensor-map-value-using-the-",
+          "level": 3,
+          "text": "10.30.3 使用 Driver API 创建模板 Tensor Map（Creating a Template Tensor Map Value Using the Driver API）"
+        },
+        {
+          "id": "本批术语表-7",
+          "level": 2,
+          "text": "本批术语表"
+        },
+        {
+          "id": "校对说明-7",
+          "level": 2,
+          "text": "校对说明"
+        },
+        {
+          "id": "10-31-性能分析器计数器函数-profiler-counter-function",
+          "level": 2,
+          "text": "10.31 性能分析器计数器函数（Profiler Counter Function）"
+        },
+        {
+          "id": "10-32-断言-assertion",
+          "level": 2,
+          "text": "10.32 断言（Assertion）"
+        },
+        {
+          "id": "10-33-陷阱函数-trap-function",
+          "level": 2,
+          "text": "10.33 陷阱函数（Trap Function）"
+        },
+        {
+          "id": "10-34-断点函数-breakpoint-function",
+          "level": 2,
+          "text": "10.34 断点函数（Breakpoint Function）"
+        },
+        {
+          "id": "10-35-格式化输出-formatted-output",
+          "level": 2,
+          "text": "10.35 格式化输出（Formatted Output）"
+        },
+        {
+          "id": "10-35-1-格式说明符-format-specifiers",
+          "level": 3,
+          "text": "10.35.1 格式说明符（Format Specifiers）"
+        },
+        {
+          "id": "10-35-2-限制-limitations",
+          "level": 3,
+          "text": "10.35.2 限制（Limitations）"
+        },
+        {
+          "id": "10-35-3-相关主机端-api-associated-host-side-api",
+          "level": 3,
+          "text": "10.35.3 相关主机端 API（Associated Host-Side API）"
+        },
+        {
+          "id": "10-35-4-示例-examples",
+          "level": 3,
+          "text": "10.35.4 示例（Examples）"
+        },
+        {
+          "id": "10-36-动态全局内存分配与操作-dynamic-global-memory-allocation-and-operations",
+          "level": 2,
+          "text": "10.36 动态全局内存分配与操作（Dynamic Global Memory Allocation and Operations）"
+        },
+        {
+          "id": "10-36-1-堆内存分配-heap-memory-allocation",
+          "level": 3,
+          "text": "10.36.1 堆内存分配（Heap Memory Allocation）"
+        },
+        {
+          "id": "10-36-2-与主机内存-api-的互操作性-interoperability-with-host-memory-api",
+          "level": 3,
+          "text": "10.36.2 与主机内存 API 的互操作性（Interoperability with Host Memory API）"
+        },
+        {
+          "id": "10-36-3-示例-examples",
+          "level": 3,
+          "text": "10.36.3 示例（Examples）"
+        },
+        {
+          "id": "10-36-3-1-每线程分配-per-thread-allocation",
+          "level": 4,
+          "text": "10.36.3.1 每线程分配（Per Thread Allocation）"
+        },
+        {
+          "id": "10-36-3-2-每线程块分配-per-thread-block-allocation",
+          "level": 4,
+          "text": "10.36.3.2 每线程块分配（Per Thread Block Allocation）"
+        },
+        {
+          "id": "10-36-3-3-跨内核启动保留分配-allocation-persisting-between-kernel-launches",
+          "level": 4,
+          "text": "10.36.3.3 跨内核启动保留分配（Allocation Persisting Between Kernel Launches）"
+        },
+        {
+          "id": "10-37-执行配置-execution-configuration",
+          "level": 3,
+          "text": "10.37 执行配置（Execution Configuration）"
+        },
+        {
+          "id": "10-38-启动边界-launch-bounds",
+          "level": 2,
+          "text": "10.38 启动边界（Launch Bounds）"
+        },
+        {
+          "id": "10-39-每线程最大寄存器数-maximum-number-of-registers-per-thread",
+          "level": 2,
+          "text": "10.39 每线程最大寄存器数（Maximum Number of Registers per Thread）"
+        },
+        {
+          "id": "10-40-pragma-unroll",
+          "level": 2,
+          "text": "10.40 #pragma unroll"
+        },
+        {
+          "id": "10-41-simd-视频指令-simd-video-instructions",
+          "level": 2,
+          "text": "10.41 SIMD 视频指令（SIMD Video Instructions）"
+        },
+        {
+          "id": "10-42-诊断-pragma-diagnostic-pragmas",
+          "level": 2,
+          "text": "10.42 诊断 Pragma（Diagnostic Pragmas）"
+        },
+        {
+          "id": "10-43-自定义-abi-pragma-custom-abi-pragmas",
+          "level": 2,
+          "text": "10.43 自定义 ABI Pragma（Custom ABI Pragmas）"
+        }
+      ],
+      "charCount": 145923
+    },
+    {
+      "number": 11,
+      "slug": "cuda-11",
+      "title": "协作组（Cooperative Groups）",
+      "displayTitle": "第十一章 协作组（Cooperative Groups）",
+      "html": "/cuda/book/html/11.html",
+      "toc": [
+        {
+          "id": "11-1-简介-introduction",
+          "level": 2,
+          "text": "11.1 简介（Introduction）"
+        },
+        {
+          "id": "11-2-cooperative-groups-的新增内容-what-s-new-in-cooperative-groups",
+          "level": 2,
+          "text": "11.2 Cooperative Groups 的新增内容（What’s New in Cooperative Groups）"
+        },
+        {
+          "id": "11-2-1-cuda-12-2",
+          "level": 3,
+          "text": "11.2.1 CUDA 12.2"
+        },
+        {
+          "id": "11-2-2-cuda-12-1",
+          "level": 3,
+          "text": "11.2.2 CUDA 12.1"
+        },
+        {
+          "id": "11-2-3-cuda-12-0",
+          "level": 3,
+          "text": "11.2.3 CUDA 12.0"
+        },
+        {
+          "id": "11-3-编程模型概念-programming-model-concept",
+          "level": 2,
+          "text": "11.3 编程模型概念（Programming Model Concept）"
+        },
+        {
+          "id": "11-3-1-组合示例-composition-example",
+          "level": 3,
+          "text": "11.3.1 组合示例（Composition Example）"
+        },
+        {
+          "id": "11-4-线程组类型-group-types",
+          "level": 2,
+          "text": "11.4 线程组类型（Group Types）"
+        },
+        {
+          "id": "11-4-1-隐式线程组-implicit-groups",
+          "level": 3,
+          "text": "11.4.1 隐式线程组（Implicit Groups）"
+        },
+        {
+          "id": "11-4-1-1-线程块组-thread-block-group",
+          "level": 4,
+          "text": "11.4.1.1 线程块组（Thread Block Group）"
+        },
+        {
+          "id": "11-4-1-2-集群组-cluster-group",
+          "level": 4,
+          "text": "11.4.1.2 集群组（Cluster Group）"
+        },
+        {
+          "id": "11-4-1-3-grid-组-grid-group",
+          "level": 4,
+          "text": "11.4.1.3 Grid 组（Grid Group）"
+        },
+        {
+          "id": "11-4-1-4-多-grid-组-multi-grid-group",
+          "level": 4,
+          "text": "11.4.1.4 多 Grid 组（Multi Grid Group）"
+        },
+        {
+          "id": "11-4-2-显式线程组-explicit-groups",
+          "level": 2,
+          "text": "11.4.2 显式线程组（Explicit Groups）"
+        },
+        {
+          "id": "11-4-2-1-线程块-tile-thread-block-tile",
+          "level": 3,
+          "text": "11.4.2.1 线程块 Tile（Thread Block Tile）"
+        },
+        {
+          "id": "11-4-2-1-1-warp-同步代码模式-warp-synchronous-code-pattern",
+          "level": 4,
+          "text": "11.4.2.1.1 Warp 同步代码模式（Warp-Synchronous Code Pattern）"
+        },
+        {
+          "id": "11-4-2-1-2-单线程组-single-thread-group",
+          "level": 4,
+          "text": "11.4.2.1.2 单线程组（Single Thread Group）"
+        },
+        {
+          "id": "11-4-2-2-合并线程组-coalesced-groups",
+          "level": 3,
+          "text": "11.4.2.2 合并线程组（Coalesced Groups）"
+        },
+        {
+          "id": "11-4-2-2-1-发现模式-discovery-pattern",
+          "level": 4,
+          "text": "11.4.2.2.1 发现模式（Discovery Pattern）"
+        },
+        {
+          "id": "11-5-线程组划分-group-partitioning",
+          "level": 2,
+          "text": "11.5 线程组划分（Group Partitioning）"
+        },
+        {
+          "id": "11-5-1-tiled-partition",
+          "level": 3,
+          "text": "11.5.1 tiled_partition"
+        },
+        {
+          "id": "11-5-2-labeled-partition",
+          "level": 3,
+          "text": "11.5.2 labeled_partition"
+        },
+        {
+          "id": "11-5-3-binary-partition",
+          "level": 3,
+          "text": "11.5.3 binary_partition"
+        },
+        {
+          "id": "11-6-线程组集体操作-group-collectives",
+          "level": 2,
+          "text": "11.6 线程组集体操作（Group Collectives）"
+        },
+        {
+          "id": "11-6-1-同步-synchronization",
+          "level": 3,
+          "text": "11.6.1 同步（Synchronization）"
+        },
+        {
+          "id": "11-6-1-1-barrier-arrive-与-barrier-wait",
+          "level": 4,
+          "text": "11.6.1.1 barrier_arrive 与 barrier_wait"
+        },
+        {
+          "id": "11-6-1-2-sync",
+          "level": 4,
+          "text": "11.6.1.2 sync"
+        },
+        {
+          "id": "11-6-2-数据传输-data-transfer",
+          "level": 3,
+          "text": "11.6.2 数据传输（Data Transfer）"
+        },
+        {
+          "id": "11-6-2-1-memcpy-async",
+          "level": 4,
+          "text": "11.6.2.1 memcpy_async"
+        },
+        {
+          "id": "11-6-2-2-wait-与-wait-prior",
+          "level": 4,
+          "text": "11.6.2.2 wait 与 wait_prior"
+        },
+        {
+          "id": "11-6-3-数据处理-data-manipulation",
+          "level": 2,
+          "text": "11.6.3 数据处理（Data Manipulation）"
+        },
+        {
+          "id": "11-6-3-1-reduce",
+          "level": 3,
+          "text": "11.6.3.1 reduce"
+        },
+        {
+          "id": "异步归约",
+          "level": 4,
+          "text": "异步归约"
+        },
+        {
+          "id": "11-6-3-2-归约运算符-reduce-operators",
+          "level": 3,
+          "text": "11.6.3.2 归约运算符（Reduce Operators）"
+        },
+        {
+          "id": "11-6-3-3-inclusive-scan-与-exclusive-scan",
+          "level": 3,
+          "text": "11.6.3.3 inclusive_scan 与 exclusive_scan"
+        },
+        {
+          "id": "scan-更新",
+          "level": 4,
+          "text": "Scan 更新"
+        },
+        {
+          "id": "使用-exclusive-scan-的流压缩",
+          "level": 4,
+          "text": "使用 exclusive_scan 的流压缩"
+        },
+        {
+          "id": "使用-exclusive-scan-update-动态分配缓冲区空间",
+          "level": 4,
+          "text": "使用 exclusive_scan_update 动态分配缓冲区空间"
+        },
+        {
+          "id": "11-6-4-执行控制-execution-control",
+          "level": 3,
+          "text": "11.6.4 执行控制（Execution Control）"
+        },
+        {
+          "id": "11-6-4-1-invoke-one-与-invoke-one-broadcast",
+          "level": 4,
+          "text": "11.6.4.1 invoke_one 与 invoke_one_broadcast"
+        },
+        {
+          "id": "11-7-grid-同步-grid-synchronization",
+          "level": 2,
+          "text": "11.7 Grid 同步（Grid Synchronization）"
+        },
+        {
+          "id": "11-8-多设备同步-multi-device-synchronization",
+          "level": 2,
+          "text": "11.8 多设备同步（Multi-Device Synchronization）"
+        }
+      ],
+      "charCount": 33189
+    },
+    {
+      "number": 12,
+      "slug": "cuda-12",
+      "title": "CUDA 动态并行（CUDA Dynamic Parallelism）",
+      "displayTitle": "第十二章 CUDA 动态并行（CUDA Dynamic Parallelism）",
+      "html": "/cuda/book/html/12.html",
+      "toc": [
+        {
+          "id": "12-1-简介-introduction",
+          "level": 2,
+          "text": "12.1 简介（Introduction）"
+        },
+        {
+          "id": "12-1-1-概述-overview",
+          "level": 3,
+          "text": "12.1.1 概述（Overview）"
+        },
+        {
+          "id": "12-1-2-术语表-glossary",
+          "level": 3,
+          "text": "12.1.2 术语表（Glossary）"
+        },
+        {
+          "id": "12-2-执行环境与内存模型-execution-environment-and-memory-model",
+          "level": 2,
+          "text": "12.2 执行环境与内存模型（Execution Environment and Memory Model）"
+        },
+        {
+          "id": "12-2-1-执行环境-execution-environment",
+          "level": 3,
+          "text": "12.2.1 执行环境（Execution Environment）"
+        },
+        {
+          "id": "12-2-1-1-父网格与子网格-parent-and-child-grids",
+          "level": 4,
+          "text": "12.2.1.1 父网格与子网格（Parent and Child Grids）"
+        },
+        {
+          "id": "12-2-1-2-cuda-原语的作用域-scope-of-cuda-primitives",
+          "level": 4,
+          "text": "12.2.1.2 CUDA 原语的作用域（Scope of CUDA Primitives）"
+        },
+        {
+          "id": "12-2-1-3-同步-synchronization",
+          "level": 4,
+          "text": "12.2.1.3 同步（Synchronization）"
+        },
+        {
+          "id": "12-2-1-4-执行流与事件-streams-and-events",
+          "level": 4,
+          "text": "12.2.1.4 执行流与事件（Streams and Events）"
+        },
+        {
+          "id": "12-2-1-5-顺序与并发-ordering-and-concurrency",
+          "level": 4,
+          "text": "12.2.1.5 顺序与并发（Ordering and Concurrency）"
+        },
+        {
+          "id": "12-2-1-6-设备管理-device-management",
+          "level": 4,
+          "text": "12.2.1.6 设备管理（Device Management）"
+        },
+        {
+          "id": "12-2-2-内存模型-memory-model",
+          "level": 3,
+          "text": "12.2.2 内存模型（Memory Model）"
+        },
+        {
+          "id": "12-2-2-1-一致性与连贯性-coherence-and-consistency",
+          "level": 4,
+          "text": "12.2.2.1 一致性与连贯性（Coherence and Consistency）"
+        },
+        {
+          "id": "12-2-2-1-1-全局内存-global-memory",
+          "level": 5,
+          "text": "12.2.2.1.1 全局内存（Global Memory）"
+        },
+        {
+          "id": "12-2-2-1-2-零拷贝内存-zero-copy-memory",
+          "level": 5,
+          "text": "12.2.2.1.2 零拷贝内存（Zero Copy Memory）"
+        },
+        {
+          "id": "12-2-2-1-3-常量内存-constant-memory",
+          "level": 5,
+          "text": "12.2.2.1.3 常量内存（Constant Memory）"
+        },
+        {
+          "id": "12-2-2-1-4-共享内存与本地内存-shared-and-local-memory",
+          "level": 5,
+          "text": "12.2.2.1.4 共享内存与本地内存（Shared and Local Memory）"
+        },
+        {
+          "id": "12-2-2-1-5-本地内存-local-memory",
+          "level": 5,
+          "text": "12.2.2.1.5 本地内存（Local Memory）"
+        },
+        {
+          "id": "12-2-2-1-6-纹理内存-texture-memory",
+          "level": 5,
+          "text": "12.2.2.1.6 纹理内存（Texture Memory）"
+        },
+        {
+          "id": "12-3-编程接口-programming-interface",
+          "level": 2,
+          "text": "12.3 编程接口（Programming Interface）"
+        },
+        {
+          "id": "12-3-1-cuda-c-参考-cuda-c-reference",
+          "level": 3,
+          "text": "12.3.1 CUDA C++ 参考（CUDA C++ Reference）"
+        },
+        {
+          "id": "12-3-1-1-设备端内核启动-device-side-kernel-launch",
+          "level": 3,
+          "text": "12.3.1.1 设备端内核启动（Device-Side Kernel Launch）"
+        },
+        {
+          "id": "12-3-1-1-1-启动是异步的-launches-are-asynchronous",
+          "level": 4,
+          "text": "12.3.1.1.1 启动是异步的（Launches are Asynchronous）"
+        },
+        {
+          "id": "12-3-1-1-2-启动环境配置-launch-environment-configuration",
+          "level": 4,
+          "text": "12.3.1.1.2 启动环境配置（Launch Environment Configuration）"
+        },
+        {
+          "id": "12-3-1-2-执行流-streams",
+          "level": 3,
+          "text": "12.3.1.2 执行流（Streams）"
+        },
+        {
+          "id": "12-3-1-2-1-隐式-null-执行流-the-implicit-null-stream",
+          "level": 4,
+          "text": "12.3.1.2.1 隐式（NULL）执行流（The Implicit NULL Stream）"
+        },
+        {
+          "id": "12-3-1-2-2-发起后不等待执行流-fire-and-forget-stream",
+          "level": 4,
+          "text": "12.3.1.2.2 发起后不等待执行流（Fire-and-Forget Stream）"
+        },
+        {
+          "id": "12-3-1-2-3-尾部启动执行流-tail-launch-stream",
+          "level": 4,
+          "text": "12.3.1.2.3 尾部启动执行流（Tail Launch Stream）"
+        },
+        {
+          "id": "12-3-1-3-事件-events",
+          "level": 3,
+          "text": "12.3.1.3 事件（Events）"
+        },
+        {
+          "id": "12-3-1-4-同步-synchronization",
+          "level": 3,
+          "text": "12.3.1.4 同步（Synchronization）"
+        },
+        {
+          "id": "12-3-1-5-设备管理-device-management",
+          "level": 3,
+          "text": "12.3.1.5 设备管理（Device Management）"
+        },
+        {
+          "id": "12-3-1-6-内存声明-memory-declarations",
+          "level": 3,
+          "text": "12.3.1.6 内存声明（Memory Declarations）"
+        },
+        {
+          "id": "12-3-1-6-1-设备内存与常量内存-device-and-constant-memory",
+          "level": 4,
+          "text": "12.3.1.6.1 设备内存与常量内存（Device and Constant Memory）"
+        },
+        {
+          "id": "12-3-1-6-2-纹理与表面-textures-and-surfaces",
+          "level": 4,
+          "text": "12.3.1.6.2 纹理与表面（Textures and Surfaces）"
+        },
+        {
+          "id": "12-3-1-6-3-共享内存变量声明-shared-memory-variable-declarations",
+          "level": 4,
+          "text": "12.3.1.6.3 共享内存变量声明（Shared Memory Variable Declarations）"
+        },
+        {
+          "id": "12-3-1-6-4-符号地址-symbol-addresses",
+          "level": 4,
+          "text": "12.3.1.6.4 符号地址（Symbol Addresses）"
+        },
+        {
+          "id": "12-3-1-7-api-错误与启动失败-api-errors-and-launch-failures",
+          "level": 3,
+          "text": "12.3.1.7 API 错误与启动失败（API Errors and Launch Failures）"
+        },
+        {
+          "id": "12-3-1-7-1-启动设置-api-launch-setup-apis",
+          "level": 4,
+          "text": "12.3.1.7.1 启动设置 API（Launch Setup APIs）"
+        },
+        {
+          "id": "12-3-1-8-api-参考-api-reference",
+          "level": 2,
+          "text": "12.3.1.8 API 参考（API Reference）"
+        },
+        {
+          "id": "12-3-2-从-ptx-进行设备端启动-device-side-launch-from-ptx",
+          "level": 2,
+          "text": "12.3.2 从 PTX 进行设备端启动（Device-side Launch from PTX）"
+        },
+        {
+          "id": "12-3-2-1-内核启动-api-kernel-launch-apis",
+          "level": 3,
+          "text": "12.3.2.1 内核启动 API（Kernel Launch APIs）"
+        },
+        {
+          "id": "12-3-2-1-1-cudalaunchdevice",
+          "level": 4,
+          "text": "12.3.2.1.1 cudaLaunchDevice"
+        },
+        {
+          "id": "12-3-2-1-2-cudagetparameterbuffer",
+          "level": 4,
+          "text": "12.3.2.1.2 cudaGetParameterBuffer"
+        },
+        {
+          "id": "12-3-2-2-参数缓冲区布局-parameter-buffer-layout",
+          "level": 3,
+          "text": "12.3.2.2 参数缓冲区布局（Parameter Buffer Layout）"
+        },
+        {
+          "id": "12-3-3-动态并行的工具包支持-toolkit-support-for-dynamic-parallelism",
+          "level": 2,
+          "text": "12.3.3 动态并行的工具包支持（Toolkit Support for Dynamic Parallelism）"
+        },
+        {
+          "id": "12-3-3-1-在-cuda-代码中包含设备端运行时-api-including-device-runtime-api-in-cuda-code",
+          "level": 3,
+          "text": "12.3.3.1 在 CUDA 代码中包含设备端运行时 API（Including Device Runtime API in CUDA Code）"
+        },
+        {
+          "id": "12-3-3-2-编译与链接-compiling-and-linking",
+          "level": 3,
+          "text": "12.3.3.2 编译与链接（Compiling and Linking）"
+        },
+        {
+          "id": "12-4-编程指南-programming-guidelines",
+          "level": 2,
+          "text": "12.4 编程指南（Programming Guidelines）"
+        },
+        {
+          "id": "12-4-1-基础-basics",
+          "level": 3,
+          "text": "12.4.1 基础（Basics）"
+        },
+        {
+          "id": "12-4-2-性能-performance",
+          "level": 3,
+          "text": "12.4.2 性能（Performance）"
+        },
+        {
+          "id": "12-4-2-1-启用动态并行的内核开销-dynamic-parallelism-enabled-kernel-overhead",
+          "level": 4,
+          "text": "12.4.2.1 启用动态并行的内核开销（Dynamic-parallelism-enabled Kernel Overhead）"
+        },
+        {
+          "id": "12-4-3-实现限制与约束-implementation-restrictions-and-limitations",
+          "level": 3,
+          "text": "12.4.3 实现限制与约束（Implementation Restrictions and Limitations）"
+        },
+        {
+          "id": "12-4-3-1-运行时-runtime",
+          "level": 4,
+          "text": "12.4.3.1 运行时（Runtime）"
+        },
+        {
+          "id": "12-4-3-1-1-内存占用-memory-footprint",
+          "level": 5,
+          "text": "12.4.3.1.1 内存占用（Memory Footprint）"
+        },
+        {
+          "id": "12-4-3-1-2-待处理内核启动-pending-kernel-launches",
+          "level": 5,
+          "text": "12.4.3.1.2 待处理内核启动（Pending Kernel Launches）"
+        },
+        {
+          "id": "12-4-3-1-3-配置选项-configuration-options",
+          "level": 5,
+          "text": "12.4.3.1.3 配置选项（Configuration Options）"
+        },
+        {
+          "id": "12-4-3-1-4-内存分配与生命周期-memory-allocation-and-lifetime",
+          "level": 5,
+          "text": "12.4.3.1.4 内存分配与生命周期（Memory Allocation and Lifetime）"
+        },
+        {
+          "id": "12-4-3-1-5-sm-id-与-warp-id-sm-id-and-warp-id",
+          "level": 5,
+          "text": "12.4.3.1.5 SM ID 与 Warp ID（SM Id and Warp Id）"
+        },
+        {
+          "id": "12-4-3-1-6-ecc-错误-ecc-errors",
+          "level": 5,
+          "text": "12.4.3.1.6 ECC 错误（ECC Errors）"
+        },
+        {
+          "id": "12-5-cdp2-与-cdp1-cdp2-vs-cdp1",
+          "level": 2,
+          "text": "12.5 CDP2 与 CDP1（CDP2 vs CDP1）"
+        },
+        {
+          "id": "12-5-1-cdp1-与-cdp2-的差异-differences-between-cdp1-and-cdp2",
+          "level": 3,
+          "text": "12.5.1 CDP1 与 CDP2 的差异（Differences Between CDP1 and CDP2）"
+        },
+        {
+          "id": "12-5-2-兼容性与互操作性-compatibility-and-interoperability",
+          "level": 3,
+          "text": "12.5.2 兼容性与互操作性（Compatibility and Interoperability）"
+        },
+        {
+          "id": "12-6-旧版-cuda-动态并行-cdp1-legacy-cuda-dynamic-parallelism",
+          "level": 2,
+          "text": "12.6 旧版 CUDA 动态并行（CDP1）（Legacy CUDA Dynamic Parallelism）"
+        },
+        {
+          "id": "12-6-1-执行环境与内存模型-execution-environment-and-memory-model-cdp1",
+          "level": 2,
+          "text": "12.6.1 执行环境与内存模型（Execution Environment and Memory Model，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-执行环境-execution-environment-cdp1",
+          "level": 3,
+          "text": "12.6.1.1 执行环境（Execution Environment，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-1-父网格与子网格-parent-and-child-grids-cdp1",
+          "level": 4,
+          "text": "12.6.1.1.1 父网格与子网格（Parent and Child Grids，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-2-cuda-原语的作用域-scope-of-cuda-primitives-cdp1",
+          "level": 4,
+          "text": "12.6.1.1.2 CUDA 原语的作用域（Scope of CUDA Primitives，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-3-同步-synchronization-cdp1",
+          "level": 2,
+          "text": "12.6.1.1.3 同步（Synchronization，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-4-执行流与事件-streams-and-events-cdp1",
+          "level": 2,
+          "text": "12.6.1.1.4 执行流与事件（Streams and Events，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-5-顺序与并发-ordering-and-concurrency-cdp1",
+          "level": 2,
+          "text": "12.6.1.1.5 顺序与并发（Ordering and Concurrency，CDP1）"
+        },
+        {
+          "id": "12-6-1-1-6-设备管理-device-management-cdp1",
+          "level": 2,
+          "text": "12.6.1.1.6 设备管理（Device Management，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-内存模型-memory-model-cdp1",
+          "level": 2,
+          "text": "12.6.1.2 内存模型（Memory Model，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-一致性与连贯性-coherence-and-consistency-cdp1",
+          "level": 3,
+          "text": "12.6.1.2.1 一致性与连贯性（Coherence and Consistency，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-1-全局内存-global-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.1 全局内存（Global Memory，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-2-零拷贝内存-zero-copy-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.2 零拷贝内存（Zero Copy Memory，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-3-常量内存-constant-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.3 常量内存（Constant Memory，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-4-共享内存与本地内存-shared-and-local-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.4 共享内存与本地内存（Shared and Local Memory，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-5-本地内存-local-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.5 本地内存（Local Memory，CDP1）"
+        },
+        {
+          "id": "12-6-1-2-1-6-纹理内存-texture-memory-cdp1",
+          "level": 4,
+          "text": "12.6.1.2.1.6 纹理内存（Texture Memory，CDP1）"
+        },
+        {
+          "id": "12-6-2-编程接口-programming-interface-cdp1",
+          "level": 2,
+          "text": "12.6.2 编程接口（Programming Interface，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-cuda-c-参考-cuda-c-reference-cdp1",
+          "level": 3,
+          "text": "12.6.2.1 CUDA C++ 参考（CUDA C++ Reference，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-1-设备端内核启动-device-side-kernel-launch-cdp1",
+          "level": 4,
+          "text": "12.6.2.1.1 设备端内核启动（Device-Side Kernel Launch，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-2-执行流-streams-cdp1",
+          "level": 4,
+          "text": "12.6.2.1.2 执行流（Streams，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-2-1-隐式-null-执行流-the-implicit-null-stream-cdp1",
+          "level": 5,
+          "text": "12.6.2.1.2.1 隐式（NULL）执行流（The Implicit NULL Stream，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-3-事件-events-cdp1",
+          "level": 4,
+          "text": "12.6.2.1.3 事件（Events，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-4-同步-synchronization-cdp1",
+          "level": 4,
+          "text": "12.6.2.1.4 同步（Synchronization，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-4-1-线程块范围同步-block-wide-synchronization-cdp1",
+          "level": 5,
+          "text": "12.6.2.1.4.1 线程块范围同步（Block Wide Synchronization，CDP1）"
+        },
+        {
+          "id": "12-6-2-1-5-12-6-2-1-8-其他接口",
+          "level": 4,
+          "text": "12.6.2.1.5–12.6.2.1.8 其他接口"
+        },
+        {
+          "id": "12-6-2-2-从-ptx-进行设备端启动-device-side-launch-from-ptx-cdp1",
+          "level": 4,
+          "text": "12.6.2.2 从 PTX 进行设备端启动（Device-side Launch from PTX，CDP1）"
+        },
+        {
+          "id": "12-6-2-3-动态并行的工具包支持-toolkit-support-for-dynamic-parallelism-cdp1",
+          "level": 4,
+          "text": "12.6.2.3 动态并行的工具包支持（Toolkit Support for Dynamic Parallelism，CDP1）"
+        },
+        {
+          "id": "12-6-2-3-1-在-cuda-代码中包含设备端运行时-api-including-device-runtime-api-in-cuda-code-cdp1",
+          "level": 5,
+          "text": "12.6.2.3.1 在 CUDA 代码中包含设备端运行时 API（Including Device Runtime API in CUDA Code，CDP1）"
+        },
+        {
+          "id": "12-6-2-3-2-编译与链接-compiling-and-linking-cdp1",
+          "level": 5,
+          "text": "12.6.2.3.2 编译与链接（Compiling and Linking，CDP1）"
+        },
+        {
+          "id": "12-6-3-编程指南-programming-guidelines-cdp1",
+          "level": 2,
+          "text": "12.6.3 编程指南（Programming Guidelines，CDP1）"
+        },
+        {
+          "id": "12-6-3-1-基础-basics-cdp1",
+          "level": 3,
+          "text": "12.6.3.1 基础（Basics，CDP1）"
+        },
+        {
+          "id": "12-6-3-2-性能-performance-cdp1",
+          "level": 3,
+          "text": "12.6.3.2 性能（Performance，CDP1）"
+        },
+        {
+          "id": "12-6-3-2-1-同步-synchronization-cdp1",
+          "level": 4,
+          "text": "12.6.3.2.1 同步（Synchronization，CDP1）"
+        },
+        {
+          "id": "12-6-3-2-2-启用动态并行的内核开销-dynamic-parallelism-enabled-kernel-overhead-cdp1",
+          "level": 4,
+          "text": "12.6.3.2.2 启用动态并行的内核开销（Dynamic-parallelism-enabled Kernel Overhead，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-实现限制与约束-implementation-restrictions-and-limitations-cdp1",
+          "level": 3,
+          "text": "12.6.3.3 实现限制与约束（Implementation Restrictions and Limitations，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-运行时-runtime-cdp1",
+          "level": 4,
+          "text": "12.6.3.3.1 运行时（Runtime，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-1-内存占用-memory-footprint-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.1 内存占用（Memory Footprint，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-2-嵌套深度与同步深度-nesting-and-synchronization-depth-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.2 嵌套深度与同步深度（Nesting and Synchronization Depth，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-3-待处理内核启动-pending-kernel-launches-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.3 待处理内核启动（Pending Kernel Launches，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-4-配置选项-configuration-options-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.4 配置选项（Configuration Options，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-5-内存分配与生命周期-memory-allocation-and-lifetime-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.5 内存分配与生命周期（Memory Allocation and Lifetime，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-6-sm-id-与-warp-id-sm-id-and-warp-id-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.6 SM ID 与 Warp ID（SM Id and Warp Id，CDP1）"
+        },
+        {
+          "id": "12-6-3-3-1-7-ecc-错误-ecc-errors-cdp1",
+          "level": 5,
+          "text": "12.6.3.3.1.7 ECC 错误（ECC Errors，CDP1）"
+        }
+      ],
+      "charCount": 32432
+    },
+    {
+      "number": 13,
+      "slug": "cuda-13",
+      "title": "虚拟内存管理（Virtual Memory Management）",
+      "displayTitle": "第十三章 虚拟内存管理（Virtual Memory Management）",
+      "html": "/cuda/book/html/13.html",
+      "toc": [
+        {
+          "id": "13-1-简介-introduction",
+          "level": 2,
+          "text": "13.1 简介（Introduction）"
+        },
+        {
+          "id": "13-2-查询支持情况-query-for-support",
+          "level": 2,
+          "text": "13.2 查询支持情况（Query for Support）"
+        },
+        {
+          "id": "13-3-分配物理内存-allocating-physical-memory",
+          "level": 2,
+          "text": "13.3 分配物理内存（Allocating Physical Memory）"
+        },
+        {
+          "id": "13-3-1-可共享的内存分配-shareable-memory-allocations",
+          "level": 3,
+          "text": "13.3.1 可共享的内存分配（Shareable Memory Allocations）"
+        },
+        {
+          "id": "13-3-2-内存类型-memory-type",
+          "level": 3,
+          "text": "13.3.2 内存类型（Memory Type）"
+        },
+        {
+          "id": "13-3-2-1-可压缩内存-compressible-memory",
+          "level": 4,
+          "text": "13.3.2.1 可压缩内存（Compressible Memory）"
+        },
+        {
+          "id": "13-4-保留虚拟地址范围-reserving-a-virtual-address-range",
+          "level": 2,
+          "text": "13.4 保留虚拟地址范围（Reserving a Virtual Address Range）"
+        },
+        {
+          "id": "13-5-虚拟别名支持-virtual-aliasing-support",
+          "level": 2,
+          "text": "13.5 虚拟别名支持（Virtual Aliasing Support）"
+        },
+        {
+          "id": "13-6-映射内存-mapping-memory",
+          "level": 2,
+          "text": "13.6 映射内存（Mapping Memory）"
+        },
+        {
+          "id": "13-7-控制访问权限-controlling-access-rights",
+          "level": 2,
+          "text": "13.7 控制访问权限（Controlling Access Rights）"
+        },
+        {
+          "id": "13-8-fabric-memory-fabric-内存",
+          "level": 2,
+          "text": "13.8 Fabric Memory（Fabric 内存）"
+        },
+        {
+          "id": "13-8-1-查询支持情况-query-for-support",
+          "level": 3,
+          "text": "13.8.1 查询支持情况（Query for Support）"
+        },
+        {
+          "id": "13-9-多播支持-multicast-support",
+          "level": 2,
+          "text": "13.9 多播支持（Multicast Support）"
+        },
+        {
+          "id": "13-9-1-查询支持情况-query-for-support",
+          "level": 3,
+          "text": "13.9.1 查询支持情况（Query for Support）"
+        },
+        {
+          "id": "13-9-2-分配多播对象-allocating-multicast-objects",
+          "level": 3,
+          "text": "13.9.2 分配多播对象（Allocating Multicast Objects）"
+        },
+        {
+          "id": "13-9-3-向多播对象添加设备-add-devices-to-multicast-objects",
+          "level": 3,
+          "text": "13.9.3 向多播对象添加设备（Add Devices to Multicast Objects）"
+        },
+        {
+          "id": "13-9-4-将内存绑定到多播对象-bind-memory-to-multicast-objects",
+          "level": 3,
+          "text": "13.9.4 将内存绑定到多播对象（Bind Memory to Multicast Objects）"
+        },
+        {
+          "id": "13-9-5-使用多播映射-use-multicast-mappings",
+          "level": 3,
+          "text": "13.9.5 使用多播映射（Use Multicast Mappings）"
+        }
+      ],
+      "charCount": 13195
+    },
+    {
+      "number": 14,
+      "slug": "cuda-14",
+      "title": "流有序内存分配器（Stream Ordered Memory Allocator）",
+      "displayTitle": "第十四章 流有序内存分配器（Stream Ordered Memory Allocator）",
+      "html": "/cuda/book/html/14.html",
+      "toc": [
+        {
+          "id": "14-1-简介-introduction",
+          "level": 2,
+          "text": "14.1 简介（Introduction）"
+        },
+        {
+          "id": "14-2-查询支持情况-query-for-support",
+          "level": 2,
+          "text": "14.2 查询支持情况（Query for Support）"
+        },
+        {
+          "id": "14-3-api-基础-cudamallocasync-与-cudafreeasync-api-fundamentals",
+          "level": 2,
+          "text": "14.3 API 基础： cudaMallocAsync 与 cudaFreeAsync （API Fundamentals）"
+        },
+        {
+          "id": "14-4-内存池与-cudamempool-t-memory-pools",
+          "level": 2,
+          "text": "14.4 内存池与 cudaMemPool_t （Memory Pools）"
+        },
+        {
+          "id": "14-5-默认-隐式内存池-default-implicit-pools",
+          "level": 2,
+          "text": "14.5 默认/隐式内存池（Default/Implicit Pools）"
+        },
+        {
+          "id": "14-6-显式内存池-explicit-pools",
+          "level": 2,
+          "text": "14.6 显式内存池（Explicit Pools）"
+        },
+        {
+          "id": "14-7-物理页缓存行为-physical-page-caching-behavior",
+          "level": 2,
+          "text": "14.7 物理页缓存行为（Physical Page Caching Behavior）"
+        },
+        {
+          "id": "14-8-资源使用统计-resource-usage-statistics",
+          "level": 2,
+          "text": "14.8 资源使用统计（Resource Usage Statistics）"
+        },
+        {
+          "id": "14-9-内存复用策略-memory-reuse-policies",
+          "level": 2,
+          "text": "14.9 内存复用策略（Memory Reuse Policies）"
+        },
+        {
+          "id": "14-9-1-cudamempoolreusefolloweventdependencies",
+          "level": 3,
+          "text": "14.9.1 cudaMemPoolReuseFollowEventDependencies"
+        },
+        {
+          "id": "14-9-2-cudamempoolreuseallowopportunistic",
+          "level": 3,
+          "text": "14.9.2 cudaMemPoolReuseAllowOpportunistic"
+        },
+        {
+          "id": "14-9-3-cudamempoolreuseallowinternaldependencies",
+          "level": 3,
+          "text": "14.9.3 cudaMemPoolReuseAllowInternalDependencies"
+        },
+        {
+          "id": "14-9-4-禁用复用策略-disabling-reuse-policies",
+          "level": 3,
+          "text": "14.9.4 禁用复用策略（Disabling Reuse Policies）"
+        },
+        {
+          "id": "14-10-多-gpu-的设备可访问性-device-accessibility-for-multi-gpu",
+          "level": 2,
+          "text": "14.10 多 GPU 的设备可访问性（Device Accessibility for Multi-GPU）"
+        },
+        {
+          "id": "14-11-ipc-内存池-ipc-memory-pools",
+          "level": 2,
+          "text": "14.11 IPC 内存池（IPC Memory Pools）"
+        },
+        {
+          "id": "14-11-1-创建并共享-ipc-内存池-creating-and-sharing-ipc-memory-pools",
+          "level": 3,
+          "text": "14.11.1 创建并共享 IPC 内存池（Creating and Sharing IPC Memory Pools）"
+        },
+        {
+          "id": "14-11-2-在导入进程中设置访问权限-set-access-in-the-importing-process",
+          "level": 3,
+          "text": "14.11.2 在导入进程中设置访问权限（Set Access in the Importing Process）"
+        },
+        {
+          "id": "14-11-3-创建并共享导出池中的分配-creating-and-sharing-allocations-from-an-exported-pool",
+          "level": 3,
+          "text": "14.11.3 创建并共享导出池中的分配（Creating and Sharing Allocations from an Exported Pool）"
+        },
+        {
+          "id": "14-11-4-ipc-导出池的限制-ipc-export-pool-limitations",
+          "level": 3,
+          "text": "14.11.4 IPC 导出池的限制（IPC Export Pool Limitations）"
+        },
+        {
+          "id": "14-11-5-ipc-导入池的限制-ipc-import-pool-limitations",
+          "level": 3,
+          "text": "14.11.5 IPC 导入池的限制（IPC Import Pool Limitations）"
+        },
+        {
+          "id": "14-12-同步-api-操作-synchronization-api-actions",
+          "level": 2,
+          "text": "14.12 同步 API 操作（Synchronization API Actions）"
+        },
+        {
+          "id": "14-13-补充说明-addendums",
+          "level": 2,
+          "text": "14.13 补充说明（Addendums）"
+        },
+        {
+          "id": "14-13-1-cudamemcpyasync-对当前上下文-设备的敏感性-current-context-device-sensitivity",
+          "level": 3,
+          "text": "14.13.1 cudaMemcpyAsync 对当前上下文/设备的敏感性（Current Context/Device Sensitivity）"
+        },
+        {
+          "id": "14-13-2-cupointergetattribute-查询-query",
+          "level": 3,
+          "text": "14.13.2 cuPointerGetAttribute 查询（Query）"
+        },
+        {
+          "id": "14-13-3-cugraphaddmemsetnode",
+          "level": 3,
+          "text": "14.13.3 cuGraphAddMemsetNode"
+        },
+        {
+          "id": "14-13-4-指针属性-pointer-attributes",
+          "level": 3,
+          "text": "14.13.4 指针属性（Pointer Attributes）"
+        },
+        {
+          "id": "校对提示-非原书正文",
+          "level": 2,
+          "text": "校对提示（非原书正文）"
+        }
+      ],
+      "charCount": 16635
+    },
+    {
+      "number": 15,
+      "slug": "cuda-15",
+      "title": "图内存节点（Graph Memory Nodes）",
+      "displayTitle": "第十五章 图内存节点（Graph Memory Nodes）",
+      "html": "/cuda/book/html/15.html",
+      "toc": [
+        {
+          "id": "15-1-简介-introduction",
+          "level": 2,
+          "text": "15.1 简介（Introduction）"
+        },
+        {
+          "id": "15-2-支持与兼容性-support-and-compatibility",
+          "level": 2,
+          "text": "15.2 支持与兼容性（Support and Compatibility）"
+        },
+        {
+          "id": "15-3-api-基础-api-fundamentals",
+          "level": 2,
+          "text": "15.3 API 基础（API Fundamentals）"
+        },
+        {
+          "id": "15-3-1-图节点-api-graph-node-apis",
+          "level": 3,
+          "text": "15.3.1 图节点 API（Graph Node APIs）"
+        },
+        {
+          "id": "15-3-2-流捕获-stream-capture",
+          "level": 3,
+          "text": "15.3.2 流捕获（Stream Capture）"
+        },
+        {
+          "id": "15-3-3-在分配图之外访问和释放图内存-accessing-and-freeing-graph-memory-outside-of-the-allocating-gr",
+          "level": 3,
+          "text": "15.3.3 在分配图之外访问和释放图内存（Accessing and Freeing Graph Memory Outside of the Allocating Graph）"
+        },
+        {
+          "id": "15-3-4-cudagraphinstantiateflagautofreeonlaunch",
+          "level": 3,
+          "text": "15.3.4 cudaGraphInstantiateFlagAutoFreeOnLaunch"
+        },
+        {
+          "id": "15-4-优化的内存复用-optimized-memory-reuse",
+          "level": 2,
+          "text": "15.4 优化的内存复用（Optimized Memory Reuse）"
+        },
+        {
+          "id": "15-4-1-图内的地址复用-address-reuse-within-a-graph",
+          "level": 3,
+          "text": "15.4.1 图内的地址复用（Address Reuse within a Graph）"
+        },
+        {
+          "id": "15-4-2-物理内存管理与共享-physical-memory-management-and-sharing",
+          "level": 3,
+          "text": "15.4.2 物理内存管理与共享（Physical Memory Management and Sharing）"
+        },
+        {
+          "id": "15-5-性能注意事项-performance-considerations",
+          "level": 2,
+          "text": "15.5 性能注意事项（Performance Considerations）"
+        },
+        {
+          "id": "15-5-1-首次启动与-cudagraphupload-first-launch-cudagraphupload",
+          "level": 3,
+          "text": "15.5.1 首次启动与 cudaGraphUpload （First Launch / cudaGraphUpload）"
+        },
+        {
+          "id": "15-6-物理内存占用-physical-memory-footprint",
+          "level": 2,
+          "text": "15.6 物理内存占用（Physical Memory Footprint）"
+        },
+        {
+          "id": "15-7-对等访问-peer-access",
+          "level": 2,
+          "text": "15.7 对等访问（Peer Access）"
+        },
+        {
+          "id": "15-7-1-使用图节点-api-设置对等访问-peer-access-with-graph-node-apis",
+          "level": 3,
+          "text": "15.7.1 使用图节点 API 设置对等访问（Peer Access with Graph Node APIs）"
+        },
+        {
+          "id": "15-7-2-使用流捕获设置对等访问-peer-access-with-stream-capture",
+          "level": 3,
+          "text": "15.7.2 使用流捕获设置对等访问（Peer Access with Stream Capture）"
+        },
+        {
+          "id": "校对提示-非原书正文",
+          "level": 2,
+          "text": "校对提示（非原书正文）"
+        }
+      ],
+      "charCount": 14824
+    },
+    {
+      "number": 16,
+      "slug": "cuda-16",
+      "title": "数学函数（Mathematical Functions）",
+      "displayTitle": "第十六章 数学函数（Mathematical Functions）",
+      "html": "/cuda/book/html/16.html",
+      "toc": [
+        {
+          "id": "16-1-标准函数-standard-functions",
+          "level": 2,
+          "text": "16.1 标准函数（Standard Functions）"
+        },
+        {
+          "id": "单精度浮点函数-single-precision-floating-point-functions",
+          "level": 3,
+          "text": "单精度浮点函数（Single-Precision Floating-Point Functions）"
+        },
+        {
+          "id": "双精度浮点函数-double-precision-floating-point-functions",
+          "level": 3,
+          "text": "双精度浮点函数（Double-Precision Floating-Point Functions）"
+        },
+        {
+          "id": "四精度浮点函数-quad-precision-floating-point-functions",
+          "level": 3,
+          "text": "四精度浮点函数（Quad-Precision Floating-Point Functions）"
+        },
+        {
+          "id": "16-2-内建函数-intrinsic-functions",
+          "level": 2,
+          "text": "16.2 内建函数（Intrinsic Functions）"
+        },
+        {
+          "id": "单精度浮点函数-single-precision-floating-point-functions-2",
+          "level": 3,
+          "text": "单精度浮点函数（Single-Precision Floating-Point Functions）"
+        },
+        {
+          "id": "双精度浮点函数-double-precision-floating-point-functions-2",
+          "level": 3,
+          "text": "双精度浮点函数（Double-Precision Floating-Point Functions）"
+        },
+        {
+          "id": "本章术语与阅读提示",
+          "level": 2,
+          "text": "本章术语与阅读提示"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 12457
+    },
+    {
+      "number": 17,
+      "slug": "cuda-17",
+      "title": "C++ 语言支持（C++ Language Support）",
+      "displayTitle": "第十七章 C++ 语言支持（C++ Language Support）",
+      "html": "/cuda/book/html/17.html",
+      "toc": [
+        {
+          "id": "17-1-c-11-语言特性-c-11-language-features",
+          "level": 2,
+          "text": "17.1 C++11 语言特性（C++11 Language Features）"
+        },
+        {
+          "id": "17-2-c-14-语言特性-c-14-language-features",
+          "level": 2,
+          "text": "17.2 C++14 语言特性（C++14 Language Features）"
+        },
+        {
+          "id": "17-3-c-17-语言特性-c-17-language-features",
+          "level": 2,
+          "text": "17.3 C++17 语言特性（C++17 Language Features）"
+        },
+        {
+          "id": "17-4-c-20-语言特性-c-20-language-features",
+          "level": 2,
+          "text": "17.4 C++20 语言特性（C++20 Language Features）"
+        },
+        {
+          "id": "17-5-限制-restrictions",
+          "level": 2,
+          "text": "17.5 限制（Restrictions）"
+        },
+        {
+          "id": "17-5-1-主机编译器扩展-host-compiler-extensions",
+          "level": 3,
+          "text": "17.5.1 主机编译器扩展（Host Compiler Extensions）"
+        },
+        {
+          "id": "17-5-2-预处理器符号-preprocessor-symbols",
+          "level": 3,
+          "text": "17.5.2 预处理器符号（Preprocessor Symbols）"
+        },
+        {
+          "id": "17-5-2-1-cuda-arch",
+          "level": 4,
+          "text": "17.5.2.1 __CUDA_ARCH__"
+        },
+        {
+          "id": "17-5-3-限定符-qualifiers",
+          "level": 3,
+          "text": "17.5.3 限定符（Qualifiers）"
+        },
+        {
+          "id": "17-5-3-1-设备内存空间说明符-device-memory-space-specifiers",
+          "level": 4,
+          "text": "17.5.3.1 设备内存空间说明符（Device Memory Space Specifiers）"
+        },
+        {
+          "id": "17-5-3-2-managed-内存空间说明符-managed-memory-space-specifier",
+          "level": 3,
+          "text": "17.5.3.2 __managed__ 内存空间说明符（ __managed__ Memory Space Specifier）"
+        },
+        {
+          "id": "17-5-3-3-volatile-限定符-volatile-qualifier",
+          "level": 3,
+          "text": "17.5.3.3 volatile 限定符（Volatile Qualifier）"
+        },
+        {
+          "id": "17-5-4-指针-pointers",
+          "level": 3,
+          "text": "17.5.4 指针（Pointers）"
+        },
+        {
+          "id": "17-5-5-运算符-operators",
+          "level": 3,
+          "text": "17.5.5 运算符（Operators）"
+        },
+        {
+          "id": "17-5-5-1-赋值运算符-assignment-operator",
+          "level": 4,
+          "text": "17.5.5.1 赋值运算符（Assignment Operator）"
+        },
+        {
+          "id": "17-5-5-2-取地址运算符-address-operator",
+          "level": 4,
+          "text": "17.5.5.2 取地址运算符（Address Operator）"
+        },
+        {
+          "id": "17-5-6-运行时类型信息-run-time-type-information-rtti",
+          "level": 3,
+          "text": "17.5.6 运行时类型信息（Run Time Type Information，RTTI）"
+        },
+        {
+          "id": "17-5-7-异常处理-exception-handling",
+          "level": 3,
+          "text": "17.5.7 异常处理（Exception Handling）"
+        },
+        {
+          "id": "17-5-8-标准库-standard-library",
+          "level": 3,
+          "text": "17.5.8 标准库（Standard Library）"
+        },
+        {
+          "id": "17-5-9-命名空间保留-namespace-reservations",
+          "level": 3,
+          "text": "17.5.9 命名空间保留（Namespace Reservations）"
+        },
+        {
+          "id": "17-5-10-函数-functions",
+          "level": 3,
+          "text": "17.5.10 函数（Functions）"
+        },
+        {
+          "id": "17-5-10-1-外部链接-external-linkage",
+          "level": 4,
+          "text": "17.5.10.1 外部链接（External Linkage）"
+        },
+        {
+          "id": "17-5-10-2-隐式声明和显式默认化的函数-implicitly-declared-and-explicitly-defaulted-functions",
+          "level": 4,
+          "text": "17.5.10.2 隐式声明和显式默认化的函数（Implicitly-declared and Explicitly-defaulted Functions）"
+        },
+        {
+          "id": "17-5-10-3-函数参数-function-parameters",
+          "level": 4,
+          "text": "17.5.10.3 函数参数（Function Parameters）"
+        },
+        {
+          "id": "17-5-10-3-1-global-函数参数处理-global-function-argument-processing",
+          "level": 5,
+          "text": "17.5.10.3.1 __global__ 函数参数处理（ __global__ Function Argument Processing）"
+        },
+        {
+          "id": "17-5-10-3-2-工具包与驱动兼容性-toolkit-and-driver-compatibility",
+          "level": 5,
+          "text": "17.5.10.3.2 工具包与驱动兼容性（Toolkit and Driver Compatibility）"
+        },
+        {
+          "id": "17-5-10-3-3-不同工具包修订版本之间的链接兼容性-link-compatibility-across-toolkit-revisions",
+          "level": 5,
+          "text": "17.5.10.3.3 不同工具包修订版本之间的链接兼容性（Link Compatibility across Toolkit Revisions）"
+        },
+        {
+          "id": "17-5-10-4-函数内部的静态变量-static-variables-within-function",
+          "level": 4,
+          "text": "17.5.10.4 函数内部的静态变量（Static Variables within Function）"
+        },
+        {
+          "id": "17-5-10-5-函数指针-function-pointers",
+          "level": 4,
+          "text": "17.5.10.5 函数指针（Function Pointers）"
+        },
+        {
+          "id": "17-5-10-6-函数递归-function-recursion",
+          "level": 4,
+          "text": "17.5.10.6 函数递归（Function Recursion）"
+        },
+        {
+          "id": "17-5-10-7-友元函数-friend-functions",
+          "level": 4,
+          "text": "17.5.10.7 友元函数（Friend Functions）"
+        },
+        {
+          "id": "17-5-10-8-运算符函数-operator-function",
+          "level": 4,
+          "text": "17.5.10.8 运算符函数（Operator Function）"
+        },
+        {
+          "id": "17-5-10-9-分配与释放函数-allocation-and-deallocation-functions",
+          "level": 4,
+          "text": "17.5.10.9 分配与释放函数（Allocation and Deallocation Functions）"
+        },
+        {
+          "id": "17-5-11-类-classes",
+          "level": 3,
+          "text": "17.5.11 类（Classes）"
+        },
+        {
+          "id": "17-5-11-1-数据成员-data-members",
+          "level": 4,
+          "text": "17.5.11.1 数据成员（Data Members）"
+        },
+        {
+          "id": "17-5-11-2-成员函数-function-members",
+          "level": 4,
+          "text": "17.5.11.2 成员函数（Function Members）"
+        },
+        {
+          "id": "17-5-11-3-虚函数-virtual-functions",
+          "level": 4,
+          "text": "17.5.11.3 虚函数（Virtual Functions）"
+        },
+        {
+          "id": "17-5-11-4-虚基类-virtual-base-classes",
+          "level": 4,
+          "text": "17.5.11.4 虚基类（Virtual Base Classes）"
+        },
+        {
+          "id": "17-5-11-5-匿名联合体-anonymous-unions",
+          "level": 4,
+          "text": "17.5.11.5 匿名联合体（Anonymous Unions）"
+        },
+        {
+          "id": "17-5-11-6-windows-专用限制-windows-specific",
+          "level": 4,
+          "text": "17.5.11.6 Windows 专用限制（Windows-Specific）"
+        },
+        {
+          "id": "17-5-12-模板-templates",
+          "level": 3,
+          "text": "17.5.12 模板（Templates）"
+        },
+        {
+          "id": "17-5-13-三字符组与双字符组-trigraphs-and-digraphs",
+          "level": 3,
+          "text": "17.5.13 三字符组与双字符组（Trigraphs and Digraphs）"
+        },
+        {
+          "id": "17-5-14-带-const-限定的变量-const-qualified-variables",
+          "level": 3,
+          "text": "17.5.14 带 const 限定的变量（Const-qualified Variables）"
+        },
+        {
+          "id": "17-5-15-long-double",
+          "level": 3,
+          "text": "17.5.15 long double"
+        },
+        {
+          "id": "17-5-16-弃用注解-deprecation-annotation",
+          "level": 3,
+          "text": "17.5.16 弃用注解（Deprecation Annotation）"
+        },
+        {
+          "id": "17-5-17-noreturn-注解-noreturn-annotation",
+          "level": 3,
+          "text": "17.5.17 noreturn 注解（Noreturn Annotation）"
+        },
+        {
+          "id": "17-5-18-likely-unlikely-标准属性",
+          "level": 3,
+          "text": "17.5.18 [[likely]] / [[unlikely]] 标准属性"
+        },
+        {
+          "id": "17-5-19-gnu-const-与-pure-属性-const-and-pure-gnu-attributes",
+          "level": 3,
+          "text": "17.5.19 GNU const 与 pure 属性（const and pure GNU Attributes）"
+        },
+        {
+          "id": "17-5-20-nv-pure-属性-nv-pure-attribute",
+          "level": 3,
+          "text": "17.5.20 __nv_pure__ 属性（ __nv_pure__ Attribute）"
+        },
+        {
+          "id": "17-5-21-intel-主机编译器专用说明-intel-host-compiler-specific",
+          "level": 3,
+          "text": "17.5.21 Intel 主机编译器专用说明（Intel Host Compiler Specific）"
+        },
+        {
+          "id": "17-5-22-c-11-特性-c-11-features",
+          "level": 3,
+          "text": "17.5.22 C++11 特性（C++11 Features）"
+        },
+        {
+          "id": "17-5-22-1-lambda-表达式-lambda-expressions",
+          "level": 4,
+          "text": "17.5.22.1 Lambda 表达式（Lambda Expressions）"
+        },
+        {
+          "id": "17-5-22-2-std-initializer-list",
+          "level": 4,
+          "text": "17.5.22.2 std::initializer_list"
+        },
+        {
+          "id": "17-5-22-3-右值引用-rvalue-references",
+          "level": 4,
+          "text": "17.5.22.3 右值引用（Rvalue References）"
+        },
+        {
+          "id": "17-5-22-4-constexpr-函数与函数模板-constexpr-functions-and-function-templates",
+          "level": 4,
+          "text": "17.5.22.4 constexpr 函数与函数模板（Constexpr Functions and Function Templates）"
+        },
+        {
+          "id": "17-5-22-5-constexpr-变量-constexpr-variables",
+          "level": 4,
+          "text": "17.5.22.5 constexpr 变量（Constexpr Variables）"
+        },
+        {
+          "id": "17-5-22-6-内联命名空间-inline-namespaces",
+          "level": 4,
+          "text": "17.5.22.6 内联命名空间（Inline Namespaces）"
+        },
+        {
+          "id": "17-5-22-6-1-内联未命名命名空间-inline-unnamed-namespaces",
+          "level": 5,
+          "text": "17.5.22.6.1 内联未命名命名空间（Inline Unnamed Namespaces）"
+        },
+        {
+          "id": "17-5-22-7-thread-local",
+          "level": 4,
+          "text": "17.5.22.7 thread_local"
+        },
+        {
+          "id": "17-5-22-8-global-函数与函数模板-global-functions-and-function-templates",
+          "level": 4,
+          "text": "17.5.22.8 __global__ 函数与函数模板（ __global__ Functions and Function Templates）"
+        },
+        {
+          "id": "17-5-22-9-managed-与-shared-变量",
+          "level": 4,
+          "text": "17.5.22.9 __managed__ 与 __shared__ 变量"
+        },
+        {
+          "id": "17-5-22-10-默认化函数-defaulted-functions",
+          "level": 4,
+          "text": "17.5.22.10 默认化函数（Defaulted Functions）"
+        },
+        {
+          "id": "17-5-23-c-14-特性-c-14-features",
+          "level": 3,
+          "text": "17.5.23 C++14 特性（C++14 Features）"
+        },
+        {
+          "id": "17-5-23-1-返回类型推导函数-functions-with-deduced-return-type",
+          "level": 4,
+          "text": "17.5.23.1 返回类型推导函数（Functions with Deduced Return Type）"
+        },
+        {
+          "id": "17-5-23-2-变量模板-variable-templates",
+          "level": 4,
+          "text": "17.5.23.2 变量模板（Variable Templates）"
+        },
+        {
+          "id": "17-5-24-c-17-特性-c-17-features",
+          "level": 3,
+          "text": "17.5.24 C++17 特性（C++17 Features）"
+        },
+        {
+          "id": "17-5-24-1-内联变量-inline-variable",
+          "level": 4,
+          "text": "17.5.24.1 内联变量（Inline Variable）"
+        },
+        {
+          "id": "17-5-24-2-结构化绑定-structured-binding",
+          "level": 4,
+          "text": "17.5.24.2 结构化绑定（Structured Binding）"
+        },
+        {
+          "id": "17-5-25-c-20-特性-c-20-features",
+          "level": 3,
+          "text": "17.5.25 C++20 特性（C++20 Features）"
+        },
+        {
+          "id": "17-5-25-1-模块支持-module-support",
+          "level": 4,
+          "text": "17.5.25.1 模块支持（Module Support）"
+        },
+        {
+          "id": "17-5-25-2-协程支持-coroutine-support",
+          "level": 4,
+          "text": "17.5.25.2 协程支持（Coroutine Support）"
+        },
+        {
+          "id": "17-5-25-3-三路比较运算符-three-way-comparison-operator",
+          "level": 4,
+          "text": "17.5.25.3 三路比较运算符（Three-way Comparison Operator）"
+        },
+        {
+          "id": "17-5-25-4-consteval-函数-consteval-functions",
+          "level": 4,
+          "text": "17.5.25.4 consteval 函数（Consteval Functions）"
+        },
+        {
+          "id": "17-6-多态函数包装器-polymorphic-function-wrappers",
+          "level": 2,
+          "text": "17.6 多态函数包装器（Polymorphic Function Wrappers）"
+        },
+        {
+          "id": "17-7-扩展-lambda-extended-lambdas",
+          "level": 2,
+          "text": "17.7 扩展 Lambda（Extended Lambdas）"
+        },
+        {
+          "id": "17-7-1-扩展-lambda-类型特征-extended-lambda-type-traits",
+          "level": 3,
+          "text": "17.7.1 扩展 Lambda 类型特征（Extended Lambda Type Traits）"
+        },
+        {
+          "id": "17-7-2-扩展-lambda-的限制-extended-lambda-restrictions",
+          "level": 3,
+          "text": "17.7.2 扩展 Lambda 的限制（Extended Lambda Restrictions）"
+        },
+        {
+          "id": "17-7-3-关于-host-device-lambda-的说明-notes-on-host-device-lambdas",
+          "level": 4,
+          "text": "17.7.3 关于 __host__ __device__ Lambda 的说明（Notes on __host__ __device__ Lambdas）"
+        },
+        {
+          "id": "17-7-4-按值捕获-this-this-capture-by-value",
+          "level": 4,
+          "text": "17.7.4 按值捕获 *this （ *this Capture By Value）"
+        },
+        {
+          "id": "17-7-5-补充说明-additional-notes",
+          "level": 4,
+          "text": "17.7.5 补充说明（Additional Notes）"
+        },
+        {
+          "id": "17-8-放宽-constexpr-限制-relaxed-constexpr-expt-relaxed-constexpr",
+          "level": 2,
+          "text": "17.8 放宽 constexpr 限制（Relaxed Constexpr， -expt-relaxed-constexpr ）"
+        },
+        {
+          "id": "17-9-代码示例-code-samples",
+          "level": 2,
+          "text": "17.9 代码示例（Code Samples）"
+        },
+        {
+          "id": "17-9-1-数据聚合类-data-aggregation-class",
+          "level": 3,
+          "text": "17.9.1 数据聚合类（Data Aggregation Class）"
+        },
+        {
+          "id": "17-9-2-派生类-derived-class",
+          "level": 3,
+          "text": "17.9.2 派生类（Derived Class）"
+        },
+        {
+          "id": "17-9-3-类模板-class-template",
+          "level": 3,
+          "text": "17.9.3 类模板（Class Template）"
+        },
+        {
+          "id": "17-9-4-函数模板-function-template",
+          "level": 3,
+          "text": "17.9.4 函数模板（Function Template）"
+        },
+        {
+          "id": "17-9-5-仿函数类-functor-class",
+          "level": 3,
+          "text": "17.9.5 仿函数类（Functor Class）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 33749
+    },
+    {
+      "number": 18,
+      "slug": "cuda-18",
+      "title": "纹理读取（Texture Fetching）",
+      "displayTitle": "第十八章 纹理读取（Texture Fetching）",
+      "html": "/cuda/book/html/18.html",
+      "toc": [
+        {
+          "id": "18-1-最近点采样-nearest-point-sampling",
+          "level": 2,
+          "text": "18.1 最近点采样（Nearest-Point Sampling）"
+        },
+        {
+          "id": "18-2-线性过滤-linear-filtering",
+          "level": 2,
+          "text": "18.2 线性过滤（Linear Filtering）"
+        },
+        {
+          "id": "一维纹理-线性插值",
+          "level": 3,
+          "text": "一维纹理：线性插值"
+        },
+        {
+          "id": "二维纹理-双线性插值",
+          "level": 3,
+          "text": "二维纹理：双线性插值"
+        },
+        {
+          "id": "三维纹理-三线性插值",
+          "level": 3,
+          "text": "三维纹理：三线性插值"
+        },
+        {
+          "id": "18-3-查表-table-lookup",
+          "level": 2,
+          "text": "18.3 查表（Table Lookup）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 2835
+    },
+    {
+      "number": 19,
+      "slug": "cuda-19",
+      "title": "计算能力（Compute Capabilities）",
+      "displayTitle": "第十九章 计算能力（Compute Capabilities）",
+      "html": "/cuda/book/html/19.html",
+      "toc": [
+        {
+          "id": "19-1-功能可用性-feature-availability",
+          "level": 2,
+          "text": "19.1 功能可用性（Feature Availability）"
+        },
+        {
+          "id": "19-2-功能与技术规格-features-and-technical-specifications",
+          "level": 2,
+          "text": "19.2 功能与技术规格（Features and Technical Specifications）"
+        },
+        {
+          "id": "表-23-各计算能力支持的功能-feature-support-per-compute-capability",
+          "level": 3,
+          "text": "表 23：各计算能力支持的功能（Feature Support per Compute Capability）"
+        },
+        {
+          "id": "第-19-章-中文表-23-各计算能力功能支持矩阵",
+          "level": 2,
+          "text": "第 19 章·中文表 23：各计算能力功能支持矩阵"
+        },
+        {
+          "id": "表-24-各计算能力的技术规格-technical-specifications-per-compute-capability",
+          "level": 3,
+          "text": "表 24：各计算能力的技术规格（Technical Specifications per Compute Capability）"
+        },
+        {
+          "id": "第-19-章-中文表-24-技术规格与计算能力对应关系",
+          "level": 2,
+          "text": "第 19 章·中文表 24：技术规格与计算能力对应关系"
+        },
+        {
+          "id": "19-3-浮点标准-floating-point-standard",
+          "level": 2,
+          "text": "19.3 浮点标准（Floating-Point Standard）"
+        },
+        {
+          "id": "19-4-计算能力-5-x-compute-capability-5-x",
+          "level": 2,
+          "text": "19.4 计算能力 5.x（Compute Capability 5.x）"
+        },
+        {
+          "id": "19-4-1-架构-architecture",
+          "level": 3,
+          "text": "19.4.1 架构（Architecture）"
+        },
+        {
+          "id": "19-4-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.4.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-4-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.4.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-5-计算能力-6-x-compute-capability-6-x",
+          "level": 2,
+          "text": "19.5 计算能力 6.x（Compute Capability 6.x）"
+        },
+        {
+          "id": "19-5-1-架构-architecture",
+          "level": 3,
+          "text": "19.5.1 架构（Architecture）"
+        },
+        {
+          "id": "19-5-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.5.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-5-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.5.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-6-计算能力-7-x-compute-capability-7-x",
+          "level": 2,
+          "text": "19.6 计算能力 7.x（Compute Capability 7.x）"
+        },
+        {
+          "id": "19-6-1-架构-architecture",
+          "level": 3,
+          "text": "19.6.1 架构（Architecture）"
+        },
+        {
+          "id": "19-6-2-独立线程调度-independent-thread-scheduling",
+          "level": 3,
+          "text": "19.6.2 独立线程调度（Independent Thread Scheduling）"
+        },
+        {
+          "id": "1-将旧-warp-内建函数替换为带同步的版本",
+          "level": 4,
+          "text": "1. 将旧 warp 内建函数替换为带同步的版本"
+        },
+        {
+          "id": "2-在-warp-内共享数据的步骤之间加入-syncwarp",
+          "level": 4,
+          "text": "2. 在 warp 内共享数据的步骤之间加入 __syncwarp()"
+        },
+        {
+          "id": "3-确保线程块内所有未退出线程都到达屏障",
+          "level": 4,
+          "text": "3. 确保线程块内所有未退出线程都到达屏障"
+        },
+        {
+          "id": "19-6-3-全局内存-global-memory",
+          "level": 3,
+          "text": "19.6.3 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-6-4-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.6.4 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-7-计算能力-8-x-compute-capability-8-x",
+          "level": 2,
+          "text": "19.7 计算能力 8.x（Compute Capability 8.x）"
+        },
+        {
+          "id": "19-7-1-架构-architecture",
+          "level": 3,
+          "text": "19.7.1 架构（Architecture）"
+        },
+        {
+          "id": "19-7-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.7.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-7-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.7.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-8-计算能力-9-0-compute-capability-9-0",
+          "level": 2,
+          "text": "19.8 计算能力 9.0（Compute Capability 9.0）"
+        },
+        {
+          "id": "19-8-1-架构-architecture",
+          "level": 3,
+          "text": "19.8.1 架构（Architecture）"
+        },
+        {
+          "id": "19-8-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.8.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-8-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.8.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-8-4-加速专用计算的功能-features-accelerating-specialized-computations",
+          "level": 3,
+          "text": "19.8.4 加速专用计算的功能（Features Accelerating Specialized Computations）"
+        },
+        {
+          "id": "19-9-计算能力-10-0-compute-capability-10-0",
+          "level": 2,
+          "text": "19.9 计算能力 10.0（Compute Capability 10.0）"
+        },
+        {
+          "id": "19-9-1-架构-architecture",
+          "level": 3,
+          "text": "19.9.1 架构（Architecture）"
+        },
+        {
+          "id": "19-9-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.9.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-9-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.9.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-9-4-加速专用计算的功能-features-accelerating-specialized-computations",
+          "level": 3,
+          "text": "19.9.4 加速专用计算的功能（Features Accelerating Specialized Computations）"
+        },
+        {
+          "id": "19-10-计算能力-12-0-compute-capability-12-0",
+          "level": 2,
+          "text": "19.10 计算能力 12.0（Compute Capability 12.0）"
+        },
+        {
+          "id": "19-10-1-架构-architecture",
+          "level": 3,
+          "text": "19.10.1 架构（Architecture）"
+        },
+        {
+          "id": "19-10-2-全局内存-global-memory",
+          "level": 3,
+          "text": "19.10.2 全局内存（Global Memory）"
+        },
+        {
+          "id": "19-10-3-共享内存-shared-memory",
+          "level": 3,
+          "text": "19.10.3 共享内存（Shared Memory）"
+        },
+        {
+          "id": "19-10-4-加速专用计算的功能-features-accelerating-specialized-computations",
+          "level": 3,
+          "text": "19.10.4 加速专用计算的功能（Features Accelerating Specialized Computations）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 24986
+    },
+    {
+      "number": 20,
+      "slug": "cuda-20",
+      "title": "驱动程序 API（Driver API）",
+      "displayTitle": "第二十章 驱动程序 API（Driver API）",
+      "html": "/cuda/book/html/20.html",
+      "toc": [
+        {
+          "id": "cuda-driver-api-对象",
+          "level": 2,
+          "text": "CUDA Driver API 对象"
+        },
+        {
+          "id": "20-1-上下文-context",
+          "level": 2,
+          "text": "20.1 上下文（Context）"
+        },
+        {
+          "id": "20-2-模块-module",
+          "level": 2,
+          "text": "20.2 模块（Module）"
+        },
+        {
+          "id": "20-3-内核执行-kernel-execution",
+          "level": 2,
+          "text": "20.3 内核执行（Kernel Execution）"
+        },
+        {
+          "id": "20-4-runtime-api-与-driver-api-的互操作性-interoperability-between-runtime-and-driver-apis",
+          "level": 2,
+          "text": "20.4 Runtime API 与 Driver API 的互操作性（Interoperability between Runtime and Driver APIs）"
+        },
+        {
+          "id": "20-5-驱动程序入口点访问-driver-entry-point-access",
+          "level": 2,
+          "text": "20.5 驱动程序入口点访问（Driver Entry Point Access）"
+        },
+        {
+          "id": "20-5-1-简介-introduction",
+          "level": 3,
+          "text": "20.5.1 简介（Introduction）"
+        },
+        {
+          "id": "20-5-2-驱动程序函数的类型定义-driver-function-typedefs",
+          "level": 3,
+          "text": "20.5.2 驱动程序函数的类型定义（Driver Function Typedefs）"
+        },
+        {
+          "id": "20-5-3-获取驱动程序函数-driver-function-retrieval",
+          "level": 3,
+          "text": "20.5.3 获取驱动程序函数（Driver Function Retrieval）"
+        },
+        {
+          "id": "20-5-3-1-使用-driver-api",
+          "level": 4,
+          "text": "20.5.3.1 使用 Driver API"
+        },
+        {
+          "id": "20-5-3-2-使用-runtime-api",
+          "level": 4,
+          "text": "20.5.3.2 使用 Runtime API"
+        },
+        {
+          "id": "20-5-3-3-获取每线程默认流版本-retrieve-per-thread-default-stream-versions",
+          "level": 4,
+          "text": "20.5.3.3 获取每线程默认流版本（Retrieve Per-thread Default Stream Versions）"
+        },
+        {
+          "id": "20-5-3-4-访问新的-cuda-功能-access-new-cuda-features",
+          "level": 4,
+          "text": "20.5.3.4 访问新的 CUDA 功能（Access New CUDA Features）"
+        },
+        {
+          "id": "20-5-4-cugetprocaddress-可能带来的影响-potential-implications",
+          "level": 3,
+          "text": "20.5.4 cuGetProcAddress 可能带来的影响（Potential Implications）"
+        },
+        {
+          "id": "20-5-4-1-cugetprocaddress-与隐式链接的差异",
+          "level": 4,
+          "text": "20.5.4.1 cuGetProcAddress 与隐式链接的差异"
+        },
+        {
+          "id": "20-5-4-2-cugetprocaddress-中编译时版本与运行时版本的区别",
+          "level": 4,
+          "text": "20.5.4.2 cuGetProcAddress 中编译时版本与运行时版本的区别"
+        },
+        {
+          "id": "20-5-4-3-显式版本检查仍可能不足-api-version-bumps-with-explicit-version-checks",
+          "level": 4,
+          "text": "20.5.4.3 显式版本检查仍可能不足（API Version Bumps with Explicit Version Checks）"
+        },
+        {
+          "id": "20-5-4-4-runtime-api-用法中的问题-issues-with-runtime-api-usage",
+          "level": 4,
+          "text": "20.5.4.4 Runtime API 用法中的问题（Issues with Runtime API Usage）"
+        },
+        {
+          "id": "20-5-4-5-runtime-api-与动态版本选择的问题-issues-with-runtime-api-and-dynamic-versioning",
+          "level": 4,
+          "text": "20.5.4.5 Runtime API 与动态版本选择的问题（Issues with Runtime API and Dynamic Versioning）"
+        },
+        {
+          "id": "20-5-4-6-runtime-api-允许指定-cuda-版本时的问题-issues-with-runtime-api-allowing-cuda-version",
+          "level": 4,
+          "text": "20.5.4.6 Runtime API 允许指定 CUDA 版本时的问题（Issues with Runtime API Allowing CUDA Version）"
+        },
+        {
+          "id": "20-5-4-7-对-api-abi-的影响-implications-to-api-abi",
+          "level": 4,
+          "text": "20.5.4.7 对 API/ABI 的影响（Implications to API/ABI）"
+        },
+        {
+          "id": "20-5-5-确定-cugetprocaddress-失败原因-determining-cugetprocaddress-failure-reasons",
+          "level": 3,
+          "text": "20.5.5 确定 cuGetProcAddress 失败原因（Determining cuGetProcAddress Failure Reasons）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 18619
+    },
+    {
+      "number": 21,
+      "slug": "cuda-21",
+      "title": "CUDA 环境变量（CUDA Environment Variables）",
+      "displayTitle": "第二十一章 CUDA 环境变量（CUDA Environment Variables）",
+      "html": "/cuda/book/html/21.html",
+      "toc": [
+        {
+          "id": "21-1-设备枚举与属性-device-enumeration-and-properties",
+          "level": 2,
+          "text": "21.1 设备枚举与属性（Device Enumeration and Properties）"
+        },
+        {
+          "id": "cuda-visible-devices",
+          "level": 3,
+          "text": "CUDA_VISIBLE_DEVICES"
+        },
+        {
+          "id": "cuda-managed-force-device-alloc",
+          "level": 3,
+          "text": "CUDA_MANAGED_FORCE_DEVICE_ALLOC"
+        },
+        {
+          "id": "cuda-device-order",
+          "level": 3,
+          "text": "CUDA_DEVICE_ORDER"
+        },
+        {
+          "id": "21-2-编译-compilation",
+          "level": 2,
+          "text": "21.2 编译（Compilation）"
+        },
+        {
+          "id": "cuda-cache-disable",
+          "level": 3,
+          "text": "CUDA_CACHE_DISABLE"
+        },
+        {
+          "id": "cuda-cache-path",
+          "level": 3,
+          "text": "CUDA_CACHE_PATH"
+        },
+        {
+          "id": "cuda-cache-maxsize",
+          "level": 3,
+          "text": "CUDA_CACHE_MAXSIZE"
+        },
+        {
+          "id": "cuda-force-ptx-jit",
+          "level": 3,
+          "text": "CUDA_FORCE_PTX_JIT"
+        },
+        {
+          "id": "cuda-disable-ptx-jit",
+          "level": 3,
+          "text": "CUDA_DISABLE_PTX_JIT"
+        },
+        {
+          "id": "cuda-force-jit",
+          "level": 3,
+          "text": "CUDA_FORCE_JIT"
+        },
+        {
+          "id": "cuda-disable-jit",
+          "level": 3,
+          "text": "CUDA_DISABLE_JIT"
+        },
+        {
+          "id": "21-3-执行-execution",
+          "level": 2,
+          "text": "21.3 执行（Execution）"
+        },
+        {
+          "id": "cuda-launch-blocking",
+          "level": 3,
+          "text": "CUDA_LAUNCH_BLOCKING"
+        },
+        {
+          "id": "cuda-device-max-connections",
+          "level": 3,
+          "text": "CUDA_DEVICE_MAX_CONNECTIONS"
+        },
+        {
+          "id": "cuda-device-max-copy-connections",
+          "level": 3,
+          "text": "CUDA_DEVICE_MAX_COPY_CONNECTIONS"
+        },
+        {
+          "id": "cuda-auto-boost",
+          "level": 3,
+          "text": "CUDA_AUTO_BOOST"
+        },
+        {
+          "id": "cuda-scale-launch-queues",
+          "level": 3,
+          "text": "CUDA_SCALE_LAUNCH_QUEUES"
+        },
+        {
+          "id": "21-4-cuda-gdb-linux-平台",
+          "level": 2,
+          "text": "21.4 cuda-gdb （Linux 平台）"
+        },
+        {
+          "id": "cuda-device-waits-on-exception",
+          "level": 3,
+          "text": "CUDA_DEVICE_WAITS_ON_EXCEPTION"
+        },
+        {
+          "id": "21-5-mps-服务-linux-平台",
+          "level": 2,
+          "text": "21.5 MPS 服务（Linux 平台）"
+        },
+        {
+          "id": "cuda-device-default-persisting-l2-cache-percentage-limit",
+          "level": 3,
+          "text": "CUDA_DEVICE_DEFAULT_PERSISTING_L2_CACHE_PERCENTAGE_LIMIT"
+        },
+        {
+          "id": "21-6-模块加载-module-loading",
+          "level": 2,
+          "text": "21.6 模块加载（Module Loading）"
+        },
+        {
+          "id": "cuda-module-loading",
+          "level": 3,
+          "text": "CUDA_MODULE_LOADING"
+        },
+        {
+          "id": "cuda-module-data-loading",
+          "level": 3,
+          "text": "CUDA_MODULE_DATA_LOADING"
+        },
+        {
+          "id": "21-7-预加载依赖库-pre-loading-dependent-libraries",
+          "level": 2,
+          "text": "21.7 预加载依赖库（Pre-loading Dependent Libraries）"
+        },
+        {
+          "id": "cuda-force-preload-libraries",
+          "level": 3,
+          "text": "CUDA_FORCE_PRELOAD_LIBRARIES"
+        },
+        {
+          "id": "21-8-cuda-graphs",
+          "level": 2,
+          "text": "21.8 CUDA Graphs"
+        },
+        {
+          "id": "cuda-graphs-use-node-priority",
+          "level": 3,
+          "text": "CUDA_GRAPHS_USE_NODE_PRIORITY"
+        }
+      ],
+      "charCount": 4923
+    },
+    {
+      "number": 22,
+      "slug": "cuda-22",
+      "title": "统一内存编程（Unified Memory Programming）",
+      "displayTitle": "第二十二章 统一内存编程（Unified Memory Programming）",
+      "html": "/cuda/book/html/22.html",
+      "toc": [
+        {
+          "id": "22-1-统一内存简介-unified-memory-introduction",
+          "level": 2,
+          "text": "22.1 统一内存简介（Unified Memory Introduction）"
+        },
+        {
+          "id": "22-1-1-统一内存的系统要求-system-requirements-for-unified-memory",
+          "level": 3,
+          "text": "22.1.1 统一内存的系统要求（System Requirements for Unified Memory）"
+        },
+        {
+          "id": "22-1-2-编程模型-programming-model",
+          "level": 3,
+          "text": "22.1.2 编程模型（Programming Model）"
+        },
+        {
+          "id": "22-1-2-1-系统分配内存-system-allocated-memory",
+          "level": 4,
+          "text": "22.1.2.1 系统分配内存（System-Allocated Memory）"
+        },
+        {
+          "id": "22-1-2-2-cuda-托管内存分配-api-cudamallocmanaged",
+          "level": 4,
+          "text": "22.1.2.2 CUDA 托管内存分配 API： cudaMallocManaged()"
+        },
+        {
+          "id": "22-1-2-3-使用-managed-声明全局托管变量",
+          "level": 4,
+          "text": "22.1.2.3 使用 __managed__ 声明全局托管变量"
+        },
+        {
+          "id": "22-1-2-4-统一内存与映射内存的区别-difference-between-unified-memory-and-mapped-memory",
+          "level": 4,
+          "text": "22.1.2.4 统一内存与映射内存的区别（Difference between Unified Memory and Mapped Memory）"
+        },
+        {
+          "id": "22-1-2-5-指针属性-pointer-attributes",
+          "level": 4,
+          "text": "22.1.2.5 指针属性（Pointer Attributes）"
+        },
+        {
+          "id": "22-1-2-6-运行时检测统一内存支持级别-runtime-detection",
+          "level": 4,
+          "text": "22.1.2.6 运行时检测统一内存支持级别（Runtime Detection）"
+        },
+        {
+          "id": "22-1-2-7-gpu-内存超额使用-gpu-memory-oversubscription",
+          "level": 4,
+          "text": "22.1.2.7 GPU 内存超额使用（GPU Memory Oversubscription）"
+        },
+        {
+          "id": "22-1-2-8-性能提示-performance-hints",
+          "level": 4,
+          "text": "22.1.2.8 性能提示（Performance Hints）"
+        },
+        {
+          "id": "22-1-2-8-1-数据预取-data-prefetching",
+          "level": 5,
+          "text": "22.1.2.8.1 数据预取（Data Prefetching）"
+        },
+        {
+          "id": "22-1-2-8-2-数据使用提示-data-usage-hints",
+          "level": 5,
+          "text": "22.1.2.8.2 数据使用提示（Data Usage Hints）"
+        },
+        {
+          "id": "22-1-2-8-3-查询托管内存的数据使用属性-querying-data-usage-attributes",
+          "level": 5,
+          "text": "22.1.2.8.3 查询托管内存的数据使用属性（Querying Data Usage Attributes）"
+        },
+        {
+          "id": "22-2-具有完整-cuda-统一内存支持的设备-unified-memory-on-devices-with-full-support",
+          "level": 2,
+          "text": "22.2 具有完整 CUDA 统一内存支持的设备（Unified Memory on Devices with Full Support）"
+        },
+        {
+          "id": "22-2-1-系统分配内存-深入示例-system-allocated-memory-in-depth-examples",
+          "level": 3,
+          "text": "22.2.1 系统分配内存：深入示例（System-Allocated Memory: In-depth Examples）"
+        },
+        {
+          "id": "22-2-1-1-由文件支持的统一内存-file-backed-unified-memory",
+          "level": 4,
+          "text": "22.2.1.1 由文件支持的统一内存（File-backed Unified Memory）"
+        },
+        {
+          "id": "22-2-1-2-使用统一内存进行进程间通信-ipc",
+          "level": 4,
+          "text": "22.2.1.2 使用统一内存进行进程间通信（IPC）"
+        },
+        {
+          "id": "22-2-2-性能调优-performance-tuning",
+          "level": 3,
+          "text": "22.2.2 性能调优（Performance Tuning）"
+        },
+        {
+          "id": "22-2-2-1-内存分页与页面大小-memory-paging-and-page-sizes",
+          "level": 4,
+          "text": "22.2.2.1 内存分页与页面大小（Memory Paging and Page Sizes）"
+        },
+        {
+          "id": "22-2-2-1-1-选择合适的页面大小-choosing-the-right-page-size",
+          "level": 5,
+          "text": "22.2.2.1.1 选择合适的页面大小（Choosing the Right Page Size）"
+        },
+        {
+          "id": "22-2-2-1-2-cpu-与-gpu-页表-硬件一致性与软件一致性-hardware-coherency-vs-software-coherency",
+          "level": 5,
+          "text": "22.2.2.1.2 CPU 与 GPU 页表：硬件一致性与软件一致性（Hardware Coherency vs. Software Coherency）"
+        },
+        {
+          "id": "22-2-2-2-从主机直接访问统一内存-direct-unified-memory-access-from-host",
+          "level": 4,
+          "text": "22.2.2.2 从主机直接访问统一内存（Direct Unified Memory Access from Host）"
+        },
+        {
+          "id": "22-2-2-3-主机原生原子操作-host-native-atomics",
+          "level": 4,
+          "text": "22.2.2.3 主机原生原子操作（Host Native Atomics）"
+        },
+        {
+          "id": "22-2-2-4-原子访问与同步原语-atomic-accesses-and-synchronization-primitives",
+          "level": 4,
+          "text": "22.2.2.4 原子访问与同步原语（Atomic Accesses and Synchronization Primitives）"
+        },
+        {
+          "id": "22-2-2-5-统一内存上的-memcpy-memset-行为-memcpy-memset-behavior-with-unified-memory",
+          "level": 4,
+          "text": "22.2.2.5 统一内存上的 Memcpy() / Memset() 行为（Memcpy()/Memset() Behavior With Unified Memory）"
+        },
+        {
+          "id": "22-3-不具备完整-cuda-统一内存支持的设备-unified-memory-on-devices-without-full-support",
+          "level": 2,
+          "text": "22.3 不具备完整 CUDA 统一内存支持的设备（Unified Memory on Devices without Full Support）"
+        },
+        {
+          "id": "22-3-1-仅支持-cuda-托管内存的设备",
+          "level": 3,
+          "text": "22.3.1 仅支持 CUDA 托管内存的设备"
+        },
+        {
+          "id": "22-3-2-windows-或计算能力-5-x-设备上的统一内存",
+          "level": 3,
+          "text": "22.3.2 Windows 或计算能力 5.x 设备上的统一内存"
+        },
+        {
+          "id": "22-3-2-1-数据迁移与一致性-data-migration-and-coherency",
+          "level": 4,
+          "text": "22.3.2.1 数据迁移与一致性（Data Migration and Coherency）"
+        },
+        {
+          "id": "22-3-2-2-gpu-内存超额使用-gpu-memory-oversubscription",
+          "level": 4,
+          "text": "22.3.2.2 GPU 内存超额使用（GPU Memory Oversubscription）"
+        },
+        {
+          "id": "22-3-2-3-多-gpu-multi-gpu",
+          "level": 4,
+          "text": "22.3.2.3 多 GPU（Multi-GPU）"
+        },
+        {
+          "id": "22-3-2-4-一致性与并发-coherency-and-concurrency",
+          "level": 4,
+          "text": "22.3.2.4 一致性与并发（Coherency and Concurrency）"
+        },
+        {
+          "id": "22-3-2-4-1-gpu-独占访问托管内存-gpu-exclusive-access-to-managed-memory",
+          "level": 5,
+          "text": "22.3.2.4.1 GPU 独占访问托管内存（GPU Exclusive Access to Managed Memory）"
+        },
+        {
+          "id": "22-3-2-4-2-显式同步与-gpu-的逻辑活动-explicit-synchronization-and-logical-gpu-activity",
+          "level": 5,
+          "text": "22.3.2.4.2 显式同步与 GPU 的逻辑活动（Explicit Synchronization and Logical GPU Activity）"
+        },
+        {
+          "id": "22-3-2-4-3-使用流管理数据可见性与-cpu-gpu-并发访问-managing-data-visibility-and-concurrent-cpu-gpu-a",
+          "level": 5,
+          "text": "22.3.2.4.3 使用流管理数据可见性与 CPU/GPU 并发访问（Managing Data Visibility and Concurrent CPU + GPU Access with Streams）"
+        },
+        {
+          "id": "22-3-2-4-4-流关联示例-stream-association-examples",
+          "level": 5,
+          "text": "22.3.2.4.4 流关联示例（Stream Association Examples）"
+        },
+        {
+          "id": "22-3-2-4-5-多线程主机程序中的流关联-stream-attach-with-multithreaded-host-programs",
+          "level": 5,
+          "text": "22.3.2.4.5 多线程主机程序中的流关联（Stream Attach With Multithreaded Host Programs）"
+        },
+        {
+          "id": "22-3-2-4-6-进阶主题-模块化程序与数据访问约束-advanced-topic-modular-programs-and-data-access-constrai",
+          "level": 5,
+          "text": "22.3.2.4.6 进阶主题：模块化程序与数据访问约束（Advanced Topic: Modular Programs and Data Access Constraints）"
+        },
+        {
+          "id": "22-3-2-4-7-与流关联的统一内存上的-memcpy-memset-行为",
+          "level": 5,
+          "text": "22.3.2.4.7 与流关联的统一内存上的 Memcpy() / Memset() 行为"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 18189
+    },
+    {
+      "number": 23,
+      "slug": "cuda-23",
+      "title": "延迟加载（Lazy Loading）",
+      "displayTitle": "第二十三章 延迟加载（Lazy Loading）",
+      "html": "/cuda/book/html/23.html",
+      "toc": [
+        {
+          "id": "23-1-什么是延迟加载-what-is-lazy-loading",
+          "level": 2,
+          "text": "23.1 什么是延迟加载？（What is Lazy Loading?）"
+        },
+        {
+          "id": "23-2-延迟加载的版本支持-lazy-loading-version-support",
+          "level": 2,
+          "text": "23.2 延迟加载的版本支持（Lazy Loading Version Support）"
+        },
+        {
+          "id": "23-2-1-驱动程序-driver",
+          "level": 3,
+          "text": "23.2.1 驱动程序（Driver）"
+        },
+        {
+          "id": "23-2-2-工具包-toolkit",
+          "level": 3,
+          "text": "23.2.2 工具包（Toolkit）"
+        },
+        {
+          "id": "23-2-3-编译器-compiler",
+          "level": 3,
+          "text": "23.2.3 编译器（Compiler）"
+        },
+        {
+          "id": "23-3-在延迟模式下触发内核加载-triggering-loading-of-kernels-in-lazy-mode",
+          "level": 2,
+          "text": "23.3 在延迟模式下触发内核加载（Triggering Loading of Kernels in Lazy Mode）"
+        },
+        {
+          "id": "23-3-1-cuda-driver-api",
+          "level": 3,
+          "text": "23.3.1 CUDA Driver API"
+        },
+        {
+          "id": "23-3-2-cuda-runtime-api",
+          "level": 3,
+          "text": "23.3.2 CUDA Runtime API"
+        },
+        {
+          "id": "23-4-查询是否启用了延迟加载-querying-whether-lazy-loading-is-turned-on",
+          "level": 2,
+          "text": "23.4 查询是否启用了延迟加载（Querying Whether Lazy Loading Is Turned On）"
+        },
+        {
+          "id": "23-5-采用延迟加载时可能遇到的问题-possible-issues-when-adopting-lazy-loading",
+          "level": 2,
+          "text": "23.5 采用延迟加载时可能遇到的问题（Possible Issues when Adopting Lazy Loading）"
+        },
+        {
+          "id": "23-5-1-并发执行-concurrent-execution",
+          "level": 3,
+          "text": "23.5.1 并发执行（Concurrent Execution）"
+        },
+        {
+          "id": "23-5-2-分配器-allocators",
+          "level": 3,
+          "text": "23.5.2 分配器（Allocators）"
+        },
+        {
+          "id": "23-5-3-自动调优-autotuning",
+          "level": 3,
+          "text": "23.5.3 自动调优（Autotuning）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 3420
+    },
+    {
+      "number": 24,
+      "slug": "cuda-24",
+      "title": "扩展 GPU 内存（Extended GPU Memory，EGM）",
+      "displayTitle": "第二十四章 扩展 GPU 内存（Extended GPU Memory，EGM）",
+      "html": "/cuda/book/html/24.html",
+      "toc": [
+        {
+          "id": "24-1-准备知识-preliminaries",
+          "level": 2,
+          "text": "24.1 准备知识（Preliminaries）"
+        },
+        {
+          "id": "24-1-1-egm-平台-系统拓扑-egm-platforms-system-topology",
+          "level": 3,
+          "text": "24.1.1 EGM 平台：系统拓扑（EGM Platforms: System Topology）"
+        },
+        {
+          "id": "24-1-2-socket-标识符-含义与获取方式-socket-identifiers",
+          "level": 3,
+          "text": "24.1.2 Socket 标识符：含义与获取方式（Socket Identifiers）"
+        },
+        {
+          "id": "24-1-3-分配器与-egm-支持-allocators-and-egm-support",
+          "level": 3,
+          "text": "24.1.3 分配器与 EGM 支持（Allocators and EGM Support）"
+        },
+        {
+          "id": "24-1-4-对现有-api-的内存管理扩展-memory-management-extensions-to-current-apis",
+          "level": 3,
+          "text": "24.1.4 对现有 API 的内存管理扩展（Memory Management Extensions to Current APIs）"
+        },
+        {
+          "id": "24-2-使用-egm-接口-using-the-egm-interface",
+          "level": 2,
+          "text": "24.2 使用 EGM 接口（Using the EGM Interface）"
+        },
+        {
+          "id": "24-2-1-单节点-单-gpu-single-node-single-gpu",
+          "level": 3,
+          "text": "24.2.1 单节点、单 GPU（Single-Node, Single-GPU）"
+        },
+        {
+          "id": "24-2-2-单节点-多-gpu-single-node-multi-gpu",
+          "level": 3,
+          "text": "24.2.2 单节点、多 GPU（Single-Node, Multi-GPU）"
+        },
+        {
+          "id": "24-2-2-1-使用-vmm-api-using-vmm-apis",
+          "level": 4,
+          "text": "24.2.2.1 使用 VMM API（Using VMM APIs）"
+        },
+        {
+          "id": "24-2-2-2-使用-cuda-内存池-using-cuda-memory-pool",
+          "level": 4,
+          "text": "24.2.2.2 使用 CUDA 内存池（Using CUDA Memory Pool）"
+        },
+        {
+          "id": "24-2-3-多节点-单-gpu-multi-node-single-gpu",
+          "level": 3,
+          "text": "24.2.3 多节点、单 GPU（Multi-Node, Single-GPU）"
+        },
+        {
+          "id": "校对说明",
+          "level": 2,
+          "text": "校对说明"
+        }
+      ],
+      "charCount": 6449
+    },
+    {
+      "number": 25,
+      "slug": "cuda-25",
+      "title": "声明（Notices）",
+      "displayTitle": "第二十五章 声明（Notices）",
+      "html": "/cuda/book/html/25.html",
+      "toc": [
+        {
+          "id": "25-1-声明-notice",
+          "level": 2,
+          "text": "25.1 声明（Notice）"
+        },
+        {
+          "id": "25-2-opencl",
+          "level": 2,
+          "text": "25.2 OpenCL"
+        },
+        {
+          "id": "25-3-商标-trademarks",
+          "level": 2,
+          "text": "25.3 商标（Trademarks）"
+        }
+      ],
+      "charCount": 1671
+    }
+  ],
+  "readerUiRevision": "left-subheadings-20261026",
+  "navigationFeatures": [
+    "按章节展开/折叠左侧小标题",
+    "阅读章节时自动展开当前章节",
+    "点击左侧小标题跳转至正文对应位置"
+  ]
+}

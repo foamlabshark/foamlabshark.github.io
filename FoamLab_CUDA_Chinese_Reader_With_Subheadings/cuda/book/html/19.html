@@ -1,0 +1,1095 @@
+<h1 id="第十九章-计算能力-compute-capabilities">第十九章 计算能力（Compute Capabilities）</h1>
+<blockquote>
+<p>对应原 PDF 第 487–514 页（原书印刷页码 471–498）。本章说明不同 CUDA 计算能力对应的功能与硬件规格。表 23、表 24 的多页原始表格已作为图片保留，以避免丢失跨架构数值和合并单元格信息；下文翻译表题、功能名称和技术说明。表格图片中的 “Yes/No” 分别表示“支持/不支持”。</p>
+</blockquote>
+<p>计算设备的一般规格与功能取决于其计算能力（见“计算能力”一节）。表 23 和表 24 汇总了当前受支持的各计算能力所对应的功能与技术规格。“浮点标准”一节介绍设备对 IEEE 浮点标准的符合情况；后续各节分别介绍计算能力 5.x、6.x、7.x、8.x、9.0、10.0 和 12.0 设备的架构特征。</p>
+<h2 id="19-1-功能可用性-feature-availability">19.1 功能可用性（Feature Availability）</h2>
+<p>引入某项计算功能时，通常希望它在后续架构中继续可用。表 23 中，某功能在引入它的计算能力之后仍标记为“支持”，表示该功能在后续架构中继续提供。</p>
+<p>某些架构引入的高度专用计算功能则不保证在后续所有计算能力中继续提供。这些功能用于加速特定操作，可能只面向部分计算能力的小版本，或者可能在未来架构中发生重大变化。</p>
+<p>因此，同一计算能力可能对应两组功能：</p>
+<ul>
+<li><strong>计算能力 <code>#.#</code>：</strong> 主要功能集合，设计目标是让这些功能在后续计算架构中继续可用。表 23 总结了这些功能及其可用性。</li>
+<li><strong>计算能力 <code>#.#a</code>：</strong> 数量较少、用途高度专门化的功能集合，用于加速特定操作；它们不保证在后续架构中继续提供，也可能发生重大变化。具体内容列在对应计算能力的小节中。</li>
+</ul>
+<p>设备代码编译时必须指定目标计算能力；代码中使用的功能必须由该目标支持。例如：</p>
+<ul>
+<li>以 <code>compute_90</code> 为编译目标时，可以使用计算能力 9.0 的功能，但不能使用计算能力 9.0a 的专用功能。</li>
+<li>以 <code>compute_90a</code> 为编译目标时，可以使用完整功能集合，包括 9.0 和 9.0a 的功能。</li>
+</ul>
+<h2 id="19-2-功能与技术规格-features-and-technical-specifications">19.2 功能与技术规格（Features and Technical Specifications）</h2>
+<h3 id="表-23-各计算能力支持的功能-feature-support-per-compute-capability">表 23：各计算能力支持的功能（Feature Support per Compute Capability）</h3>
+<p>表 23 的列按以下计算能力组织：5.0/5.2、5.3、6.x、7.x、8.x、9.0、10.x 和 12.0。原表说明：未单独列出的功能默认在所有计算能力上受支持。</p>
+<p>下列为原表功能项的中文译名；精确的“支持/不支持”范围请同时参照后面的原表分页图像。</p>
+<table>
+<thead>
+<tr>
+<th>原表功能项</th>
+<th>中文说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atomic functions on 32-bit integer values in global memory</td>
+<td>对全局内存中的 32 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic functions on 32-bit integer values in shared memory</td>
+<td>对共享内存中的 32 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic functions on 64-bit integer values in global memory</td>
+<td>对全局内存中的 64 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic functions on 64-bit integer values in shared memory</td>
+<td>对共享内存中的 64 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic functions on 128-bit integer values in global memory</td>
+<td>对全局内存中的 128 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic functions on 128-bit integer values in shared memory</td>
+<td>对共享内存中的 128 位整数执行原子操作</td>
+</tr>
+<tr>
+<td>Atomic addition on 32-bit floating-point values in global/shared memory</td>
+<td>对全局内存和共享内存中的 32 位浮点值执行原子加法</td>
+</tr>
+<tr>
+<td>Atomic addition on 64-bit floating-point values in global/shared memory</td>
+<td>对全局内存和共享内存中的 64 位浮点值执行原子加法</td>
+</tr>
+<tr>
+<td>Atomic addition on <code>float2</code> and <code>float4</code> vectors in global memory</td>
+<td>对全局内存中的 <code>float2</code>、<code>float4</code> 向量执行原子加法</td>
+</tr>
+<tr>
+<td>Warp vote functions</td>
+<td>Warp 投票函数</td>
+</tr>
+<tr>
+<td>Memory fence functions</td>
+<td>内存栅栏函数</td>
+</tr>
+<tr>
+<td>Synchronization functions</td>
+<td>同步函数</td>
+</tr>
+<tr>
+<td>Surface functions</td>
+<td>表面函数</td>
+</tr>
+<tr>
+<td>Unified Memory programming</td>
+<td>统一内存编程</td>
+</tr>
+<tr>
+<td>Dynamic parallelism</td>
+<td>动态并行</td>
+</tr>
+<tr>
+<td>Half-precision floating-point operations</td>
+<td>半精度浮点操作：加、减、乘、比较、warp shuffle 和转换</td>
+</tr>
+<tr>
+<td>Bfloat16-precision floating-point operations</td>
+<td>Bfloat16 精度浮点操作：加、减、乘、比较、warp shuffle 和转换</td>
+</tr>
+<tr>
+<td>Tensor Cores</td>
+<td>Tensor Core 张量核心</td>
+</tr>
+<tr>
+<td>Mixed-precision warp-matrix functions</td>
+<td>混合精度 warp 矩阵函数</td>
+</tr>
+<tr>
+<td>Hardware-accelerated <code>memcpy_async</code></td>
+<td>硬件加速的 <code>memcpy_async</code>（使用 <code>cuda::pipeline</code> 的异步数据复制）</td>
+</tr>
+<tr>
+<td>Hardware-accelerated split arrive/wait barrier</td>
+<td>硬件加速的分离式 arrive/wait 屏障</td>
+</tr>
+<tr>
+<td>L2 cache residency management</td>
+<td>L2 缓存驻留管理</td>
+</tr>
+<tr>
+<td>DPX instructions</td>
+<td>用于加速动态规划的 DPX 指令</td>
+</tr>
+<tr>
+<td>Distributed shared memory</td>
+<td>分布式共享内存</td>
+</tr>
+<tr>
+<td>Thread block cluster</td>
+<td>线程块集群</td>
+</tr>
+<tr>
+<td>Tensor Memory Accelerator (TMA) unit</td>
+<td>张量内存加速器（TMA）单元</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 23 原表（第 1–4 页）：</strong></p>
+<p><img alt="表 23，第 1 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p1.png"/></p>
+<p><img alt="表 23，第 2 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p2.png"/></p>
+<p><img alt="表 23，第 3 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p3.png"/></p>
+<p><img alt="表 23，第 4 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p4.png"/></p>
+<p><strong>表 23 原表（第 5–7 页）：</strong></p>
+<p><img alt="表 23，第 5 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p5.png"/></p>
+<p><img alt="表 23，第 6 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p6.png"/></p>
+<p><img alt="表 23，第 7 页" decoding="async" loading="lazy" src="/cuda/book/images/table_23_feature_support_p7.png"/></p>
+<h2 id="第-19-章-中文表-23-各计算能力功能支持矩阵">第 19 章·中文表 23：各计算能力功能支持矩阵</h2>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>5.0/5.2</th>
+<th>5.3</th>
+<th>6.x</th>
+<th>7.x</th>
+<th>8.x</th>
+<th>9.0</th>
+<th>10.x</th>
+<th>12.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局内存：32 位整数原子函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>共享内存：32 位整数原子函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全局内存：64 位整数原子函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>共享内存：64 位整数原子函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全局内存：128 位整数原子函数</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>共享内存：128 位整数原子函数</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全局/共享内存：32 位浮点原子加法</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全局/共享内存：64 位浮点原子加法</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全局内存：<code>float2</code>/<code>float4</code> 原子加法</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Warp 投票函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>内存栅栏函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>同步函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Surface 表面函数</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>统一内存编程</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>CUDA 动态并行</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>半精度（FP16）算术/比较/Shuffle/转换</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Bfloat16 算术/比较/Shuffle/转换</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Tensor Core</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>混合精度 Warp 矩阵函数</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>硬件加速 <code>memcpy_async</code></td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>硬件加速分离式 arrive/wait 屏障</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>L2 缓存驻留管理</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>DPX 动态规划加速指令</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>分布式共享内存</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>线程块集群</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>张量内存加速器（TMA）</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody>
+</table>
+<p><em>依据：用户提供的原 PDF 第 488–494 页的表 23 单元格范围，按合并单元格对应计算能力填充“支持/不支持”。不表示性能强弱，未单列的功能默认全系列支持。</em></p>
+<h3 id="表-24-各计算能力的技术规格-technical-specifications-per-compute-capability">表 24：各计算能力的技术规格（Technical Specifications per Compute Capability）</h3>
+<p>表 24 按计算能力列出线程网格、线程块、寄存器、共享内存、缓存，以及纹理/表面对象的规格。由于原表横跨多个页面，且不同计算能力的数值使用合并单元格表示，本工作稿保留完整原表图像，避免手工重排时错配数值。以下为表中各行的中文名称。</p>
+<table>
+<thead>
+<tr>
+<th>原表规格项</th>
+<th>中文译名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maximum number of resident grids per device</td>
+<td>每台设备可驻留的最大网格数（并发内核执行）</td>
+</tr>
+<tr>
+<td>Maximum dimensionality of grid of thread blocks</td>
+<td>线程块网格的最大维度数</td>
+</tr>
+<tr>
+<td>Maximum x-dimension of a grid of thread blocks</td>
+<td>网格的最大 x 维度（线程块数）</td>
+</tr>
+<tr>
+<td>Maximum y- or z-dimension of a grid of thread blocks</td>
+<td>网格的最大 y 或 z 维度</td>
+</tr>
+<tr>
+<td>Maximum dimensionality of thread block</td>
+<td>线程块的最大维度数</td>
+</tr>
+<tr>
+<td>Maximum x- or y-dimensionality of a block</td>
+<td>线程块的最大 x 或 y 维度</td>
+</tr>
+<tr>
+<td>Maximum z-dimension of a block</td>
+<td>线程块的最大 z 维度</td>
+</tr>
+<tr>
+<td>Maximum number of threads per block</td>
+<td>每个线程块的最大线程数</td>
+</tr>
+<tr>
+<td>Warp size</td>
+<td>Warp 大小</td>
+</tr>
+<tr>
+<td>Maximum number of resident blocks per SM</td>
+<td>每个 SM 可驻留的最大线程块数</td>
+</tr>
+<tr>
+<td>Maximum number of resident warps per SM</td>
+<td>每个 SM 可驻留的最大 warp 数</td>
+</tr>
+<tr>
+<td>Maximum number of resident threads per SM</td>
+<td>每个 SM 可驻留的最大线程数</td>
+</tr>
+<tr>
+<td>Number of 32-bit registers per SM</td>
+<td>每个 SM 的 32 位寄存器数量</td>
+</tr>
+<tr>
+<td>Maximum number of 32-bit registers per thread block</td>
+<td>每个线程块可使用的最大 32 位寄存器数</td>
+</tr>
+<tr>
+<td>Maximum number of 32-bit registers per thread</td>
+<td>每个线程可使用的最大 32 位寄存器数</td>
+</tr>
+<tr>
+<td>Maximum amount of shared memory per SM</td>
+<td>每个 SM 的最大共享内存容量</td>
+</tr>
+<tr>
+<td>Maximum amount of shared memory per thread block</td>
+<td>每个线程块的最大共享内存容量</td>
+</tr>
+<tr>
+<td>Number of shared memory banks</td>
+<td>共享内存 bank 数量</td>
+</tr>
+<tr>
+<td>Maximum amount of local memory per thread</td>
+<td>每个线程的最大本地内存容量</td>
+</tr>
+<tr>
+<td>Constant memory size</td>
+<td>常量内存大小</td>
+</tr>
+<tr>
+<td>Cache working set per SM for constant memory</td>
+<td>每个 SM 的常量内存缓存工作集</td>
+</tr>
+<tr>
+<td>Cache working set per SM for texture memory</td>
+<td>每个 SM 的纹理内存缓存工作集</td>
+</tr>
+<tr>
+<td>Maximum width for a 1D texture object</td>
+<td>一维纹理对象的最大宽度</td>
+</tr>
+<tr>
+<td>Maximum width and number of layers for a 1D layered texture object</td>
+<td>一维分层纹理对象的最大宽度与层数</td>
+</tr>
+<tr>
+<td>Maximum width and height for a 2D texture object</td>
+<td>二维纹理对象的最大宽度与高度</td>
+</tr>
+<tr>
+<td>Maximum width, height and number of layers for a 2D layered texture object</td>
+<td>二维分层纹理对象的最大宽度、高度与层数</td>
+</tr>
+<tr>
+<td>Maximum width, height and depth for a 3D texture object</td>
+<td>三维纹理对象的最大宽度、高度与深度</td>
+</tr>
+<tr>
+<td>Maximum width/height for a cubemap texture object</td>
+<td>立方体贴图纹理对象的最大宽度/高度</td>
+</tr>
+<tr>
+<td>Maximum number of textures that can be bound to a kernel</td>
+<td>可绑定到一个内核的最大纹理数</td>
+</tr>
+<tr>
+<td>Maximum width and dimensions of surface objects</td>
+<td>表面对象的最大宽度及各维度限制</td>
+</tr>
+<tr>
+<td>Maximum number of surfaces that can use a kernel</td>
+<td>一个内核可使用的最大表面数</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 24 原表（第 1–3 页，数值按原版保留）：</strong></p>
+<p><img alt="表 24，第 1 页" decoding="async" loading="lazy" src="/cuda/book/images/table_24_compute_specs_p1.png"/></p>
+<p><img alt="表 24，第 2 页" decoding="async" loading="lazy" src="/cuda/book/images/table_24_compute_specs_p2.png"/></p>
+<p><img alt="表 24，第 3 页" decoding="async" loading="lazy" src="/cuda/book/images/table_24_compute_specs_p3.png"/></p>
+<p>原表注释：表中 KB 和 K 均按 1024 计，即 1 KiB 为 1024 字节；表中有些共享内存容量超过 48 KB 的配置要求使用动态共享内存。</p>
+<h2 id="第-19-章-中文表-24-技术规格与计算能力对应关系">第 19 章·中文表 24：技术规格与计算能力对应关系</h2>
+<p>按原表合并单元格的计算能力范围整理；同一行可能存在多个取值区间。<strong>⚠ 待核</strong>表示原 PDF 的密集排版导致数字重叠，暂不猜测。请对照同目录的表 24 原图复核。</p>
+<table>
+<thead>
+<tr>
+<th>技术规格（中文）</th>
+<th>计算能力范围 → 原表数值</th>
+<th>来源 PDF 页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每设备最大驻留网格数（并发内核执行）</td>
+<td>5.0–5.2：32；5.3：16；6.0：12；6.1：⚠ 原表数值排版重叠，待核；6.2：16；7.0：12；7.2：⚠ 原表数值排版重叠，待核；7.5–12.0：128</td>
+<td>495</td>
+</tr>
+<tr>
+<td>线程块网格最大维度数</td>
+<td>5.0–12.0: 3</td>
+<td>495</td>
+</tr>
+<tr>
+<td>网格 x 维度最大值（线程块数）</td>
+<td>5.0–12.0: 2³¹−1</td>
+<td>495</td>
+</tr>
+<tr>
+<td>网格 y/z 维度最大值</td>
+<td>5.0–12.0: 65535</td>
+<td>495</td>
+</tr>
+<tr>
+<td>线程块最大维度数</td>
+<td>5.0–12.0: 3</td>
+<td>495</td>
+</tr>
+<tr>
+<td>线程块 x/y 维度最大值</td>
+<td>5.0–12.0: 1024</td>
+<td>495</td>
+</tr>
+<tr>
+<td>线程块 z 维度最大值</td>
+<td>5.0–12.0: 64</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每线程块最大线程数</td>
+<td>5.0–12.0: 1024</td>
+<td>495</td>
+</tr>
+<tr>
+<td>Warp 大小</td>
+<td>5.0–12.0: 32</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每 SM 最大驻留线程块数</td>
+<td>5.0–7.2: 32；7.5: 16；8.0: 32；8.6–8.7: 16；8.9: 24；9.0–12.0: 32</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每 SM 最大驻留 Warp 数</td>
+<td>5.0–7.2: 64；7.5: 32；8.0: 64；8.6–8.9: 48；9.0–10.x: 64；12.0: 48</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每 SM 最大驻留线程数</td>
+<td>5.0–7.2：2048；7.5：1024；8.0：2048；8.6–8.9：1536；9.0–10.x：2048；12.0：1536</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每 SM 32 位寄存器数</td>
+<td>5.0–12.0: 64 K</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每线程块最大 32 位寄存器数</td>
+<td>5.0–5.2: 64 K；5.3: 32 K；6.0–6.1: 64 K；6.2: 32 K；7.0–12.0: 64 K</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每线程最大 32 位寄存器数</td>
+<td>5.0–12.0: 255</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每 SM 最大共享内存</td>
+<td>5.0：64 KB；5.2：96 KB；5.3–6.0：64 KB；6.1：96 KB；6.2：64 KB；7.0–7.2：96 KB；7.5：64 KB；8.0：164 KB；8.6：100 KB；8.7：164 KB；8.9：100 KB；9.0–10.x：228 KB；12.0：100 KB</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每线程块最大共享内存</td>
+<td>5.0–6.2：48 KB；7.0–7.2：96 KB；7.5：64 KB；8.0：163 KB；8.6：99 KB；8.7：163 KB；8.9：99 KB；9.0–10.x：227 KB；12.0：99 KB</td>
+<td>495</td>
+</tr>
+<tr>
+<td>共享内存 Bank 数</td>
+<td>5.0–12.0: 32</td>
+<td>495</td>
+</tr>
+<tr>
+<td>每线程最大本地内存</td>
+<td>5.0–12.0: 512 KB</td>
+<td>496</td>
+</tr>
+<tr>
+<td>常量内存容量</td>
+<td>5.0–12.0: 64 KB</td>
+<td>496</td>
+</tr>
+<tr>
+<td>每 SM 常量内存缓存工作集</td>
+<td>5.0–5.3: 8 KB；6.0: 4 KB；6.1–12.0: 8 KB</td>
+<td>496</td>
+</tr>
+<tr>
+<td>每 SM 纹理内存缓存工作集</td>
+<td>5.0–5.3：12–48 KB；6.0–6.2：24–48 KB；7.0–7.2：32–128 KB；7.5：32 或 64 KB；8.0：28–192 KB；8.6：28–128 KB；8.7：28–192 KB；8.9：28–128 KB；9.0–10.x：28–256 KB；12.0：28–128 KB</td>
+<td>496</td>
+</tr>
+<tr>
+<td>一维 CUDA 数组纹理最大宽度</td>
+<td>5.0–5.3: 65536；6.0–12.0: 131072</td>
+<td>496</td>
+</tr>
+<tr>
+<td>一维线性内存纹理最大宽度</td>
+<td>5.0–5.3：2²⁷；6.0：2²⁸；6.1–6.2：2²⁷；7.0：2²⁸；7.2：2²⁷；7.5–12.0：2²⁸</td>
+<td>496</td>
+</tr>
+<tr>
+<td>一维分层纹理最大宽度 × 层数</td>
+<td>5.0–5.3: 16384 x 2048；6.0–12.0: 32768 x 2048</td>
+<td>496</td>
+</tr>
+<tr>
+<td>二维 CUDA 数组纹理最大宽度 × 高度</td>
+<td>5.0–5.3: 65536 x 65536；6.0–12.0: 131072 x 65536</td>
+<td>496</td>
+</tr>
+<tr>
+<td>二维线性内存纹理最大宽度 × 高度</td>
+<td>5.0–5.3: 65536 x 65536；6.0–12.0: 131072 x 65000</td>
+<td>496</td>
+</tr>
+<tr>
+<td>支持纹理聚集的二维 CUDA 数组纹理最大宽高</td>
+<td>5.0–5.3: 16384 x 16384；6.0–12.0: 32768 x 32768</td>
+<td>496</td>
+</tr>
+<tr>
+<td>二维分层纹理最大宽 × 高 × 层数</td>
+<td>5.0–5.3: 16384 x 16384 x 2048；6.0–12.0: 32768 x 32768 x 2048</td>
+<td>496</td>
+</tr>
+<tr>
+<td>三维 CUDA 数组纹理最大宽 × 高 × 深</td>
+<td>5.0–5.3: 4096 x 4096 x 4096；6.0–12.0: 16384 x 16384 x 16384</td>
+<td>496</td>
+</tr>
+<tr>
+<td>立方体纹理最大宽度（及高度）</td>
+<td>5.0–5.3: 16384；6.0–12.0: 32768</td>
+<td>496</td>
+</tr>
+<tr>
+<td>分层立方体纹理最大宽度 × 层数</td>
+<td>5.0–5.3：16384 × 2046；6.0–12.0：32768 × 2046（原表如此）</td>
+<td>496</td>
+</tr>
+<tr>
+<td>每个内核最多绑定纹理数</td>
+<td>5.0–12.0: 256</td>
+<td>497</td>
+</tr>
+<tr>
+<td>一维 CUDA 数组 Surface 最大宽度</td>
+<td>5.0–5.3: 16384；6.0–12.0: 32768</td>
+<td>497</td>
+</tr>
+<tr>
+<td>一维分层 Surface 最大宽度 × 层数</td>
+<td>5.0–5.3: 16384 x 2048；6.0–12.0: 32768 x 2048</td>
+<td>497</td>
+</tr>
+<tr>
+<td>二维 CUDA 数组 Surface 最大宽高</td>
+<td>5.0–5.3：65536 × 65536；6.0–12.0：131072 × 65536</td>
+<td>497</td>
+</tr>
+<tr>
+<td>二维分层 Surface 最大宽 × 高 × 层数</td>
+<td>5.0–5.3：16384 × 16384 × 2048；6.0–12.0：32768 × 32768 × 1048（原表如此，待核）</td>
+<td>497</td>
+</tr>
+<tr>
+<td>三维 CUDA 数组 Surface 最大宽 × 高 × 深</td>
+<td>5.0–5.3: 4096 x 4096 x 4096；6.0–12.0: 16384 x 16384 x 16384</td>
+<td>497</td>
+</tr>
+<tr>
+<td>立方体 Surface 最大宽度（及高度）</td>
+<td>5.0–5.3: 16384；6.0–12.0: 32768</td>
+<td>497</td>
+</tr>
+<tr>
+<td>分层立方体 Surface 最大宽度 × 层数</td>
+<td>5.0–5.3：16384 × 2046；6.0–12.0：32768 × 2046（原表如此）</td>
+<td>497</td>
+</tr>
+<tr>
+<td>每个内核最多使用 Surface 数量</td>
+<td>5.0–6.2: 16；7.0–12.0: 32</td>
+<td>497</td>
+</tr>
+</tbody>
+</table>
+<p><em>说明：原表中的共享内存 12.0 规格存在文内自相矛盾；本表不擅自改写，保留待核项。单位 K 在原表中指 1024，KB 指 KiB。</em></p>
+<blockquote>
+<p><strong>技术注意：</strong> 对于“计算能力 12.0”共享内存，表 24 给出的每 SM 100 KB 与每线程块 99 KB，与第 19.10.3 节中“227 KB”的文字说明矛盾。保留源文两处数据、标注未消歧，不将文字中的 227 KB 当作可靠 12.0 规格。</p>
+</blockquote>
+<h2 id="19-3-浮点标准-floating-point-standard">19.3 浮点标准（Floating-Point Standard）</h2>
+<p>所有计算设备均遵循 IEEE 754-2008 二进制浮点算术标准，但存在以下差异：</p>
+<ul>
+<li>没有可在运行时动态配置的舍入模式；不过，大多数操作支持多种 IEEE 舍入模式，并通过设备端内建函数提供这些模式。</li>
+<li>没有用于检测浮点异常是否发生的机制。所有操作都相当于始终屏蔽 IEEE-754 异常；发生异常事件时，会返回 IEEE-754 对应的屏蔽结果。因此，虽然支持 SNaN（信号 NaN）编码，但它们不会发出信号，而是按静默 NaN 处理。</li>
+<li>如果单精度浮点操作的一个或多个输入是 NaN，结果将为位模式 <code>0x7fffffff</code> 的静默 NaN。</li>
+<li>双精度浮点绝对值和取负操作对 NaN 的处理不符合 IEEE-754：NaN 会原样传递。</li>
+<li>为确保符合 IEEE 标准，代码应使用 <code>-ftz=false</code>、<code>-prec-div=true</code> 和 <code>-prec-sqrt=true</code> 编译；这些也是默认设置，具体参见 <code>nvcc</code> 用户手册。</li>
+</ul>
+<p>无论编译选项 <code>-ftz</code> 如何设置：</p>
+<ul>
+<li>全局内存上的单精度浮点原子加法始终采用冲零（flush-to-zero）模式，相当于 <code>FADD.F32.FTZ.RN</code>。</li>
+<li>共享内存上的单精度浮点原子加法始终支持非规格化数，相当于 <code>FADD.F32.RN</code>。</li>
+</ul>
+<p>根据 IEEE-754R 标准，如果 <code>fminf()</code>、<code>fmin()</code>、<code>fmaxf()</code> 或 <code>fmax()</code> 的一个输入是 NaN、另一个不是 NaN，则结果为非 NaN 的输入值。</p>
+<p>当浮点值超出目标整数格式的表示范围时，IEEE-754 并未规定转换结果。在 CUDA 计算设备上，转换会钳位到支持范围的端点；这与 x86 架构的行为不同。整数除以零和整数溢出的行为也未由 IEEE-754 定义。CUDA 计算设备没有检测这些整数运算异常的机制；整数除以零会产生未指定、依赖具体机器的值。</p>
+<p>关于 NVIDIA GPU 的浮点精度和 IEEE-754 符合性，原文另提供 NVIDIA 的技术说明链接：<a href="https://developer.nvidia.com/content/precision-performance-floating-point-and-ieee-754-compliance-nvidia-gpus" rel="noopener noreferrer" target="_blank">https://developer.nvidia.com/content/precision-performance-floating-point-and-ieee-754-compliance-nvidia-gpus</a>。</p>
+<h2 id="19-4-计算能力-5-x-compute-capability-5-x">19.4 计算能力 5.x（Compute Capability 5.x）</h2>
+<h3 id="19-4-1-架构-architecture">19.4.1 架构（Architecture）</h3>
+<p>一个流式多处理器（SM）包含：</p>
+<ul>
+<li>128 个 CUDA 核心，用于算术运算；</li>
+<li>32 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 获得待执行的 warp 后，会先将它们分配给四个调度器。每次发射指令时，每个调度器都会从分配给自己的 warp 中选择一个已准备好执行的 warp，并为其发射一条指令（如果存在就绪 warp）。</p>
+<p>SM 还具有：</p>
+<ul>
+<li>只读常量缓存，由所有功能单元共享，用于加速读取位于设备内存中的常量内存；</li>
+<li>24 KB 的统一 L1/纹理缓存，用于缓存全局内存读取；</li>
+<li>计算能力 5.0 设备上的 64 KB 共享内存，或计算能力 5.2 设备上的 96 KB 共享内存。</li>
+</ul>
+<p>统一 L1/纹理缓存也供纹理单元使用，以实现“纹理与表面内存”一节介绍的寻址模式和数据过滤方式。</p>
+<p>所有 SM 共享一个 L2 缓存，用于缓存对本地内存或全局内存的访问，包括临时寄存器溢出数据。应用程序可通过设备属性 <code>l2CacheSize</code> 查询 L2 缓存大小。缓存行为（例如读取同时缓存在统一 L1/纹理缓存和 L2，还是只缓存在 L2）可以通过加载指令的修饰符按访问进行部分配置。</p>
+<h3 id="19-4-2-全局内存-global-memory">19.4.2 全局内存（Global Memory）</h3>
+<p>全局内存访问始终缓存在 L2 中。</p>
+<p>如果数据在整个内核生命周期内只读，也可以通过 <code>__ldg()</code> 函数读取，从而缓存在前文所述的统一 L1/纹理缓存中。当编译器检测到某些数据满足只读条件时，会使用 <code>__ldg()</code> 读取；但编译器不一定总能识别这一条件。将用于读取这些数据的指针同时标记为 <code>const</code> 和 <code>__restrict__</code>，可以提高编译器识别只读条件的可能性。</p>
+<p>对于计算能力 5.0 设备，在整个内核生命周期内并非只读的数据不能缓存在统一 L1/纹理缓存中。对于计算能力 5.2 设备，这类数据默认也不缓存在统一 L1/纹理缓存中，但可以通过以下方式启用缓存：</p>
+<ul>
+<li>使用内联汇编，并按 PTX 参考手册指定适当的修饰符；</li>
+<li>使用编译选项 <code>-Xptxas -dlcm=ca</code>，此时所有读取都会缓存，除非内联汇编修饰符明确禁用缓存；</li>
+<li>使用编译选项 <code>-Xptxas -fscm=ca</code>，此时所有读取都会缓存，包括通过内联汇编执行、且未考虑其修饰符的读取。</li>
+</ul>
+<p>通过上述任一方式启用缓存后，计算能力 5.2 设备会在统一 L1/纹理缓存中缓存全局内存读取，但线程块消耗过多 SM 寄存器文件的内核启动除外。性能分析器会报告这些例外情况。</p>
+<h3 id="19-4-3-共享内存-shared-memory">19.4.3 共享内存（Shared Memory）</h3>
+<p>共享内存分为 32 个 bank，连续的 32 位字映射到连续的 bank。每个 bank 每个时钟周期的带宽为 32 位。</p>
+<p>如果同一 warp 中的两个线程访问同一个 32 位字内的任意地址，即使这些地址位于同一个 bank，也不会产生 bank 冲突。对于读取，该字会广播给请求它的线程；对于写入，每个地址只会由其中一个线程执行写入，但具体由哪个线程写入并未定义。</p>
+<p>图 38 展示了跨步访问的示例。</p>
+<p><em>图 38：在 32 位 bank 大小模式下的跨步共享内存访问。左：跨步为一个 32 位字的线性寻址，无 bank 冲突；中：跨步为两个 32 位字，产生二路 bank 冲突；右：跨步为三个 32 位字，无 bank 冲突。</em></p>
+<p><img alt="图 38：跨步共享内存访问" decoding="async" loading="lazy" src="/cuda/book/images/figure_38_strided_shared_memory_access.png"/></p>
+<p>图 39 展示了不规则访问示例。</p>
+<p><em>图 39：不规则共享内存访问。左：通过随机排列实现无冲突访问；中：线程 3、4、6、7 和 9 访问 bank 5 中的同一个字，因此无冲突；右：线程访问同一 bank 中的同一个字，形成无冲突广播访问。</em></p>
+<p><img alt="图 39：不规则共享内存访问" decoding="async" loading="lazy" src="/cuda/book/images/figure_39_irregular_shared_memory_access.png"/></p>
+<h2 id="19-5-计算能力-6-x-compute-capability-6-x">19.5 计算能力 6.x（Compute Capability 6.x）</h2>
+<h3 id="19-5-1-架构-architecture">19.5.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>计算能力 6.0 设备具有 64 个 CUDA 核心，计算能力 6.1 和 6.2 设备具有 128 个 CUDA 核心，用于算术运算；</li>
+<li>计算能力 6.0 设备具有 16 个特殊功能单元，计算能力 6.1 和 6.2 设备具有 32 个，用于单精度浮点超越函数；</li>
+<li>计算能力 6.0 设备具有 2 个 warp 调度器，计算能力 6.1 和 6.2 设备具有 4 个。</li>
+</ul>
+<p>SM 会先将待执行的 warp 分配给各个调度器；每次发射指令时，每个调度器都会从自己负责的 warp 中选择一个就绪 warp 发射指令。</p>
+<p>SM 还具有共享的只读常量缓存、用于全局内存读取的统一 L1/纹理缓存，以及共享内存：</p>
+<ul>
+<li>计算能力 6.0 和 6.2：L1/纹理缓存 24 KB，共享内存 64 KB；</li>
+<li>计算能力 6.1：L1/纹理缓存 48 KB，共享内存 96 KB。</li>
+</ul>
+<p>统一 L1/纹理缓存也供纹理单元使用，以实现“纹理与表面内存”一节介绍的寻址模式和数据过滤。所有 SM 共享的 L2 缓存用于缓存本地内存或全局内存访问，包括临时寄存器溢出数据。可通过设备属性 <code>l2CacheSize</code> 查询其大小。加载指令的修饰符可以按访问部分配置缓存行为。</p>
+<h3 id="19-5-2-全局内存-global-memory">19.5.2 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-5-3-共享内存-shared-memory">19.5.3 共享内存（Shared Memory）</h3>
+<p>共享内存的行为与计算能力 5.x 设备相同，参见 19.4.3 节。</p>
+<h2 id="19-6-计算能力-7-x-compute-capability-7-x">19.6 计算能力 7.x（Compute Capability 7.x）</h2>
+<h3 id="19-6-1-架构-architecture">19.6.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>64 个 FP32 核心，用于单精度算术运算；</li>
+<li>32 个 FP64 核心，用于双精度算术运算（计算能力 7.5 设备为 2 个）；</li>
+<li>64 个 INT32 核心，用于整数运算；</li>
+<li>8 个混合精度 Tensor Core，用于深度学习矩阵运算；</li>
+<li>16 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 将 warp 静态分配给各个调度器。每次发射指令时，每个调度器都会为自己分配的、已准备好执行的某个 warp 发射一条指令。</p>
+<p>SM 具有由所有功能单元共享的只读常量缓存，以及统一数据缓存和共享内存。二者总容量在 Volta 上为 128 KB，在 Turing 上为 96 KB。共享内存从统一数据缓存中划分出来，可配置为不同大小；剩余数据缓存用作 L1 缓存，并由纹理单元用于寻址和数据过滤。</p>
+<h3 id="19-6-2-独立线程调度-independent-thread-scheduling">19.6.2 独立线程调度（Independent Thread Scheduling）</h3>
+<p>Volta 架构引入了 warp 内的独立线程调度，使此前无法实现的 warp 内同步模式成为可能，也简化了将 CPU 代码移植到 GPU 时的修改工作。但如果开发者假定旧架构中的 warp 内线程始终同步执行，这种变化可能导致实际参与某段代码的线程集合与预期不同。</p>
+<p>以下是需要关注的代码模式及使代码适配 Volta 的建议。</p>
+<h4 id="1-将旧-warp-内建函数替换为带同步的版本">1. 将旧 warp 内建函数替换为带同步的版本</h4>
+<p>使用 warp 内建函数（例如 <code>__shfl*</code>、<code>__any</code>、<code>__all</code> 和 <code>__ballot</code>）的应用，应迁移到带 <code>*_sync</code> 后缀的安全同步版本。新的 warp 内建函数接收线程掩码，用于明确指定哪些 lane（warp 中的线程）必须参与操作。详情参见“Warp 投票函数”和“Warp Shuffle 函数”。</p>
+<p>这些内建函数在 CUDA 9.0 及更高版本中可用，可以通过 <code>CUDART_VERSION</code> 条件编译：</p>
+<pre><code class="language-cpp">#if defined(CUDART_VERSION) &amp;&amp; CUDART_VERSION &gt;= 9000
+// 使用带 *_sync 后缀的 warp 内建函数。
+#endif
+</code></pre>
+<p>这些函数并非只适用于 Volta 或 Turing，而是可用于所有架构；多数情况下，一个代码版本即可适配所有架构。不过，在 Pascal 及更早架构上，掩码中的所有线程必须在收敛状态下执行同一 warp 内建指令，而且掩码中所有线程的并集必须等于该 warp 的活动掩码。以下代码在 Volta 上有效，但在 Pascal 及更早架构上无效：</p>
+<pre><code class="language-cpp">if (tid % warpSize &lt; 16) {
+    float swapped = __shfl_xor_sync(0xffffffff, val, 16);
+} else {
+    float swapped = __shfl_xor_sync(0xffffffff, val, 16);
+}
+</code></pre>
+<p><code>__ballot(1)</code> 的替代函数是 <code>__activemask()</code>。但 warp 内线程即使处于同一代码路径，也可能发生分歧；因此 <code>__activemask()</code> 和 <code>__ballot(1)</code> 可能只返回当前路径中的部分线程。</p>
+<p>例如，下面的代码试图在 <code>dataLen</code> 不是 32 的倍数时，使用 <code>__activemask()</code> 处理不完整的 warp，但它是无效的：</p>
+<pre><code class="language-cpp">for (int i = warpLane; i &lt; dataLen; i += warpSize) {
+    unsigned active = __activemask();
+    unsigned bitPack = __ballot_sync(active, data[i] &gt; threshold);
+    if (warpLane == 0) {
+        output[i / 32] = bitPack;
+    }
+}
+</code></pre>
+<p>CUDA 不保证 warp 只会在循环条件处分歧。如果还因其他原因发生分歧，warp 中不同线程子集可能为同一个 32 位输出元素计算出冲突结果。可使用非分歧的循环条件，并通过 <code>__ballot_sync()</code> 安全枚举参与阈值计算的线程：</p>
+<pre><code class="language-cpp">for (int i = warpLane; i - warpLane &lt; dataLen; i += warpSize) {
+    unsigned active = __ballot_sync(0xFFFFFFFF, i &lt; dataLen);
+    if (i &lt; dataLen) {
+        unsigned bitPack = __ballot_sync(active, data[i] &gt; threshold);
+        if (warpLane == 0) {
+            output[i / 32] = bitPack;
+        }
+    }
+}
+</code></pre>
+<p>上述“发现模式”（Discovery Pattern）展示了 <code>__activemask()</code> 的一种有效用法。</p>
+<h4 id="2-在-warp-内共享数据的步骤之间加入-syncwarp">2. 在 warp 内共享数据的步骤之间加入 <code>__syncwarp()</code></h4>
+<p>如果应用使用 warp 同步代码，那么当线程通过全局内存或共享内存交换数据时，应在相关步骤之间插入新的 warp 范围屏障 <code>__syncwarp()</code>。不能再假定线程以锁步方式执行，也不能假定不同线程之间的读写无需同步就能在 warp 内彼此可见。</p>
+<p>例如，在蝶形归约的每次读取和写入之间，应按需要插入 <code>__syncwarp()</code>，确保 warp 内数据交换有明确的同步点。</p>
+<h4 id="3-确保线程块内所有未退出线程都到达屏障">3. 确保线程块内所有未退出线程都到达屏障</h4>
+<p>虽然文档一直将 <code>__syncthreads()</code> 描述为同步线程块中的所有线程，但在 Pascal 及更早架构上，硬件只能在 warp 级别强制执行同步。在某些情况下，只要每个 warp 中至少有一个线程到达屏障，即使并非所有线程都执行了屏障，屏障也可能成功。</p>
+<p>从 Volta 开始，CUDA 内建函数 <code>__syncthreads()</code>、PTX 指令 <code>bar.sync</code> 及其派生指令都按线程强制执行同步：只有线程块中所有尚未退出的线程都到达屏障后，屏障才会成功。利用旧行为的代码很可能发生死锁，必须修改以确保所有尚未退出的线程都能到达屏障。</p>
+<p>Compute Sanitizer 提供的 <code>racecheck</code> 和 <code>synccheck</code> 工具可帮助定位违规。迁移期间，开发者也可以选择启用不支持独立线程调度的 Pascal 调度模型，详情参见“应用程序兼容性”。</p>
+<h3 id="19-6-3-全局内存-global-memory">19.6.3 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-6-4-共享内存-shared-memory">19.6.4 共享内存（Shared Memory）</h3>
+<p>共享内存所占用的统一数据缓存容量可以按内核配置。Volta 架构（计算能力 7.0）的统一数据缓存为 128 KB，共享内存容量可设为 0、8、16、32、64 或 96 KB。Turing 架构（计算能力 7.5）的统一数据缓存为 96 KB，共享内存容量可设为 32 或 64 KB。</p>
+<p>与 Kepler 不同，驱动程序会自动为每个内核配置共享内存容量，以避免共享内存占用率成为瓶颈，并尽可能允许该内核与已启动的其他内核并发执行。多数情况下，驱动程序的默认行为应能提供良好性能。</p>
+<p>由于驱动程序不一定了解完整工作负载，应用程序有时可以提供所需共享内存配置的提示。例如，共享内存使用量很少或为零的内核，可以请求更大的共享内存划分，以便鼓励后续需要更多共享内存的内核与其并发执行。</p>
+<p>新的 <code>cudaFuncSetAttribute()</code> API 可将首选共享内存容量（carveout）设为最大支持容量的百分比。Volta 的最大支持容量为 96 KB，Turing 为 64 KB。与 Kepler 引入的旧接口 <code>cudaFuncSetCacheConfig()</code> 相比，新接口不会将首选容量作为内核启动的硬性要求；驱动程序可在需要时选择不同配置，以保证函数可以执行或避免频繁重新配置造成的抖动。</p>
+<pre><code class="language-cpp">// 设备代码
+__global__ void MyKernel(...) {
+    __shared__ float buffer[BLOCK_DIM];
+    // ...
+}
+
+// 主机代码
+int carveout = 50; // 首选最大共享内存容量的 50%
+cudaFuncSetAttribute(
+    MyKernel,
+    cudaFuncAttributePreferredSharedMemoryCarveout,
+    carveout);
+MyKernel&lt;&lt;&lt;gridDim, BLOCK_DIM&gt;&gt;&gt;(...);
+</code></pre>
+<p>除整数百分比外，还可使用以下枚举值：</p>
+<ul>
+<li><code>cudaSharedmemCarveoutDefault</code>（<code>-1</code>）；</li>
+<li><code>cudaSharedmemCarveoutMaxL1</code>（<code>0</code>）；</li>
+<li><code>cudaSharedmemCarveoutMaxShared</code>（<code>100</code>）。</li>
+</ul>
+<p>如果百分比无法精确对应某个受支持的容量，系统会向上取整到下一个可用容量。例如，SM 7.0 支持 0、8、16、32、64 或 96 KB；96 KB 的 50% 是 48 KB，不属于支持值，因此会向上取整为 64 KB。</p>
+<p>计算能力 7.x 设备允许单个线程块访问全部共享内存容量：Volta 为 96 KB，Turing 为 64 KB。依赖单个线程块使用超过 48 KB 共享内存的内核具有架构特定性，必须使用动态共享内存（而不是静态大小数组），并显式调用 <code>cudaFuncSetAttribute()</code> 启用相应容量。</p>
+<pre><code class="language-cpp">// 设备代码
+__global__ void MyKernel(...) {
+    extern __shared__ float buffer[];
+    // ...
+}
+
+// 主机代码：Volta 示例，96 KB
+int maxbytes = 98304;
+cudaFuncSetAttribute(
+    MyKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, maxbytes);
+MyKernel&lt;&lt;&lt;gridDim, blockDim, maxbytes&gt;&gt;&gt;(...);
+</code></pre>
+<h2 id="19-7-计算能力-8-x-compute-capability-8-x">19.7 计算能力 8.x（Compute Capability 8.x）</h2>
+<h3 id="19-7-1-架构-architecture">19.7.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>计算能力 8.0 设备具有 64 个 FP32 核心；8.6、8.7 和 8.9 设备具有 128 个；</li>
+<li>计算能力 8.0 设备具有 32 个 FP64 核心；8.6、8.7 和 8.9 设备具有 2 个；</li>
+<li>64 个 INT32 核心，用于整数运算；</li>
+<li>对于计算能力 8.0、8.6 和 8.7，具有 4 个第三代混合精度 Tensor Core，支持 FP16、<code>__nv_bfloat16</code>、TF32、子字节及 FP64 矩阵运算；</li>
+<li>对于计算能力 8.9，具有 4 个第四代混合精度 Tensor Core，支持 FP8、FP16、<code>__nv_bfloat16</code>、TF32、子字节及 FP64；</li>
+<li>16 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 将 warp 静态分配给各调度器；每次发射指令时，各调度器会为自己负责的就绪 warp 发射一条指令。</p>
+<p>SM 具有共享的只读常量缓存，以及统一数据缓存和共享内存：计算能力 8.0 和 8.7 的总容量为 192 KB，计算能力 8.6 和 8.9 的总容量为 128 KB。共享内存从统一数据缓存中划分出来；剩余部分作为 L1 缓存，也供纹理单元用于寻址和数据过滤。</p>
+<h3 id="19-7-2-全局内存-global-memory">19.7.2 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-7-3-共享内存-shared-memory">19.7.3 共享内存（Shared Memory）</h3>
+<p>与 Volta 类似，统一数据缓存中分配给共享内存的容量可按内核配置。Ampere 架构的统一数据缓存容量如下：</p>
+<ul>
+<li>计算能力 8.0 和 8.7：192 KB；</li>
+<li>计算能力 8.6 和 8.9：128 KB。</li>
+</ul>
+<p>计算能力 8.0 和 8.7 的共享内存容量可设为 0、8、16、32、64、100、132 或 164 KB；计算能力 8.6 和 8.9 可设为 0、8、16、32、64 或 100 KB。</p>
+<p>应用程序可通过 <code>cudaFuncSetAttribute()</code> 设置首选 carveout：</p>
+<pre><code class="language-cpp">cudaFuncSetAttribute(
+    kernel_name,
+    cudaFuncAttributePreferredSharedMemoryCarveout,
+    carveout);
+</code></pre>
+<p><code>carveout</code> 可以是最大支持共享内存容量的整数百分比（计算能力 8.0/8.7 为 164 KB，8.6/8.9 为 100 KB），也可以是 <code>cudaSharedmemCarveoutDefault</code>、<code>cudaSharedmemCarveoutMaxL1</code> 或 <code>cudaSharedmemCarveoutMaxShared</code>。按百分比设置时，容量向上取整到最近的受支持值。例如，计算能力 8.0 的 50% 会映射到 100 KB，而不是 82 KB。该设置只是提示；如有需要，驱动程序可以选择其他配置。</p>
+<p>计算能力 8.0 和 8.7 的单个线程块最多可访问 163 KB 共享内存；计算能力 8.6 和 8.9 的单个线程块最多可访问 99 KB。单个线程块使用超过 48 KB 共享内存的内核必须使用动态共享内存，而不是静态大小数组，并通过 <code>cudaFuncSetAttribute()</code> 设置 <code>cudaFuncAttributeMaxDynamicSharedMemorySize</code> 显式启用。</p>
+<p>注意：每个线程块可用的最大共享内存小于每个 SM 可划分的最大共享内存。未提供给线程块使用的 1 KB 共享内存保留给系统使用。</p>
+<h2 id="19-8-计算能力-9-0-compute-capability-9-0">19.8 计算能力 9.0（Compute Capability 9.0）</h2>
+<h3 id="19-8-1-架构-architecture">19.8.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>128 个 FP32 核心，用于单精度算术运算；</li>
+<li>64 个 FP64 核心，用于双精度算术运算；</li>
+<li>64 个 INT32 核心，用于整数运算；</li>
+<li>4 个第四代混合精度 Tensor Core，支持 FP8 输入格式 E4M3 或 E5M2、FP16、<code>__nv_bfloat16</code>、TF32、INT8 和 FP64 矩阵运算，并支持稀疏性；</li>
+<li>16 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 将 warp 静态分配给各调度器。每次发射指令时，各调度器会为自己负责的就绪 warp 发射一条指令。</p>
+<p>SM 具有共享的只读常量缓存，以及统一数据缓存和共享内存。计算能力 9.0 设备的统一数据缓存与共享内存总容量为 256 KB，约为 NVIDIA Ampere 架构 192 KB 容量的 1.33 倍。共享内存从统一数据缓存中划分出来；剩余部分作为 L1 缓存，也供纹理单元实现寻址和数据过滤。</p>
+<h3 id="19-8-2-全局内存-global-memory">19.8.2 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-8-3-共享内存-shared-memory">19.8.3 共享内存（Shared Memory）</h3>
+<p>与 NVIDIA Ampere 架构类似，统一数据缓存中分配给共享内存的容量可按内核配置。H100 Tensor Core GPU（计算能力 9.0）的统一数据缓存为 256 KB，共享内存容量可设为 0、8、16、32、64、100、132、164、196 或 228 KB。</p>
+<p>应用程序可以配置首选共享内存容量（carveout）。计算能力 9.0 的单个线程块最多可访问 227 KB 共享内存。依赖单个线程块使用超过 48 KB 共享内存的内核具有架构特定性，必须使用动态共享内存，而不是静态大小数组，并显式调用 <code>cudaFuncSetAttribute()</code> 设置 <code>cudaFuncAttributeMaxDynamicSharedMemorySize</code>。</p>
+<p>每个线程块可用的最大共享内存小于每个 SM 可划分的最大容量；未提供给线程块的 1 KB 共享内存保留给系统使用。</p>
+<h3 id="19-8-4-加速专用计算的功能-features-accelerating-specialized-computations">19.8.4 加速专用计算的功能（Features Accelerating Specialized Computations）</h3>
+<p>NVIDIA Hopper 架构提供了用于加速矩阵乘加（MMA）计算的功能，包括：</p>
+<ul>
+<li>MMA 指令的异步执行；</li>
+<li>作用于跨越一个 warp-group 的大型矩阵的 MMA 指令；</li>
+<li>在 warp-group 之间动态重新分配寄存器容量，以支持更大的矩阵；</li>
+<li>直接从共享内存访问操作数矩阵。</li>
+</ul>
+<p>这组功能只能通过内联 PTX 在 CUDA 编译工具链中使用。原文强烈建议应用程序通过 cuBLAS、cuDNN 或 cuFFT 等 CUDA-X 库使用这些复杂功能；设备内核则建议通过 CUTLASS 使用。CUTLASS 是一组 CUDA C++ 模板抽象，可用于在 CUDA 的不同层级和规模上实现高性能矩阵乘法（GEMM）及相关计算。</p>
+<h2 id="19-9-计算能力-10-0-compute-capability-10-0">19.9 计算能力 10.0（Compute Capability 10.0）</h2>
+<h3 id="19-9-1-架构-architecture">19.9.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>128 个 FP32 核心，用于单精度算术运算；</li>
+<li>64 个 FP64 核心，用于双精度算术运算；</li>
+<li>64 个 INT32 核心，用于整数运算；</li>
+<li>4 个第五代混合精度 Tensor Core，支持 FP8 输入格式 E4M3 或 E5M2、FP16、<code>__nv_bfloat16</code>、TF32、INT8 和 FP64 矩阵运算，并支持稀疏性；</li>
+<li>16 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 将 warp 静态分配给各调度器；每次发射指令时，各调度器会为自己负责的就绪 warp 发射一条指令。</p>
+<p>SM 具有共享的只读常量缓存，以及容量为 256 KB 的统一数据缓存和共享内存。共享内存从统一数据缓存中划分出来；剩余部分作为 L1 缓存，也供纹理单元用于寻址和数据过滤。</p>
+<h3 id="19-9-2-全局内存-global-memory">19.9.2 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-9-3-共享内存-shared-memory">19.9.3 共享内存（Shared Memory）</h3>
+<p>统一数据缓存中分配给共享内存的容量可按内核配置，其行为与计算能力 9.0 相同。计算能力 10.0 设备的统一数据缓存为 256 KB，共享内存容量可设为 0、8、16、32、64、100、132、164、196 或 228 KB。</p>
+<p>应用程序可以配置首选 carveout。计算能力 10.0 的单个线程块最多可访问 227 KB 共享内存。单个线程块使用超过 48 KB 共享内存的内核必须使用动态共享内存，而不是静态大小数组，并通过 <code>cudaFuncSetAttribute()</code> 设置 <code>cudaFuncAttributeMaxDynamicSharedMemorySize</code> 显式启用。</p>
+<p>每个线程块可用的最大共享内存小于每个 SM 可划分的最大容量；未提供给线程块的 1 KB 共享内存保留给系统使用。</p>
+<h3 id="19-9-4-加速专用计算的功能-features-accelerating-specialized-computations">19.9.4 加速专用计算的功能（Features Accelerating Specialized Computations）</h3>
+<p>NVIDIA Blackwell 架构扩展了 NVIDIA Hopper 架构中用于加速矩阵乘加（MMA）的功能。这些功能只能通过内联 PTX 在 CUDA 编译工具链中使用。</p>
+<p>原文建议应用程序通过 cuBLAS、cuDNN 或 cuFFT 等 CUDA-X 库使用这些复杂功能，并建议设备内核通过 CUTLASS 使用这些功能。CUTLASS 提供用于实现高性能 GEMM 及相关计算的 CUDA C++ 模板抽象。</p>
+<h2 id="19-10-计算能力-12-0-compute-capability-12-0">19.10 计算能力 12.0（Compute Capability 12.0）</h2>
+<h3 id="19-10-1-架构-architecture">19.10.1 架构（Architecture）</h3>
+<p>一个 SM 包含：</p>
+<ul>
+<li>128 个 FP32 核心；</li>
+<li>2 个 FP64 核心；</li>
+<li>64 个 INT32 核心；</li>
+<li>第五代混合精度 Tensor Core，支持 FP8 输入格式 E4M3 或 E5M2、FP16、<code>__nv_bfloat16</code>、TF32、INT8 和 FP64 矩阵运算，并支持稀疏性；</li>
+<li>16 个特殊功能单元，用于单精度浮点超越函数；</li>
+<li>4 个 warp 调度器。</li>
+</ul>
+<p>SM 将 warp 静态分配给各调度器；每次发射指令时，各调度器会为自己负责的就绪 warp 发射一条指令。</p>
+<p>SM 具有共享的只读常量缓存，以及总容量为 128 KB 的统一数据缓存和共享内存。共享内存从统一数据缓存中划分出来；剩余部分作为 L1 缓存，也供纹理单元用于寻址和数据过滤。</p>
+<h3 id="19-10-2-全局内存-global-memory">19.10.2 全局内存（Global Memory）</h3>
+<p>全局内存的行为与计算能力 5.x 设备相同，参见 19.4.2 节。</p>
+<h3 id="19-10-3-共享内存-shared-memory">19.10.3 共享内存（Shared Memory）</h3>
+<p>统一数据缓存中分配给共享内存的容量可按内核配置。计算能力 12.0 设备的统一数据缓存为 128 KB，共享内存容量可设为 0、8、16、32、64 或 100 KB。</p>
+<p>应用程序可以配置首选 carveout。原文指出，计算能力 12.0 的单个线程块最多可访问 227 KB 共享内存。单个线程块使用超过 48 KB 共享内存的内核必须使用动态共享内存，而不是静态大小数组，并通过 <code>cudaFuncSetAttribute()</code> 设置 <code>cudaFuncAttributeMaxDynamicSharedMemorySize</code> 显式启用。</p>
+<p>每个线程块可用的最大共享内存小于每个 SM 可划分的最大容量；未提供给线程块的 1 KB 共享内存保留给系统使用。</p>
+<h3 id="19-10-4-加速专用计算的功能-features-accelerating-specialized-computations">19.10.4 加速专用计算的功能（Features Accelerating Specialized Computations）</h3>
+<p>NVIDIA Blackwell 架构扩展了 NVIDIA Hopper 架构中用于加速矩阵乘加（MMA）的功能。这些功能只能通过内联 PTX 在 CUDA 编译工具链中使用。</p>
+<p>原文建议应用程序通过 cuBLAS、cuDNN 或 cuFFT 等 CUDA-X 库使用这些复杂功能，并建议设备内核通过 CUTLASS 使用这些功能。CUTLASS 提供用于实现高性能 GEMM 及相关计算的 CUDA C++ 模板抽象。</p>
+<h2 id="校对说明">校对说明</h2>
+<p>本章技术规格表中的原始数值保存在表 23、表 24 的分页图片中，正文已翻译表项名称，但这些多列数值尚未重排成完整的中文表格。发布前应逐项复核表格中各计算能力的列对应关系。原 PDF 正文中的部分图号交叉引用与图题编号不一致；译稿按图题编号引用图 38 和图 39，并保留了原图。</p>
+<ul>
+<li>本 PDF 正文提到“表 20/表 21”，但当前表格实际标题编号为“表 23/表 24”；正文对共享内存图的交叉引用也与当前图题编号不一致。译稿按页面上实际显示的表题/图题编号保存，并记录该源文编号差异。</li>
+<li><strong>原文技术数据矛盾（需要核验）：</strong> 19.10.1/19.10.3 给出计算能力 12.0 的统一数据缓存与共享内存总容量为 128 KB，且共享内存划分值最高为 100 KB；但 19.10.3 随后又写“单个线程块最多可访问 227 KB 共享内存”。后者大于该 SM 的总容量，内部不一致。本译稿保留原 PDF 数值并在此标记，没有擅自改成猜测值；使用前应核对 NVIDIA 后续勘误或更新版文档。</li>
+</ul>

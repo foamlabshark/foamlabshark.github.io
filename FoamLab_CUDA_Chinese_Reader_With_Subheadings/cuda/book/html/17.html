@@ -1,0 +1,1094 @@
+<h1 id="第十七章-c-语言支持-c-language-support">第十七章 C++ 语言支持（C++ Language Support）</h1>
+<blockquote>
+<p>对应原 PDF 第 425 页起（原书印刷页码 409 起）。保留原书小节编号、C++ 术语、编译选项、API 名称与代码示例。</p>
+</blockquote>
+<p>使用 <code>nvcc</code> 编译的 CUDA 源文件可以同时包含主机代码和设备代码。对于 C++ 输入，CUDA 前端编译器力求模拟主机编译器的行为。输入源代码依据 C++ ISO/IEC 14882:2003、14882:2011、14882:2014 或 14882:2017 规范处理；CUDA 前端编译器也会尽可能模拟主机编译器偏离 ISO 规范的行为。</p>
+<p>此外，CUDA 还扩展了本文档所述的 CUDA 专用语言构造，并受到本章列出的限制约束。17.1–17.4 节分别给出 C++11、C++14、C++17 和 C++20 特性的支持情况；17.5 节介绍语言限制。</p>
+<h2 id="17-1-c-11-语言特性-c-11-language-features">17.1 C++11 语言特性（C++11 Language Features）</h2>
+<p>下表列出已纳入 C++11 标准的新语言特性。“提案”列给出 ISO C++ 委员会提案编号；“nvcc（设备代码）中可用”列表示 <code>nvcc</code> 首次在设备代码中实现该特性的版本（如果已实现）。</p>
+<p><strong>表 21：C++11 语言特性</strong></p>
+<table>
+<thead>
+<tr>
+<th>语言特性</th>
+<th>C++11 提案</th>
+<th>nvcc 设备代码支持版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>右值引用</td>
+<td>N2118</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td><code>*this</code> 的右值引用</td>
+<td>N2439</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>使用右值初始化类对象</td>
+<td>N1610</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>非静态数据成员初始化器</td>
+<td>N2756</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>可变参数模板</td>
+<td>N2242</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>扩展可变参数模板模板参数</td>
+<td>N2555</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>初始化列表</td>
+<td>N2672</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>静态断言</td>
+<td>N1720</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td><code>auto</code> 类型变量</td>
+<td>N1984</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>多声明符 <code>auto</code></td>
+<td>N1737</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>移除作为存储类说明符的 <code>auto</code></td>
+<td>N2546</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>新的函数声明符语法</td>
+<td>N2541</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>Lambda 表达式</td>
+<td>N2927</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>表达式的声明类型</td>
+<td>N2343</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>不完整返回类型</td>
+<td>N3276</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>右尖括号 <code>&gt;&gt;</code></td>
+<td>N1757</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>函数模板的默认模板参数</td>
+<td>DR226</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>解决表达式的 SFINAE 问题</td>
+<td>DR339</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>别名模板</td>
+<td>N2258</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td><code>extern</code> 模板</td>
+<td>N1987</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>空指针常量</td>
+<td>N2431</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>强类型枚举</td>
+<td>N2347</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>枚举的前置声明</td>
+<td>N2764、DR1206</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>标准化属性语法</td>
+<td>N2761</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>广义常量表达式</td>
+<td>N2235</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>对齐支持</td>
+<td>N2341</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>有条件支持的行为</td>
+<td>N1627</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>将未定义行为转变为可诊断错误</td>
+<td>N1727</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>委托构造函数</td>
+<td>N1986</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>继承构造函数</td>
+<td>N2540</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>显式转换运算符</td>
+<td>N2437</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>新字符类型</td>
+<td>N2249</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>Unicode 字符串字面量</td>
+<td>N2442</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>原始字符串字面量</td>
+<td>N2442</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>字面量中的通用字符名</td>
+<td>N2170</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>用户定义字面量</td>
+<td>N2765</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>标准布局类型</td>
+<td>N2342</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>默认化函数</td>
+<td>N2346</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>删除函数</td>
+<td>N2346</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>扩展 friend 声明</td>
+<td>N1791</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>扩展 <code>sizeof</code></td>
+<td>N2253、DR850</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>内联命名空间</td>
+<td>N2535</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>不受限制的联合体</td>
+<td>N2544</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>局部类型和未命名类型作为模板参数</td>
+<td>N2657</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>基于范围的 <code>for</code> 循环</td>
+<td>N2930</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>显式虚函数覆盖</td>
+<td>N2928、N3206、N3272</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>垃圾回收与基于可达性的泄漏检测的最低限度支持</td>
+<td>N2670</td>
+<td>不适用，见“限制”</td>
+</tr>
+<tr>
+<td>允许移动构造函数抛出异常（<code>noexcept</code>）</td>
+<td>N3050</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>定义移动特殊成员函数</td>
+<td>N3053</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>并发：顺序点</td>
+<td>N2239</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>并发：原子操作</td>
+<td>N2427</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>并发：强比较并交换</td>
+<td>N2748</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>并发：双向内存栅栏</td>
+<td>N2752</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>并发：内存模型</td>
+<td>N2429</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>并发：原子操作与内存模型的数据依赖排序</td>
+<td>N2664</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>传播异常</td>
+<td>N2179</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>允许在信号处理程序中使用原子操作</td>
+<td>N2547</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>线程局部存储</td>
+<td>N2659</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>具有并发性的动态初始化与销毁</td>
+<td>N2660</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>C++11 中的 C99 特性：预定义标识符 <code>__func__</code></td>
+<td>N2340</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>C++11 中的 C99 预处理器</td>
+<td>N1653</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td><code>long long</code></td>
+<td>N1811</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td>扩展整型</td>
+<td>N1988</td>
+<td>原表未列出版本</td>
+</tr>
+</tbody>
+</table>
+<h2 id="17-2-c-14-语言特性-c-14-language-features">17.2 C++14 语言特性（C++14 Language Features）</h2>
+<p>下表列出纳入 C++14 标准的新语言特性。</p>
+<p><strong>表 22：C++14 语言特性</strong></p>
+<table>
+<thead>
+<tr>
+<th>语言特性</th>
+<th>C++14 提案</th>
+<th>nvcc 设备代码支持版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调整某些 C++ 上下文转换</td>
+<td>N3323</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>二进制字面量</td>
+<td>N3472</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>返回类型推导函数</td>
+<td>N3638</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>广义 lambda 捕获（初始化捕获）</td>
+<td>N3648</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>泛型（多态）lambda 表达式</td>
+<td>N3649</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>变量模板</td>
+<td>N3651</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>放宽 <code>constexpr</code> 函数要求</td>
+<td>N3652</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>成员初始化器与聚合类型</td>
+<td>N3653</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>明确内存分配规则</td>
+<td>N3664</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td>带大小参数的释放</td>
+<td>N3778</td>
+<td>原表未列出版本</td>
+</tr>
+<tr>
+<td><code>[[deprecated]]</code> 属性</td>
+<td>N3760</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>使用单引号作为数字分隔符</td>
+<td>N3781</td>
+<td>9.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="17-3-c-17-语言特性-c-17-language-features">17.3 C++17 语言特性（C++17 Language Features）</h2>
+<p><code>nvcc</code> 11.0 及更高版本支持所有 C++17 语言特性，但仍受到本章所述限制。</p>
+<h2 id="17-4-c-20-语言特性-c-20-language-features">17.4 C++20 语言特性（C++20 Language Features）</h2>
+<p><code>nvcc</code> 12.0 及更高版本支持所有 C++20 语言特性，但仍受到本章所述限制。</p>
+<h2 id="17-5-限制-restrictions">17.5 限制（Restrictions）</h2>
+<h3 id="17-5-1-主机编译器扩展-host-compiler-extensions">17.5.1 主机编译器扩展（Host Compiler Extensions）</h3>
+<p>主机编译器专有的语言扩展不支持在设备代码中使用。</p>
+<ul>
+<li><code>__Complex</code> 类型仅支持主机代码。</li>
+<li><code>__int128</code> 类型在与支持该类型的主机编译器配合编译时，也支持用于设备代码。</li>
+<li><code>__float128</code> 类型仅适用于计算能力为 10.0 及以上、且配合支持该类型的主机编译器编译的设备。编译器处理 <code>__float128</code> 常量表达式时，可能使用精度较低的浮点表示。</li>
+</ul>
+<h3 id="17-5-2-预处理器符号-preprocessor-symbols">17.5.2 预处理器符号（Preprocessor Symbols）</h3>
+<h4 id="17-5-2-1-cuda-arch">17.5.2.1 <code>__CUDA_ARCH__</code></h4>
+<ol>
+<li>
+<p>下列实体的类型签名不得取决于 <code>__CUDA_ARCH__</code> 是否定义，也不得取决于它的具体取值：</p>
+<ul>
+<li><code>__global__</code> 函数及函数模板；</li>
+<li><code>__device__</code> 和 <code>__constant__</code> 变量；</li>
+<li>纹理和表面对象。</li>
+</ul>
+<p>例如，以下代码非法，因为设备变量 <code>xxx</code> 和内核 <code>foo</code> 的类型会随 <code>__CUDA_ARCH__</code> 改变：</p>
+<pre><code class="language-cpp">#if !defined(__CUDA_ARCH__)
+typedef int mytype;
+#else
+typedef double mytype;
+#endif
+
+__device__ mytype xxx; // 错误：xxx 的类型依赖于 __CUDA_ARCH__
+
+__global__ void foo(
+    mytype in,         // 错误：foo 的类型依赖于 __CUDA_ARCH__
+    mytype *ptr) {
+    *ptr = in;
+}
+</code></pre>
+</li>
+<li>
+<p>如果一个 <code>__global__</code> 函数模板由主机实例化并启动，那么无论 <code>__CUDA_ARCH__</code> 是否定义、取值为何，该模板都必须使用相同的模板参数实例化。</p>
+</li>
+<li>
+<p>在分离编译模式下，具有外部链接的函数或变量定义是否存在，不得依赖于 <code>__CUDA_ARCH__</code> 是否定义或其具体取值。</p>
+</li>
+<li>
+<p>在分离编译模式下，不得在头文件中以可能导致不同目标文件出现不同运行行为的方式使用 <code>__CUDA_ARCH__</code>；或者必须保证所有目标文件都针对相同的计算架构编译。如果头文件中定义的弱函数或模板函数依赖 <code>__CUDA_ARCH__</code>，不同目标文件针对不同架构编译时，可能生成彼此冲突的实例。</p>
+<p>例如，若头文件中的模板在 <code>compute_70</code> 下返回空指针、在其他架构下返回共享内存数组地址，而两个源文件针对不同架构编译并实例化相同类型，那么链接时只会采用其中一个版本，程序行为将取决于最终选中的版本。应将这些源文件编译为相同计算架构，或避免在共享头文件函数中用 <code>__CUDA_ARCH__</code> 控制行为。</p>
+</li>
+</ol>
+<p>编译器不保证一定会针对上述不受支持的 <code>__CUDA_ARCH__</code> 用法生成诊断信息。</p>
+<h3 id="17-5-3-限定符-qualifiers">17.5.3 限定符（Qualifiers）</h3>
+<h4 id="17-5-3-1-设备内存空间说明符-device-memory-space-specifiers">17.5.3.1 设备内存空间说明符（Device Memory Space Specifiers）</h4>
+<p><code>__device__</code>、<code>__shared__</code>、<code>__managed__</code> 和 <code>__constant__</code> 内存空间说明符不能用于：</p>
+<ul>
+<li><code>class</code>、<code>struct</code> 和 <code>union</code> 的数据成员；</li>
+<li>形式参数；</li>
+<li>在主机端执行的函数内部、且不是 <code>extern</code> 的变量声明。</li>
+</ul>
+<p>在设备端执行的函数中，变量声明如果既不是 <code>extern</code> 也不是 <code>static</code>，则不能使用 <code>__device__</code>、<code>__constant__</code> 或 <code>__managed__</code> 内存空间说明符。</p>
+<p>使用 <code>__device__</code>、<code>__constant__</code>、<code>__managed__</code> 或 <code>__shared__</code> 定义的变量，其类类型不能具有非空构造函数或非空析构函数。</p>
+<p>在翻译单元的某一点，如果类的构造函数是平凡构造函数，或满足以下全部条件，则可视为“空构造函数”：构造函数已定义；没有参数；初始化列表为空；函数体为空；类没有虚函数、虚基类或非静态数据成员初始化器；所有基类及类类型的非静态数据成员的默认构造函数也都可视为空构造函数。</p>
+<p>析构函数若为平凡析构函数，或满足以下全部条件，则可视为“空析构函数”：析构函数已定义且函数体为空；类没有虚函数和虚基类；所有基类及类类型的非静态数据成员的析构函数也都可视为空析构函数。</p>
+<h3 id="17-5-3-2-managed-内存空间说明符-managed-memory-space-specifier">17.5.3.2 <code>__managed__</code> 内存空间说明符（<code>__managed__</code> Memory Space Specifier）</h3>
+<p>使用 <code>__managed__</code> 声明的托管变量受到以下限制：</p>
+<ul>
+<li>托管变量的地址不是常量表达式。</li>
+<li>托管变量不能具有 <code>const</code> 限定类型或引用类型。</li>
+<li>当 CUDA Runtime 可能尚未处于有效状态时，不得使用托管变量的地址或值，包括静态/动态初始化或销毁静态、线程局部对象的过程；调用 <code>exit()</code> 后执行的代码；以及 CUDA Runtime 可能尚未初始化时执行的代码。</li>
+<li>托管变量不能作为未加括号的 id-expression 参数用于 <code>decltype()</code>。</li>
+<li>托管变量具有与动态分配托管内存相同的一致性和连贯性行为。</li>
+<li>在多 GPU 执行平台上，托管变量只分配一次，不会为每块 GPU 分别分配。</li>
+<li>主机函数内部不能声明没有 <code>extern</code> 链接属性的托管变量；设备函数内部不能声明既不是 <code>extern</code> 也不是 <code>static</code> 的托管变量。</li>
+</ul>
+<p>示例：</p>
+<pre><code class="language-cpp">__device__ __managed__ int xxx = 10; // 正确
+
+int *ptr = &amp;xxx; // 错误：静态初始化时使用托管变量
+
+struct S1_t {
+    int field;
+    S1_t() : field(xxx) {}
+};
+
+struct S2_t {
+    ~S2_t() { xxx = 10; }
+};
+
+S1_t temp1; // 错误：动态初始化时使用托管变量
+S2_t temp2; // 错误：静态存储期对象的析构函数中使用托管变量
+
+__device__ __managed__ const int yyy = 10; // 错误：const 限定类型
+__device__ __managed__ int &amp;zzz = xxx;     // 错误：引用类型
+
+template &lt;int *addr&gt; struct S3_t {};
+S3_t&lt;&amp;xxx&gt; temp; // 错误：托管变量的地址不是常量表达式
+
+__global__ void kern(int *ptr) {
+    assert(ptr == &amp;xxx); // 正确
+    xxx = 20;            // 正确
+}
+
+int main() {
+    int *ptr = &amp;xxx; // 正确
+    kern&lt;&lt;&lt;1, 1&gt;&gt;&gt;(ptr);
+    cudaDeviceSynchronize();
+    xxx++;
+
+    decltype(xxx) qqq;       // 错误：未加括号的托管变量 id-expression
+    decltype((xxx)) zzz = yyy; // 正确
+}
+</code></pre>
+<h3 id="17-5-3-3-volatile-限定符-volatile-qualifier">17.5.3.3 <code>volatile</code> 限定符（Volatile Qualifier）</h3>
+<p>只要遵守内存栅栏函数规定的内存排序语义和同步函数规定的内存可见性语义，编译器就可以优化对全局内存或共享内存的读写，例如将全局内存读取缓存到寄存器或 L1 缓存中。</p>
+<p>可以使用 <code>volatile</code> 关键字关闭这些优化：如果位于全局内存或共享内存中的变量声明为 <code>volatile</code>，编译器就会假定其他线程可能随时更改或使用其值，因此对该变量的每次引用都会生成实际的内存读取或写入指令。</p>
+<h3 id="17-5-4-指针-pointers">17.5.4 指针（Pointers）</h3>
+<p>在主机代码中解引用指向全局内存或共享内存的指针，或在设备代码中解引用指向主机内存的指针，都会导致未定义行为，通常表现为段错误并终止应用程序。</p>
+<p>通过获取 <code>__device__</code>、<code>__shared__</code> 或 <code>__constant__</code> 变量地址得到的地址，只能在设备代码中使用。通过 <code>cudaGetSymbolAddress()</code>（见“设备内存”一节）获得的 <code>__device__</code> 或 <code>__constant__</code> 变量地址，则只能在主机代码中使用。</p>
+<h3 id="17-5-5-运算符-operators">17.5.5 运算符（Operators）</h3>
+<h4 id="17-5-5-1-赋值运算符-assignment-operator">17.5.5.1 赋值运算符（Assignment Operator）</h4>
+<p><code>__constant__</code> 变量只能由主机代码通过 Runtime 函数赋值，不能在设备代码中赋值。<code>__shared__</code> 变量的声明不能包含初始化。任何 CUDA 内建变量都不允许被赋值。</p>
+<h4 id="17-5-5-2-取地址运算符-address-operator">17.5.5.2 取地址运算符（Address Operator）</h4>
+<p>不允许获取任何 CUDA 内建变量的地址。</p>
+<h3 id="17-5-6-运行时类型信息-run-time-type-information-rtti">17.5.6 运行时类型信息（Run Time Type Information，RTTI）</h3>
+<p>以下 RTTI 相关特性支持用于主机代码，但不支持用于设备代码：</p>
+<ul>
+<li><code>typeid</code> 运算符；</li>
+<li><code>std::type_info</code>；</li>
+<li><code>dynamic_cast</code> 运算符。</li>
+</ul>
+<h3 id="17-5-7-异常处理-exception-handling">17.5.7 异常处理（Exception Handling）</h3>
+<p>异常处理仅支持主机代码，不支持设备代码。<code>__global__</code> 函数不支持异常规范。</p>
+<h3 id="17-5-8-标准库-standard-library">17.5.8 标准库（Standard Library）</h3>
+<p>除非另有说明，标准库仅支持主机代码，不支持设备代码。</p>
+<h3 id="17-5-9-命名空间保留-namespace-reservations">17.5.9 命名空间保留（Namespace Reservations）</h3>
+<p>除非另有明确例外，向 <code>cuda::</code>、<code>nv::</code>、<code>cooperative_groups::</code> 或其任何嵌套命名空间中添加声明或定义，都属于未定义行为。</p>
+<p>例如，在保留命名空间 <code>cuda</code> 中直接声明类或定义函数是不允许的：</p>
+<pre><code class="language-cpp">namespace cuda {
+    // 错误：向保留命名空间添加类声明。
+    struct foo {};
+
+    // 错误：向保留命名空间添加函数定义。
+    cudaStream_t make_stream() {
+        cudaStream_t s;
+        cudaStreamCreate(&amp;s);
+        return s;
+    }
+}
+</code></pre>
+<p>在 <code>cuda::utils</code> 等嵌套命名空间中添加定义同样不允许。不过，在用户自己的命名空间内部嵌套使用名为 <code>cuda</code> 的命名空间是允许的：</p>
+<pre><code class="language-cpp">namespace utils {
+    namespace cuda {
+        cudaStream_t make_stream() {
+            cudaStream_t s;
+            cudaStreamCreate(&amp;s);
+            return s;
+        }
+    }
+}
+</code></pre>
+<p>但如果随后在全局作用域使用 <code>using namespace utils;</code>，使用户定义的 <code>utils::cuda</code> 等价于向全局保留的 <code>cuda</code> 命名空间添加符号，则同样不允许。</p>
+<h3 id="17-5-10-函数-functions">17.5.10 函数（Functions）</h3>
+<h4 id="17-5-10-1-外部链接-external-linkage">17.5.10.1 外部链接（External Linkage）</h4>
+<p>设备代码调用使用 <code>extern</code> 声明的函数时，该函数必须与设备代码定义在同一编译单元中。编译单元可以是单个文件，也可以是使用可重定位设备代码和 <code>nvlink</code> 链接在一起的多个文件。</p>
+<h4 id="17-5-10-2-隐式声明和显式默认化的函数-implicitly-declared-and-explicitly-defaulted-functions">17.5.10.2 隐式声明和显式默认化的函数（Implicitly-declared and Explicitly-defaulted Functions）</h4>
+<p>设函数 <span class="cuda-math-inline">\(F\)</span> 为隐式声明的函数，或在首次声明时显式默认化的函数。<span class="cuda-math-inline">\(F\)</span> 的执行空间说明符（<code>__host__</code>、<code>__device__</code>）是所有调用它的函数的执行空间说明符的并集；在该分析中，<code>__global__</code> 调用者按 <code>__device__</code> 调用者处理。</p>
+<p>例如，若 <code>Derived</code> 的隐式构造函数只由设备函数调用，它会被视为 <code>__device__</code> 函数；若 <code>Other</code> 的隐式构造函数同时由主机函数和设备函数调用，则会被视为 <code>__host__ __device__</code> 函数。</p>
+<p>此外，如果 <span class="cuda-math-inline">\(F\)</span> 是虚析构函数，那么所有由 <span class="cuda-math-inline">\(F\)</span> 覆盖、且不是隐式定义或并非在首次声明时默认化的虚析构函数，其执行空间也会加入 <span class="cuda-math-inline">\(F\)</span> 的执行空间集合。</p>
+<h4 id="17-5-10-3-函数参数-function-parameters">17.5.10.3 函数参数（Function Parameters）</h4>
+<p><code>__global__</code> 函数参数通过常量内存传递到设备。从 Volta 架构开始，参数总量限制为 32,764 字节；较旧架构的限制为 4 KB。</p>
+<p><code>__global__</code> 函数不能使用可变数量的参数，也不能通过引用传递参数。</p>
+<p>在分离编译模式下，如果某个翻译单元对 <code>__device__</code> 或 <code>__global__</code> 函数进行了 ODR-use，则该函数的参数类型和返回类型必须在该翻译单元中完整定义。</p>
+<p>例如，如果一个源文件仅前置声明了类型 <code>S</code>，便声明接受 <code>S</code> 的设备函数并取得其地址，而另一个源文件才定义 <code>S</code> 和该函数，那么在使用 <code>-rdc=true</code> 编译并链接时，<code>nvlink</code> 会因函数原型与定义不匹配而报错。</p>
+<h5 id="17-5-10-3-1-global-函数参数处理-global-function-argument-processing">17.5.10.3.1 <code>__global__</code> 函数参数处理（<code>__global__</code> Function Argument Processing）</h5>
+<p>从设备代码启动 <code>__global__</code> 函数时，每个参数都必须可平凡复制且可平凡析构。</p>
+<p>从主机代码启动 <code>__global__</code> 函数时，参数类型可以不可平凡复制或不可平凡析构，但参数处理方式会偏离标准 C++ 模型，用户必须确保这不会破坏程序正确性。主要有两方面差异。</p>
+<p><strong>1. 使用 <code>memcpy</code> 而不是调用复制构造函数</strong></p>
+<p>编译器降低主机端内核启动代码时，会生成桩函数（stub），按值复制参数一次或多次，最终使用 <code>memcpy</code> 将参数复制到设备端内核参数内存。即使参数类型不可平凡复制，也可能如此；如果复制构造函数有副作用，程序行为就可能与预期不同。</p>
+<pre><code class="language-cpp">#include &lt;cassert&gt;
+
+struct S {
+    int x;
+    int *ptr;
+    __host__ __device__ S() {}
+    __host__ __device__ S(const S &amp;) { ptr = &amp;x; }
+};
+
+__global__ void foo(S in) {
+    // 可能断言失败：编译器生成的代码会 memcpy 参数，
+    // 跳过复制构造函数，因此 in.ptr 不一定指向 &amp;in.x。
+    assert(in.ptr == &amp;in.x);
+}
+
+int main() {
+    S tmp;
+    foo&lt;&lt;&lt;1, 1&gt;&gt;&gt;(tmp);
+    cudaDeviceSynchronize();
+}
+</code></pre>
+<p>另一个例子是复制构造函数递增托管变量计数器。由于主机端桩函数可能按值复制参数多次，不能假定计数器只增加一次。</p>
+<p><strong>2. 析构函数可能在 <code>__global__</code> 函数执行结束前被调用</strong></p>
+<p>内核启动相对于主机执行是异步的。因此，如果 <code>__global__</code> 函数参数具有非平凡析构函数，该析构函数可能在内核执行完成之前就在主机端运行。若析构函数具有副作用，这可能破坏程序正确性。</p>
+<pre><code class="language-cpp">struct S {
+    int *ptr;
+    S() : ptr(nullptr) {}
+    S(const S &amp;) { cudaMallocManaged(&amp;ptr, sizeof(int)); }
+    ~S() { cudaFree(ptr); }
+};
+
+__global__ void foo(S in) {
+    // 该写入可能访问已被析构函数释放的内存。
+    *(in.ptr) = 4;
+}
+
+int main() {
+    S V;
+    foo&lt;&lt;&lt;1, 1&gt;&gt;&gt;(V);
+    cudaDeviceSynchronize();
+}
+</code></pre>
+<p>在该示例中，主机端桩函数返回时可能调用 <code>S::~S()</code> 并释放内存，而 GPU 内核仍在异步执行。</p>
+<h5 id="17-5-10-3-2-工具包与驱动兼容性-toolkit-and-driver-compatibility">17.5.10.3.2 工具包与驱动兼容性（Toolkit and Driver Compatibility）</h5>
+<p>要编译、启动和调试参数大小超过 4 KB 的内核，必须使用 CUDA 12.1 工具包和 R530 或更高版本的驱动程序。若在较旧驱动程序上启动这类内核，CUDA 会返回 <code>CUDA_ERROR_NOT_SUPPORTED</code>。</p>
+<h5 id="17-5-10-3-3-不同工具包修订版本之间的链接兼容性-link-compatibility-across-toolkit-revisions">17.5.10.3.3 不同工具包修订版本之间的链接兼容性（Link Compatibility across Toolkit Revisions）</h5>
+<p>链接设备目标文件时，如果至少一个目标文件包含参数大小超过 4 KB 的内核，那么在链接之前，必须使用 CUDA 12.1 或更高版本的工具包，从各自的设备源文件重新编译所有目标文件。否则会产生链接错误。</p>
+<h4 id="17-5-10-4-函数内部的静态变量-static-variables-within-function">17.5.10.4 函数内部的静态变量（Static Variables within Function）</h4>
+<p>在函数 <code>F</code> 的直接或嵌套代码块作用域内声明静态变量 <code>V</code> 时，只有当 <code>F</code> 是 <code>__global__</code>、仅带 <code>__device__</code> 的函数，或处于设备编译阶段的 <code>__host__ __device__</code> 函数时，才允许使用变量内存空间说明符。若声明中没有显式说明符，设备编译期间会隐式添加 <code>__device__</code>。<code>V</code> 的初始化限制与在命名空间作用域中使用相同内存空间说明符声明的变量相同；例如，<code>__device__</code> 变量不能具有非空构造函数，也不允许动态初始化。</p>
+<pre><code class="language-cpp">__device__ void f1() {
+    static int i1;               // 正确：隐式 __device__
+    static int i2 = 11;          // 正确：隐式 __device__
+    static __managed__ int m1;   // 正确
+    static __device__ int d1;    // 正确
+    static __constant__ int c1;  // 正确
+    static __shared__ int i5;    // 正确
+
+    int x = 33;
+    static int i6 = x;           // 错误：动态初始化
+}
+</code></pre>
+<p>在 <code>__host__ __device__</code> 函数中，可用 <code>#ifdef __CUDA_ARCH__</code> 将设备专用静态变量声明限制在设备编译阶段；否则，这些声明在主机编译阶段可能报错。</p>
+<h4 id="17-5-10-5-函数指针-function-pointers">17.5.10.5 函数指针（Function Pointers）</h4>
+<p>在主机代码中取得的 <code>__global__</code> 函数地址不能在设备代码中使用；反之，在设备代码中取得的 <code>__global__</code> 函数地址也不能在主机代码中使用。在主机代码中不允许取得 <code>__device__</code> 函数的地址。</p>
+<h4 id="17-5-10-6-函数递归-function-recursion">17.5.10.6 函数递归（Function Recursion）</h4>
+<p><code>__global__</code> 函数不支持递归。</p>
+<h4 id="17-5-10-7-友元函数-friend-functions">17.5.10.7 友元函数（Friend Functions）</h4>
+<p>不能在 friend 声明中定义 <code>__global__</code> 函数或函数模板。可以在 friend 声明中进行声明，但不能直接提供函数体。</p>
+<h4 id="17-5-10-8-运算符函数-operator-function">17.5.10.8 运算符函数（Operator Function）</h4>
+<p>运算符函数不能是 <code>__global__</code> 函数。</p>
+<h4 id="17-5-10-9-分配与释放函数-allocation-and-deallocation-functions">17.5.10.9 分配与释放函数（Allocation and Deallocation Functions）</h4>
+<p>用户自定义的 <code>operator new</code>、<code>operator new[]</code>、<code>operator delete</code> 或 <code>operator delete[]</code> 不能替换编译器提供的对应 <code>__host__</code> 或 <code>__device__</code> 内建函数。</p>
+<h3 id="17-5-11-类-classes">17.5.11 类（Classes）</h3>
+<h4 id="17-5-11-1-数据成员-data-members">17.5.11.1 数据成员（Data Members）</h4>
+<p>除同时带有 <code>const</code> 限定的静态数据成员外，其他静态数据成员均不受支持（见“带 const 限定的变量”）。</p>
+<h4 id="17-5-11-2-成员函数-function-members">17.5.11.2 成员函数（Function Members）</h4>
+<p>静态成员函数不能是 <code>__global__</code> 函数。</p>
+<h4 id="17-5-11-3-虚函数-virtual-functions">17.5.11.3 虚函数（Virtual Functions）</h4>
+<p>派生类函数覆盖基类虚函数时，被覆盖函数和覆盖函数的执行空间说明符（<code>__host__</code>、<code>__device__</code>）必须一致。</p>
+<p>不能将具有虚函数的类对象作为参数传给 <code>__global__</code> 函数。如果对象在主机代码中创建，却在设备代码中调用其虚函数，行为未定义；如果对象在设备代码中创建，却在主机代码中调用其虚函数，行为同样未定义。使用 Microsoft 主机编译器时，还需遵守 Windows 专用限制。</p>
+<h4 id="17-5-11-4-虚基类-virtual-base-classes">17.5.11.4 虚基类（Virtual Base Classes）</h4>
+<p>不能将派生自虚基类的类对象作为参数传给 <code>__global__</code> 函数。使用 Microsoft 主机编译器时，还需遵守 Windows 专用限制。</p>
+<h4 id="17-5-11-5-匿名联合体-anonymous-unions">17.5.11.5 匿名联合体（Anonymous Unions）</h4>
+<p>命名空间作用域中的匿名联合体，其成员变量不能在 <code>__global__</code> 或 <code>__device__</code> 函数中引用。</p>
+<h4 id="17-5-11-6-windows-专用限制-windows-specific">17.5.11.6 Windows 专用限制（Windows-Specific）</h4>
+<p>CUDA 编译器遵循 IA-64 ABI 的类布局规则，而 Microsoft 主机编译器采用不同规则。对于成员指针类型，以及具有虚函数、虚基类、特定多重继承或特定空基类布局的类型，CUDA 编译器计算出的类布局和大小可能与 Microsoft 主机编译器不同。</p>
+<p>若类型 <code>C</code> 本身是上述类型，或 <code>C</code> 的字段类型/基类类型包含上述类型，若 <code>C</code> 只在主机代码或只在设备代码中使用，程序通常可以正确工作；但在主机与设备之间传递 <code>C</code> 对象（例如作为 <code>__global__</code> 参数或通过 <code>cudaMemcpy*()</code>）属于未定义行为。</p>
+<p>如果对象在主机代码中创建，则在设备代码中访问该对象或其子对象、或调用其成员函数，行为未定义。反之，如果对象在设备代码中创建，则在主机代码中访问该对象或其子对象、或调用其成员函数，也属于未定义行为。若怀疑布局不一致，可分别在主机和设备端输出 <code>sizeof(C)</code> 与 <code>offsetof(C, field)</code> 进行排查。</p>
+<h3 id="17-5-12-模板-templates">17.5.12 模板（Templates）</h3>
+<p>如果满足以下任一条件，则某个类型或模板不能用作 <code>__global__</code> 函数模板实例化，或 <code>__device__</code> / <code>__constant__</code> 变量实例化的类型、非类型或模板模板参数：</p>
+<ul>
+<li>该类型或模板定义在 <code>__host__</code> 或 <code>__host__ __device__</code> 函数内部；</li>
+<li>该类型或模板是具有 <code>private</code> 或 <code>protected</code> 访问权限的类成员，并且其外围类不是定义在 <code>__device__</code> 或 <code>__global__</code> 函数内部；</li>
+<li>该类型是未命名类型，或由上述类型组合而成。</li>
+</ul>
+<p>例如，不能通过模板参数访问类外部不可见的私有嵌套类型。C++14 中还有额外限制：函数局部类型不能用于实例化设备变量模板；lambda 闭包类型不能用于变量模板实例化。</p>
+<h3 id="17-5-13-三字符组与双字符组-trigraphs-and-digraphs">17.5.13 三字符组与双字符组（Trigraphs and Digraphs）</h3>
+<p>所有平台均不支持三字符组（trigraphs）；Windows 平台不支持双字符组（digraphs）。</p>
+<h3 id="17-5-14-带-const-限定的变量-const-qualified-variables">17.5.14 带 <code>const</code> 限定的变量（Const-qualified Variables）</h3>
+<p>设 <code>V</code> 是命名空间作用域变量或类静态成员变量，其类型带有 <code>const</code> 限定，且没有 <code>__device__</code>、<code>__constant__</code>、<code>__shared__</code> 等执行空间注解。这样的 <code>V</code> 被视为主机变量。</p>
+<p>只有当 <code>V</code> 在使用位置之前已通过常量表达式初始化、类型没有 <code>volatile</code> 限定，并且类型为内建整数类型或内建浮点类型时，才可以在设备代码中直接使用其值。Microsoft 主机编译器是例外：此时不支持直接使用内建浮点类型的此类变量值。</p>
+<p>设备源代码不能引用 <code>V</code> 本身，也不能取得 <code>V</code> 的地址。例如，已用常量表达式初始化的 <code>const int xxx = 10</code> 可用于设备端数组长度或值计算；但引用 <code>xxx</code>、取得 <code>&amp;xxx</code>，或使用尚未在使用点之前通过常量表达式初始化的 <code>extern const int</code>，均不允许。</p>
+<h3 id="17-5-15-long-double">17.5.15 <code>long double</code></h3>
+<p>设备代码不支持 <code>long double</code> 类型。</p>
+<h3 id="17-5-16-弃用注解-deprecation-annotation">17.5.16 弃用注解（Deprecation Annotation）</h3>
+<p>当主机编译器为 GCC、Clang、xlC、ICC 或 PGI 时，<code>nvcc</code> 支持 <code>deprecated</code> 属性；当主机编译器为 <code>cl.exe</code> 时，支持相应的 <code>declspec</code>。启用 C++14 方言后，也支持标准属性 <code>[[deprecated]]</code>。</p>
+<p>在设备编译阶段（定义了 <code>__CUDA_ARCH__</code>）中，如果 <code>__device__</code>、<code>__global__</code> 或 <code>__host__ __device__</code> 函数体引用了已弃用实体，CUDA 前端编译器会生成弃用诊断。其他引用由主机编译器处理。</p>
+<p>CUDA 前端编译器不支持各种主机编译器提供的 <code>#pragma gcc diagnostic</code> 或 <code>#pragma warning</code> 机制。因此，这些 pragma 不会影响 CUDA 前端生成的弃用诊断，但会影响主机编译器生成的诊断。可用 NVIDIA 专用的 <code>#pragma nv_diag_suppress</code> 抑制设备代码的警告；<code>nvcc</code> 选项 <code>-Wno-deprecated-declarations</code> 可抑制所有弃用警告，<code>-Werror=deprecated-declarations</code> 则可将其提升为错误。</p>
+<h3 id="17-5-17-noreturn-注解-noreturn-annotation">17.5.17 <code>noreturn</code> 注解（Noreturn Annotation）</h3>
+<p>当主机编译器为 GCC、Clang、xlC、ICC 或 PGI 时，<code>nvcc</code> 支持 <code>noreturn</code> 属性；当主机编译器为 <code>cl.exe</code> 时，支持相应的 <code>declspec</code>。启用 C++11 方言后，也支持标准属性 <code>[[noreturn]]</code>。这些属性或说明符既可用于主机代码，也可用于设备代码。</p>
+<h3 id="17-5-18-likely-unlikely-标准属性">17.5.18 <code>[[likely]]</code> / <code>[[unlikely]]</code> 标准属性</h3>
+<p>所有支持 C++ 标准属性语法的配置都接受这两个属性。它们可以向设备编译器优化器提示：相对于不包含该语句的其他路径，某条语句更有可能或更不可能执行。</p>
+<pre><code class="language-cpp">__device__ int foo(int x) {
+    if (x &lt; 10) [[likely]] {
+        return 4;
+    }
+    if (x &lt; 20) [[unlikely]] {
+        return 1;
+    }
+    return 0;
+}
+</code></pre>
+<p>如果在主机编译阶段（<code>__CUDA_ARCH__</code> 未定义时）使用这些属性，主机编译器也会看到它们；若该编译器不支持这些属性，可能产生警告，例如 Clang 11 可能报告未知属性。</p>
+<h3 id="17-5-19-gnu-const-与-pure-属性-const-and-pure-gnu-attributes">17.5.19 GNU <code>const</code> 与 <code>pure</code> 属性（const and pure GNU Attributes）</h3>
+<p>当所用语言方言和主机编译器支持 GNU 属性时，这两个属性可用于主机函数和设备函数。</p>
+<ul>
+<li>对带 <code>pure</code> 属性的设备函数，设备优化器假定函数不会更改调用者可见的任何可变状态（例如内存）。</li>
+<li>对带 <code>const</code> 属性的设备函数，设备优化器假定函数不会访问或更改调用者可见的任何可变状态。</li>
+</ul>
+<p>例如，将 <code>get(int)</code> 标记为 <code>const</code> 后，优化器可能识别出同一参数的第二次 <code>get(in)</code> 调用可以复用第一次调用的结果。</p>
+<h3 id="17-5-20-nv-pure-属性-nv-pure-attribute">17.5.20 <code>__nv_pure__</code> 属性（<code>__nv_pure__</code> Attribute）</h3>
+<p><code>__nv_pure__</code> 属性支持主机函数和设备函数。对于主机函数，如果所用语言方言支持 GNU <code>pure</code> 属性，该属性会转换为 GNU <code>pure</code>；如果使用 MSVC 作为主机编译器，则会转换为 MSVC <code>noalias</code> 属性。</p>
+<p>对于带 <code>__nv_pure__</code> 属性的设备函数，设备优化器假定该函数不会更改调用者可见的可变状态（例如内存）。</p>
+<h3 id="17-5-21-intel-主机编译器专用说明-intel-host-compiler-specific">17.5.21 Intel 主机编译器专用说明（Intel Host Compiler Specific）</h3>
+<p>CUDA 前端编译器解析器无法识别 Intel 编译器（例如 <code>icc</code>）支持的某些内建函数。因此，当使用 Intel 编译器作为主机编译器时，<code>nvcc</code> 会在预处理阶段定义宏 <code>__INTEL_COMPILER_USE_INTRINSIC_PROTOTYPES</code>。该宏会在相关头文件中启用 Intel 内建函数的显式声明，使 <code>nvcc</code> 能够在主机代码中支持这些函数。由于额外声明较多，这可能会增加编译时间。</p>
+<h3 id="17-5-22-c-11-特性-c-11-features">17.5.22 C++11 特性（C++11 Features）</h3>
+<p>主机编译器默认启用的 C++11 特性也受 <code>nvcc</code> 支持，但仍受本文档中的限制约束。使用 <code>nvcc -std=c++11</code> 会启用全部 C++11 特性，并以相应的 C++11 方言选项调用主机预处理器、编译器和链接器。原文指出，该选项当时支持的主机编译器包括 GCC 4.7 及更高版本、Clang、ICC 15 及更高版本，以及 XL C 13.1 及更高版本。</p>
+<h4 id="17-5-22-1-lambda-表达式-lambda-expressions">17.5.22.1 Lambda 表达式（Lambda Expressions）</h4>
+<p>Lambda 表达式对应闭包类的所有成员函数（包括 <code>operator()</code>）的执行空间说明符由编译器推导。编译器会在包含 lambda 表达式的最小代码块、类或命名空间作用域中创建闭包类型，然后查找包围该闭包类型的最内层函数作用域，并将该函数的执行空间说明符赋给闭包类成员函数。如果不存在外围函数作用域，则默认为 <code>__host__</code>。</p>
+<p>例如，全局作用域中的 lambda 默认为 <code>__host__</code>；在 <code>__device__</code> 函数中定义的 lambda 默认为 <code>__device__</code>；在 <code>__host__ __device__</code> 函数中定义的 lambda 则具有 <code>__host__ __device__</code> 执行空间。</p>
+<p>除非 lambda 定义在 <code>__device__</code> 或 <code>__global__</code> 函数内部，否则其闭包类型不能用于 <code>__global__</code> 函数模板实例化的类型参数或非类型参数。</p>
+<h4 id="17-5-22-2-std-initializer-list">17.5.22.2 <code>std::initializer_list</code></h4>
+<p>默认情况下，CUDA 编译器会隐式地将 <code>std::initializer_list</code> 的成员函数视为具有 <code>__host__ __device__</code> 执行空间，因此设备代码可以直接调用这些函数。使用 <code>nvcc --no-host-device-initializer-list</code> 可关闭此行为；此时这些成员函数会被视为 <code>__host__</code> 函数，不能从设备代码直接调用。</p>
+<h4 id="17-5-22-3-右值引用-rvalue-references">17.5.22.3 右值引用（Rvalue References）</h4>
+<p>默认情况下，CUDA 编译器会隐式地将 <code>std::move</code> 和 <code>std::forward</code> 函数模板视为具有 <code>__host__ __device__</code> 执行空间，因此设备代码可以直接调用。使用 <code>nvcc --no-host-device-move-forward</code> 可关闭此行为；此时 <code>std::move</code> 和 <code>std::forward</code> 会被视为 <code>__host__</code> 函数，不能从设备代码直接调用。</p>
+<h4 id="17-5-22-4-constexpr-函数与函数模板-constexpr-functions-and-function-templates">17.5.22.4 <code>constexpr</code> 函数与函数模板（Constexpr Functions and Function Templates）</h4>
+<p>默认情况下，不能从执行空间不兼容的函数调用 <code>constexpr</code> 函数。实验性选项 <code>--expt-relaxed-constexpr</code> 可移除此限制：启用后，主机代码可以调用 <code>__device__ constexpr</code> 函数，设备代码也可以调用 <code>__host__ constexpr</code> 函数。指定该选项后，<code>nvcc</code> 会定义宏 <code>__CUDACC_RELAXED_CONSTEXPR__</code>。注意，即使函数模板带有 <code>constexpr</code> 关键字，模板实例化后的函数也不一定是 <code>constexpr</code> 函数。</p>
+<h4 id="17-5-22-5-constexpr-变量-constexpr-variables">17.5.22.5 <code>constexpr</code> 变量（Constexpr Variables）</h4>
+<p>设 <code>V</code> 为命名空间作用域变量或类静态成员变量，带有 <code>constexpr</code>，且没有 <code>__device__</code>、<code>__constant__</code> 或 <code>__shared__</code> 等执行空间注解。这样的 <code>V</code> 被视为主机代码变量。</p>
+<p>如果 <code>V</code> 是标量类型（<code>long double</code> 除外），且类型没有 <code>volatile</code> 限定，则可以在设备代码中直接使用其值。若 <code>V</code> 是非标量类型，则只有在调用为常量表达式的 <code>constexpr __device__</code> 或 <code>__host__ __device__</code> 函数内部，才能使用 <code>V</code> 的标量元素。设备源代码不能引用 <code>V</code> 本身，也不能取得 <code>V</code> 的地址。</p>
+<pre><code class="language-cpp">constexpr int xxx = 10;
+constexpr int yyy = xxx + 4;
+struct S1_t { static constexpr int qqq = 100; };
+constexpr int host_arr[] = {1, 2, 3};
+
+constexpr __device__ int get(int idx) {
+    return host_arr[idx];
+}
+
+__device__ int foo(int idx) {
+    int v1 = xxx + yyy + S1_t::qqq; // 正确
+    const int &amp;v2 = xxx;            // 错误：引用主机 constexpr 变量
+    const int *v3 = &amp;xxx;           // 错误：取得主机 constexpr 变量地址
+    v1 += get(2);                   // 正确：常量表达式
+    v1 += get(idx);                 // 错误：不是常量表达式
+    v1 += host_arr[2];              // 错误：host_arr 不是标量类型
+    return v1;
+}
+</code></pre>
+<h4 id="17-5-22-6-内联命名空间-inline-namespaces">17.5.22.6 内联命名空间（Inline Namespaces）</h4>
+<p>编译 CUDA 翻译单元时，CUDA 编译器可能会调用主机编译器编译其中的主机代码，并插入引用 <code>__global__</code> 函数、<code>__device__</code> / <code>__constant__</code> 变量以及表面或纹理类型变量的生成代码。</p>
+<p>如果这类实体定义在内联命名空间中，而外围命名空间又定义了同名且类型签名相同的实体，生成代码中的引用可能被主机编译器判定为歧义，导致主机端编译失败。避免此问题的方法之一，是为内联命名空间中定义的实体使用唯一名称。</p>
+<h5 id="17-5-22-6-1-内联未命名命名空间-inline-unnamed-namespaces">17.5.22.6.1 内联未命名命名空间（Inline Unnamed Namespaces）</h5>
+<p>在内联未命名命名空间的命名空间作用域中，不能声明以下实体：</p>
+<ul>
+<li><code>__managed__</code>、<code>__device__</code>、<code>__shared__</code> 和 <code>__constant__</code> 变量；</li>
+<li><code>__global__</code> 函数和函数模板；</li>
+<li>表面或纹理类型变量。</li>
+</ul>
+<h4 id="17-5-22-7-thread-local">17.5.22.7 <code>thread_local</code></h4>
+<p>设备代码不允许使用 <code>thread_local</code> 存储说明符。</p>
+<h4 id="17-5-22-8-global-函数与函数模板-global-functions-and-function-templates">17.5.22.8 <code>__global__</code> 函数与函数模板（<code>__global__</code> Functions and Function Templates）</h4>
+<p>如果 lambda 闭包类型用于 <code>__global__</code> 函数模板实例化的模板参数，那么该 lambda 必须定义在 <code>__device__</code> 或 <code>__global__</code> 函数的直接或嵌套代码块作用域内，或者必须是扩展 lambda。</p>
+<p>此外：</p>
+<ul>
+<li><code>__global__</code> 函数或函数模板不能声明为 <code>constexpr</code>；</li>
+<li><code>__global__</code> 函数或函数模板不能有 <code>std::initializer_list</code> 或 <code>va_list</code> 类型的参数；</li>
+<li><code>__global__</code> 函数不能有右值引用类型的参数；</li>
+<li>可变参数 <code>__global__</code> 函数模板只能有一个参数包，并且参数包必须位于模板参数列表的最后。</li>
+</ul>
+<h4 id="17-5-22-9-managed-与-shared-变量">17.5.22.9 <code>__managed__</code> 与 <code>__shared__</code> 变量</h4>
+<p><code>__managed__</code> 和 <code>__shared__</code> 变量不能使用 <code>constexpr</code> 关键字。</p>
+<h4 id="17-5-22-10-默认化函数-defaulted-functions">17.5.22.10 默认化函数（Defaulted Functions）</h4>
+<p>对在首次声明时就显式默认化的函数，CUDA 编译器会忽略其执行空间说明符，并按“隐式声明和显式默认化的函数”一节中的规则推导执行空间。</p>
+<p>如果函数不是在首次声明时默认化，则不会忽略其执行空间说明符。例如，首次声明为 <code>__host__ S2()</code> 的构造函数，即使后来写为 <code>S2::S2() = default</code>，其执行空间仍固定为 <code>__host__</code>，因此设备函数不能调用它。</p>
+<h3 id="17-5-23-c-14-特性-c-14-features">17.5.23 C++14 特性（C++14 Features）</h3>
+<p>主机编译器默认启用的 C++14 特性也受 <code>nvcc</code> 支持。传入 <code>nvcc -std=c++14</code> 会启用全部 C++14 特性，并以相应的 C++14 方言选项调用主机预处理器、编译器和链接器。原文指出，当时该选项支持 GCC 5.1 及更高版本、Clang 3.7 及更高版本，以及 ICC 17 及更高版本。</p>
+<h4 id="17-5-23-1-返回类型推导函数-functions-with-deduced-return-type">17.5.23.1 返回类型推导函数（Functions with Deduced Return Type）</h4>
+<p><code>__global__</code> 函数不能使用返回类型推导。</p>
+<p>如果 <code>__device__</code> 函数使用返回类型推导，CUDA 前端编译器会在调用主机编译器之前，将该函数声明转换为返回 <code>void</code> 的形式。这可能影响主机代码对设备函数推导返回类型的检查。因此，除非相关引用在 <code>__CUDA_ARCH__</code> 未定义时不存在，否则在设备函数体以外引用这种推导返回类型会产生编译错误。</p>
+<p>例如，可以在设备函数体内部调用 <code>__device__ auto fn1(int)</code>，但不能在主机代码中使用 <code>decltype(fn1(10))</code>、获取函数指针，或在主机端模板参数中引用其推导类型。</p>
+<h4 id="17-5-23-2-变量模板-variable-templates">17.5.23.2 变量模板（Variable Templates）</h4>
+<p>使用 Microsoft 主机编译器时，<code>__device__</code> / <code>__constant__</code> 变量模板不能具有带 <code>const</code> 限定的类型。例如，<code>template &lt;typename T&gt; __device__ const T d1(2);</code> 会报错；但指向 <code>const T</code> 的指针变量模板（例如 <code>template &lt;typename T&gt; __device__ const T *d3;</code>）是允许的。</p>
+<h3 id="17-5-24-c-17-特性-c-17-features">17.5.24 C++17 特性（C++17 Features）</h3>
+<p>主机编译器默认启用的 C++17 特性也受 <code>nvcc</code> 支持。使用 <code>nvcc -std=c++17</code> 会启用全部 C++17 特性，并以相应的 C++17 方言选项调用主机预处理器、编译器和链接器。原文指出，当时该选项支持 GCC 7.0 及更高版本、Clang 8.0 及更高版本、Visual Studio 2017 及更高版本、PGI 19.0 及更高版本，以及 ICC 19.0 及更高版本。</p>
+<h4 id="17-5-24-1-内联变量-inline-variable">17.5.24.1 内联变量（Inline Variable）</h4>
+<p>在整程序编译模式下，命名空间作用域的内联变量如果使用 <code>__device__</code>、<code>__constant__</code> 或 <code>__managed__</code> 内存空间说明符，则必须具有内部链接。</p>
+<pre><code class="language-cpp">inline __device__ int xxx;        // 整程序编译模式下错误
+                                  // 分离编译模式下正确
+inline __shared__ int yyy0;       // 正确
+static inline __device__ int yyy; // 正确：内部链接
+
+namespace {
+    inline __device__ int zzz;    // 正确：内部链接
+}
+</code></pre>
+<p>使用 G++ 主机编译器时，带 <code>__managed__</code> 内存空间说明符的内联变量可能无法在调试器中显示。</p>
+<h4 id="17-5-24-2-结构化绑定-structured-binding">17.5.24.2 结构化绑定（Structured Binding）</h4>
+<p>结构化绑定声明不能带变量内存空间说明符。例如：</p>
+<pre><code class="language-cpp">struct S { int x; int y; };
+__device__ auto [a1, b1] = S{4, 5}; // 错误
+</code></pre>
+<h3 id="17-5-25-c-20-特性-c-20-features">17.5.25 C++20 特性（C++20 Features）</h3>
+<p>主机编译器默认启用的 C++20 特性也受 <code>nvcc</code> 支持。使用 <code>nvcc -std=c++20</code> 会启用全部 C++20 特性，并以相应的 C++20 方言选项调用主机预处理器、编译器和链接器。原文指出，当时该选项支持 GCC 10.0 及更高版本、Clang 10.0 及更高版本、Visual Studio 2022 及更高版本，以及 nvc++ 20.7 及更高版本。</p>
+<h4 id="17-5-25-1-模块支持-module-support">17.5.25.1 模块支持（Module Support）</h4>
+<p>CUDA C++ 的主机代码和设备代码均不支持模块。使用 <code>module</code>、<code>export</code> 和 <code>import</code> 关键字会被诊断为错误。</p>
+<h4 id="17-5-25-2-协程支持-coroutine-support">17.5.25.2 协程支持（Coroutine Support）</h4>
+<p>设备代码不支持协程。在设备函数作用域内使用 <code>co_await</code>、<code>co_yield</code> 或 <code>co_return</code> 会在设备编译期间被诊断为错误。</p>
+<h4 id="17-5-25-3-三路比较运算符-three-way-comparison-operator">17.5.25.3 三路比较运算符（Three-way Comparison Operator）</h4>
+<p>三路比较运算符 <code>&lt;=&gt;</code> 同时支持主机代码和设备代码，但某些用法会隐式依赖主机实现提供的标准模板库功能。此类用法可能需要指定 <code>--expt-relaxed-constexpr</code> 来消除警告，而且主机标准库实现必须满足设备代码的要求。</p>
+<h4 id="17-5-25-4-consteval-函数-consteval-functions">17.5.25.4 <code>consteval</code> 函数（Consteval Functions）</h4>
+<p>通常不允许跨执行空间调用函数，编译器会发出警告或错误。但被调用函数若声明为 <code>consteval</code>，则不受此限制。因此，<code>__device__</code> 或 <code>__global__</code> 函数可以调用 <code>__host__ consteval</code> 函数，主机函数也可以调用 <code>__device__ consteval</code> 函数。</p>
+<h2 id="17-6-多态函数包装器-polymorphic-function-wrappers">17.6 多态函数包装器（Polymorphic Function Wrappers）</h2>
+<p>头文件 <code>&lt;nvfunctional&gt;</code> 提供多态函数包装器类模板 <code>nvstd::function</code>。该模板的实例可以存储、复制并调用任意可调用目标，例如 lambda 表达式。<code>nvstd::function</code> 可用于主机代码和设备代码。</p>
+<pre><code class="language-cpp">#include &lt;nvfunctional&gt;
+
+__device__ int foo_d() { return 1; }
+__host__ __device__ int foo_hd() { return 2; }
+__host__ int foo_h() { return 3; }
+
+__global__ void kernel(int *result) {
+    nvstd::function&lt;int()&gt; fn1 = foo_d;
+    nvstd::function&lt;int()&gt; fn2 = foo_hd;
+    nvstd::function&lt;int()&gt; fn3 = []() { return 10; };
+    *result = fn1() + fn2() + fn3();
+}
+</code></pre>
+<p>主机代码中的 <code>nvstd::function</code> 不能用 <code>__device__</code> 函数地址，或 <code>operator()</code> 为 <code>__device__</code> 函数的仿函数初始化。设备代码中的 <code>nvstd::function</code> 不能用 <code>__host__</code> 函数地址，或 <code>operator()</code> 为 <code>__host__</code> 函数的仿函数初始化。不能在运行时将 <code>nvstd::function</code> 实例从主机传到设备，或从设备传到主机；如果 <code>__global__</code> 函数由主机启动，则其参数类型不能是 <code>nvstd::function</code>。</p>
+<p>该类提供主机/设备构造函数、析构函数、复制和移动赋值、<code>swap</code>、布尔状态转换、函数调用运算符，以及与 <code>nullptr</code> 比较的重载。函数调用运算符 <code>operator()</code> 仅标记为 <code>__device__</code>；其他所列基本操作同时支持 <code>__host__</code> 和 <code>__device__</code>。</p>
+<h2 id="17-7-扩展-lambda-extended-lambdas">17.7 扩展 Lambda（Extended Lambdas）</h2>
+<p><code>nvcc</code> 选项 <code>--extended-lambda</code> 允许在 lambda 表达式中显式标注执行空间。注解应放在 lambda 引入符之后、可选的 lambda 声明符之前。指定该选项后，<code>nvcc</code> 会定义宏 <code>__CUDACC_EXTENDED_LAMBDA__</code>。使用 ICC 主机编译器时，该选项要求 ICC 版本至少为 1800。</p>
+<ul>
+<li><strong>扩展 <code>__device__</code> lambda：</strong> 显式标记为 <code>__device__</code>，并定义在 <code>__host__</code> 或 <code>__host__ __device__</code> 函数的直接或嵌套代码块作用域内。</li>
+<li><strong>扩展 <code>__host__ __device__</code> lambda：</strong> 显式标记为 <code>__host__ __device__</code>，并定义在 <code>__host__</code> 或 <code>__host__ __device__</code> 函数的直接或嵌套代码块作用域内。</li>
+<li><strong>扩展 lambda：</strong> 上述两类 lambda 的统称。它们可用于 <code>__global__</code> 函数模板实例化的类型参数。</li>
+</ul>
+<p>如果没有显式指定执行空间注解，编译器会根据闭包类所在的外围作用域推导执行空间，并将注解应用于闭包类的所有成员函数。</p>
+<pre><code class="language-cpp">void foo_host() {
+    auto lam1 = [] {};                     // 不是扩展 lambda：没有显式注解
+    auto lam2 = [] __device__ {};          // 扩展 __device__ lambda
+    auto lam3 = [] __host__ __device__ {}; // 扩展 host-device lambda
+    auto lam4 = [] __host__ {};            // 不是扩展 lambda：仅标记 host
+}
+
+__device__ void foo_device() {
+    // 本函数内的 lambda 都不是扩展 lambda，因为外围函数不是
+    // __host__ 或 __host__ __device__ 函数。
+    auto lam1 = [] {};
+    auto lam2 = [] __device__ {};
+    auto lam3 = [] __host__ __device__ {};
+}
+</code></pre>
+<h3 id="17-7-1-扩展-lambda-类型特征-extended-lambda-type-traits">17.7.1 扩展 Lambda 类型特征（Extended Lambda Type Traits）</h3>
+<p>编译器提供以下类型特征，用于在编译期识别扩展 lambda 的闭包类型：</p>
+<ul>
+<li><code>__nv_is_extended_device_lambda_closure_type(type)</code>：如果 <code>type</code> 是扩展 <code>__device__</code> lambda 的闭包类，则为真。</li>
+<li><code>__nv_is_extended_device_lambda_with_preserved_return_type(type)</code>：如果 <code>type</code> 是扩展 <code>__device__</code> lambda 的闭包类，且该 lambda 的尾置返回类型满足保留条件，则为真。若尾置返回类型引用 lambda 参数名，则返回类型不会被保留。</li>
+<li><code>__nv_is_extended_host_device_lambda_closure_type(type)</code>：如果 <code>type</code> 是扩展 <code>__host__ __device__</code> lambda 的闭包类，则为真。</li>
+</ul>
+<p>这些类型特征在所有编译模式下均可使用；但如果未启用扩展 lambda 模式，它们始终返回假。</p>
+<h3 id="17-7-2-扩展-lambda-的限制-extended-lambda-restrictions">17.7.2 扩展 Lambda 的限制（Extended Lambda Restrictions）</h3>
+<p>在调用主机编译器之前，CUDA 编译器会把扩展 lambda 替换为命名空间作用域中定义的占位类型实例。该占位类型的模板参数需要取得包含原始 lambda 的函数地址，以确保使用扩展 lambda 闭包类型作为模板参数的 <code>__global__</code> 函数模板能够正确执行。由此产生以下限制：</p>
+<ol>
+<li><strong>不能嵌套定义扩展 lambda。</strong> 扩展 lambda 不能定义在另一个扩展 lambda 表达式内部。</li>
+<li><strong>不能定义在泛型 lambda 内部。</strong> 扩展 lambda 不能位于泛型 lambda 表达式内部。</li>
+<li>如果扩展 lambda 位于一个或多个嵌套 lambda 的直接或嵌套代码块作用域内，那么最外层的这些 lambda 必须定义在某个函数的直接或嵌套代码块作用域内。</li>
+<li>包含扩展 lambda 的外围函数必须有名称，且其地址必须可取得。如果外围函数是类成员函数，则所有外围类都必须有名称，成员函数在父类中不能是 <code>private</code> 或 <code>protected</code>，所有外围类在各自父类中也不能是 <code>private</code> 或 <code>protected</code>。</li>
+<li>在扩展 lambda 定义的位置，必须能够无歧义地取得外围函数地址。如果类型别名遮蔽同名模板参数等情况导致地址表达式不明确，则不支持。</li>
+<li>不能在函数局部类中定义扩展 lambda。</li>
+<li>扩展 lambda 的外围函数不能使用返回类型推导。</li>
+<li>扩展 <code>__host__ __device__</code> lambda 不能是泛型 lambda。</li>
+<li>如果外围函数是函数模板实例或成员函数模板，和/或它是类模板成员，则模板参数必须满足以下条件：最多只能有一个可变参数包且必须位于参数列表末尾；模板参数必须命名；模板实例化参数类型不能涉及函数局部类型（扩展 lambda 闭包类型除外），也不能涉及 <code>private</code> 或 <code>protected</code> 类成员。</li>
+<li>使用 Visual Studio 主机编译器时，外围函数必须具有外部链接，因为该编译器不支持将无外部链接函数的地址作为模板参数。</li>
+<li>使用 Visual Studio 主机编译器时，不能在 <code>if constexpr</code> 代码块的主体内定义扩展 lambda。</li>
+<li><strong>捕获变量限制：</strong>
+<ul>
+<li>变量只能按值捕获，不能按引用捕获；</li>
+<li>数组维度超过 7 的数组变量不能被捕获；</li>
+<li>对数组捕获，生成给主机编译器的代码会先默认初始化闭包类中的数组字段，再逐元素复制赋值，因此数组元素类型必须能在主机代码中默认构造并复制赋值；</li>
+<li>可变参数包中的函数参数不能被捕获；</li>
+<li>捕获变量的类型不能涉及函数局部类型（扩展 lambda 闭包类型除外），也不能涉及 <code>private</code> 或 <code>protected</code> 类成员；</li>
+<li>对扩展 <code>__host__ __device__</code> lambda，其 <code>operator()</code> 的参数和返回类型也不能涉及上述不支持的类型；</li>
+<li>扩展 <code>__host__ __device__</code> lambda 不支持初始化捕获；扩展 <code>__device__</code> lambda 支持初始化捕获，但数组类型和 <code>std::initializer_list</code> 类型除外；</li>
+<li>扩展 lambda 的函数调用运算符不是 <code>constexpr</code>，闭包类型不是字面类型，声明中不能使用 <code>constexpr</code> 或 <code>consteval</code>；</li>
+<li>不能在扩展 lambda 内部词法嵌套的 <code>if constexpr</code> 块中首次隐式捕获变量，除非该变量已在块外捕获或已出现在显式捕获列表中。</li>
+</ul>
+</li>
+<li>同一函数中的扩展 lambda 会被编译器按出现顺序编号，该编号用于生成传给主机编译器的命名类型。因此，扩展 lambda 的存在与否、数量和相对声明顺序不能依赖 <code>__CUDA_ARCH__</code> 是否定义或其具体值。</li>
+<li>对扩展 <code>__device__</code> lambda，除非 <code>__nv_is_extended_device_lambda_with_preserved_return_type()</code> 返回真，否则传给主机编译器的占位类型不会定义与原 lambda 完全等价的 <code>operator()</code>。因此，在主机代码中推导这类 lambda 的返回类型或参数类型可能得到不正确结果；在设备代码中进行此类检查则允许。该限制不适用于扩展 <code>__host__ __device__</code> lambda，也不适用于返回类型被保留的扩展 <code>__device__</code> lambda。</li>
+<li>对扩展设备 lambda，<code>operator()</code> 参数类型只能在设备代码中进行类型检查；返回类型也只能在设备代码中检查，除非上述“保留返回类型”特征为真。</li>
+<li>如果扩展 lambda 仿函数从主机传到设备（例如作为 <code>__global__</code> 参数），lambda 函数体中涉及变量捕获的表达式必须在 <code>__CUDA_ARCH__</code> 未定义和不同取值时保持一致，否则主机与设备编译时闭包布局可能不同，导致程序错误。</li>
+<li>扩展 <code>__device__</code> lambda 在传给主机编译器的代码中会替换为占位类型。该占位类型在主机代码中不提供函数指针转换运算符，但在设备代码中提供；扩展 <code>__host__ __device__</code> lambda 不受此限制。</li>
+<li>占位类型可能定义构造函数、析构函数等 C++ 特殊成员函数，因此 CUDA 前端与主机编译器对扩展 lambda 闭包类型的某些标准类型特征结果可能不同，包括 <code>std::is_trivially_copyable</code>、<code>std::is_trivially_constructible</code>、<code>std::is_trivially_copy_constructible</code>、<code>std::is_trivially_move_constructible</code> 和 <code>std::is_trivially_destructible</code>。不要在 <code>__global__</code> 函数模板实例化或 <code>__device__</code> / <code>__constant__</code> / <code>__managed__</code> 变量模板实例化中依赖这些类型特征的结果。</li>
+</ol>
+<p>CUDA 编译器会针对上述第 1–12 类限制中的一部分情形发出诊断；第 13–17 类情形不保证生成诊断，但主机编译器可能无法编译生成的代码。</p>
+<h4 id="17-7-3-关于-host-device-lambda-的说明-notes-on-host-device-lambdas">17.7.3 关于 <code>__host__ __device__</code> Lambda 的说明（Notes on <code>__host__ __device__</code> Lambdas）</h4>
+<p>与 <code>__device__</code> lambda 不同，<code>__host__ __device__</code> lambda 也能从主机代码调用。CUDA 编译器会把主机代码中定义的扩展 lambda 替换为命名占位类型；该占位类型通过间接函数调用调用原 lambda 的 <code>operator()</code>。间接调用可能使扩展 <code>__host__ __device__</code> lambda 比隐式或显式标记为仅 <code>__host__</code> 的 lambda 更难被主机编译器优化，因为后者更容易将 lambda 函数体内联到调用位置。</p>
+<h4 id="17-7-4-按值捕获-this-this-capture-by-value">17.7.4 按值捕获 <code>*this</code>（<code>*this</code> Capture By Value）</h4>
+<p>当 lambda 定义在非静态类成员函数内部，并且函数体引用类成员变量时，C++11/C++14 规则要求捕获 <code>this</code> 指针，而不是直接捕获被引用的成员变量。如果扩展 <code>__device__</code> 或 <code>__host__ __device__</code> lambda 定义在主机函数中、之后在 GPU 上执行，那么当 <code>this</code> 指针指向主机内存时，在 GPU 上访问相应成员变量会导致运行时错误。</p>
+<p>C++17 引入了新的 <code>*this</code> 捕获模式：编译器复制 <code>*this</code> 所表示的对象，而不是按值捕获 <code>this</code> 指针。CUDA 编译器支持在 <code>__device__</code> 和 <code>__global__</code> 函数中定义的 lambda 使用该模式，也支持在启用 <code>--extended-lambda</code> 时，在主机代码中定义的扩展 <code>__device__</code> lambda 使用该模式。</p>
+<pre><code class="language-cpp">#include &lt;cstdio&gt;
+
+template &lt;typename T&gt;
+__global__ void foo(T in) {
+    printf("\n value = %d", in());
+}
+
+struct S1_t {
+    int xxx;
+    __host__ __device__ S1_t() : xxx(10) {}
+
+    void doit() {
+        // 捕获对象副本，而不是主机端 this 指针。
+        auto lam1 = [=, *this] __device__ {
+            return xxx + 1;
+        };
+        foo&lt;&lt;&lt;1, 1&gt;&gt;&gt;(lam1); // 启动成功
+        cudaDeviceSynchronize();
+    }
+};
+</code></pre>
+<p>在主机函数中定义的未标注 lambda，以及扩展 <code>__host__ __device__</code> lambda，不能使用 <code>*this</code> 捕获模式。在设备函数中定义的 lambda（无论是否显式标注执行空间）可以使用该模式；在 <code>__host__ __device__</code> 函数中，只允许扩展 <code>__device__</code> lambda 使用它。</p>
+<h4 id="17-7-5-补充说明-additional-notes">17.7.5 补充说明（Additional Notes）</h4>
+<p><strong>参数依赖查找（ADL）：</strong> 扩展 lambda 会被替换为占位类型，而占位类型的模板参数包含外围函数地址。这可能使更多命名空间参与参数依赖查找（ADL），导致主机编译器为某个函数调用选择错误的重载，或因候选函数歧义而编译失败。因此，如果涉及扩展 lambda 闭包类型的函数参数参与 ADL，应留意额外命名空间带来的影响。</p>
+<h2 id="17-8-放宽-constexpr-限制-relaxed-constexpr-expt-relaxed-constexpr">17.8 放宽 <code>constexpr</code> 限制（Relaxed Constexpr，<code>-expt-relaxed-constexpr</code>）</h2>
+<p>默认情况下，不支持以下跨执行空间调用：</p>
+<ol>
+<li>在主机代码生成阶段（即 <code>__CUDA_ARCH__</code> 未定义时），主机函数调用仅带 <code>__device__</code> 的 <code>constexpr</code> 函数。</li>
+<li>在设备代码生成阶段（即定义了 <code>__CUDA_ARCH__</code> 时），设备函数或 <code>__global__</code> 函数调用仅带 <code>__host__</code> 的 <code>constexpr</code> 函数。</li>
+</ol>
+<p>实验性选项 <code>--expt-relaxed-constexpr</code> 可以放宽此限制。启用后，规则如下：</p>
+<ol>
+<li>
+<p>如果跨执行空间调用发生在要求常量求值的上下文中（例如初始化 <code>constexpr</code> 变量），则允许调用。</p>
+<pre><code class="language-cpp">constexpr __host__ int H(int x) { return x + 1; }
+__global__ void doit() {
+    constexpr int val = H(1); // 正确：需要常量求值
+}
+
+constexpr __device__ int D(int x) { return x + 1; }
+int main() {
+    constexpr int val = D(1); // 正确：需要常量求值
+}
+</code></pre>
+</li>
+<li>
+<p>在其他上下文中：</p>
+<ul>
+<li>设备代码生成期间，如果设备代码调用仅带 <code>__host__</code> 的 <code>constexpr</code> 函数 <code>H</code>，编译器会将 <code>H</code> 的函数体生成到设备代码中（除非该函数未被使用，或仅在常量表达式上下文中调用）。</li>
+<li>被设备代码调用的 <code>__host__</code> 专用 <code>constexpr</code> 函数 <code>H</code>，必须遵守适用于 <code>__device__</code> 函数的所有代码限制。不过，编译器可能不会对 <code>H</code> 的这些违规用法发出构建期诊断。</li>
+</ul>
+</li>
+</ol>
+<p>例如，设备端调用的 <code>constexpr __host__</code> 函数不能引用主机变量，也不能使用异常（<code>throw</code> / <code>catch</code>）或 RTTI（<code>typeid</code>、<code>dynamic_cast</code>）。这些代码可能编译成功，却在运行时行为错误。</p>
+<ul>
+<li>主机代码生成期间，仅带 <code>__device__</code> 的 <code>constexpr</code> 函数 <code>D</code> 的函数体会保留在传给主机编译器的代码中。如果 <code>D</code> 试图 ODR-use 命名空间作用域的设备变量，或仅带 <code>__device__</code> 的非 <code>constexpr</code> 函数，那么主机代码调用 <code>D</code> 不受支持；代码可能在没有诊断的情况下编译成功，但运行结果不正确。</li>
+<li>由于这些限制和诊断缺失，调用标准 C++ 头文件中仅带 <code>__host__</code> 的 <code>constexpr</code> 函数时应特别谨慎。其实现可能随主机平台或标准库版本而变化；如果实现 ODR-use 了主机变量或函数，代码在移植到其他平台或编译器版本时可能静默失效。</li>
+</ul>
+<h2 id="17-9-代码示例-code-samples">17.9 代码示例（Code Samples）</h2>
+<h3 id="17-9-1-数据聚合类-data-aggregation-class">17.9.1 数据聚合类（Data Aggregation Class）</h3>
+<pre><code class="language-cpp">class PixelRGBA {
+public:
+    __device__ PixelRGBA() : r_(0), g_(0), b_(0), a_(0) {}
+    __device__ PixelRGBA(unsigned char r, unsigned char g,
+                         unsigned char b, unsigned char a = 255)
+        : r_(r), g_(g), b_(b), a_(a) {}
+private:
+    unsigned char r_, g_, b_, a_;
+    friend PixelRGBA operator+(const PixelRGBA&amp;, const PixelRGBA&amp;);
+};
+
+__device__ PixelRGBA operator+(const PixelRGBA&amp; p1, const PixelRGBA&amp; p2) {
+    return PixelRGBA(p1.r_ + p2.r_, p1.g_ + p2.g_,
+                     p1.b_ + p2.b_, p1.a_ + p2.a_);
+}
+
+__device__ void func() {
+    PixelRGBA p1, p2;
+    // 在此初始化 p1 和 p2。
+    PixelRGBA p3 = p1 + p2;
+}
+</code></pre>
+<h3 id="17-9-2-派生类-derived-class">17.9.2 派生类（Derived Class）</h3>
+<pre><code class="language-cpp">__device__ void* operator new(size_t bytes, MemoryPool&amp; p);
+__device__ void operator delete(void*, MemoryPool&amp; p);
+
+class Shape {
+public:
+    __device__ Shape() {}
+    __device__ void putThis(PrintBuffer *p) const;
+    __device__ virtual void Draw(PrintBuffer *p) const {
+        p-&gt;put("Shapeless");
+    }
+    __device__ virtual ~Shape() {}
+};
+
+class Point : public Shape {
+public:
+    __device__ Point() : x(0), y(0) {}
+    __device__ Point(int ix, int iy) : x(ix), y(iy) {}
+    __device__ void PutCoord(PrintBuffer *p) const;
+    __device__ void Draw(PrintBuffer *p) const;
+    __device__ ~Point() {}
+private:
+    int x, y;
+};
+
+__device__ Shape* GetPointObj(MemoryPool&amp; pool) {
+    Shape* shape = new(pool) Point(rand(-20, 10), rand(-100, -20));
+    return shape;
+}
+</code></pre>
+<h3 id="17-9-3-类模板-class-template">17.9.3 类模板（Class Template）</h3>
+<pre><code class="language-cpp">template &lt;class T&gt;
+class myValues {
+    T values[MAX_VALUES];
+public:
+    __device__ myValues(T clear) { /* ... */ }
+    __device__ void setValue(int Idx, T value) { /* ... */ }
+    __device__ void putToMemory(T* valueLocation) { /* ... */ }
+};
+
+template &lt;class T&gt;
+__global__ void useValues(T* memoryBuffer) {
+    myValues&lt;T&gt; myLocation(0);
+    // ...
+}
+
+__device__ void* buffer;
+
+int main() {
+    // ...
+    useValues&lt;int&gt;&lt;&lt;&lt;blocks, threads&gt;&gt;&gt;(buffer);
+    // ...
+}
+</code></pre>
+<h3 id="17-9-4-函数模板-function-template">17.9.4 函数模板（Function Template）</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__device__ bool func(T x) {
+    // ...
+    return (...);
+}
+
+template &lt;&gt;
+__device__ bool func&lt;int&gt;(int x) { // 特化
+    return true;
+}
+
+// 显式指定模板参数。
+bool result1 = func&lt;double&gt;(0.5);
+
+// 隐式推导模板参数。
+int x = 1;
+bool result2 = func(x);
+</code></pre>
+<h3 id="17-9-5-仿函数类-functor-class">17.9.5 仿函数类（Functor Class）</h3>
+<pre><code class="language-cpp">class Add {
+public:
+    __device__ float operator()(float a, float b) const {
+        return a + b;
+    }
+};
+
+class Sub {
+public:
+    __device__ float operator()(float a, float b) const {
+        return a - b;
+    }
+};
+
+// 设备代码
+template&lt;class O&gt;
+__global__ void VectorOperation(
+    const float *A, const float *B, float *C, unsigned int N, O op) {
+    unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
+    if (iElement &lt; N)
+        C[iElement] = op(A[iElement], B[iElement]);
+}
+
+// 主机代码
+int main() {
+    // ...
+    VectorOperation&lt;&lt;&lt;blocks, threads&gt;&gt;&gt;(v1, v2, v3, N, Add());
+    // ...
+}
+</code></pre>
+<h2 id="校对说明">校对说明</h2>
+<p>本章按原 PDF 第 425–482 页整理为第一轮工作译稿。C++ 支持矩阵、语言限制、扩展 lambda 限制和示例代码已按章节结构转录，但尚未在 CUDA 12.8 工具链中逐例编译验证。发布前应特别复核执行空间规则、模板限制和编译器选项。</p>

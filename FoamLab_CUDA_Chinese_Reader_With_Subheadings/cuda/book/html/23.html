@@ -1,0 +1,66 @@
+<h1 id="第二十三章-延迟加载-lazy-loading">第二十三章 延迟加载（Lazy Loading）</h1>
+<blockquote>
+<p>对应原 PDF 第 573–576 页（原书印刷页码 557–560）。保留环境变量、CUDA API 名称和代码标识符。</p>
+</blockquote>
+<h2 id="23-1-什么是延迟加载-what-is-lazy-loading">23.1 什么是延迟加载？（What is Lazy Loading?）</h2>
+<p>延迟加载会将 CUDA 模块和内核的加载时间从程序初始化阶段推迟到更接近内核执行的时刻。如果程序没有使用所包含的所有内核，其中一些内核就会被不必要地加载。使用库时尤其容易出现这种情况，因为程序通常只会用到所包含库中的少量内核。</p>
+<p>延迟加载使程序只加载实际需要使用的内核，从而缩短初始化时间，并减少 GPU 内存和主机内存开销。将环境变量 <code>CUDA_MODULE_LOADING</code> 设置为 <code>LAZY</code> 即可启用。</p>
+<p>第一项优化是：除包含托管变量的模块外，CUDA Runtime 在程序初始化时不再加载所有模块。每个模块会在首次使用其中的变量或内核时加载。这项优化只影响 CUDA Runtime 用户；直接使用 <code>cuModuleLoad()</code> 的 CUDA Driver 用户不受影响。该优化在 CUDA 11.8 中发布。对于通过 <code>cuLibraryLoad()</code> 将模块数据加载到内存的 Driver API 用户，可通过环境变量 <code>CUDA_MODULE_DATA_LOADING</code> 改变数据加载行为。</p>
+<p>第二项优化是：调用 <code>cuModuleLoad*()</code> 系列函数时，不会立即加载模块中的所有内核，而是将内核加载推迟到调用 <code>cuModuleGetFunction()</code> 时。某些内核仍必须在 <code>cuModuleLoad*()</code> 阶段加载，例如其函数指针保存在全局变量中的内核。这项优化同时适用于 CUDA Runtime 和 CUDA Driver 用户。CUDA Runtime 通常只会在首次使用或引用某个内核时调用 <code>cuModuleGetFunction()</code>。这项优化在 CUDA 11.7 中发布。</p>
+<p>只要程序遵守 CUDA 编程模型，这两项优化的设计目标就是对用户透明。</p>
+<h2 id="23-2-延迟加载的版本支持-lazy-loading-version-support">23.2 延迟加载的版本支持（Lazy Loading Version Support）</h2>
+<p>延迟加载涉及 CUDA Runtime 和 CUDA Driver；要使用该功能，可能需要同时升级二者。</p>
+<h3 id="23-2-1-驱动程序-driver">23.2.1 驱动程序（Driver）</h3>
+<p>延迟加载要求用户态驱动程序库达到 R515 或更高版本，但支持向前兼容，因此可以运行在较旧的内核态驱动程序之上。若没有 R515 或更高版本的用户态库，即使工具包版本为 CUDA 11.7 或更高，也无法使用延迟加载。</p>
+<h3 id="23-2-2-工具包-toolkit">23.2.2 工具包（Toolkit）</h3>
+<p>延迟加载在 CUDA 11.7 中引入，并在 CUDA 11.8 中得到重要升级。如果应用使用 CUDA Runtime，要获得延迟加载的收益，就必须使用 CUDA 11.7 或更高版本的 Runtime。</p>
+<p>由于 CUDA Runtime 通常静态链接进程序和库，因此需要使用 CUDA 11.7 或更高版本的 Toolkit 重新编译程序，并使用相应版本的库。否则，即使驱动程序支持延迟加载，也无法获得收益。如果只有部分库使用 CUDA 11.7 或更高版本，那么只有这些库能受益；其他库仍会急切加载全部内容。</p>
+<h3 id="23-2-3-编译器-compiler">23.2.3 编译器（Compiler）</h3>
+<p>延迟加载不要求编译器提供特殊支持。由 11.7 之前的编译器生成的 SASS 和 PTX 也可以在启用延迟加载时加载，并获得该功能的完整收益。不过，仍然需要 CUDA 11.7 或更高版本的 CUDA Runtime。</p>
+<h2 id="23-3-在延迟模式下触发内核加载-triggering-loading-of-kernels-in-lazy-mode">23.3 在延迟模式下触发内核加载（Triggering Loading of Kernels in Lazy Mode）</h2>
+<p>内核和变量会自动加载，无需显式执行加载操作。启动内核，或引用变量/内核，都会自动加载相关模块和内核。</p>
+<p>如果希望在不执行或修改内核的情况下预先加载它，可以采用以下方式。</p>
+<h3 id="23-3-1-cuda-driver-api">23.3.1 CUDA Driver API</h3>
+<p>内核会在调用 <code>cuModuleGetFunction()</code> 时加载。即使没有启用延迟加载，也需要调用该函数来取得内核句柄。因此，可以利用此 API 更精细地控制内核加载的时机。</p>
+<h3 id="23-3-2-cuda-runtime-api">23.3.2 CUDA Runtime API</h3>
+<p>CUDA Runtime 会自动管理模块，因此建议调用 <code>cudaFuncGetAttributes()</code> 来引用目标内核。这会确保内核加载，而不会改变内核状态。</p>
+<h2 id="23-4-查询是否启用了延迟加载-querying-whether-lazy-loading-is-turned-on">23.4 查询是否启用了延迟加载（Querying Whether Lazy Loading Is Turned On）</h2>
+<p>可调用 <code>cuModuleGetLoadingMode()</code> 查询用户是否启用了延迟加载。运行该函数前，必须先初始化 CUDA。</p>
+<pre><code class="language-cpp">#include "cuda.h"
+#include "assert.h"
+#include "iostream"
+
+int main() {
+    CUmoduleLoadingMode mode;
+    assert(CUDA_SUCCESS == cuInit(0));
+    assert(CUDA_SUCCESS == cuModuleGetLoadingMode(&amp;mode));
+
+    std::cout &lt;&lt; "CUDA Module Loading Mode is "
+              &lt;&lt; ((mode == CU_MODULE_LAZY_LOADING) ? "lazy" : "eager")
+              &lt;&lt; std::endl;
+    return 0;
+}
+</code></pre>
+<h2 id="23-5-采用延迟加载时可能遇到的问题-possible-issues-when-adopting-lazy-loading">23.5 采用延迟加载时可能遇到的问题（Possible Issues when Adopting Lazy Loading）</h2>
+<p>延迟加载的设计目标是不要求应用程序修改代码即可使用，但仍有一些注意事项，特别是应用程序没有完全遵守 CUDA 编程模型时。</p>
+<h3 id="23-5-1-并发执行-concurrent-execution">23.5.1 并发执行（Concurrent Execution）</h3>
+<p>加载内核可能需要同步 CUDA 上下文。有些程序错误地将内核并发执行的可能性当作保证。如果程序假定两个内核一定能够并发执行，而其中一个内核必须等另一个内核执行才能退出，就可能发生死锁。</p>
+<p>例如，内核 A 在无限循环中等待内核 B 执行；启动内核 B 时触发其延迟加载。如果加载 B 需要同步上下文，就可能发生死锁：A 等待 B，而加载 B 又等待 A 完成，以便同步上下文。</p>
+<p>这种程序设计模式不推荐使用。如果必须保留，可采取以下措施：</p>
+<ul>
+<li>在启动之前预加载所有希望并发执行的内核；</li>
+<li>将 <code>CUDA_MODULE_DATA_LOADING</code> 设为 <code>EAGER</code>，强制急切加载模块数据，但不强制每个函数都急切加载。</li>
+</ul>
+<h3 id="23-5-2-分配器-allocators">23.5.2 分配器（Allocators）</h3>
+<p>延迟加载将代码加载从初始化阶段推迟到执行阶段，而把代码加载到 GPU 需要分配内存。如果应用程序在启动时就分配全部显存（例如用作自定义分配器的内存池），之后可能没有剩余显存供 CUDA 加载内核。尽管延迟加载总体上能为用户节省内存，但 CUDA 仍需在每个内核首次启动时为其加载代码分配一定内存。</p>
+<p>可能的解决方案：</p>
+<ul>
+<li>使用 <code>cudaMallocAsync()</code>，而不是在启动时就占满全部显存的分配器；</li>
+<li>预留额外缓冲空间，以容纳延迟加载内核所需的内存；</li>
+<li>在初始化自定义分配器前，预加载程序将使用的所有内核。</li>
+</ul>
+<h3 id="23-5-3-自动调优-autotuning">23.5.3 自动调优（Autotuning）</h3>
+<p>有些应用会启动多个实现相同功能的内核，以比较其速度。虽然通常都建议至少执行一次预热迭代，但在启用延迟加载时尤其重要，因为首次加载内核所花费的时间会扭曲测量结果。</p>
+<p>建议在计时前至少进行一次预热迭代，或在启动计时测试前预加载待测内核。</p>
+<h2 id="校对说明">校对说明</h2>
+<p>本章为第一轮译稿。环境变量、API 名称和示例代码已保留；代码尚未在 CUDA 12.8 工具链中验证。</p>

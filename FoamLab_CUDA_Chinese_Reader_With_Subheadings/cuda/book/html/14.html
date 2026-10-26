@@ -1,0 +1,387 @@
+<h1 id="第十四章-流有序内存分配器-stream-ordered-memory-allocator">第十四章 流有序内存分配器（Stream Ordered Memory Allocator）</h1>
+<blockquote>
+<p>对应原 PDF 第 383–396 页（原书印刷页码 367–380）。保留原书章节编号、CUDA API、代码标识符与示例结构。</p>
+</blockquote>
+<h2 id="14-1-简介-introduction">14.1 简介（Introduction）</h2>
+<p>使用 <code>cudaMalloc</code> 和 <code>cudaFree</code> 管理内存分配时，会导致 GPU 在所有正在执行的 CUDA 流之间进行同步。流有序内存分配器允许应用程序将内存分配和释放操作，与同一 CUDA 流中提交的其他工作（例如内核启动和异步复制）建立顺序关系。</p>
+<p>该分配器利用流排序语义复用内存分配，从而改善应用程序的内存使用情况。它还允许应用程序控制分配器的内存缓存行为。如果设置了合适的释放阈值，当应用程序愿意接受更大的内存占用时，分配器可以通过缓存避免昂贵的操作系统调用。该分配器也支持在进程之间方便且安全地共享内存分配。</p>
+<p>对于许多应用程序，流有序内存分配器可以减少对自定义内存管理抽象的需求，并简化高性能内存管理机制的实现。已经使用自定义分配器的应用程序和库，也可以改用流有序内存分配器，让多个库共享由驱动程序管理的内存池，从而减少多余的内存消耗。此外，驱动程序能够结合自身对分配器和其他流管理 API 的了解执行优化。作为 CUDA 11.3 工具包支持的一部分，Nsight Compute 和新一代 CUDA 调试器也能够识别该分配器。</p>
+<h2 id="14-2-查询支持情况-query-for-support">14.2 查询支持情况（Query for Support）</h2>
+<p>用户可以调用 <code>cudaDeviceGetAttribute()</code> 并查询设备属性 <code>cudaDevAttrMemoryPoolsSupported</code>，判断设备是否支持流有序内存分配器。</p>
+<p>从 CUDA 11.3 开始，可以通过设备属性 <code>cudaDevAttrMemoryPoolSupportedHandleTypes</code> 查询 IPC 内存池支持情况。较旧的驱动程序尚未定义该属性枚举，因此会返回 <code>cudaErrorInvalidValue</code>。在查询前检查驱动版本，可以避免触发此错误。</p>
+<pre><code class="language-cpp">int driverVersion = 0;
+int deviceSupportsMemoryPools = 0;
+int poolSupportedHandleTypes = 0;
+
+cudaDriverGetVersion(&amp;driverVersion);
+
+if (driverVersion &gt;= 11020) {
+    cudaDeviceGetAttribute(
+        &amp;deviceSupportsMemoryPools,
+        cudaDevAttrMemoryPoolsSupported, device);
+}
+
+if (deviceSupportsMemoryPools != 0) {
+    // device 支持流有序内存分配器
+}
+
+if (driverVersion &gt;= 11030) {
+    cudaDeviceGetAttribute(
+        &amp;poolSupportedHandleTypes,
+        cudaDevAttrMemoryPoolSupportedHandleTypes, device);
+}
+
+if (poolSupportedHandleTypes &amp; cudaMemHandleTypePosixFileDescriptor) {
+    // 指定设备上的内存池可以使用基于 POSIX 文件描述符的 IPC 创建
+}
+</code></pre>
+<p>也可以使用 <code>cudaGetLastError()</code> 清除错误，而不是通过版本检查避免触发错误。</p>
+<h2 id="14-3-api-基础-cudamallocasync-与-cudafreeasync-api-fundamentals">14.3 API 基础：<code>cudaMallocAsync</code> 与 <code>cudaFreeAsync</code>（API Fundamentals）</h2>
+<p><code>cudaMallocAsync</code> 和 <code>cudaFreeAsync</code> 是该分配器的核心 API。<code>cudaMallocAsync</code> 返回一个内存分配，<code>cudaFreeAsync</code> 则释放该分配。两个 API 都接受流参数，用于定义分配何时可用，以及何时停止可用。</p>
+<p><code>cudaMallocAsync</code> 返回的指针值会同步确定，因此可用于构造后续工作。需要注意，<code>cudaMallocAsync</code> 在决定分配所在位置时，会忽略当前设备/上下文；它会根据指定的内存池或传入的流来确定驻留设备。最简单的使用模式是在同一个流中分配、使用并释放内存：</p>
+<pre><code class="language-cpp">void *ptr;
+size_t size = 512;
+cudaMallocAsync(&amp;ptr, size, cudaStreamPerThread);
+
+// 使用该分配执行工作。
+kernel&lt;&lt;&lt;..., cudaStreamPerThread&gt;&gt;&gt;(ptr, ...);
+
+// 异步释放，不需要让 CPU 与 GPU 同步。
+cudaFreeAsync(ptr, cudaStreamPerThread);
+</code></pre>
+<p>如果在分配该内存的流以外的其他流中使用它，用户必须保证访问发生在分配操作之后，否则行为未定义。可以通过同步分配流，或使用 CUDA 事件在生产流和消费流之间建立同步来保证顺序。</p>
+<p><code>cudaFreeAsync()</code> 会向指定流插入释放操作。用户必须保证释放操作发生在分配操作以及所有使用该分配的操作之后。释放操作开始后继续使用该分配，会导致未定义行为。应使用事件和/或流同步操作，确保其他流对该分配的访问已经完成，然后释放流才开始释放内存。</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;ptr, size, stream1);
+cudaEventRecord(event1, stream1);
+
+// stream2 必须等待分配准备好后才能访问。
+cudaStreamWaitEvent(stream2, event1);
+kernel&lt;&lt;&lt;..., stream2&gt;&gt;&gt;(ptr, ...);
+
+cudaEventRecord(event2, stream2);
+
+// 释放前，stream3 必须等待 stream2 完成对该分配的访问。
+cudaStreamWaitEvent(stream3, event2);
+cudaFreeAsync(ptr, stream3);
+</code></pre>
+<p>用户也可以使用 <code>cudaFreeAsync()</code> 释放通过 <code>cudaMalloc()</code> 分配的内存。释放前同样必须保证所有访问都已完成：</p>
+<pre><code class="language-cpp">cudaMalloc(&amp;ptr, size);
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptr, ...);
+cudaFreeAsync(ptr, stream);
+</code></pre>
+<p>通过 <code>cudaMallocAsync</code> 分配的内存也可以使用 <code>cudaFree()</code> 释放。使用 <code>cudaFree()</code> 释放这类分配时，驱动程序会假定所有访问均已完成，并且不会再执行额外同步。用户可以调用 <code>cudaStreamQuery</code>、<code>cudaStreamSynchronize</code>、<code>cudaEventQuery</code>、<code>cudaEventSynchronize</code> 或 <code>cudaDeviceSynchronize</code>，确保相应的异步工作已完成，GPU 不会再访问该分配。</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;ptr, size, stream);
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptr, ...);
+
+// 需要同步，以避免过早释放内存。
+cudaStreamSynchronize(stream);
+cudaFree(ptr);
+</code></pre>
+<h2 id="14-4-内存池与-cudamempool-t-memory-pools">14.4 内存池与 <code>cudaMemPool_t</code>（Memory Pools）</h2>
+<p>内存池封装虚拟地址和物理内存资源，并根据内存池的属性与特性分配和管理这些资源。内存池最重要的属性之一，是它所管理的内存类型及其所在位置。</p>
+<p>所有 <code>cudaMallocAsync</code> 调用都会使用某个内存池的资源。如果没有指定内存池，<code>cudaMallocAsync</code> 会使用传入流所属设备的当前内存池。可以通过 <code>cudaDeviceSetMempool</code> 设置某个设备的当前内存池，并通过 <code>cudaDeviceGetMempool</code> 查询。</p>
+<p>默认情况下（即没有调用 <code>cudaDeviceSetMempool</code> 时），设备的当前内存池就是该设备的默认内存池。<code>cudaMallocFromPoolAsync</code> 以及 <code>cudaMallocAsync</code> 的 C++ 重载允许用户为某次分配指定内存池，而不必将其设为当前池。<code>cudaDeviceGetDefaultMempool</code> 和 <code>cudaMemPoolCreate</code> 可用于获取内存池句柄。</p>
+<p><strong>注意：</strong> 每台设备的当前内存池都是该设备本地的。因此，如果分配时没有指定内存池，所得分配始终位于该流所属的设备上。</p>
+<p>可以通过 <code>cudaMemPoolSetAttribute</code> 和 <code>cudaMemPoolGetAttribute</code> 控制内存池属性。</p>
+<h2 id="14-5-默认-隐式内存池-default-implicit-pools">14.5 默认/隐式内存池（Default/Implicit Pools）</h2>
+<p>可以通过 <code>cudaDeviceGetDefaultMempool</code> 获取设备的默认内存池。默认内存池中的分配属于不可迁移的设备内存，并驻留在该设备上；这些分配始终可由该设备访问。</p>
+<p>可以通过 <code>cudaMemPoolSetAccess</code> 修改默认内存池的可访问性，并通过 <code>cudaMemPoolGetAccess</code> 查询。由于默认内存池无需显式创建，因此有时也称为<strong>隐式内存池</strong>。设备的默认内存池不支持 IPC。</p>
+<h2 id="14-6-显式内存池-explicit-pools">14.6 显式内存池（Explicit Pools）</h2>
+<p><code>cudaMemPoolCreate</code> 用于创建显式内存池。相比默认/隐式内存池，显式内存池允许应用程序为分配指定更多属性，例如 IPC 能力、内存池最大大小，以及在受支持的平台上让分配驻留于指定 CPU NUMA 节点等。</p>
+<p>以下代码创建一个与设备 0 的隐式内存池类似的内存池：</p>
+<pre><code class="language-cpp">int device = 0;
+cudaMemPoolProps poolProps = {};
+poolProps.allocType = cudaMemAllocationTypePinned;
+poolProps.location.id = device;
+poolProps.location.type = cudaMemLocationTypeDevice;
+
+cudaMemPoolCreate(&amp;memPool, &amp;poolProps);
+</code></pre>
+<p>以下代码展示如何创建一个位于有效 CPU NUMA 节点、且支持通过文件描述符进行 IPC 共享的内存池：</p>
+<pre><code class="language-cpp">// 创建驻留在 CPU NUMA 节点上的内存池，并支持通过文件描述符进行 IPC 共享。
+int cpu_numa_id = 0;
+cudaMemPoolProps poolProps = {};
+poolProps.allocType = cudaMemAllocationTypePinned;
+poolProps.location.id = cpu_numa_id;
+poolProps.location.type = cudaMemLocationTypeHostNuma;
+poolProps.handleType = cudaMemHandleTypePosixFileDescriptor;
+
+cudaMemPoolCreate(&amp;ipcMemPool, &amp;poolProps);
+</code></pre>
+<h2 id="14-7-物理页缓存行为-physical-page-caching-behavior">14.7 物理页缓存行为（Physical Page Caching Behavior）</h2>
+<p>默认情况下，分配器会尝试尽量减少内存池持有的物理内存。为了减少操作系统分配和释放物理内存的调用次数，应用程序需要为每个内存池配置一个内存占用目标。</p>
+<p>可以通过释放阈值属性 <code>cudaMemPoolAttrReleaseThreshold</code> 设置该值。释放阈值表示内存池在尝试将内存归还给操作系统前应保留的字节数。当内存池持有的内存超过释放阈值时，分配器会在下一次流、事件或设备同步调用时尝试将内存归还给操作系统。将释放阈值设为 <code>UINT64_MAX</code>，可以阻止驱动程序在每次同步后尝试缩小内存池。</p>
+<pre><code class="language-cpp">cuuint64_t setVal = UINT64_MAX;
+cudaMemPoolSetAttribute(
+    memPool, cudaMemPoolAttrReleaseThreshold, &amp;setVal);
+</code></pre>
+<p>如果应用程序将 <code>cudaMemPoolAttrReleaseThreshold</code> 设置得足够高，实际上禁用了内存池缩减，则可能希望在适当时机显式缩小内存池占用。<code>cudaMemPoolTrimTo</code> 可以完成这一操作。其参数 <code>minBytesToKeep</code> 允许应用程序保留预计在下一执行阶段仍需使用的内存量。</p>
+<pre><code class="language-cpp">cuuint64_t setVal = UINT64_MAX;
+cudaMemPoolSetAttribute(
+    memPool, cudaMemPoolAttrReleaseThreshold, &amp;setVal);
+
+// 当前阶段需要从流有序分配器获得大量内存。
+for (i = 0; i &lt; 10; i++) {
+    for (j = 0; j &lt; 10; j++) {
+        cudaMallocAsync(&amp;ptrs[j], size[j], stream);
+    }
+    kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptrs, ...);
+    for (j = 0; j &lt; 10; j++) {
+        cudaFreeAsync(ptrs[j], stream);
+    }
+}
+
+// 下一阶段不再需要这么多内存。
+// 先同步，使 trim 操作确认这些分配已不再使用。
+cudaStreamSynchronize(stream);
+cudaMemPoolTrimTo(mempool, 0);
+
+// 缩减操作释放的物理内存，现在可供其他进程或分配机制使用。
+</code></pre>
+<h2 id="14-8-资源使用统计-resource-usage-statistics">14.8 资源使用统计（Resource Usage Statistics）</h2>
+<p>CUDA 11.3 新增了以下内存池属性，用于查询内存池的内存使用情况：</p>
+<ul>
+<li><code>cudaMemPoolAttrReservedMemCurrent</code></li>
+<li><code>cudaMemPoolAttrReservedMemHigh</code></li>
+<li><code>cudaMemPoolAttrUsedMemCurrent</code></li>
+<li><code>cudaMemPoolAttrUsedMemHigh</code></li>
+</ul>
+<p>查询 <code>cudaMemPoolAttrReservedMemCurrent</code> 会返回内存池当前占用的 GPU 物理内存总量。查询 <code>cudaMemPoolAttrUsedMemCurrent</code> 会返回从该内存池分配、且当前不可复用的内存总量。</p>
+<p><code>cudaMemPoolAttr*MemHigh</code> 属性是高水位值，记录自上次重置以来相应 <code>cudaMemPoolAttr*MemCurrent</code> 属性达到的最大值。可以通过 <code>cudaMemPoolSetAttribute</code> 将它们重置为当前值。</p>
+<pre><code class="language-cpp">// 批量获取使用统计的辅助结构和函数示例。
+struct usageStatistics {
+    cuuint64_t reserved;
+    cuuint64_t reservedHigh;
+    cuuint64_t used;
+    cuuint64_t usedHigh;
+};
+
+void getUsageStatistics(
+    cudaMemoryPool_t memPool,
+    struct usageStatistics *statistics) {
+    cudaMemPoolGetAttribute(
+        memPool, cudaMemPoolAttrReservedMemCurrent, &amp;statistics-&gt;reserved);
+    cudaMemPoolGetAttribute(
+        memPool, cudaMemPoolAttrReservedMemHigh, &amp;statistics-&gt;reservedHigh);
+    cudaMemPoolGetAttribute(
+        memPool, cudaMemPoolAttrUsedMemCurrent, &amp;statistics-&gt;used);
+    cudaMemPoolGetAttribute(
+        memPool, cudaMemPoolAttrUsedMemHigh, &amp;statistics-&gt;usedHigh);
+}
+
+// 将高水位值重置为当前值。
+void resetStatistics(cudaMemPool_t memPool) {
+    cuuint64_t value = 0;
+    cudaMemPoolSetAttribute(
+        memPool, cudaMemPoolAttrReservedMemHigh, &amp;value);
+    cudaMemPoolSetAttribute(
+        memPool, cudaMemPoolAttrUsedMemHigh, &amp;value);
+}
+</code></pre>
+<h2 id="14-9-内存复用策略-memory-reuse-policies">14.9 内存复用策略（Memory Reuse Policies）</h2>
+<p>为满足分配请求，驱动程序会先尝试复用此前通过 <code>cudaFreeAsync()</code> 释放的内存，然后才尝试从操作系统分配更多内存。例如，在某个流中释放的内存，可以立即被同一流中后续的分配请求复用。类似地，当某个流与 CPU 完成同步后，该流中此前释放的内存也可供任意流中的分配复用。</p>
+<p>流有序分配器提供了若干可控制的分配策略。内存池属性 <code>cudaMemPoolReuseFollowEventDependencies</code>、<code>cudaMemPoolReuseAllowOpportunistic</code> 和 <code>cudaMemPoolReuseAllowInternalDependencies</code> 用于控制这些策略。升级到较新的 CUDA 驱动程序后，复用策略可能会发生变化、增强、扩展或重新排序。</p>
+<h3 id="14-9-1-cudamempoolreusefolloweventdependencies">14.9.1 <code>cudaMemPoolReuseFollowEventDependencies</code></h3>
+<p>在分配更多 GPU 物理内存之前，分配器会检查 CUDA 事件建立的依赖关系，并尝试复用在其他流中释放的内存。</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;ptr, size, originalStream);
+kernel&lt;&lt;&lt;..., originalStream&gt;&gt;&gt;(ptr, ...);
+cudaFreeAsync(ptr, originalStream);
+cudaEventRecord(event, originalStream);
+
+// 等待捕获了另一流中释放操作的事件。
+// 启用 cudaMemPoolReuseFollowEventDependencies 后，
+// 另一流中的新分配请求就可能复用该内存。
+cudaStreamWaitEvent(otherStream, event);
+cudaMallocAsync(&amp;ptr2, size, otherStream);
+</code></pre>
+<h3 id="14-9-2-cudamempoolreuseallowopportunistic">14.9.2 <code>cudaMemPoolReuseAllowOpportunistic</code></h3>
+<p>根据 <code>cudaMemPoolReuseAllowOpportunistic</code> 策略，分配器会检查已释放的分配，判断释放操作的流排序条件是否已经满足（例如，该流是否已执行到释放操作所指定的位置）。</p>
+<p>禁用此策略后，分配器仍会复用那些在流与 CPU 完成同步后可用的内存。禁用该策略并不会阻止 <code>cudaMemPoolReuseFollowEventDependencies</code> 生效。</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;ptr, size, originalStream);
+kernel&lt;&lt;&lt;..., originalStream&gt;&gt;&gt;(ptr, ...);
+cudaFreeAsync(ptr, originalStream);
+
+// 经过一段时间，内核执行完毕。
+wait(10);
+
+// 启用 cudaMemPoolReuseAllowOpportunistic 时，
+// 分配器可根据 originalStream 的执行进度复用先前的分配。
+cudaMallocAsync(&amp;ptr2, size, otherStream);
+</code></pre>
+<h3 id="14-9-3-cudamempoolreuseallowinternaldependencies">14.9.3 <code>cudaMemPoolReuseAllowInternalDependencies</code></h3>
+<p>如果无法从操作系统分配并映射更多物理内存，驱动程序会查找那些需要等待其他流继续执行才能变为可用的内存。如果找到这样的内存，驱动程序会在分配流中插入所需依赖关系，并复用该内存。</p>
+<pre><code class="language-cpp">cudaMallocAsync(&amp;ptr, size, originalStream);
+kernel&lt;&lt;&lt;..., originalStream&gt;&gt;&gt;(ptr, ...);
+cudaFreeAsync(ptr, originalStream);
+
+// 启用 cudaMemPoolReuseAllowInternalDependencies，且驱动程序无法
+// 分配更多物理内存时，可能会在分配流中插入等效于
+// cudaStreamWaitEvent 的依赖，使 otherStream 中的后续工作
+// 排在 originalStream 中可能访问原分配的工作之后。
+cudaMallocAsync(&amp;ptr2, size, otherStream);
+</code></pre>
+<h3 id="14-9-4-禁用复用策略-disabling-reuse-policies">14.9.4 禁用复用策略（Disabling Reuse Policies）</h3>
+<p>虽然可控制的复用策略能够改善内存复用，但用户也可能希望禁用它们。</p>
+<p>允许机会式复用（例如 <code>cudaMemPoolReuseAllowOpportunistic</code>）会使每次运行的分配模式受到 CPU 与 GPU 执行交错顺序的影响，从而产生运行间差异。内部依赖插入（例如 <code>cudaMemPoolReuseAllowInternalDependencies</code>）可能以意料之外、且潜在非确定性的方式串行化工作；而用户可能更希望在分配失败时显式同步事件或流。</p>
+<h2 id="14-10-多-gpu-的设备可访问性-device-accessibility-for-multi-gpu">14.10 多 GPU 的设备可访问性（Device Accessibility for Multi-GPU）</h2>
+<p>与虚拟内存管理 API 控制分配可访问性的方式类似，内存池分配的可访问性也不遵循 <code>cudaDeviceEnablePeerAccess</code> 或 <code>cuCtxEnablePeerAccess</code>。相反，必须使用 <code>cudaMemPoolSetAccess</code> 指定哪些设备可以访问来自某个内存池的分配。</p>
+<p>默认情况下，分配可由其驻留设备访问，而且无法撤销该设备的访问权限。若要允许其他设备访问，访问设备必须与内存池所在设备具备对等访问能力；可以使用 <code>cudaDeviceCanAccessPeer</code> 检查。如果没有检查对等能力，设置访问权限可能返回 <code>cudaErrorInvalidDevice</code>。如果该内存池尚未分配过内存，<code>cudaMemPoolSetAccess</code> 即使在设备不支持对等访问时也可能成功，但后续从该池分配内存时会失败。</p>
+<p><code>cudaMemPoolSetAccess</code> 会影响该内存池的所有分配，而不仅是之后创建的分配。<code>cudaMemPoolGetAccess</code> 返回的可访问性同样适用于该池的所有分配。建议不要频繁更改某个内存池对指定 GPU 的访问设置；一旦允许某台 GPU 访问某个池，最好在该池的整个生命周期内保持这一权限。</p>
+<pre><code class="language-cpp">cudaError_t setAccessOnDevice(
+    cudaMemPool_t memPool, int residentDevice, int accessingDevice) {
+    cudaMemAccessDesc accessDesc = {};
+    accessDesc.location.type = cudaMemLocationTypeDevice;
+    accessDesc.location.id = accessingDevice;
+    accessDesc.flags = cudaMemAccessFlagsProtReadWrite;
+
+    int canAccess = 0;
+    cudaError_t error = cudaDeviceCanAccessPeer(
+        &amp;canAccess, accessingDevice, residentDevice);
+
+    if (error != cudaSuccess) {
+        return error;
+    } else if (canAccess == 0) {
+        return cudaErrorPeerAccessUnsupported;
+    }
+
+    // 使地址范围可访问。
+    return cudaMemPoolSetAccess(memPool, &amp;accessDesc, 1);
+}
+</code></pre>
+<h2 id="14-11-ipc-内存池-ipc-memory-pools">14.11 IPC 内存池（IPC Memory Pools）</h2>
+<p>支持 IPC 的内存池可以方便、高效且安全地在进程之间共享 GPU 内存。CUDA 的 IPC 内存池提供与 CUDA 虚拟内存管理 API 相同的安全优势。</p>
+<p>通过内存池在进程间共享内存分为两个阶段。首先，进程需要共享对内存池的访问权限；然后，再共享该池中的特定内存分配。第一阶段用于建立并强制执行安全策略。第二阶段则协调各进程中使用的虚拟地址，以及导入进程中映射何时必须有效。</p>
+<h3 id="14-11-1-创建并共享-ipc-内存池-creating-and-sharing-ipc-memory-pools">14.11.1 创建并共享 IPC 内存池（Creating and Sharing IPC Memory Pools）</h3>
+<p>共享内存池访问权限的步骤如下：通过 <code>cudaMemPoolExportToShareableHandle()</code> 获取该内存池的操作系统原生句柄，将句柄通过操作系统原生 IPC 机制传给导入进程，再通过 <code>cudaMemPoolImportFromShareableHandle()</code> 创建导入的内存池。</p>
+<p>要使 <code>cudaMemPoolExportToShareableHandle</code> 成功，创建内存池时必须在内存池属性结构中指定所请求的句柄类型。有关如何在进程间传递操作系统原生句柄的具体 IPC 机制，请参阅相关示例。</p>
+<p>以下代码展示导出进程和导入进程的操作。此例使用 POSIX 文件描述符句柄：</p>
+<pre><code class="language-cpp">// 导出进程：在设备 0 上创建支持 IPC、可导出的内存池。
+cudaMemPoolProps poolProps = {};
+poolProps.allocType = cudaMemAllocationTypePinned;
+poolProps.location.id = 0;
+poolProps.location.type = cudaMemLocationTypeDevice;
+
+// 将 handleTypes 设为非零值，使内存池支持导出（IPC）。
+poolProps.handleTypes = CU_MEM_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR;
+cudaMemPoolCreate(&amp;memPool, &amp;poolProps);
+
+// 基于文件描述符的句柄是整数类型。
+int fdHandle = 0;
+
+// 获取内存池对应的操作系统原生句柄。
+// 此处传入句柄存储位置的指针。
+cudaMemPoolExportToShareableHandle(
+    &amp;fdHandle,
+    memPool,
+    CU_MEM_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR,
+    0);
+
+// 必须通过相应的操作系统专用 API 将句柄发送给导入进程。
+
+// 导入进程：
+int fdHandle;
+// 必须通过相应的操作系统专用 API 从导出进程取得句柄。
+
+// 根据可共享句柄创建导入的内存池。
+// 注意：这里按值传递句柄。
+cudaMemPoolImportFromShareableHandle(
+    &amp;importedMemPool,
+    (void*)fdHandle,
+    CU_MEM_HANDLE_TYPE_POSIX_FILE_DESCRIPTOR,
+    0);
+</code></pre>
+<h3 id="14-11-2-在导入进程中设置访问权限-set-access-in-the-importing-process">14.11.2 在导入进程中设置访问权限（Set Access in the Importing Process）</h3>
+<p>导入的内存池最初只能由其驻留设备访问。导入内存池不会继承导出进程设置的任何可访问性。导入进程必须调用 <code>cudaMemPoolSetAccess</code>，为计划访问该内存的 GPU 启用访问权限。</p>
+<p>如果导入的内存池属于导入进程中不可见的设备，用户必须使用 <code>cudaMemPoolSetAccess</code>，允许实际使用这些分配的 GPU 进行访问。</p>
+<h3 id="14-11-3-创建并共享导出池中的分配-creating-and-sharing-allocations-from-an-exported-pool">14.11.3 创建并共享导出池中的分配（Creating and Sharing Allocations from an Exported Pool）</h3>
+<p>共享内存池后，导出进程中通过该池的 <code>cudaMallocAsync()</code> 创建的分配，可以与已导入该池的其他进程共享。由于安全策略是在内存池级别建立并验证的，操作系统不需要再为池中的每个具体分配单独维护安全信息。换言之，用于导入池分配的不透明类型 <code>cudaMemPoolPtrExportData</code>，可以通过任意机制发送给导入进程。</p>
+<p>即使导出和导入分配时没有与分配流进行同步，导入进程访问分配时仍必须遵守与导出进程相同的规则：对该分配的访问必须发生在分配操作的流排序之后。</p>
+<p>以下代码展示如何使用 <code>cudaMemPoolExportPointer()</code> 和 <code>cudaMemPoolImportPointer()</code> 共享分配，并使用 IPC 事件确保导入进程不会在分配准备好之前访问它。</p>
+<pre><code class="language-cpp">// 在导出进程中准备分配。
+cudaMemPoolPtrExportData exportData;
+cudaEvent_t readyIpcEvent;
+cudaIpcEventHandle_t readyIpcEventHandle;
+
+// 用于进程间协调的 IPC 事件。
+// cudaEventInterprocess 标志使事件可用于 IPC。
+// 原书示例在此处写为 cudaEventCreate，需与目标 SDK 的函数签名核验。
+cudaEventCreate(
+    &amp;readyIpcEvent,
+    cudaEventDisableTiming | cudaEventInterprocess);
+
+// 从导出进程的内存池分配内存。
+cudaMallocAsync(&amp;ptr, size, exportMemPool, stream);
+
+// 当分配准备好时记录事件。
+cudaEventRecord(readyIpcEvent, stream);
+cudaMemPoolExportPointer(&amp;exportData, ptr);
+cudaIpcGetEventHandle(&amp;readyIpcEventHandle, readyIpcEvent);
+
+// 使用任意机制向导入进程共享 IPC 事件和指针导出数据。
+// 这里将数据复制到共享内存。
+shmem-&gt;ptrData = exportData;
+shmem-&gt;readyIpcEventHandle = readyIpcEventHandle;
+// 通知消费者数据已准备好。
+
+// 导入分配：
+cudaMemPoolPtrExportData *importData = &amp;shmem-&gt;ptrData;
+cudaEvent_t readyIpcEvent;
+cudaIpcEventHandle_t *readyIpcEventHandle =
+    &amp;shmem-&gt;readyIpcEventHandle;
+
+// 使用任意机制从导出进程取得 IPC 事件句柄和导出数据。
+// 此例使用共享内存，因此只需同步以确保共享内存已填充。
+cudaIpcOpenEventHandle(&amp;readyIpcEvent, readyIpcEventHandle);
+
+// 导入分配。该操作不会阻塞等待分配准备就绪。
+cudaMemPoolImportPointer(&amp;ptr, importedMemPool, importData);
+
+// 使用该分配前，等待分配流中此前的操作完成。
+cudaStreamWaitEvent(stream, readyIpcEvent);
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptr, ...);
+</code></pre>
+<p>释放分配时，必须先在导入进程中释放，再在导出进程中释放。以下代码展示如何使用 CUDA IPC 事件，在两个进程的 <code>cudaFreeAsync</code> 操作之间建立必要同步。</p>
+<pre><code class="language-cpp">// 导入进程：释放前执行最后一次访问。
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptr, ...);
+cudaFreeAsync(ptr, stream);
+
+// 导入进程释放后，不得再访问该分配。
+cudaIpcEventRecord(finishedIpcEvent, stream);
+
+// 导出进程：使自身的释放与导入进程的流顺序协调。
+cudaStreamWaitEvent(stream, finishedIpcEvent);
+kernel&lt;&lt;&lt;..., stream&gt;&gt;&gt;(ptrInExportingProcess, ...);
+
+// 原书此处提取文本写为 cudFreeAsync，疑为拼写错误，需对照原文校验。
+cudFreeAsync(ptrInExportingProcess, stream);
+</code></pre>
+<p>导入进程的释放操作不会阻止导出进程在其释放之前使用该分配。也可以使用 <code>cudaFree()</code> 在两个进程中释放该分配；此外，也可使用其他流同步 API 代替 CUDA IPC 事件。</p>
+<h3 id="14-11-4-ipc-导出池的限制-ipc-export-pool-limitations">14.11.4 IPC 导出池的限制（IPC Export Pool Limitations）</h3>
+<p>目前，IPC 内存池不支持将物理内存块释放回操作系统。因此，<code>cudaMemPoolTrimTo</code> 不会产生效果（no-op），<code>cudaMemPoolAttrReleaseThreshold</code> 也实际上会被忽略。该行为由驱动程序而不是运行时控制，未来的驱动程序更新可能会改变这一行为。</p>
+<h3 id="14-11-5-ipc-导入池的限制-ipc-import-pool-limitations">14.11.5 IPC 导入池的限制（IPC Import Pool Limitations）</h3>
+<p>不允许从导入池中进行分配。具体来说，导入池不能被设为当前内存池，也不能用于 <code>cudaMallocFromPoolAsync</code> API。因此，分配复用策略属性对这些池没有意义。</p>
+<p>IPC 内存池目前也不支持将物理内存块释放回操作系统，因此 <code>cudaMemPoolTrimTo</code> 不起作用，<code>cudaMemPoolAttrReleaseThreshold</code> 实际上会被忽略。</p>
+<p>资源使用统计属性查询只反映导入到当前进程中的分配及其关联的物理内存。</p>
+<h2 id="14-12-同步-api-操作-synchronization-api-actions">14.12 同步 API 操作（Synchronization API Actions）</h2>
+<p>将分配器集成到 CUDA 驱动程序后，可利用同步 API 执行优化。当用户请求 CUDA 驱动程序进行同步时，驱动程序会等待异步工作完成。返回前，驱动程序会确定哪些释放操作已被此次同步保证完成。</p>
+<p>这些分配会变为可供分配器复用的内存，不受指定流或已禁用分配策略的影响。驱动程序还会在此时检查 <code>cudaMemPoolAttrReleaseThreshold</code>，并释放任何可以释放的多余物理内存。</p>
+<h2 id="14-13-补充说明-addendums">14.13 补充说明（Addendums）</h2>
+<h3 id="14-13-1-cudamemcpyasync-对当前上下文-设备的敏感性-current-context-device-sensitivity">14.13.1 <code>cudaMemcpyAsync</code> 对当前上下文/设备的敏感性（Current Context/Device Sensitivity）</h3>
+<p>在当前 CUDA 驱动程序中，任何涉及 <code>cudaMallocAsync</code> 分配内存的异步内存复制，都应使用指定流所属的上下文作为调用线程的当前上下文。</p>
+<p><code>cudaMemcpyPeerAsync</code> 不受此要求约束，因为该 API 使用其参数中指定的设备主上下文，而不是当前上下文。</p>
+<h3 id="14-13-2-cupointergetattribute-查询-query">14.13.2 <code>cuPointerGetAttribute</code> 查询（Query）</h3>
+<p>对已调用 <code>cudaFreeAsync</code> 释放的分配再次调用 <code>cuPointerGetAttribute</code>，会导致未定义行为。具体而言，无论该分配是否仍能从某个给定流访问，行为都未定义。</p>
+<h3 id="14-13-3-cugraphaddmemsetnode">14.13.3 <code>cuGraphAddMemsetNode</code></h3>
+<p><code>cuGraphAddMemsetNode</code> 不能用于通过流有序分配器分配的内存。不过，可以在流捕获期间对这些分配执行 memset 操作。</p>
+<h3 id="14-13-4-指针属性-pointer-attributes">14.13.4 指针属性（Pointer Attributes）</h3>
+<p><code>cuPointerGetAttributes</code> 查询可用于流有序分配。由于流有序分配不与特定上下文关联，查询 <code>CU_POINTER_ATTRIBUTE_CONTEXT</code> 虽然会成功，但 <code>*data</code> 中返回的是 <code>NULL</code>。</p>
+<p>可以使用属性 <code>CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL</code> 确定分配所在设备；在选择上下文以执行通过 <code>cudaMemcpyPeerAsync</code> 完成的点对点复制时，这一信息可能很有用。</p>
+<p>属性 <code>CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE</code> 从 CUDA 11.3 开始提供，可用于调试，也可用于 IPC 操作前确认某个分配来自哪个内存池。</p>
+<hr/>
+<h2 id="校对提示-非原书正文">校对提示（非原书正文）</h2>
+<ul>
+<li>原 PDF 的内存池统计示例中，<code>cudaMemPoolGetAttribute</code> 的输出参数在文本提取结果里未显示取址符号。本工作稿按 API 的指针参数形式写为 <code>&amp;statistics-&gt;...</code>；需在技术审校时对照 CUDA 12.8 原始代码确认。</li>
+<li>原 PDF 的 IPC 事件示例写作 <code>cudaEventCreate</code> 并传入标志参数，和常见 CUDA Runtime API 签名存在疑点；本工作稿保留原示例写法并标注待核验。</li>
+<li>原 PDF 导入/导出进程示例末尾出现 <code>cudFreeAsync</code> 拼写；本工作稿保留该拼写并标注待核验，不能直接把该示例当作可编译代码。</li>
+<li>本章代码尚未在 CUDA 12.8 SDK 环境中编译测试。</li>
+</ul>

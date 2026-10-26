@@ -1,0 +1,446 @@
+<h1 id="第八章-性能指南-performance-guidelines">第八章 性能指南（Performance Guidelines）</h1>
+<h2 id="8-1-整体性能优化策略-overall-performance-optimization-strategies">8.1 整体性能优化策略（Overall Performance Optimization Strategies）</h2>
+<p>性能优化围绕四项基本策略展开：</p>
+<ul>
+<li>尽可能增加并行执行，以充分利用计算资源；</li>
+<li>优化内存使用，以获得最高内存吞吐量；</li>
+<li>优化指令使用，以获得最高指令吞吐量；</li>
+<li>尽量减少内存抖动（memory thrashing）。</li>
+</ul>
+<p>对于应用程序的某个部分，哪种策略能带来最大的性能提升，取决于该部分的性能瓶颈。例如，如果某个内核主要受内存访问限制，那么优化它的指令使用通常不会带来显著的性能提升。</p>
+<p>因此，优化工作应持续依据测量结果和性能瓶颈监控来指导，例如使用 CUDA profiler。还可以将某个内核的浮点运算吞吐量或内存吞吐量（选择更有意义的一项）与设备对应的理论峰值吞吐量进行比较，从而判断该内核还有多少优化空间。</p>
+<h2 id="8-2-最大化利用率-maximize-utilization">8.2 最大化利用率（Maximize Utilization）</h2>
+<p>为了最大化利用率，应用程序应当尽可能暴露并行性，并将这些并行工作高效映射到系统的不同组成部分，使它们在大部分时间里都保持繁忙。</p>
+<h3 id="8-2-1-应用程序层面-application-level">8.2.1 应用程序层面（Application Level）</h3>
+<p>在较高层面上，应用程序应使用异步函数调用和执行流，最大化主机、设备以及连接主机与设备的总线之间的并行执行，详见“异步并发执行”。</p>
+<p>应将最适合每类处理器的工作分配给它：串行工作交给主机， 并行工作交给设备。</p>
+<p>对于并行工作，当算法中的某些线程需要同步并共享数据，从而打断并行执行时，通常有两种情况：</p>
+<ul>
+<li>如果这些线程属于同一个线程块，应使用 <code>__syncthreads()</code>，并在同一次内核调用中通过共享内存交换数据。</li>
+<li>如果这些线程属于不同线程块，则必须通过全局内存交换数据，并使用两次独立的内核调用：一次写入全局内存，另一次从全局内存读取。</li>
+</ul>
+<p>第二种方式效率较低，因为它增加了内核调用开销和全局内存流量。因此，应尽可能按照 CUDA 编程模型重新组织算法，让需要线程间通信的计算尽可能在同一个线程块内完成。</p>
+<h3 id="8-2-2-设备层面-device-level">8.2.2 设备层面（Device Level）</h3>
+<p>在更低的层面上，应用程序应最大化同一设备中不同多处理器之间的并行执行。</p>
+<p>一个设备可以并发执行多个内核，因此也可以通过使用执行流来启用足够多的内核并发执行，从而提高利用率，详见“异步并发执行”。</p>
+<h3 id="8-2-3-多处理器层面-multiprocessor-level">8.2.3 多处理器层面（Multiprocessor Level）</h3>
+<p>在更低的层面上，应用程序应最大化多处理器内部不同功能单元之间的并行执行。</p>
+<p>如“硬件多线程”一节所述，GPU 多处理器主要依靠线程级并行来最大化功能单元的利用率。因此，利用率与驻留 warp 的数量直接相关。每次发出指令时，warp 调度器都会选择一条已准备好执行的指令。该指令可以是同一 warp 中另一条相互独立的指令（利用指令级并行），但更常见的情况是选择另一个 warp 的指令（利用线程级并行）。</p>
+<p>如果选中了就绪指令，就会将其发给该 warp 的活动线程。一个 warp 从发出一条指令到能够执行下一条指令所需的时钟周期数称为<strong>延迟（latency）</strong>。当所有 warp 调度器在延迟期间的每个时钟周期，都始终有某个 warp 的指令可供发出时，就实现了充分利用率；换言之，延迟被完全“隐藏”了。</p>
+<p>隐藏 <span class="cuda-math-inline">\(L\)</span> 个时钟周期的延迟所需的指令数，取决于这些指令各自的吞吐量，详见“算术指令”。如果假设指令具有最大吞吐量，则所需指令数为：</p>
+<ul>
+<li>对于计算能力为 5.x、6.1、6.2、7.x 和 8.x 的设备，需要 <span class="cuda-math-inline">\(4L\)</span> 条指令。这些设备的多处理器每个时钟周期可为四个 warp 各发出一条指令。</li>
+<li>对于计算能力为 6.0 的设备，需要 <span class="cuda-math-inline">\(2L\)</span> 条指令，因为这些设备每个时钟周期发出的两条指令分别属于两个不同的 warp。</li>
+</ul>
+<p>warp 无法执行下一条指令的最常见原因，是该指令的输入操作数尚未就绪。</p>
+<p>如果所有输入操作数都位于寄存器中，延迟通常来自寄存器依赖，也就是某些输入操作数由尚未执行完毕的前序指令写入。此时，延迟等于前序指令的执行时间，warp 调度器必须在这段时间里调度其他 warp 的指令。执行时间取决于指令类型。例如，在计算能力为 7.x 的设备上，大多数算术指令通常需要 4 个时钟周期。这意味着，在假设 warp 以最大吞吐量执行指令的情况下，每个多处理器需要 16 个活动 warp（4 个周期 × 4 个 warp 调度器）来隐藏算术指令延迟；如果 warp 内部存在指令级并行性，则所需 warp 数量可以更少，因为同一个 warp 中的多条独立指令可以连续发出。</p>
+<p>如果某个输入操作数位于片外内存，延迟就会高得多，通常达到数百个时钟周期。隐藏这种高延迟所需的 warp 数量，取决于内核代码及其指令级并行程度。一般来说，没有片外内存操作数的指令（通常是算术指令）与具有片外内存操作数的指令之比越低，就需要越多 warp。这个比值通常称为程序的<strong>算术强度（arithmetic intensity）</strong>。</p>
+<p>warp 尚未就绪的另一个原因，是它正在等待某个内存栅栏（参见“内存栅栏函数”）或同步点（参见“同步函数”）。同步点可能迫使多处理器空闲，因为越来越多的 warp 会等待同一线程块中其他 warp 完成同步点之前的指令。如果一个多处理器上能够同时驻留多个线程块，就有助于减少这种空闲，因为不同线程块中的 warp 不需要在同一个同步点相互等待。</p>
+<p>对于某个内核调用，每个多处理器上能够驻留的线程块和 warp 数量，取决于调用的执行配置、该多处理器的内存资源，以及内核的资源需求，详见“硬件多线程”。使用 <code>--ptxas-options=-v</code> 选项编译时，编译器会报告寄存器和共享内存的使用量。</p>
+<p>一个线程块所需的共享内存总量，等于静态分配的共享内存与动态分配的共享内存之和。</p>
+<p>内核使用的寄存器数量会显著影响可驻留 warp 的数量。例如，对于计算能力为 6.x 的设备，如果内核使用 64 个寄存器、每个线程块有 512 个线程，且只需要很少的共享内存，那么多处理器上可以驻留两个线程块（即 32 个 warp），因为它们需要的寄存器总数 <span class="cuda-math-inline">\(2\times512\times64\)</span> 正好等于多处理器可用寄存器数量。但如果内核多使用一个寄存器，就只能驻留一个线程块（即 16 个 warp），因为两个线程块将需要 <span class="cuda-math-inline">\(2\times512\times65\)</span> 个寄存器，超过可用数量。</p>
+<p>因此，编译器会尝试尽量减少寄存器使用量，同时避免寄存器溢出（参见“设备内存访问”）并尽量减少指令数。可以使用编译器选项 <code>maxrregcount</code>、<code>__launch_bounds__()</code> 限定符或 <code>__maxnreg__()</code> 限定符控制寄存器使用量。</p>
+<p>寄存器文件由 32 位寄存器组成。因此，存储在寄存器中的每个变量至少需要一个 32 位寄存器；例如，一个 <code>double</code> 变量需要两个 32 位寄存器。</p>
+<p>对于给定内核，执行配置对性能的影响通常取决于内核代码，因此建议通过实验确定合适的配置。应用程序还可以根据寄存器文件大小、共享内存大小、设备计算能力、多处理器数量和内存带宽来参数化执行配置；这些属性都可以通过运行时 API 查询。</p>
+<p>每个线程块的线程数应尽量选择为 warp 大小的整数倍，以避免 warp 中线程不足造成计算资源浪费。</p>
+<h4 id="8-2-3-1-占用率计算器-occupancy-calculator">8.2.3.1 占用率计算器（Occupancy Calculator）</h4>
+<p>CUDA 提供多个 API，帮助程序员根据寄存器和共享内存需求选择线程块大小和集群大小。</p>
+<ul>
+<li>占用率计算 API <code>cudaOccupancyMaxActiveBlocksPerMultiprocessor</code> 可以根据线程块大小和内核的共享内存用量预测占用率。它以每个多处理器上可并发驻留的线程块数量表示占用率。将该值乘以每个线程块中的 warp 数，可得到每个多处理器上的并发 warp 数；再除以每个多处理器的最大 warp 数，即可得到百分比占用率。</li>
+<li>基于占用率的启动配置 API <code>cudaOccupancyMaxPotentialBlockSize</code> 和 <code>cudaOccupancyMaxPotentialBlockSizeVariableSMem</code>，会使用启发式方法计算能够实现最大多处理器占用率的执行配置。</li>
+<li>占用率计算 API <code>cudaOccupancyMaxActiveClusters</code> 可以根据集群大小、线程块大小和内核共享内存用量预测占用率。它报告系统中 GPU 对给定集群大小可同时活动的最大集群数。</li>
+</ul>
+<p>以下示例计算 <code>MyKernel</code> 的占用率，并以并发 warp 数与每个多处理器最大 warp 数的比值报告占用率。</p>
+<pre><code class="language-cpp">// 设备代码
+__global__ void MyKernel(int *d, int *a, int *b)
+{
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    d[idx] = a[idx] * b[idx];
+}
+
+// 主机代码
+int main()
+{
+    int numBlocks;   // 以活动线程块数表示的占用率
+    int blockSize = 32;
+
+    // 将占用率换算为 warp 数所需的变量
+    int device;
+    cudaDeviceProp prop;
+    int activeWarps;
+    int maxWarps;
+
+    cudaGetDevice(&amp;device);
+    cudaGetDeviceProperties(&amp;prop, device);
+
+    cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+        &amp;numBlocks, MyKernel, blockSize, 0);
+
+    activeWarps = numBlocks * blockSize / prop.warpSize;
+    maxWarps = prop.maxThreadsPerMultiProcessor / prop.warpSize;
+
+    std::cout &lt;&lt; "Occupancy: "
+              &lt;&lt; (double)activeWarps / maxWarps * 100
+              &lt;&lt; "%" &lt;&lt; std::endl;
+
+    return 0;
+}
+</code></pre>
+<p>以下示例根据用户输入，使用占用率启动配置器来配置 <code>MyKernel</code> 的启动参数。</p>
+<pre><code class="language-cpp">// 设备代码
+__global__ void MyKernel(int *array, int arrayCount)
+{
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx &lt; arrayCount) {
+        array[idx] *= array[idx];
+    }
+}
+
+// 主机代码
+int launchMyKernel(int *array, int arrayCount)
+{
+    int blockSize;    // 启动配置器返回的线程块大小
+    int minGridSize;  // 对完整设备启动实现最大占用率所需的最小网格大小
+    int gridSize;     // 根据输入规模确定的实际网格大小
+
+    cudaOccupancyMaxPotentialBlockSize(
+        &amp;minGridSize, &amp;blockSize, (void*)MyKernel, 0, arrayCount);
+
+    // 根据数组大小向上取整
+    gridSize = (arrayCount + blockSize - 1) / blockSize;
+
+    MyKernel&lt;&lt;&lt;gridSize, blockSize&gt;&gt;&gt;(array, arrayCount);
+    cudaDeviceSynchronize();
+
+    // 如有需要，可使用 cudaOccupancyMaxActiveBlocksPerMultiprocessor
+    // 计算占用率。
+    return 0;
+}
+</code></pre>
+<p>以下示例展示如何使用集群占用率 API，查找指定集群大小下的最大活动集群数。本例使用大小为 2 的集群，每个线程块包含 128 个线程。</p>
+<p>从计算能力 9.0 开始，集群大小 8 具有向前兼容性；但如果 GPU 硬件或 MIG 配置过小，无法支持 8 个多处理器，则最大集群大小会降低。因此，建议在启动集群内核前，先通过 <code>cudaOccupancyMaxPotentialClusterSize</code> 查询最大集群大小。</p>
+<pre><code class="language-cpp">{
+    cudaLaunchConfig_t config = {0};
+    config.gridDim = number_of_blocks;
+    config.blockDim = 128;  // 每个线程块 128 个线程
+    config.dynamicSmemBytes = dynamic_shared_memory_size;
+
+    cudaLaunchAttribute attribute[1];
+    attribute[0].id = cudaLaunchAttributeClusterDimension;
+    attribute[0].val.clusterDim.x = 2; // 集群大小为 2
+    attribute[0].val.clusterDim.y = 1;
+    attribute[0].val.clusterDim.z = 1;
+    config.attrs = attribute;
+    config.numAttrs = 1;
+
+    int max_cluster_size = 0;
+    cudaOccupancyMaxPotentialClusterSize(
+        &amp;max_cluster_size, (void *)kernel, &amp;config);
+
+    int max_active_clusters = 0;
+    cudaOccupancyMaxActiveClusters(
+        &amp;max_active_clusters, (void *)kernel, &amp;config);
+
+    std::cout &lt;&lt; "Max Active Clusters of size 2: "
+              &lt;&lt; max_active_clusters &lt;&lt; std::endl;
+}
+</code></pre>
+<p>CUDA Nsight Compute 用户界面还提供独立的占用率计算器和启动配置器实现，位于 <code>&lt;CUDA_Toolkit_Path&gt;/include/cuda_occupancy.h</code>，可用于不依赖 CUDA 软件栈的场景。Nsight Compute 版本的占用率计算器尤其适合作为学习工具，因为它能够直观显示线程块大小、每线程寄存器数和每线程共享内存等参数变化对占用率的影响。</p>
+<h2 id="8-3-最大化内存吞吐量-maximize-memory-throughput">8.3 最大化内存吞吐量（Maximize Memory Throughput）</h2>
+<p>要最大化应用程序的整体内存吞吐量，第一步是尽量减少低带宽的数据传输。</p>
+<p>这意味着应尽量减少主机与设备之间的数据传输（详见“主机与设备之间的数据传输”），因为它们的带宽远低于全局内存与设备之间的数据传输带宽。</p>
+<p>同样，也应尽量减少全局内存与设备之间的数据传输，并尽可能利用片上内存：共享内存和缓存，包括计算能力为 2.x 及以上设备可用的 L1、L2 缓存，以及所有设备都可用的纹理缓存和常量缓存。</p>
+<p>共享内存相当于由用户管理的缓存：应用程序显式分配并访问它。一个典型的编程模式是先将来自设备内存的数据暂存到共享内存中。也就是说，线程块中的每个线程会：</p>
+<ul>
+<li>将数据从设备内存加载到共享内存；</li>
+<li>与线程块中的其他线程同步，以确保每个线程都能安全读取由其他线程填充的共享内存位置；</li>
+<li>在共享内存中处理数据。</li>
+</ul>
+<h2 id="8-3-最大化内存吞吐量-maximize-memory-throughput-2">8.3 最大化内存吞吐量（Maximize Memory Throughput）</h2>
+<p>为了最大化应用程序整体内存吞吐量，首先应尽量减少低带宽的数据传输。这意味着要尽量减少主机与设备之间的数据传输，因为它们的带宽远低于全局内存与设备之间的数据传输带宽。</p>
+<p>同样，也应尽量减少全局内存与设备之间的数据传输，并尽可能利用片上内存：共享内存和缓存，包括计算能力为 2.x 及以上设备可用的 L1、L2 缓存，以及所有设备都可用的纹理缓存和常量缓存。</p>
+<p>共享内存相当于由用户管理的缓存：应用程序显式分配并访问它。典型模式是先将设备内存中的数据暂存到共享内存中。通常，线程块中的每个线程会：</p>
+<ol>
+<li>将数据从设备内存加载到共享内存；</li>
+<li>与线程块中的其他线程同步，确保可以安全读取由其他线程填充的共享内存位置；</li>
+<li>在共享内存中处理数据；</li>
+<li>如有必要，再次同步，以确保共享内存已更新为计算结果；</li>
+<li>将结果写回设备内存。</li>
+</ol>
+<p>对于某些应用程序（例如全局内存访问模式依赖于数据的应用程序），传统的硬件管理缓存可能更适合利用数据局部性。对于计算能力为 7.x、8.x 和 9.0 的设备，L1 缓存和共享内存使用同一片片上内存；每次内核调用可以配置其中多少容量用于 L1、多少用于共享内存。</p>
+<p>根据不同类型内存的访问模式，内核的内存访问吞吐量可能相差一个数量级。因此，提升内存吞吐量的下一步，是按照“设备内存访问”中介绍的最佳访问模式组织内存访问。这一点对全局内存尤其重要，因为与片上带宽和算术指令吞吐量相比，全局内存带宽较低，所以非最优的全局内存访问通常会显著影响性能。</p>
+<h3 id="8-3-1-主机与设备之间的数据传输-data-transfer-between-host-and-device">8.3.1 主机与设备之间的数据传输（Data Transfer between Host and Device）</h3>
+<p>应用程序应尽量减少主机与设备之间的数据传输。一种方法是将更多代码从主机移到设备，即使这意味着某些内核暴露的并行性不足，无法让设备以最高效率运行。</p>
+<p>中间数据结构可以在设备内存中创建、由设备处理，并在整个过程中从不映射到主机或复制回主机内存。</p>
+<p>此外，每次传输都存在固定开销，因此将许多小型传输合并为一次大型传输，通常总是比逐次执行小型传输性能更好。</p>
+<p>在具有前端总线的系统上，使用页锁定主机内存可以提升主机与设备之间的数据传输性能，详见“页锁定主机内存”。</p>
+<p>另外，使用映射的页锁定内存时，无需分配设备内存，也无需显式地在主机与设备内存之间复制数据。每次内核访问映射内存时，数据传输都会隐式发生。为了获得最高性能，这些内存访问必须像全局内存访问一样实现合并。如果访问已合并，且映射内存只被读取或写入一次，那么与主机和设备之间的显式复制相比，使用映射的页锁定内存可能更有优势。</p>
+<p>在设备内存与主机内存物理上相同的集成系统中，主机与设备之间的复制是多余的，应改用映射的页锁定内存。可以检查设备属性 <code>integrated</code> 是否等于 1，查询设备是否为集成设备。</p>
+<h3 id="8-3-2-设备内存访问-device-memory-accesses">8.3.2 设备内存访问（Device Memory Accesses）</h3>
+<p>访问可寻址内存（即全局、本地、共享、常量或纹理内存）的指令，可能需要重复发出多次，具体取决于 warp 内各线程的内存地址分布。地址分布对指令吞吐量的影响取决于内存类型，下面各节将分别介绍。</p>
+<p>例如，对于全局内存，一般来说，地址越分散，吞吐量下降得越明显。</p>
+<h4 id="全局内存-global-memory">全局内存（Global Memory）</h4>
+<p>全局内存位于设备内存中，设备内存通过 32、64 或 128 字节的内存事务进行访问。这些事务必须自然对齐：只有起始地址是事务大小整数倍的 32、64 或 128 字节对齐片段，才能通过相应事务读取或写入。</p>
+<p>当一个 warp 执行访问全局内存的指令时，硬件会根据每个线程访问的字大小，以及各线程地址的分布，将 warp 内线程的访问合并为一个或多个内存事务。</p>
+<p>一般而言，需要的事务越多，除线程实际访问的数据外，还会传输越多未使用的数据，从而降低指令吞吐量。例如，如果每个线程访问 4 字节数据，却为每个线程生成一次 32 字节内存事务，那么吞吐量会降低到原来的八分之一。</p>
+<p>所需事务数量及其对吞吐量的影响取决于设备计算能力。有关不同计算能力下全局内存访问的处理方式，详见“计算能力 5.x”“计算能力 6.x”“计算能力 7.x”“计算能力 8.x”和“计算能力 9.0”。</p>
+<p>为了最大化全局内存吞吐量，应尽可能提高访问合并程度：</p>
+<ul>
+<li>按照目标设备计算能力所对应的最佳访问模式组织内存访问；</li>
+<li>使用满足下文“大小与对齐要求”的数据类型；</li>
+<li>在某些情况下对数据进行填充，例如按照下文“二维数组”一节的方式处理二维数组。</li>
+</ul>
+<h5 id="大小与对齐要求-size-and-alignment-requirement">大小与对齐要求（Size and Alignment Requirement）</h5>
+<p>全局内存指令支持读取或写入大小为 1、2、4、8 或 16 字节的数据。只有当数据类型大小为这些值之一，且数据自然对齐（地址是其大小的整数倍）时，对全局内存数据的访问才会编译为单条全局内存指令。</p>
+<p>如果不满足大小与对齐要求，访问会被编译成多条指令，并采用交错的访问模式，导致这些指令无法充分合并。因此，建议对驻留在全局内存中的数据使用满足上述要求的数据类型。</p>
+<p>内置向量类型会自动满足对齐要求。对于结构体，可以使用 <code>__align__(8)</code> 或 <code>__align__(16)</code> 对齐说明符强制编译器满足大小与对齐要求，例如：</p>
+<pre><code class="language-cpp">struct __align__(8) {
+    float x;
+    float y;
+};
+
+struct __align__(16) {
+    float x;
+    float y;
+    float z;
+};
+</code></pre>
+<p>任何位于全局内存中的变量地址，或由 Driver/Runtime API 的内存分配函数返回的地址，至少都按 256 字节对齐。</p>
+<p>读取未自然对齐的 8 字节或 16 字节数据会产生错误结果（偏差可能达到若干个字），因此必须特别注意这些类型的变量或数组起始地址的对齐。一个容易忽略的情况是自定义全局内存分配方案：程序不再为多个数组分别调用 <code>cudaMalloc()</code> 或 <code>cuMemAlloc()</code>，而是一次分配一个大内存块，再将其划分为多个数组。此时，每个数组的起始地址都相对整个内存块起始地址产生偏移，必须确保各数组仍然满足对齐要求。</p>
+<h5 id="二维数组-two-dimensional-arrays">二维数组（Two-Dimensional Arrays）</h5>
+<p>一种常见的全局内存访问模式是：索引为 <span class="cuda-math-inline">\((t_x,t_y)\)</span> 的每个线程，访问宽度为 <code>width</code>、基地址为 <code>BaseAddress</code>、元素类型为 <code>type*</code> 的二维数组中的一个元素：</p>
+<div class="cuda-math-display">\[
+\text{BaseAddress}+\text{width}\times t_y+t_x
+\]</div>
+<p>要让这些访问充分合并，线程块的宽度和数组的宽度都应是 warp 大小的整数倍。</p>
+<p>因此，如果数组宽度不是 warp 大小的整数倍，将数组实际分配为宽度向上取整到最近的 warp 大小整数倍，并对每行进行适当填充，通常会更高效。参考手册介绍的 <code>cudaMallocPitch()</code>、<code>cuMemAllocPitch()</code> 及相关内存复制函数，可以帮助程序员以不依赖具体硬件的方式分配满足这些约束的数组。</p>
+<h4 id="本地内存-local-memory">本地内存（Local Memory）</h4>
+<p>如“变量内存空间说明符”一节所述，本地内存只会用于某些自动变量。编译器可能将以下自动变量放入本地内存：</p>
+<ul>
+<li>编译器无法确定其索引是否为常量的数组；</li>
+<li>会占用过多寄存器空间的大型结构体或数组；</li>
+<li>当内核使用的寄存器超过可用数量时，被溢出到本地内存的变量（即寄存器溢出）。</li>
+</ul>
+<p>使用 <code>-ptx</code> 或 <code>-keep</code> 选项编译后检查 PTX 汇编代码，可以判断变量在初始编译阶段是否被放入本地内存：这类变量会使用 <code>.local</code> 声明，并通过 <code>ld.local</code> 和 <code>st.local</code> 指令访问。即使最初没有被放入本地内存，后续编译阶段仍可能因目标架构的寄存器资源不足而作出不同决定。可以使用 <code>cuobjdump</code> 检查 cubin 对象以确认这一点。使用 <code>--ptxas-options=-v</code> 编译时，编译器还会报告每个内核的本地内存总使用量（<code>lmem</code>）。某些数学函数的实现路径也可能访问本地内存。</p>
+<p>本地内存位于设备内存中，因此其访问延迟高、带宽低，与全局内存类似，也受到相同的内存合并要求约束。不过，本地内存的组织方式使连续的 32 位字对应连续递增的线程 ID。因此，只要 warp 中所有线程访问相同的相对地址（例如数组中的同一索引或结构体中的同一成员），访问就可以充分合并。</p>
+<p>从计算能力 5.x 开始，设备的本地内存访问与全局内存访问一样，始终缓存在 L2 中。</p>
+<h4 id="共享内存-shared-memory">共享内存（Shared Memory）</h4>
+<p>共享内存在芯片上，因此其带宽远高于本地内存或全局内存，延迟也低得多。</p>
+<p>为了获得高带宽，共享内存被划分为大小相同、可并行访问的存储模块，称为<strong>存储体（bank）</strong>。如果一次内存请求涉及的 <span class="cuda-math-inline">\(n\)</span> 个地址分别落在 <span class="cuda-math-inline">\(n\)</span> 个不同存储体中，就可以同时处理，整体带宽可达到单个存储体带宽的 <span class="cuda-math-inline">\(n\)</span> 倍。</p>
+<p>如果一次请求中的两个地址落在同一个存储体中，就会发生<strong>存储体冲突（bank conflict）</strong>，访问必须串行化。硬件会将存在冲突的请求拆分成若干个互不冲突的请求；吞吐量会按拆分后的请求数量相应下降。如果原始请求最终拆分为 <span class="cuda-math-inline">\(n\)</span> 个独立请求，就称其发生了 <span class="cuda-math-inline">\(n\)</span> 路存储体冲突。</p>
+<p>为了获得最佳性能，需要理解内存地址如何映射到各存储体，并据此安排内存请求，以尽量减少冲突。不同计算能力设备的具体映射方式见相应的“计算能力”章节。</p>
+<h4 id="常量内存-constant-memory">常量内存（Constant Memory）</h4>
+<p>常量内存空间位于设备内存中，并由常量缓存缓存。</p>
+<p>如果一个请求包含多个不同的内存地址，该请求会拆分成与不同地址数量相同的独立请求，吞吐量会按独立请求数量相应下降。若缓存命中，拆分后的请求会以常量缓存的吞吐量处理；若缓存未命中，则以设备内存的吞吐量处理。</p>
+<h4 id="纹理与表面内存-texture-and-surface-memory">纹理与表面内存（Texture and Surface Memory）</h4>
+<p>纹理内存和表面内存位于设备内存中，并由纹理缓存缓存。因此，纹理读取或表面读取只有在缓存未命中时才会产生一次设备内存读取；若缓存命中，则只需从纹理缓存读取一次。</p>
+<p>纹理缓存针对二维空间局部性进行了优化。因此，同一 warp 中读取二维坐标彼此接近的纹理或表面地址的线程，可以获得最佳性能。纹理缓存也针对恒定延迟的流式读取设计：缓存命中能够减少 DRAM 带宽需求，但不会降低读取延迟。</p>
+<p>通过纹理或表面读取设备内存，相较于从全局内存或常量内存读取，可能具有以下优势：</p>
+<ul>
+<li>如果读取模式不符合全局内存或常量内存获得高性能所需的访问模式，但纹理读取或表面读取仍具有局部性，就可能获得更高带宽；</li>
+<li>地址计算由内核之外的专用单元执行；</li>
+<li>一次操作可以将打包数据分发到多个独立变量；</li>
+<li>8 位和 16 位整数输入数据可以选择转换为 32 位浮点数，范围为 <span class="cuda-math-inline">\([0.0,1.0]\)</span> 或 <span class="cuda-math-inline">\([-1.0,1.0]\)</span>，详见“纹理内存”。</li>
+</ul>
+<h2 id="8-4-最大化指令吞吐量-maximize-instruction-throughput">8.4 最大化指令吞吐量（Maximize Instruction Throughput）</h2>
+<p>为了最大化指令吞吐量，应用程序应：</p>
+<ul>
+<li>尽量减少低吞吐量算术指令的使用。当不会影响最终结果时，可以用精度换取速度，例如用内建函数替代常规函数（内建函数见“内建函数”）、使用单精度而非双精度，或将非规格化数刷新为零；</li>
+<li>尽量减少控制流指令引起的 warp 分支发散，详见“控制流指令”；</li>
+<li>减少指令数量，例如尽可能消除同步点（详见“同步指令”），或使用受限指针 <code>__restrict__</code>。</li>
+</ul>
+<p>本节中的吞吐量以每个多处理器每个时钟周期执行的操作数表示。对于大小为 32 的 warp，一条指令对应 32 次操作。因此，如果每个时钟周期的操作数为 <span class="cuda-math-inline">\(N\)</span>，则指令吞吐量为每个时钟周期 <span class="cuda-math-inline">\(N/32\)</span> 条指令。</p>
+<p>这里列出的吞吐量均针对单个多处理器。要获得整台设备的吞吐量，需要乘以设备中的多处理器数量。</p>
+<h3 id="8-4-1-算术指令-arithmetic-instructions">8.4.1 算术指令（Arithmetic Instructions）</h3>
+<p>下表给出了不同计算能力设备上，硬件原生支持的算术指令吞吐量。原书表 4 横跨六页；为避免遗漏表格数值和脚注，本译稿保留了六页原始表格图，后续可继续制作中文表头版本。</p>
+<p><strong>表 4：原生算术指令的吞吐量（每个多处理器每个时钟周期的结果数）</strong></p>
+<p><img alt="表 4，第 1 页：原生算术指令吞吐量" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p1.png"/></p>
+<p><img alt="表 4，第 2 页：原生算术指令吞吐量（续）" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p2.png"/></p>
+<p><img alt="表 4，第 3 页：原生算术指令吞吐量（续）" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p3.png"/></p>
+<p><img alt="表 4，第 4 页：原生算术指令吞吐量（续）" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p4.png"/></p>
+<p><img alt="表 4，第 5 页：原生算术指令吞吐量（续）" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p5.png"/></p>
+<p><img alt="表 4，第 6 页：原生算术指令吞吐量（续）" decoding="async" loading="lazy" src="/cuda/book/images/table_04_native_p6.png"/></p>
+<p><strong>表 4 术语说明：</strong></p>
+<ul>
+<li>16 位、32 位和 64 位浮点加法、乘法及乘加操作；</li>
+<li>浮点倒数、倒数平方根、平方根、以 2 为底的对数和指数、正弦与余弦；</li>
+<li>32 位整数加法、扩展精度加法、减法、乘法、乘加、移位、比较、最小值、最大值、位反转、位域提取/插入、位逻辑运算、前导零计数、人口计数、warp shuffle、warp reduce、warp vote 以及绝对差之和；</li>
+<li>SIMD 视频指令、类型转换，以及 16 位和 32 位 DPX 指令。</li>
+</ul>
+<p>表中脚注指出，部分数值会因具体 GPU 计算能力或扩展精度实现而不同。使用前应以目标设备对应的计算能力章节和 CUDA Toolkit 文档为准。</p>
+<p>除原生指令外，其他指令和函数都基于原生指令实现。不同计算能力的设备可能采用不同实现；编译后生成的原生指令数量也可能随编译器版本变化。复杂函数可能根据输入走不同的代码路径。可以使用 <code>cuobjdump</code> 检查 cubin 对象中的具体实现。</p>
+<p>部分函数的实现可以直接在 CUDA 头文件中查看，例如 <code>math_functions.h</code> 和 <code>device_functions.h</code>。</p>
+<p>通常，使用 <code>-ftz=true</code> 编译（将非规格化数刷新为零）的代码，比使用 <code>-ftz=false</code> 编译的代码性能更高。同样，使用 <code>-prec-div=false</code>（精度较低的除法）和 <code>-prec-sqrt=false</code>（精度较低的平方根）通常也能获得更高性能。<code>nvcc</code> 用户手册对这些编译选项有更详细的说明。</p>
+<h4 id="单精度浮点除法-single-precision-floating-point-division">单精度浮点除法（Single-Precision Floating-Point Division）</h4>
+<p>与除法运算符相比，<code>__fdividef(x, y)</code>（参见“内建函数”）可以更快地执行单精度浮点除法。</p>
+<h4 id="单精度浮点倒数平方根-single-precision-floating-point-reciprocal-square-root">单精度浮点倒数平方根（Single-Precision Floating-Point Reciprocal Square Root）</h4>
+<p>为了保留 IEEE-754 语义，只有当倒数和平方根都允许使用近似计算时（即同时使用 <code>-prec-div=false</code> 和 <code>-prec-sqrt=false</code>），编译器才可以将 <code>1.0/sqrtf()</code> 优化为 <code>rsqrtf()</code>。因此，如果需要倒数平方根，建议直接调用 <code>rsqrtf()</code>。</p>
+<h4 id="单精度浮点平方根-single-precision-floating-point-square-root">单精度浮点平方根（Single-Precision Floating-Point Square Root）</h4>
+<p>单精度浮点平方根采用“先计算倒数平方根，再计算倒数”的方式实现，而不是“先计算倒数平方根，再进行乘法”。这样可以确保在输入为 0 或无穷大时得到正确结果。</p>
+<h4 id="正弦与余弦-sine-and-cosine">正弦与余弦（Sine and Cosine）</h4>
+<p>正弦和余弦等函数的实现及吞吐量取决于目标设备的计算能力。请结合表 4 及对应的计算能力章节查看具体数值。</p>
+<hr/>
+<h2 id="本批术语表">本批术语表</h2>
+<table>
+<thead>
+<tr>
+<th>英文术语</th>
+<th>中文译法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>memory throughput</td>
+<td>内存吞吐量</td>
+</tr>
+<tr>
+<td>coalescing</td>
+<td>访问合并</td>
+</tr>
+<tr>
+<td>bank conflict</td>
+<td>存储体冲突</td>
+</tr>
+<tr>
+<td>local memory</td>
+<td>本地内存</td>
+</tr>
+<tr>
+<td>constant memory</td>
+<td>常量内存</td>
+</tr>
+<tr>
+<td>texture/surface memory</td>
+<td>纹理/表面内存</td>
+</tr>
+<tr>
+<td>instruction throughput</td>
+<td>指令吞吐量</td>
+</tr>
+<tr>
+<td>arithmetic intensity</td>
+<td>算术强度</td>
+</tr>
+<tr>
+<td>occupancy</td>
+<td>占用率</td>
+</tr>
+<tr>
+<td>register spilling</td>
+<td>寄存器溢出</td>
+</tr>
+<tr>
+<td>non-normalized number / denormalized number</td>
+<td>非规格化数</td>
+</tr>
+<tr>
+<td>reciprocal square root</td>
+<td>倒数平方根</td>
+</tr>
+</tbody>
+</table>
+<h2 id="校对说明">校对说明</h2>
+<p>本批继续翻译第八章 8.3–8.4.1，保留了内存访问类型的分级小标题、公式与代码，并将原书跨六页的表 4 以原图嵌入。表 4 的数值尚未逐格转录为中文表格；正式发布前应核对原表、脚注和目标 GPU 的计算能力说明。</p>
+<h4 id="正弦与余弦-参数约化-sine-and-cosine-argument-reduction">正弦与余弦：参数约化（Sine and Cosine: Argument Reduction）</h4>
+<p><code>sinf(x)</code>、<code>cosf(x)</code>、<code>tanf(x)</code>、<code>sincosf(x)</code> 及其对应的双精度指令，计算成本都比较高；当参数 <span class="cuda-math-inline">\(x\)</span> 的绝对值较大时，开销会更高。</p>
+<p>更具体地说，参数约化代码（实现见“数学函数”）包含两条执行路径，分别称为<strong>快速路径</strong>和<strong>慢速路径</strong>。参数绝对值足够小时，会使用快速路径，主要由少量乘加运算组成。参数绝对值较大时，会使用慢速路径；为了保证整个参数范围内的结果正确，需要进行较长的计算。</p>
+<p>目前，单精度三角函数在参数绝对值小于 <code>105615.0f</code> 时选择快速路径；双精度三角函数在参数绝对值小于 <code>2147483648.0</code> 时选择快速路径。</p>
+<p>慢速路径比快速路径需要更多寄存器。为了降低寄存器压力，部分中间变量会存入本地内存；但本地内存的高延迟和低带宽可能影响性能。目前，单精度函数使用 28 字节本地内存，双精度函数使用 44 字节。不过，确切用量可能随版本变化。</p>
+<p>由于慢速路径计算量较大，并且会使用本地内存，因此当需要慢速参数约化时，这些三角函数的吞吐量会比快速路径低一个数量级。</p>
+<h4 id="整数算术-integer-arithmetic">整数算术（Integer Arithmetic）</h4>
+<p>整数除法和取模运算成本较高，编译后最多可能需要 20 条指令。在某些情况下，可以用位运算替代：如果 <span class="cuda-math-inline">\(n\)</span> 是 2 的幂，那么：</p>
+<div class="cuda-math-display">\[
+i/n \equiv i \gg \log_2(n)
+\]</div>
+<div class="cuda-math-display">\[
+i \% n \equiv i \mathbin{\&amp;}(n-1)
+\]</div>
+<p>如果 <span class="cuda-math-inline">\(n\)</span> 是字面量，编译器会执行这些转换。</p>
+<p><code>__brev</code> 和 <code>__popc</code> 分别映射为单条指令；<code>__brevll</code> 和 <code>__popcll</code> 则需要少量指令。<code>__[u]mul24</code> 是旧式内建函数，现已没有继续使用的理由。</p>
+<h4 id="半精度算术-half-precision-arithmetic">半精度算术（Half Precision Arithmetic）</h4>
+<p>为了提高 16 位浮点加法、乘法或乘加的性能，建议在半精度计算中使用 <code>half2</code> 数据类型，在 <code>__nv_bfloat16</code> 精度计算中使用 <code>__nv_bfloat162</code>。</p>
+<p>这样就可以使用向量内建函数（例如 <code>__hadd2</code>、<code>__hsub2</code>、<code>__hmul2</code>、<code>__hfma2</code>）在一条指令中执行两次操作。与分别调用两次 <code>half</code> 或 <code>__nv_bfloat16</code> 操作相比，使用 <code>half2</code> 或 <code>__nv_bfloat162</code> 也可能提升其他内建函数（例如 warp shuffle）的性能。</p>
+<p>内建函数 <code>__halves2half2</code> 用于将两个半精度值转换为 <code>half2</code>；<code>__halves2bfloat162</code> 则用于将两个 <code>__nv_bfloat16</code> 值转换为 <code>__nv_bfloat162</code>。</p>
+<h4 id="类型转换-type-conversion">类型转换（Type Conversion）</h4>
+<p>有时，编译器必须插入类型转换指令，从而增加执行周期。以下情况可能出现这种问题：</p>
+<ul>
+<li>操作 <code>char</code> 或 <code>short</code> 类型变量的函数，其操作数通常需要先转换为 <code>int</code>；</li>
+<li>在单精度浮点运算中使用双精度浮点常量（即未带类型后缀的常量），这是 C/C++ 标准所要求的。</li>
+</ul>
+<p>第二种情况可以通过使用带 <code>f</code> 后缀的单精度浮点常量来避免，例如 <code>3.141592653589793f</code>、<code>1.0f</code> 和 <code>0.5f</code>。</p>
+<h3 id="8-4-2-控制流指令-control-flow-instructions">8.4.2 控制流指令（Control Flow Instructions）</h3>
+<p>任何控制流指令（<code>if</code>、<code>switch</code>、<code>do</code>、<code>for</code>、<code>while</code>）都可能因同一 warp 中的线程发生分支发散（沿不同执行路径运行），显著降低有效指令吞吐量。如果发生分支发散，不同执行路径必须串行执行，从而增加该 warp 总共执行的指令数量。</p>
+<p>当控制流取决于线程 ID 时，应尽量减少分支发散的 warp 数量。由于线程块中的 warp 分布是确定的（详见“SIMT 架构”），可以据此安排控制条件。例如，如果控制条件只依赖于 <code>threadIdx / warpSize</code>，其中 <code>warpSize</code> 是 warp 大小，那么控制条件与 warp 边界完全对齐，不会发生 warp 内分支发散。</p>
+<p>有时，编译器会展开循环，或者使用**分支谓词化（branch predication）**来优化掉较短的 <code>if</code> 或 <code>switch</code> 代码块。此时 warp 不会发生分支发散。程序员也可以使用 <code>#pragma unroll</code> 指令控制循环展开，详见相应章节。</p>
+<p>使用分支谓词化时，依赖控制条件的指令并不会被跳过。相反，每条指令都会关联一个按线程设置为真或假的条件码（谓词）。虽然这些指令都会被调度执行，但只有谓词为真的指令才真正执行。谓词为假的指令不会写入结果，也不会计算地址或读取操作数。</p>
+<h3 id="8-4-3-同步指令-synchronization-instruction">8.4.3 同步指令（Synchronization Instruction）</h3>
+<p><code>__syncthreads()</code> 的吞吐量为：</p>
+<ul>
+<li>计算能力 6.0 的设备：每个时钟周期 32 次操作；</li>
+<li>计算能力 7.x 和 8.x 的设备：每个时钟周期 16 次操作；</li>
+<li>计算能力 5.x、6.1 和 6.2 的设备：每个时钟周期 64 次操作。</li>
+</ul>
+<p>请注意，<code>__syncthreads()</code> 可能迫使多处理器空闲，从而影响性能，详见“设备内存访问”。</p>
+<h2 id="8-5-尽量减少内存抖动-minimize-memory-thrashing">8.5 尽量减少内存抖动（Minimize Memory Thrashing）</h2>
+<p>如果应用程序过于频繁地分配和释放内存，分配调用可能会随时间推移而变慢，直到达到某个上限。这通常与内存释放回操作系统、供其重新使用的机制有关。</p>
+<p>为了获得最佳性能，建议遵循以下做法：</p>
+<ul>
+<li><strong>按需分配内存。</strong> 应根据问题规模确定分配量。不要试图通过 <code>cudaMalloc</code>、<code>cudaMallocHost</code> 或 <code>cuMemCreate</code> 分配所有可用内存，因为这会迫使内存立即驻留，并阻止其他应用程序使用这些内存。这会增加操作系统调度器的压力，甚至可能完全阻止其他应用程序使用同一 GPU。</li>
+<li><strong>尽早进行合适大小的分配。</strong> 尽量在应用程序早期分配适当大小的内存，并只在应用程序不再需要内存时才进行释放。减少应用程序中的 <code>cudaMalloc</code> 与 <code>cudaFree</code> 调用次数，尤其要避免在性能关键区域频繁调用。</li>
+<li><strong>在设备内存不足时考虑回退。</strong> 如果无法分配足够的设备内存，可以考虑改用其他内存类型，例如 <code>cudaMallocHost</code> 或 <code>cudaMallocManaged</code>。这些方式的性能可能较低，但能让应用程序继续执行。</li>
+<li><strong>在支持的平台上考虑统一内存超额使用。</strong> <code>cudaMallocManaged</code> 支持内存超额使用；如果正确设置 <code>cudaMemAdvise</code> 策略，应用程序可以保留大部分、甚至几乎全部 <code>cudaMalloc</code> 的性能。<code>cudaMallocManaged</code> 也不会强制分配立即驻留，只有在实际需要或预取时才驻留，从而减轻操作系统调度器的整体压力，并更好地支持多租户场景。</li>
+</ul>
+<hr/>
+<h2 id="第八章术语表">第八章术语表</h2>
+<table>
+<thead>
+<tr>
+<th>英文术语</th>
+<th>中文译法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>global memory coalescing</td>
+<td>全局内存访问合并</td>
+</tr>
+<tr>
+<td>bank conflict</td>
+<td>存储体冲突</td>
+</tr>
+<tr>
+<td>branch predication</td>
+<td>分支谓词化</td>
+</tr>
+<tr>
+<td>arithmetic intensity</td>
+<td>算术强度</td>
+</tr>
+<tr>
+<td>occupancy</td>
+<td>占用率</td>
+</tr>
+<tr>
+<td>memory thrashing</td>
+<td>内存抖动</td>
+</tr>
+<tr>
+<td>register spilling</td>
+<td>寄存器溢出</td>
+</tr>
+<tr>
+<td>argument reduction</td>
+<td>参数约化</td>
+</tr>
+<tr>
+<td>half precision</td>
+<td>半精度</td>
+</tr>
+<tr>
+<td>instruction throughput</td>
+<td>指令吞吐量</td>
+</tr>
+</tbody>
+</table>
+<h2 id="校对说明-2">校对说明</h2>
+<p>第八章当前译稿覆盖 8.1–8.5，保留了主要代码、公式、术语和原书表 4 的六页原图。表 4 数值尚未逐格转录为中文表格，部分性能描述应结合目标 GPU 计算能力和 CUDA Toolkit 文档校对。</p>

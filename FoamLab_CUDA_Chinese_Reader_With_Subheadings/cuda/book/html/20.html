@@ -1,0 +1,562 @@
+<h1 id="第二十章-驱动程序-api-driver-api">第二十章 驱动程序 API（Driver API）</h1>
+<blockquote>
+<p>对应原 PDF 第 515–532 页（原书印刷页码 499–516）。保留 CUDA Driver API 名称、代码标识符、编译选项和示例结构。</p>
+</blockquote>
+<p>本章假定读者已了解 CUDA Runtime 一节介绍的概念。</p>
+<p>驱动程序 API 实现在设备驱动程序安装时复制到系统中的 CUDA 动态库中（Windows 上为 <code>cuda.dll</code>，Linux 上为 <code>cuda.so</code>）。其所有入口点均以 <code>cu</code> 为前缀。它是一种基于句柄的命令式 API：大多数对象通过不透明句柄引用，函数接收这些句柄并操作相应对象。</p>
+<h2 id="cuda-driver-api-对象">CUDA Driver API 对象</h2>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>句柄类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>设备</td>
+<td><code>CUdevice</code></td>
+<td>支持 CUDA 的设备</td>
+</tr>
+<tr>
+<td>上下文</td>
+<td><code>CUcontext</code></td>
+<td>大致相当于 CPU 进程</td>
+</tr>
+<tr>
+<td>模块</td>
+<td><code>CUmodule</code></td>
+<td>大致相当于动态库</td>
+</tr>
+<tr>
+<td>函数</td>
+<td><code>CUfunction</code></td>
+<td>内核函数</td>
+</tr>
+<tr>
+<td>设备堆内存</td>
+<td><code>CUdeviceptr</code></td>
+<td>指向设备内存的指针</td>
+</tr>
+<tr>
+<td>CUDA 数组</td>
+<td><code>CUarray</code></td>
+<td>设备上的一维或二维数据的不透明容器，可通过纹理或表面引用读取</td>
+</tr>
+<tr>
+<td>纹理对象</td>
+<td><code>CUtexref</code></td>
+<td>描述如何解释纹理内存数据的对象</td>
+</tr>
+<tr>
+<td>表面引用</td>
+<td><code>CUsurfref</code></td>
+<td>描述如何读取或写入 CUDA 数组的对象</td>
+</tr>
+<tr>
+<td>流</td>
+<td><code>CUstream</code></td>
+<td>描述 CUDA 流的对象</td>
+</tr>
+<tr>
+<td>事件</td>
+<td><code>CUevent</code></td>
+<td>描述 CUDA 事件的对象</td>
+</tr>
+</tbody>
+</table>
+<p>调用任何驱动程序 API 函数前，必须先调用 <code>cuInit()</code> 初始化驱动程序 API。随后必须创建一个附属于特定设备的 CUDA 上下文，并将其设为当前主机线程的当前上下文，详见 20.1 节。</p>
+<p>在 CUDA 上下文中，主机代码会显式加载 PTX 或二进制对象中的内核，详见 20.2 节。因此，C++ 编写的内核必须先单独编译成 PTX 或二进制对象，再通过 API 入口点启动，详见 20.3 节。</p>
+<p>如果应用程序需要在未来的设备架构上运行，应加载 PTX，而不是二进制代码。二进制代码与特定架构绑定，可能不兼容未来架构；PTX 则会在加载时由设备驱动程序编译为二进制代码。</p>
+<p>以下示例展示使用驱动程序 API 执行向量加法的主机端流程：</p>
+<pre><code class="language-cpp">int main() {
+    int N = ...;
+    size_t size = N * sizeof(float);
+
+    // 在主机内存中分配输入向量 h_A 和 h_B，并初始化数据。
+    float* h_A = (float*)malloc(size);
+    float* h_B = (float*)malloc(size);
+    // ...
+
+    cuInit(0);
+
+    int deviceCount = 0;
+    cuDeviceGetCount(&amp;deviceCount);
+    if (deviceCount == 0) {
+        printf("There is no device supporting CUDA.\n");
+        exit(0);
+    }
+
+    CUdevice cuDevice;
+    cuDeviceGet(&amp;cuDevice, 0);
+
+    CUcontext cuContext;
+    cuCtxCreate(&amp;cuContext, 0, cuDevice);
+
+    CUmodule cuModule;
+    cuModuleLoad(&amp;cuModule, "VecAdd.ptx");
+
+    CUdeviceptr d_A, d_B, d_C;
+    cuMemAlloc(&amp;d_A, size);
+    cuMemAlloc(&amp;d_B, size);
+    cuMemAlloc(&amp;d_C, size);
+
+    cuMemcpyHtoD(d_A, h_A, size);
+    cuMemcpyHtoD(d_B, h_B, size);
+
+    CUfunction vecAdd;
+    cuModuleGetFunction(&amp;vecAdd, cuModule, "VecAdd");
+
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
+    void* args[] = { &amp;d_A, &amp;d_B, &amp;d_C, &amp;N };
+
+    cuLaunchKernel(vecAdd,
+        blocksPerGrid, 1, 1,
+        threadsPerBlock, 1, 1,
+        0, 0, args, 0);
+    // ...
+}
+</code></pre>
+<p>完整示例可在 CUDA 示例 <code>vectorAddDrv</code> 中找到。</p>
+<h2 id="20-1-上下文-context">20.1 上下文（Context）</h2>
+<p>CUDA 上下文类似于 CPU 进程。驱动程序 API 中执行的所有资源和操作都封装在 CUDA 上下文内；上下文销毁时，系统会自动清理这些资源。除模块、纹理引用和表面引用等对象外，每个上下文还有自己独立的地址空间。因此，不同上下文中的 <code>CUdeviceptr</code> 值指向不同的内存位置。</p>
+<p>一个主机线程在同一时刻只能有一个设备上下文处于当前状态。调用 <code>cuCtxCreate()</code> 创建上下文时，新上下文会成为调用线程的当前上下文。需要上下文才能执行的大多数 CUDA 函数（不包括设备枚举和上下文管理函数）在当前线程没有有效上下文时会返回 <code>CUDA_ERROR_INVALID_CONTEXT</code>。</p>
+<p>每个主机线程都有一个当前上下文栈。<code>cuCtxCreate()</code> 会将新上下文压入栈顶；调用 <code>cuCtxPopCurrent()</code> 可以将上下文从该主机线程分离。分离后的上下文处于未绑定状态，可以被压入任意主机线程的当前上下文栈。<code>cuCtxPopCurrent()</code> 还会恢复先前的当前上下文（如果存在）。</p>
+<p>每个上下文都有一个使用计数。<code>cuCtxCreate()</code> 创建的上下文使用计数为 1；<code>cuCtxAttach()</code> 将计数加 1，<code>cuCtxDetach()</code> 将计数减 1。调用 <code>cuCtxDetach()</code> 或 <code>cuCtxDestroy()</code> 后，当使用计数归零时，上下文会被销毁。</p>
+<p>驱动程序 API 可以与 Runtime API 互操作。通过 <code>cuDevicePrimaryCtxRetain()</code>，驱动程序 API 可以访问由 Runtime 管理的主上下文（primary context，见“初始化”一节）。</p>
+<p>使用计数有助于多个第三方库在同一上下文中协同工作。例如，三个库共用一个上下文时，每个库可在使用上下文时调用 <code>cuCtxAttach()</code>，结束使用时调用 <code>cuCtxDetach()</code>。通常，应用程序应在加载或初始化库之前创建上下文，这样应用程序可根据自身策略创建上下文，库则使用传入的上下文。若库需要创建自己的上下文，而调用者可能已经创建了其他上下文，可按图 40 所示使用 <code>cuCtxPushCurrent()</code> 和 <code>cuCtxPopCurrent()</code>。</p>
+<p><em>图 40：库的上下文管理（Library Context Management）。</em></p>
+<p><img alt="图 40：库的上下文管理" decoding="async" loading="lazy" src="/cuda/book/images/figure_40_library_context_management.png"/></p>
+<h2 id="20-2-模块-module">20.2 模块（Module）</h2>
+<p>模块是可动态加载的设备代码和数据包，类似于 Windows DLL，由 <code>nvcc</code> 输出（见“使用 NVCC 编译”）。模块中的所有符号名称，包括函数、全局变量以及纹理/表面引用，都在模块作用域内维护，因此由不同第三方独立编写的模块可以在同一 CUDA 上下文中互操作。</p>
+<p>以下代码加载模块，并获取其中某个内核的句柄：</p>
+<pre><code class="language-cpp">CUmodule cuModule;
+cuModuleLoad(&amp;cuModule, "myModule.ptx");
+
+CUfunction myKernel;
+cuModuleGetFunction(&amp;myKernel, cuModule, "MyKernel");
+</code></pre>
+<p>以下示例从 PTX 代码编译并加载模块，同时获取编译错误日志：</p>
+<pre><code class="language-cpp">#define BUFFER_SIZE 8192
+CUmodule cuModule;
+CUjit_option options[3];
+void* values[3];
+char* PTXCode = "some PTX code";
+char error_log[BUFFER_SIZE];
+
+options[0] = CU_JIT_ERROR_LOG_BUFFER;
+values[0] = (void*)error_log;
+options[1] = CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES;
+values[1] = (void*)BUFFER_SIZE;
+options[2] = CU_JIT_TARGET_FROM_CUCONTEXT;
+values[2] = 0;
+
+int err = cuModuleLoadDataEx(&amp;cuModule, PTXCode, 3, options, values);
+if (err != CUDA_SUCCESS) {
+    printf("Link error:\n%s\n", error_log);
+}
+</code></pre>
+<p>另一个示例可将多个 PTX 代码单元编译、链接并加载到模块中，同时获取链接与编译错误日志。完整代码可在 CUDA 示例 <code>ptxjit</code> 中找到。</p>
+<h2 id="20-3-内核执行-kernel-execution">20.3 内核执行（Kernel Execution）</h2>
+<p><code>cuLaunchKernel()</code> 根据给定的执行配置启动内核。参数可以通过两种方式传入：</p>
+<ol>
+<li>使用指针数组（<code>cuLaunchKernel()</code> 的倒数第二个参数）。数组中的第 n 个指针对应内核的第 n 个参数，并指向存放该参数值的内存区域。</li>
+<li>使用 <code>cuLaunchKernel()</code> 的最后一个参数传入额外选项。当使用 <code>CU_LAUNCH_PARAM_BUFFER_POINTER</code> 时，所有参数放在同一个缓冲区内，各参数之间的偏移必须满足设备代码中对应参数类型的对齐要求。</li>
+</ol>
+<p>内建向量类型在设备代码中的对齐要求见表 5。其他基本类型在设备代码中的对齐要求通常与主机代码相同，可通过 <code>__alignof()</code> 获取。唯一例外是某些主机编译器配置（例如 GCC 的 <code>-mno-align-double</code>）会将 <code>double</code>、<code>long long</code>（以及 64 位系统上的 <code>long</code>）按一个字对齐，而设备代码始终要求这些类型按两个字对齐。</p>
+<p><code>CUdeviceptr</code> 虽然是整数类型，但表示指针，因此其对齐要求为 <code>__alignof(void*)</code>。</p>
+<p>以下代码使用 <code>ALIGN_UP()</code> 宏调整每个参数的偏移，使其满足对齐要求；再使用 <code>ADD_TO_PARAM_BUFFER()</code> 将参数复制到通过 <code>CU_LAUNCH_PARAM_BUFFER_POINTER</code> 传递的缓冲区中。</p>
+<pre><code class="language-cpp">#define ALIGN_UP(offset, alignment) \
+    (offset) = ((offset) + (alignment) - 1) &amp; ~((alignment) - 1)
+
+char paramBuffer[1024];
+size_t paramBufferSize = 0;
+
+#define ADD_TO_PARAM_BUFFER(value, alignment) \
+    do { \
+        paramBufferSize = ALIGN_UP(paramBufferSize, alignment); \
+        memcpy(paramBuffer + paramBufferSize, &amp;(value), sizeof(value)); \
+        paramBufferSize += sizeof(value); \
+    } while (0)
+
+int i;
+ADD_TO_PARAM_BUFFER(i, __alignof(i));
+
+float4 f4;
+ADD_TO_PARAM_BUFFER(f4, 16); // float4 的对齐要求为 16
+
+char c;
+ADD_TO_PARAM_BUFFER(c, __alignof(c));
+
+float f;
+ADD_TO_PARAM_BUFFER(f, __alignof(f));
+
+CUdeviceptr devPtr;
+ADD_TO_PARAM_BUFFER(devPtr, __alignof(devPtr));
+
+float2 f2;
+ADD_TO_PARAM_BUFFER(f2, 8); // float2 的对齐要求为 8
+
+void* extra[] = {
+    CU_LAUNCH_PARAM_BUFFER_POINTER, paramBuffer,
+    CU_LAUNCH_PARAM_BUFFER_SIZE, &amp;paramBufferSize,
+    CU_LAUNCH_PARAM_END
+};
+
+cuLaunchKernel(cuFunction,
+    blockWidth, blockHeight, blockDepth,
+    gridWidth, gridHeight, gridDepth,
+    0, 0, 0, extra);
+</code></pre>
+<p>结构体的对齐要求等于其字段对齐要求中的最大值。因此，包含内建向量类型、<code>CUdeviceptr</code>，或未按设备要求对齐的 <code>double</code> / <code>long long</code> 的结构体，在主机代码与设备代码中的对齐要求可能不同，填充布局也可能不同。例如，某个结构体在主机端可能完全没有填充，但在设备端会在字段 <code>f</code> 后填充 12 字节，因为字段 <code>f4</code> 要求 16 字节对齐。</p>
+<h2 id="20-4-runtime-api-与-driver-api-的互操作性-interoperability-between-runtime-and-driver-apis">20.4 Runtime API 与 Driver API 的互操作性（Interoperability between Runtime and Driver APIs）</h2>
+<p>一个应用程序可以混合使用 Runtime API 和 Driver API。</p>
+<p>如果通过 Driver API 创建上下文并将其设为当前上下文，后续 Runtime API 调用会使用该上下文，而不是再创建一个新的上下文。</p>
+<p>如果 Runtime 已经初始化（例如按“CUDA Runtime”一节所述隐式初始化），可以使用 <code>cuCtxGetCurrent()</code> 获取初始化期间创建的上下文，之后的 Driver API 调用也可以使用该上下文。</p>
+<p>Runtime 隐式创建的上下文称为<strong>主上下文（primary context）</strong>，见“初始化”一节。可以通过 Driver API 的主上下文管理函数管理它。</p>
+<p>设备内存可以通过任一 API 分配和释放。<code>CUdeviceptr</code> 可以转换为普通指针，反之亦然：</p>
+<pre><code class="language-cpp">CUdeviceptr devPtr;
+float* d_data;
+
+// 使用 Driver API 分配
+cuMemAlloc(&amp;devPtr, size);
+d_data = (float*)devPtr;
+
+// 使用 Runtime API 分配
+cudaMalloc(&amp;d_data, size);
+devPtr = (CUdeviceptr)d_data;
+</code></pre>
+<p>这意味着，使用 Driver API 编写的应用程序可以调用使用 Runtime API 编写的库，例如 cuFFT、cuBLAS 等。参考手册中“设备”和“版本管理”部分的所有函数也可以交替使用。</p>
+<h2 id="20-5-驱动程序入口点访问-driver-entry-point-access">20.5 驱动程序入口点访问（Driver Entry Point Access）</h2>
+<h3 id="20-5-1-简介-introduction">20.5.1 简介（Introduction）</h3>
+<p>驱动程序入口点访问 API 用于获取 CUDA 驱动程序函数的地址。从 CUDA 11.3 开始，用户可以通过这些 API 返回的函数指针调用可用的 CUDA Driver API。</p>
+<p>这些 API 的功能类似于 POSIX 平台上的 <code>dlsym</code> 和 Windows 上的 <code>GetProcAddress</code>。用户可以：</p>
+<ul>
+<li>通过 CUDA Driver API 获取驱动程序函数地址；</li>
+<li>通过 CUDA Runtime API 获取驱动程序函数地址；</li>
+<li>请求驱动程序函数的每线程默认流版本；</li>
+<li>在只更新驱动程序而不更新旧工具包的情况下访问新的 CUDA 功能。</li>
+</ul>
+<h3 id="20-5-2-驱动程序函数的类型定义-driver-function-typedefs">20.5.2 驱动程序函数的类型定义（Driver Function Typedefs）</h3>
+<p>为便于获取 CUDA Driver API 入口点，CUDA Toolkit 提供了包含所有 CUDA 驱动程序 API 函数指针类型定义的头文件。这些头文件安装在工具包的 <code>include/</code> 目录中。</p>
+<table>
+<thead>
+<tr>
+<th>API 头文件</th>
+<th>函数指针类型定义头文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cuda.h</code></td>
+<td><code>cudaTypedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaGL.h</code></td>
+<td><code>cudaGLTypedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaProfiler.h</code></td>
+<td><code>cudaProfilerTypedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaVDPAU.h</code></td>
+<td><code>cudaVDPAUTypedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaEGL.h</code></td>
+<td><code>cudaEGLTypedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaD3D9.h</code></td>
+<td><code>cudaD3D9Typedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaD3D10.h</code></td>
+<td><code>cudaD3D10Typedefs.h</code></td>
+</tr>
+<tr>
+<td><code>cudaD3D11.h</code></td>
+<td><code>cudaD3D11Typedefs.h</code></td>
+</tr>
+</tbody>
+</table>
+<p>上述头文件不会直接定义函数指针变量，而是定义函数指针类型。例如，<code>cudaTypedefs.h</code> 为 <code>cuMemAlloc</code> 提供以下类型定义：</p>
+<pre><code class="language-cpp">typedef CUresult (CUDAAPI *PFN_cuMemAlloc_v3020)(
+    CUdeviceptr_v2 *dptr, size_t bytesize);
+
+typedef CUresult (CUDAAPI *PFN_cuMemAlloc_v2000)(
+    CUdeviceptr_v1 *dptr, unsigned int bytesize);
+</code></pre>
+<p>CUDA 驱动程序符号使用带版本后缀 <code>_v*</code> 的命名方式（第一个版本除外）。当某个 API 的签名或语义发生变化时，对应驱动程序符号的版本号会增加。对于 <code>cuMemAlloc</code>，第一个符号名是 <code>cuMemAlloc</code>，下一个版本是 <code>cuMemAlloc_v2</code>。CUDA 2.0（版本号 2000）引入的第一个版本使用 <code>PFN_cuMemAlloc_v2000</code>；CUDA 3.2（版本号 3020）引入的下一个版本使用 <code>PFN_cuMemAlloc_v3020</code>。</p>
+<p>如果用户需要特定版本，可以显式使用相应的类型定义：</p>
+<pre><code class="language-cpp">PFN_cuMemAlloc_v3020 pfn_cuMemAlloc_v2;
+PFN_cuMemAlloc_v2000 pfn_cuMemAlloc_v1;
+</code></pre>
+<p>此外，头文件还为安装的 CUDA Toolkit 发布时可用的每个驱动程序符号的最新版本提供了不带 <code>_v*</code> 后缀的类型别名。例如，在 CUDA 11.3 工具包中，<code>cuMemAlloc_v2</code> 是最新版本，因此也可以写为：</p>
+<pre><code class="language-cpp">PFN_cuMemAlloc pfn_cuMemAlloc;
+</code></pre>
+<h3 id="20-5-3-获取驱动程序函数-driver-function-retrieval">20.5.3 获取驱动程序函数（Driver Function Retrieval）</h3>
+<p>结合驱动程序入口点访问 API 和适当的类型定义，可以获取任何 CUDA Driver API 的函数指针。</p>
+<h4 id="20-5-3-1-使用-driver-api">20.5.3.1 使用 Driver API</h4>
+<p>Driver API 需要传入 CUDA 版本，以获取请求符号的 ABI 兼容版本。CUDA Driver API 的 ABI 版本由函数名中的 <code>_v*</code> 后缀表示。</p>
+<p>例如，<code>cudaTypedefs.h</code> 中的 <code>cuStreamBeginCapture</code> 有两个版本：</p>
+<pre><code class="language-cpp">// cuda.h
+CUresult CUDAAPI cuStreamBeginCapture(CUstream hStream);
+CUresult CUDAAPI cuStreamBeginCapture_v2(
+    CUstream hStream, CUstreamCaptureMode mode);
+
+// cudaTypedefs.h
+typedef CUresult (CUDAAPI *PFN_cuStreamBeginCapture_v10000)(
+    CUstream hStream);
+
+typedef CUresult (CUDAAPI *PFN_cuStreamBeginCapture_v10010)(
+    CUstream hStream, CUstreamCaptureMode mode);
+</code></pre>
+<p>后缀 <code>_v10000</code> 和 <code>_v10010</code> 表示这两个版本分别在 CUDA 10.0 和 CUDA 10.1 中引入。可以使用 <code>cuGetProcAddress()</code> 获取相应版本的函数指针：</p>
+<pre><code class="language-cpp">#include &lt;cudaTypedefs.h&gt;
+
+PFN_cuStreamBeginCapture_v10000 pfn_v1;
+PFN_cuStreamBeginCapture_v10010 pfn_v2;
+
+cuGetProcAddress(
+    "cuStreamBeginCapture", &amp;pfn_v1, 10000,
+    CU_GET_PROC_ADDRESS_DEFAULT, &amp;driverStatus);
+
+cuGetProcAddress(
+    "cuStreamBeginCapture", &amp;pfn_v2, 10010,
+    CU_GET_PROC_ADDRESS_DEFAULT, &amp;driverStatus);
+</code></pre>
+<p>获取 v1 时，CUDA 版本参数应为 10.0（<code>10000</code>）；获取 v2 时应为 10.1（<code>10010</code>）。使用更高的版本号请求特定版本并不总是可移植的：如果未来在 CUDA 11.3 中引入假设的 v3，<code>cuGetProcAddress()</code> 可能开始返回 v3 符号。若 v2 和 v3 的 ABI 或函数签名不同，却仍通过面向 v2 的类型定义调用 v3，就会产生未定义行为。</p>
+<p>如果要获取指定 CUDA Toolkit 中某个驱动程序 API 的最新版本，可以将 <code>CUDA_VERSION</code> 作为版本参数，并使用不带版本后缀的类型定义。</p>
+<h4 id="20-5-3-2-使用-runtime-api">20.5.3.2 使用 Runtime API</h4>
+<p>Runtime API 的 <code>cudaGetDriverEntryPoint()</code> 使用 CUDA Runtime 版本，为请求的驱动程序符号获取 ABI 兼容版本。以下示例使用 <code>cuMemAllocAsync</code>，该函数从 CUDA 11.2 开始提供，因此最低要求的 Runtime 版本为 CUDA 11.2。</p>
+<pre><code class="language-cpp">#include &lt;cudaTypedefs.h&gt;
+
+PFN_cuMemAllocAsync pfn_cuMemAllocAsync;
+
+// 假设 CUDA Runtime 版本不低于 11.2。
+cudaGetDriverEntryPoint(
+    "cuMemAllocAsync",
+    &amp;pfn_cuMemAllocAsync,
+    cudaEnableDefault,
+    &amp;driverStatus);
+
+if (driverStatus == cudaDriverEntryPointSuccess &amp;&amp;
+    pfn_cuMemAllocAsync) {
+    pfn_cuMemAllocAsync(...);
+}
+</code></pre>
+<p>Runtime API 的 <code>cudaGetDriverEntryPointByVersion()</code> 使用用户提供的 CUDA 版本获取所请求驱动程序符号的 ABI 兼容版本，因此可以更精确地控制所请求的 ABI 版本。</p>
+<h4 id="20-5-3-3-获取每线程默认流版本-retrieve-per-thread-default-stream-versions">20.5.3.3 获取每线程默认流版本（Retrieve Per-thread Default Stream Versions）</h4>
+<p>部分 CUDA Driver API 可以配置为使用默认流语义或每线程默认流语义。具有每线程默认流语义的驱动程序 API，其名称带有 <code>_ptsz</code> 或 <code>_ptds</code> 后缀。例如，<code>cuLaunchKernel</code> 的每线程默认流版本为 <code>cuLaunchKernel_ptsz</code>。</p>
+<p>通过驱动程序入口点访问 API，用户可以请求 <code>cuLaunchKernel</code> 的每线程默认流版本，而不是默认流版本。配置默认流或每线程默认流语义会影响同步行为。可以通过以下方式获取相应版本：</p>
+<ul>
+<li>使用编译选项 <code>--default-stream per-thread</code>，或定义宏 <code>CUDA_API_PER_THREAD_DEFAULT_STREAM</code>，启用每线程默认流行为；</li>
+<li>使用 <code>CU_GET_PROC_ADDRESS_LEGACY_STREAM</code> / <code>cudaEnableLegacyStream</code> 强制采用默认流行为；</li>
+<li>使用 <code>CU_GET_PROC_ADDRESS_PER_THREAD_DEFAULT_STREAM</code> / <code>cudaEnablePerThreadDefaultStream</code> 强制采用每线程默认流行为。</li>
+</ul>
+<h4 id="20-5-3-4-访问新的-cuda-功能-access-new-cuda-features">20.5.3.4 访问新的 CUDA 功能（Access New CUDA Features）</h4>
+<p>通常建议安装最新的 CUDA Toolkit，以访问新的驱动程序功能。如果用户不想更新工具包，或暂时无法获得最新工具包，也可以只更新 CUDA 驱动程序，再通过这些 API 访问新功能。</p>
+<p>例如，假设用户使用 CUDA 11.3，但希望使用仅在 CUDA 12.0 驱动程序中提供的新 API <code>cuFoo</code>。由于 CUDA 11.3 的 <code>cudaTypedefs.h</code> 尚未定义 <code>cuFoo</code> 的类型，用户可以手动声明函数指针类型，再使用 <code>cuGetProcAddress()</code> 获取入口点：</p>
+<pre><code class="language-cpp">int main() {
+    // 假设已安装 CUDA 12.0 驱动程序。
+    typedef CUresult (CUDAAPI *PFN_cuFoo)(...);
+    PFN_cuFoo pfn_cuFoo = NULL;
+    CUdriverProcAddressQueryResult driverStatus;
+
+    int driverVersion;
+    cuDriverGetVersion(&amp;driverVersion);
+
+    CUresult status = cuGetProcAddress(
+        "cuFoo", &amp;pfn_cuFoo, driverVersion,
+        CU_GET_PROC_ADDRESS_DEFAULT, &amp;driverStatus);
+
+    if (status == CUDA_SUCCESS &amp;&amp; pfn_cuFoo) {
+        pfn_cuFoo(...);
+    } else {
+        printf("无法获取 cuFoo 的地址，driverStatus = %d。"
+               "请检查是否安装了支持 CUDA 12.0 的最新驱动程序。\n",
+               driverStatus);
+        assert(0);
+    }
+}
+</code></pre>
+<h3 id="20-5-4-cugetprocaddress-可能带来的影响-potential-implications">20.5.4 <code>cuGetProcAddress</code> 可能带来的影响（Potential Implications）</h3>
+<p>本节给出使用 <code>cuGetProcAddress()</code> 和 <code>cudaGetDriverEntryPoint()</code> 时可能遇到的具体或理论问题。</p>
+<h4 id="20-5-4-1-cugetprocaddress-与隐式链接的差异">20.5.4.1 <code>cuGetProcAddress</code> 与隐式链接的差异</h4>
+<p><code>cuDeviceGetUuid</code> 在 CUDA 9.2 中引入；其新版本 <code>cuDeviceGetUuid_v2</code> 在 CUDA 11.4 中引入。为了保持小版本兼容性，直到 CUDA 12.0，<code>cuda.h</code> 中的 <code>cuDeviceGetUuid</code> 才会升级为 <code>cuDeviceGetUuid_v2</code>。</p>
+<p>因此，直接调用函数和通过 <code>cuGetProcAddress()</code> 获取函数指针，可能得到不同版本。假设使用 CUDA 11.4 编译：</p>
+<pre><code class="language-cpp">#include &lt;cuda.h&gt;
+CUuuid uuid;
+CUdevice dev;
+CUresult status;
+
+status = cuDeviceGet(&amp;dev, 0);
+status = cuDeviceGetUuid(&amp;uuid, dev);
+</code></pre>
+<p>直接调用会执行 <code>cuDeviceGetUuid</code> 的旧版本。如果改为：</p>
+<pre><code class="language-cpp">#include &lt;cudaTypedefs.h&gt;
+CUuuid uuid;
+CUdevice dev;
+CUresult status;
+CUdriverProcAddressQueryResult driverStatus;
+
+status = cuDeviceGet(&amp;dev, 0);
+
+PFN_cuDeviceGetUuid pfn_cuDeviceGetUuid;
+status = cuGetProcAddress(
+    "cuDeviceGetUuid", &amp;pfn_cuDeviceGetUuid, CUDA_VERSION,
+    CU_GET_PROC_ADDRESS_DEFAULT, &amp;driverStatus);
+
+if (CUDA_SUCCESS == status &amp;&amp; pfn_cuDeviceGetUuid) {
+    // 该函数指针可能指向 cuDeviceGetUuid_v2。
+}
+</code></pre>
+<p>在 CUDA 11.4 中，这种方式会取得 <code>cuDeviceGetUuid_v2</code> 的函数指针，而不是与直接调用相同的旧版本。因此，调用者必须确保函数指针的类型定义与实际返回的函数版本相匹配。</p>
+<h4 id="20-5-4-2-cugetprocaddress-中编译时版本与运行时版本的区别">20.5.4.2 <code>cuGetProcAddress</code> 中编译时版本与运行时版本的区别</h4>
+<p>如果使用编译时常量 <code>CUDA_VERSION</code> 决定请求哪个函数指针，情况相对明确。如果通过 <code>cuDriverGetVersion()</code> 或 <code>cudaDriverGetVersion()</code> 动态查询驱动版本，再将其传给 <code>cuGetProcAddress()</code>，就可能产生兼容性问题。</p>
+<p>例如，应用程序使用 CUDA 11.3 编译时，类型定义对应旧版 <code>cuDeviceGetUuid</code>。若之后只把驱动程序升级到 CUDA 11.4，而不重新编译应用程序，动态查询到的版本可能变为 <code>11040</code>，于是 <code>cuGetProcAddress()</code> 返回 v2 函数指针，但应用程序仍按旧版本类型定义调用它，行为可能未定义。</p>
+<p>即使某些版本的函数签名恰好相同，也不能依赖这一点；不同 API 版本可能具有不同的 ABI。</p>
+<h4 id="20-5-4-3-显式版本检查仍可能不足-api-version-bumps-with-explicit-version-checks">20.5.4.3 显式版本检查仍可能不足（API Version Bumps with Explicit Version Checks）</h4>
+<p>假设某个 API 的演进如下：</p>
+<pre><code class="language-cpp">CUresult cuFoo(int bar);                 // CUDA 11.4
+CUresult cuFoo_v2(int bar);              // CUDA 11.5
+CUresult cuFoo_v3(int bar, void* jazz);  // CUDA 11.6
+
+typedef CUresult (CUDAAPI *PFN_cuFoo_v11040)(int bar);
+typedef CUresult (CUDAAPI *PFN_cuFoo_v11050)(int bar);
+typedef CUresult (CUDAAPI *PFN_cuFoo_v11060)(int bar, void* jazz);
+</code></pre>
+<p>如果应用程序只在 CUDA 11.5 编译，并根据驱动版本在 v1 与 v2 之间选择，却没有用 CUDA 11.6 的类型定义重新编译，那么在 CUDA 11.6 驱动程序上，<code>cuGetProcAddress()</code> 可能返回 v3 函数指针。继续使用 v1 或 v2 的类型定义调用它会导致未定义行为。</p>
+<p>该例说明：即使对 <code>cuGetProcAddress()</code> 执行显式版本检查，也不一定能安全覆盖同一 CUDA 主版本中的所有小版本更新。</p>
+<h4 id="20-5-4-4-runtime-api-用法中的问题-issues-with-runtime-api-usage">20.5.4.4 Runtime API 用法中的问题（Issues with Runtime API Usage）</h4>
+<p>前面的例子讨论了通过 Driver API 获取驱动程序函数指针时可能遇到的问题。本节讨论 Runtime API <code>cudaGetDriverEntryPoint()</code> 的类似问题。</p>
+<p>该函数会根据当前 CUDA Runtime 版本返回对应的驱动程序 API 版本。用户无法像调用 <code>cuGetProcAddress()</code> 那样，直接指定要获取的特定版本。于是，当编译时使用的 Runtime 版本与安装的驱动版本不一致时，可能出现函数指针类型与实际返回的函数版本不匹配。</p>
+<p>例如，若应用程序使用 CUDA 11.4 Runtime 编译，但系统安装的是 CUDA 11.3 驱动，编译时的 <code>PFN_cuDeviceGetUuid</code> 类型可能对应 v2，而旧驱动返回的却是旧版函数指针。这类组合会导致类型定义不匹配。</p>
+<table>
+<thead>
+<tr>
+<th>安装的驱动版本</th>
+<th>CUDA 11.3 Runtime/Toolkit</th>
+<th>CUDA 11.4 Runtime/Toolkit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CUDA 11.3</td>
+<td>v1</td>
+<td>v1x</td>
+</tr>
+<tr>
+<td>CUDA 11.4</td>
+<td>v1</td>
+<td>v2</td>
+</tr>
+</tbody>
+</table>
+<p>这里 <code>v1</code> 表示 <code>cuDeviceGetUuid</code>，<code>v2</code> 表示 <code>cuDeviceGetUuid_v2</code>，<code>x</code> 表示编译时的函数指针类型定义与返回的函数指针不匹配。问题尤其会出现在使用较新的 CUDA 11.4 Runtime/Toolkit、但运行于较旧 CUDA 11.3 驱动的组合中。</p>
+<h4 id="20-5-4-5-runtime-api-与动态版本选择的问题-issues-with-runtime-api-and-dynamic-versioning">20.5.4.5 Runtime API 与动态版本选择的问题（Issues with Runtime API and Dynamic Versioning）</h4>
+<p>当应用程序编译所用的 CUDA 版本、动态链接的 CUDA Runtime 版本和 CUDA 驱动版本彼此不同，情况会更复杂。原文比较了三种获取 <code>cuDeviceGetUuid</code> 函数指针的方式：</p>
+<ol>
+<li>使用编译时常量 <code>CUDA_VERSION</code> 调用 <code>cuGetProcAddress()</code>；</li>
+<li>使用 <code>cudaGetDriverEntryPoint()</code>，由 Runtime 选择函数版本；</li>
+<li>先通过 Runtime 查询驱动版本，再将该版本传给 <code>cuGetProcAddress()</code>。</li>
+</ol>
+<p>原表中的版本缩写为：<code>3</code> 表示 CUDA 11.3，<code>4</code> 表示 CUDA 11.4；<code>tX</code> 表示编译时使用的类型定义版本，<code>vX</code> 表示运行时返回或使用的函数版本。</p>
+<table>
+<thead>
+<tr>
+<th>获取方式</th>
+<th>3/3/3</th>
+<th>3/3/4</th>
+<th>3/4/3</th>
+<th>3/4/4</th>
+<th>4/3/3</th>
+<th>4/3/4</th>
+<th>4/4/3</th>
+<th>4/4/4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>编译时 <code>CUDA_VERSION</code> 调用 <code>cuGetProcAddress</code></td>
+<td>t1/v1</td>
+<td>t1/v1</td>
+<td>t1/v1</td>
+<td>t1/v1</td>
+<td>不适用</td>
+<td>不适用</td>
+<td>t2/v1</td>
+<td>t2/v2</td>
+</tr>
+<tr>
+<td><code>cudaGetDriverEntryPoint</code></td>
+<td>t1/v1</td>
+<td>t1/v1</td>
+<td>t1/v1</td>
+<td>t1/v2</td>
+<td>不适用</td>
+<td>不适用</td>
+<td>t2/v1</td>
+<td>t2/v2</td>
+</tr>
+<tr>
+<td>查询驱动版本后调用 <code>cuGetProcAddress</code></td>
+<td>t1/v1</td>
+<td>t1/v2</td>
+<td>t1/v1</td>
+<td>t1/v2</td>
+<td>不适用</td>
+<td>不适用</td>
+<td>t2/v1</td>
+<td>t2/v2</td>
+</tr>
+</tbody>
+</table>
+<p>如果应用程序使用 CUDA 11.3 编译，类型定义对应旧版函数；使用 CUDA 11.4 编译时，类型定义则对应 <code>_v2</code> 版本。因此，表中某些组合可能出现类型定义与实际函数版本不匹配的情况。</p>
+<h4 id="20-5-4-6-runtime-api-允许指定-cuda-版本时的问题-issues-with-runtime-api-allowing-cuda-version">20.5.4.6 Runtime API 允许指定 CUDA 版本时的问题（Issues with Runtime API Allowing CUDA Version）</h4>
+<p>除非另有说明，Runtime API <code>cudaGetDriverEntryPointByVersion()</code> 允许用户请求特定 CUDA 驱动程序版本，因此会面临与 Driver API 的 <code>cuGetProcAddress()</code> 类似的问题。</p>
+<h4 id="20-5-4-7-对-api-abi-的影响-implications-to-api-abi">20.5.4.7 对 API/ABI 的影响（Implications to API/ABI）</h4>
+<p>前面 <code>cuDeviceGetUuid</code> 的版本不匹配问题影响可能相对有限，因为 <code>_v2</code> 版本主要用于支持多实例 GPU（MIG）模式；在不使用 MIG 的系统上，用户甚至可能察觉不到 API 版本不同。</p>
+<p>更严重的情况是函数签名发生变化、从而导致 ABI 改变。例如，<code>cuCtxCreate</code> 的 <code>_v2</code> 版本在 CUDA 3.2 中引入，并长期作为 <code>cuda.h</code> 中默认的 <code>cuCtxCreate</code>；CUDA 11.4 又引入了 <code>cuCtxCreate_v3</code>，其签名增加了额外参数。</p>
+<p>如果函数指针的类型定义与实际返回的函数指针不匹配，就可能发生不易察觉的 ABI 不兼容，并导致未定义行为。例如，使用 CUDA 11.3 Toolkit 编译、但运行在 CUDA 11.4 驱动上的代码，如果请求的版本号为 11040 或更高，可能获取 <code>cuCtxCreate_v3</code> 的地址，却仍按旧版参数列表调用它，因而未提供新版本要求的所有参数。</p>
+<h3 id="20-5-5-确定-cugetprocaddress-失败原因-determining-cugetprocaddress-failure-reasons">20.5.5 确定 <code>cuGetProcAddress</code> 失败原因（Determining cuGetProcAddress Failure Reasons）</h3>
+<p><code>cuGetProcAddress()</code> 可能发生两类错误：</p>
+<ol>
+<li><strong>API 调用或用法错误。</strong> 这类错误通过函数返回的 <code>CUresult</code> 错误码报告，例如将函数指针输出参数 <code>pfn</code> 设为 <code>NULL</code>，或传入无效标志。</li>
+<li><strong>无法找到请求的驱动程序符号。</strong> 这类情况通过 <code>CUdriverProcAddressQueryResult</code> 类型的 <code>symbolStatus</code> 输出参数报告，可用于区分驱动程序找不到符号的原因。</li>
+</ol>
+<p>例如，<code>cuDeviceGetExecAffinitySupport</code> 从 CUDA 11.4 开始提供：</p>
+<pre><code class="language-cpp">// cuDeviceGetExecAffinitySupport 在 CUDA 11.4 中引入。
+CUdriverProcAddressQueryResult driverStatus;
+cudaVersion = ...;
+
+status = cuGetProcAddress(
+    "cuDeviceGetExecAffinitySupport", &amp;pfn,
+    cudaVersion, 0, &amp;driverStatus);
+
+if (CUDA_SUCCESS == status) {
+    if (driverStatus == CU_GET_PROC_ADDRESS_VERSION_NOT_SUFFICIENT) {
+        printf("将 cudaVersion 更新到 11.4 后即可使用新功能；"
+               "当前驱动程序已满足要求。\n");
+        // 提供的 cudaVersion 小于 11.4，但驱动程序版本至少为 11.4。
+    } else if (driverStatus == CU_GET_PROC_ADDRESS_SYMBOL_NOT_FOUND) {
+        printf("请同时将 CUDA 驱动程序和 cudaVersion 更新到至少 11.4。\n");
+        // 驱动程序中找不到符号，可能是驱动版本过旧或符号名称拼写错误。
+    } else if (driverStatus == CU_GET_PROC_ADDRESS_SUCCESS &amp;&amp; pfn) {
+        printf("cudaVersion 和驱动程序均至少为 11.4，可以使用新功能。\n");
+        pfn();
+    }
+}
+</code></pre>
+<p>如果返回 <code>CU_GET_PROC_ADDRESS_VERSION_NOT_SUFFICIENT</code>，表示驱动程序中找到了该符号，但它是在传入的 <code>cudaVersion</code> 之后才引入的。例如，传入 11030 或更低版本、同时运行于 CUDA 11.4 或更高版本驱动时，会得到这一状态，因为 <code>cuDeviceGetExecAffinitySupport</code> 是在 CUDA 11.4（11040）中引入的。</p>
+<p>如果返回 <code>CU_GET_PROC_ADDRESS_SYMBOL_NOT_FOUND</code>，表示驱动程序中找不到该符号。原因可能是驱动程序版本过旧，也可能只是符号名称拼写错误。例如，将名称写成 <code>CUDeviceGetExecAffinitySupport</code>（开头误用大写 <code>CU</code>）就会因字符串不匹配而无法找到 API。开发时使用新驱动成功获取符号，但部署到较旧驱动时，也可能遇到此状态。</p>
+<h2 id="校对说明">校对说明</h2>
+<ol>
+<li>原 PDF 正文称驱动程序 API 对象见“表 22”，但本页实际表题为“表 25”；译稿按实际表题保留为“表 25”。</li>
+<li>原 PDF 的普通向量加法示例按 <code>gridWidth/Height/Depth</code> 在前、线程块维度在后调用 <code>cuLaunchKernel()</code>；但后面的参数缓冲区示例却把 <code>blockWidth/Height/Depth</code> 放在 <code>gridWidth/Height/Depth</code> 前面，与该 API 的常见签名顺序不一致。本译稿在参数缓冲区示例中保留原 PDF 的顺序，并将其标记为疑似原文错误；不要直接把该示例视为已验证可编译代码。</li>
+<li>本章代码示例尚未在 CUDA 12.8 工具链中逐例编译验证。涉及 <code>cuGetProcAddress()</code> 的版本兼容示例尤其需要与对应版本的 <code>cuda.h</code> 和 <code>cudaTypedefs.h</code> 核对。</li>
+</ol>
