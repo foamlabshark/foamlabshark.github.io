@@ -14,6 +14,7 @@
   if(window.foamAuth?.publicConfig)return window.foamAuth.publicConfig;
   if(!configuration){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);configuration=fetch('/assets/auth-config.json',{cache:'force-cache',signal:controller.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).catch(e=>{configuration=null;throw e;}).finally(()=>clearTimeout(timer));}
   const value=await configuration,url=new URL(value.supabaseUrl);
+  if(value.siteOrigin&&location.origin!==value.siteOrigin)throw Error('请在 FoamLab 官方网站查看成员数据。');
   if(url.protocol!=='https:'||!url.hostname.endsWith('.supabase.co')||!value.publishableKey||value.publishableKey.startsWith('sb_secret_'))throw Error('Public data configuration unavailable');
   return value;
  }

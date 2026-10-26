@@ -224,7 +224,9 @@
  const pictures=()=>Promise.race([Promise.all(['terrain','buildings','homes','scenery'].map(n=>{const img=new Image();img.src='/assets/town/'+n+'-atlas.webp';return img.decode().catch(()=>{});})),new Promise(r=>setTimeout(r,2500))]);
  let initialization=0,initialIdentity;
  async function init(){const version=++initialization;try{root.removeAttribute('data-ready');root.setAttribute('aria-busy','true');loading(12,'正在唤醒熊猫…');const art=pictures();const statics=Promise.all(['/assets/town/provinces.json','/assets/town/catalog.json'].map(async url=>{const r=await fetch(url);if(!r.ok)throw Error('小镇资料暂时无法读取，请刷新重试。');return r.json();}));
-  await window.foamAuth?.ready;if(version!==initialization)return;initialIdentity=user()?.id||null;loading(35,'正在打开小镇大门…');
+  await window.foamAuth?.ready;if(version!==initialization)return;
+  if(window.foamAuth?.originRestricted){void statics.catch(()=>{});setStatus('请在 FoamLab 官方网站进入熊猫小镇。',true);root.setAttribute('aria-busy','false');root.dataset.ready='error';$('#town-content').innerHTML='<a class="button" href="https://foamlabshark.github.io/town/">前往官方小镇 →</a>';return;}
+  initialIdentity=user()?.id||null;loading(35,'正在打开小镇大门…');
   const hash=decodeURIComponent(location.hash.slice(1)).split('/')[0];let guess=hash&&hash!=='map'?hash:null;if(!hash&&user()){try{guess=localStorage.getItem(lastKey());}catch{}}
   const mapRequest=N.rpc('foamlab_town_map'),selfRequest=user()?refreshSelf().catch(error=>setStatus(error.message,true)):null;
   if(guess&&/^[a-z]+$/.test(guess))S.prefetch={province:guess,promise:N.rpc('foamlab_town_street',{province:guess,page:0,query:''}).catch(()=>null)};

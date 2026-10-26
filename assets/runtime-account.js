@@ -67,7 +67,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 'use strict';
 (() => {
  const $=s=>document.querySelector(s);const shortcuts={"courses":"系统学习","topics":"专题学习","start":"快速开始","commands":"命令速查","dictionaries":"配置与字典速查","algorithms":"有限体积法","linux":"Linux 入门","cpp":"C++ 入门","programming":"OpenFOAM 编程","tools":"工具生态","resources":"资料中心","sharing":"实践与分享","community":"讨论中心","assignments":"作业与实践","announcements":"网站公告"};const defaultShortcuts=["courses", "topics", "commands", "dictionaries", "programming", "resources", "sharing", "community"];const selectedShortcuts=value=>Array.isArray(value)?[...new Set(value.map(key=>({authors:'sharing',recommendations:'resources'})[key]||key))].filter(key=>Object.hasOwn(shortcuts,key)):defaultShortcuts;
- const state={client:null,user:null,profile:null,progress:[],pet:null,petError:false,configured:false,githubEnabled:false,dataError:false,profileError:false,progressError:false,loading:true,dataLoading:false,signingOut:false};window.foamAuth=state;
+ const state={client:null,user:null,profile:null,progress:[],pet:null,petError:false,configured:false,githubEnabled:false,dataError:false,profileError:false,progressError:false,loading:true,dataLoading:false,signingOut:false,originRestricted:false};window.foamAuth=state;
  let session=null,revision=0,initializing=true,reloadTimer,renderedProfile='',accountController=null,accountLoad=null,profileVersion=0;
  let activityOwner=null,activityAt=-Infinity,activityRequest=null;
  // Record visible, authenticated visits using the database clock. The callback
@@ -176,6 +176,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   try{
    const r=await authFetch('/assets/auth-config.json');if(!r.ok)throw Error('无法读取登录配置。');
    const cfg=await r.json();if(!cfg.supabaseUrl||!cfg.publishableKey)return state;
+   if(cfg.siteOrigin&&location.origin!==cfg.siteOrigin){
+    state.originRestricted=true;
+    const banner=document.createElement('p'),link=document.createElement('a');banner.className='lab-evidence';banner.setAttribute('role','alert');banner.dataset.siteOriginRestriction='';
+    banner.append('此版本的在线服务仅在 FoamLab 官方网站提供。');link.href='https://foamlabshark.github.io';link.textContent='前往官方网站 →';banner.append(' ',link);
+    (document.querySelector('main .page-wrap')||document.querySelector('main')||document.body).prepend(banner);
+    throw Error('请前往 https://foamlabshark.github.io 使用在线服务。');
+   }
    const u=new URL(cfg.supabaseUrl);if(u.protocol!=='https:'||!u.hostname.endsWith('.supabase.co'))throw Error('认证服务地址配置不正确。');
    if(cfg.publishableKey.startsWith('sb_secret_'))throw Error('认证配置错误：网页不能使用服务端密钥。');
    if(!window.supabase?.createClient)throw Error('认证组件未能加载，请刷新页面。');
