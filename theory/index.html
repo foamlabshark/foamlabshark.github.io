@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111816" media="(prefers-color-scheme: dark)">
   
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  
   <link rel="preconnect" href="https://nmkforbzmbstasnjxlid.supabase.co" crossorigin>
   <link rel="preload" href="/assets/auth-config.json" as="fetch" crossorigin>
   
@@ -348,3 +349,73 @@
 <dialog id="search-dialog" aria-labelledby="search-title"><div class="dialog-head"><h2 id="search-title">搜索学习资料</h2><button class="icon-button" data-close-dialog aria-label="关闭搜索">×</button></div><div class="search-scopes"><label>查找范围<select id="search-scope"><option value="">全站</option></select></label><label hidden>子模块<select id="search-subscope"><option value="">全部子模块</option></select></label></div><label class="search-field"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m16 16 5 5"/></svg><input id="global-search" type="search" maxlength="120" placeholder="例如：blockMesh、压力边界、SIMPLE" autocomplete="off" aria-label="搜索关键词"></label><div id="search-results" aria-live="polite"><p class="muted">输入关键词查找文章；登录后可搜索正文和代码。</p></div><div class="dialog-foot">支持中文与命令名称 <kbd>Esc</kbd> 关闭</div></dialog>
 <div class="toast" role="status" hidden></div>
 </body></html>
+
+<script>
+(() => {
+  const init = () => {
+    const nav = document.querySelector('#sidebar nav');
+    const grid = document.getElementById('theory-modules');
+
+    function addCUDA() {
+      // 添加左侧「基础理论与原理」目录入口
+      const group = nav?.querySelector(
+        '[data-nav-section="theory"] > .nav-subgroup'
+      );
+
+      if (group && !group.querySelector('a[href="/cuda/"]')) {
+        const item = document.createElement('div');
+        item.className = 'nav-group';
+        item.innerHTML = `
+          <div class="nav-parent">
+            <a class="nav-item nav-subitem" href="/cuda/">
+              <span>CUDA C++ 编程指南</span>
+            </a>
+          </div>`;
+        group.appendChild(item);
+      }
+
+      // 添加第七张课程卡片
+      if (grid && !grid.querySelector('a[href="/cuda/"]')) {
+        grid.insertAdjacentHTML('beforeend', `
+          <article class="lab-card">
+            <div class="lab-card-body">
+              <h2>
+                <a href="/cuda/">CUDA C++ 编程指南</a>
+              </h2>
+              <p>
+                CUDA 并行编程、GPU 架构及性能优化。
+                中文工作译稿，包含章节、代码和图片。
+              </p>
+              <a class="button secondary" href="/cuda/">
+                查看课程目录 →
+              </a>
+            </div>
+          </article>`);
+      }
+    }
+
+    addCUDA();
+
+    // 网站动态加载课程后，自动恢复 CUDA 入口
+    if (nav) {
+      new MutationObserver(addCUDA).observe(nav, {
+        childList: true
+      });
+    }
+
+    if (grid) {
+      new MutationObserver(addCUDA).observe(grid, {
+        childList: true
+      });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, {
+      once: true
+    });
+  } else {
+    init();
+  }
+})();
+</script>
