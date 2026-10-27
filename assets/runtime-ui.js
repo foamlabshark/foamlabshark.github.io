@@ -1145,7 +1145,7 @@
  function confirm(heading,description,action='确认'){
   return new Promise(resolve=>{const d=makeDialog('social-confirm',heading,'<p>'+esc(description)+'</p><form method="dialog" class="social-actions"><button type="submit" value="cancel" class="secondary">取消</button><button type="submit" value="confirm">'+esc(action)+'</button></form>');d.addEventListener('close',()=>resolve(d.returnValue==='confirm'),{once:true});});
  }
- async function requireLogin(){await A.ready;if(A.user)return true;const d=makeDialog('social-login','登录后使用好友功能','<p>添加好友、私聊和分享笔记需要登录。</p><button type="button" data-social-login>使用 GitHub 登录</button>');$('[data-social-login]',d).onclick=()=>{d.close();void L.login();};return false;}
+ async function requireLogin(){await A.ready;if(A.user)return true;if($('.social-login[open]'))return false;const d=makeDialog('social-login','登录后使用好友功能','<p>添加好友、私聊和分享笔记需要登录。</p><button type="button" data-social-login>使用 GitHub 登录</button>');$('[data-social-login]',d).onclick=()=>{d.close();void L.login();};return false;}
  async function act(button,status,operation,payload,done){
   if(button.disabled)return;button.disabled=true;status.textContent='正在处理…';
   try{const result=await api(operation,payload);summaryVersion++;invalidateLists();status.textContent='';await done?.(result);void refreshSummary(true);refreshOpenList();}
@@ -1346,7 +1346,37 @@
   }catch(error){notify(error.message);}
  }
  // A single controller and subscription are used on the website and in town.
- window.FoamSocial={open:openHub,profile:showProfile,chat:openChat,shareNote:chooseShare,refresh:()=>refreshSummary(true)};
+ async function showMemberGroup(dimension,label){
+  if(!['institutions','research'].includes(dimension)||typeof label!=='string'||!label.trim()||!await requireLogin())return;
+  if($('.social-member-group[open]'))return;
+  const d=makeDialog('social-member-group',label+' · 成员','<p class="social-group-summary"></p><div class="social-group-list" aria-live="polite"></div><p class="social-status" role="status"></p><nav class="social-group-pages" aria-label="成员列表翻页"><button type="button" class="secondary" data-group-previous>上一页</button><span data-group-page></span><button type="button" class="secondary" data-group-next>下一页</button></nav>');
+  const list=$('.social-group-list',d),status=$('.social-status',d),previous=$('[data-group-previous]',d),next=$('[data-group-next]',d);let page=0,version=0,busy=false;
+  async function read(target){
+   if(busy)return;busy=true;const request=++version;previous.disabled=next.disabled=true;list.setAttribute('aria-busy','true');if(!list.children.length)status.textContent='正在查看成员…';
+   try{
+    const result=await api('member_group',{dimension,label,page:target});if(!d.isConnected||request!==version)return;
+    page=result.page;status.textContent='';list.replaceChildren();
+    $('.social-group-summary',d).textContent=(dimension==='institutions'?'学校／单位':'研究方向')+' · 共 '+result.total+' 位成员';
+    for(const p of result.items){
+     const row=document.createElement('article');row.className='social-group-member';row.dataset.memberId=p.user_id;
+     const identity=document.createElement('button');identity.type='button';identity.className='social-person';identity.dataset.socialProfile=p.user_id;identity.innerHTML=person(p);identity.setAttribute('aria-label','查看 '+title(p)+' 的资料');row.append(identity);
+     const research=document.createElement('small');research.className='social-group-research';research.textContent=p.research||'未填写研究方向';row.append(research);
+     const action=document.createElement('button');action.type='button';action.className='secondary social-group-action';
+     function update(profile){
+      const relation=profile.relation;action.textContent=relation==='self'?'我':relation==='friends'?'发消息':relation==='outgoing'?'已申请':relation==='incoming'?'查看申请':['blocked','unavailable'].includes(relation)?'查看资料':'加好友';action.disabled=relation==='self'||relation==='outgoing';
+      action.onclick=async()=>{if(relation==='friends')void openChat(profile.user_id);else if(['incoming','blocked','unavailable'].includes(relation))void showProfile(profile.user_id);else{await act(action,status,'request',{user_id:profile.user_id},next=>{profile=next;});if(action.isConnected)update(profile);}};
+     }
+     update(p);row.append(action);list.append(row);
+    }
+    if(!result.items.length){const empty=document.createElement('p');empty.className='social-empty';empty.textContent='暂无符合条件的成员。';list.append(empty);}
+    $('[data-group-page]',d).textContent=(page+1)+' / '+Math.max(1,Math.ceil(result.total/50));previous.disabled=page===0;next.disabled=!result.more;
+   }catch(error){
+    if(d.isConnected){status.textContent=error.message;const retry=document.createElement('button');retry.type='button';retry.className='secondary';retry.textContent='重试';retry.onclick=()=>void read(target);status.append(retry);}
+   }finally{if(d.isConnected){list.removeAttribute('aria-busy');busy=false;}}
+  }
+  previous.onclick=()=>void read(page-1);next.onclick=()=>void read(page+1);d.addEventListener('close',()=>++version,{once:true});await read(0);
+ }
+ window.FoamSocial={open:openHub,profile:showProfile,group:showMemberGroup,chat:openChat,shareNote:chooseShare,refresh:()=>refreshSummary(true)};
  function entrances(){
   const top=$('.account-actions');if(top&&!$('[data-social-open]',top)){const b=document.createElement('button');b.type='button';b.className='account-nav social-entry';b.dataset.socialOpen='friends';b.setAttribute('aria-haspopup','dialog');b.innerHTML='好友<span class="social-unread" data-social-count hidden></span>';top.prepend(b);}
   const menu=$('.account-panel-links');if(menu&&!$('[data-social-open]',menu)){const b=document.createElement('button');b.type='button';b.dataset.socialOpen='friends';b.className='account-panel-action';b.innerHTML='好友<span class="social-menu-tail"><b class="social-unread" data-social-count hidden></b><span aria-hidden="true">→</span></span>';menu.prepend(b);}

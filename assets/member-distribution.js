@@ -11,7 +11,10 @@
  const compact=document.createElement('span'),loose=document.createElement('span'),density=document.createElement('input');compact.textContent='紧凑';loose.textContent='舒展';density.type='range';density.min='0';density.max='100';density.step='1';density.value='42';density.dataset.cloudDensity='';density.setAttribute('aria-label','词云疏密');densityControl.append(compact,density,loose);plot.append(densityControl);
  let researchView='bubbles',cloudDensity=42,cloudZoom=1;
  const names={institutions:'学校 / 单位',research:'研究方向',stages:'学习阶段',cohorts:'出生年代'};
- const captions={institutions:'气泡面积与成员人数成正比。悬停、点击或用键盘选中气泡可查看全称与人数。',research:'按分隔符拆分研究方向，保留全部名称；某名称的字按原顺序包含在另一个名称中时，也计入前者。同一成员对同一名称只计一次，一人可计入多个方向。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
+ const captions={institutions:'气泡面积与成员人数成正比。双击气泡或按回车查看成员并添加好友；手机双击空白处复原画布。',research:'按分隔符拆分研究方向，保留全部名称；某名称的字按原顺序包含在另一个名称中时，也计入前者。同一成员对同一名称只计一次，一人可计入多个方向。双击气泡或按回车查看成员并添加好友。',stages:'按成员填写的当前学习阶段统计，每位成员只计入一个阶段。',cohorts:'按出生年份所属年代统计，例如 90 后为 1990—1999 年出生。个人出生年月不对外展示。'};
+ const bubbleMembers=new WeakMap();
+ function openMemberGroup(dimension,label){if(!document.querySelector('.social-member-group[open],.social-login[open]'))void window.FoamSocial?.group(dimension,label);}
+ function openBubbleMembers(element){const group=bubbleMembers.get(element);if(group)openMemberGroup(group.dimension,group.label);}
  let kind='institutions',data=null,initialized=false,pending=null,lastRead=0,packPromise=null,drawRevision=0,resizeFrame=0,lastSize='',motion=null,motionPaused=false,bubbleZoom=1,view=null,selectedLabel=null,wheelFrame=0,wheelDelta=0,zoomTimer=0;
  const node=(tag,attrs={},content)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [key,value]of Object.entries(attrs))n.setAttribute(key,value);if(content!=null)n.textContent=content;return n;};
  const rows=()=>Array.isArray(data?.[kind])?data[kind].filter(r=>typeof r.label==='string'&&Number.isSafeInteger(r.count)&&r.count>=0):[];
@@ -31,14 +34,18 @@
   element.setAttribute('tabindex','0');element.setAttribute('role','button');element.setAttribute('aria-label',`${row.label}${row.range?'，'+row.range:''}，${row.count} 人`);
   element.append(node('title',{},`${row.label}${row.range?' · '+row.range:''}：${row.count} 人`));
   for(const event of ['pointerenter','focus','click'])element.addEventListener(event,()=>select(row,element));
-  element.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(row,element);}});
+  if(element.classList.contains('member-bubble')){
+   bubbleMembers.set(element,{dimension:kind,label:row.label});element.setAttribute('aria-label',element.getAttribute('aria-label')+'，双击或按回车查看成员');
+   element.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();openBubbleMembers(element);});
+  }
+  element.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(row,element);if(e.key==='Enter')openBubbleMembers(element);}});
  }
  function bubbleMotion(svg,items,width,height){
   $('[data-distribution-reset]').setAttribute('aria-label','复原气泡位置');$('[data-distribution-reset]').title='复原气泡位置';
   const preference=matchMedia('(prefers-reduced-motion: reduce)'),control=$('[data-distribution-motion]'),resetControl=$('[data-distribution-reset]');
   let frameId=0,lastTick=0,inView=false,disposed=false,pointer=null,drag=null,zooming=false;
   const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
-  const enabled=()=>!disposed&&!zooming&&inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.documentElement.classList.contains('profile-required-open');
+  const enabled=()=>!disposed&&!zooming&&inView&&!document.hidden&&!preference.matches&&!motionPaused&&!listDialog.open&&!document.querySelector('.social-dialog[open]')&&!document.documentElement.classList.contains('profile-required-open');
   const coordinates=e=>{const rect=svg.getBoundingClientRect();return {x:(e.clientX-rect.left)*width/rect.width,y:(e.clientY-rect.top)*height/rect.height};};
   function place(item){item.g.setAttribute('transform',`translate(${item.x.toFixed(2)},${item.y.toFixed(2)})`);item.circle.setAttribute('transform',`rotate(${item.angle||0}) scale(${1-item.squeeze},${1/(1-item.squeeze)})`);}
   function tick(now){
@@ -96,7 +103,7 @@
    if(bubbleZoom!==1){bubbleZoom=1;commitZoom();}else centerView();releaseZoomMotion();
   };
   const observer=new IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);update();},{threshold:.01});observer.observe(svg);
-  const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  const gate=new MutationObserver(update);gate.observe(document.documentElement,{attributes:true,attributeFilter:['class']});gate.observe(document.body,{childList:true});
   document.addEventListener('visibilitychange',update);preference.addEventListener('change',update);update();
   return {
    setZooming(value){if(disposed)return;zooming=value;update();},
@@ -157,7 +164,15 @@
   if(!list.length){target.textContent='没有符合条件的统计项目。';return;}
   const table=document.createElement('table'),caption=document.createElement('caption');caption.textContent=names[kind]+'人数统计';caption.className='sr-only';table.append(caption);
   const head=document.createElement('thead'),tr=document.createElement('tr');for(const label of [names[kind],'人数']){const th=document.createElement('th');th.scope='col';th.textContent=label;tr.append(th);}head.append(tr);table.append(head);
-  const body=document.createElement('tbody');for(const row of list){const tr=document.createElement('tr');for(const value of [row.label+(row.range?'（'+row.range+'）':''),row.count]){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);target.append(table);
+  const body=document.createElement('tbody'),dimension=kind;
+  for(const row of list){
+   const tr=document.createElement('tr'),label=document.createElement('td'),count=document.createElement('td');count.textContent=row.count;
+   if(['institutions','research'].includes(dimension)){
+    const button=document.createElement('button');button.type='button';button.className='member-distribution-member-link';button.textContent=row.label;button.setAttribute('aria-label','查看 '+row.label+' 的成员');button.onclick=()=>openMemberGroup(dimension,row.label);label.append(button);
+   }else label.textContent=row.label+(row.range?'（'+row.range+'）':'');
+   tr.append(label,count);body.append(tr);
+  }
+  table.append(body);target.append(table);
  }
  let fluidPromise=null,cloudCache=null,cloudBuild=null,warmTimer=0;
  const retiredClouds=[];
@@ -385,6 +400,20 @@
  // Capture touch pointers on the chart so a pinch can transition back to one-finger panning.
  // A single touch pans; two touches scale by their distance and keep the drawing centred.
  let pan=null,pinch=null,pinchFrame=0,pinchZoom=null,tap=null,lastTap=null;
+ let mouseTap=null,lastMouseTap=null;
+ chart.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'||e.button!==0)return;
+  const bubble=e.target.closest('.member-bubble');mouseTap=bubble?{id:e.pointerId,bubble,x:e.clientX,y:e.clientY,at:performance.now()}:null;
+ },true);
+ chart.addEventListener('pointermove',e=>{if(mouseTap?.id===e.pointerId&&Math.hypot(e.clientX-mouseTap.x,e.clientY-mouseTap.y)>10){mouseTap=null;lastMouseTap=null;}},true);
+ chart.addEventListener('pointerup',e=>{
+  if(e.pointerType==='touch'||mouseTap?.id!==e.pointerId)return;
+  const now=performance.now(),current=mouseTap;mouseTap=null;
+  if(now-current.at>350){lastMouseTap=null;return;}
+  const double=lastMouseTap&&lastMouseTap.bubble===current.bubble&&now-lastMouseTap.at<=500&&Math.hypot(current.x-lastMouseTap.x,current.y-lastMouseTap.y)<=24;
+  lastMouseTap=double?null:{...current,at:now};if(double)openBubbleMembers(current.bubble);
+ },true);
+ chart.addEventListener('pointercancel',()=>{mouseTap=lastMouseTap=null;},true);
  const touches=new Map();
  const touchDistance=()=>{const [a,b]=[...touches.values()];return Math.max(10,Math.hypot(a.x-b.x,a.y-b.y));};
  function rebaseTouchPan(camera){
@@ -419,7 +448,7 @@
  chart.addEventListener('pointerdown',e=>{
   if(e.pointerType!=='touch'||e.button!==0||chart.dataset.pannable!=='true'||!chart.querySelector('.member-distribution-world'))return;
   e.preventDefault();e.stopPropagation();cancelWheelZoom();holdZoomMotion();
-  if(!touches.size)tap={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now()};
+  if(!touches.size)tap={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now(),bubble:e.target.closest('.member-bubble')};
   else{tap=null;lastTap=null;}
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});chart.setPointerCapture(e.pointerId);chart.classList.add('is-panning');
   if(touches.size===1)rebaseTouchPan();else{flushPinchZoom();beginPinch();}
@@ -435,10 +464,11 @@
  },true);
  const endTouch=e=>{
   if(e.pointerType!=='touch'||!touches.has(e.pointerId))return;
-  // Only two short, nearby taps reset the view; a drag or any multi-touch gesture cancels them.
+  // Double-tap a bubble to inspect its members; double-tap the background to reset.
   const now=performance.now(),shortTap=e.type==='pointerup'&&touches.size===1&&tap?.id===e.pointerId&&now-tap.at<=260&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=10;
   const doubleTap=shortTap&&lastTap&&now-lastTap.at<=320&&Math.hypot(tap.x-lastTap.x,tap.y-lastTap.y)<=32;
-  lastTap=shortTap&&!doubleTap?{x:tap.x,y:tap.y,at:now}:null;tap=null;
+  const memberTarget=doubleTap&&tap.bubble&&tap.bubble===lastTap.bubble?tap.bubble:null,resetBackground=doubleTap&&!tap.bubble&&!lastTap.bubble;
+  lastTap=shortTap&&!doubleTap?{x:tap.x,y:tap.y,at:now,bubble:tap.bubble}:null;tap=null;
   e.stopPropagation();touches.delete(e.pointerId);
   if(e.type==='pointerup')flushPinchZoom();else{cancelAnimationFrame(pinchFrame);pinchFrame=0;pinchZoom=null;}
   if(touches.size>=2)beginPinch();
@@ -447,7 +477,7 @@
    if(touches.size)rebaseTouchPan(camera);else{pan=null;chart.classList.remove('is-panning');releaseZoomMotion();}
   }
   if(chart.hasPointerCapture(e.pointerId))chart.releasePointerCapture(e.pointerId);
-  if(doubleTap)$('[data-distribution-reset]').click();
+  if(memberTarget)openBubbleMembers(memberTarget);else if(resetBackground)$('[data-distribution-reset]').click();
  };
  for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,endTouch,true);
  window.addEventListener('blur',cancelChartGesture);
