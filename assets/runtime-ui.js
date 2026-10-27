@@ -1154,6 +1154,13 @@
  }
  function person(p){return '<span class="social-avatar" aria-hidden="true">'+avatar(p)+'</span><span class="social-person-copy"><strong>'+esc(title(p))+'</strong><small>'+esc(p.remark&&p.remark!==p.name?'昵称：'+p.name:'Lv.'+p.level+' · '+(p.institution||'未填写学校／单位'))+'</small></span>';}
  function online(p){return '<span class="social-presence'+(p.online?' is-online':'')+'"><i aria-hidden="true"></i>'+(p.online?'在线':'离线')+'</span>';}
+ async function requestFriend(profile,done){
+  if(!uuid(profile.user_id)||!await requireLogin()||$('.social-friend-request[open]'))return;
+  const d=makeDialog('social-friend-request','好友申请','<div class="social-profile-identity">'+person(profile)+'</div><form class="social-request-form"><label>申请留言（选填）<textarea name="message" rows="3" maxlength="140" placeholder="介绍一下自己，方便对方认识你"></textarea></label><p class="social-status" role="status"></p><div class="social-actions"><button type="button" class="secondary" data-request-cancel>取消</button><button type="submit">发送申请</button></div></form>'),form=$('form',d),status=$('.social-status',d);
+  $('[data-request-cancel]',d).onclick=()=>d.close();
+  form.onsubmit=e=>{e.preventDefault();void act($('[type=submit]',form),status,'request',{user_id:profile.user_id,message:form.elements.message.value},next=>{profiles.set(profile.user_id,next);done?.(next);d.close();});};
+  form.elements.message.focus({preventScroll:true});
+ }
  async function showProfile(id){
   if(!uuid(id)||!await requireLogin())return;
   const d=makeDialog('social-profile','成员资料','<div data-social-profile-body><p role="status">正在读取资料…</p></div>'),content=$('[data-social-profile-body]',d);
@@ -1364,7 +1371,7 @@
      const action=document.createElement('button');action.type='button';action.className='secondary social-group-action';
      function update(profile){
       const relation=profile.relation;action.textContent=relation==='self'?'我':relation==='friends'?'发消息':relation==='outgoing'?'已申请':relation==='incoming'?'查看申请':['blocked','unavailable'].includes(relation)?'查看资料':'加好友';action.disabled=relation==='self'||relation==='outgoing';
-      action.onclick=async()=>{if(relation==='friends')void openChat(profile.user_id);else if(['incoming','blocked','unavailable'].includes(relation))void showProfile(profile.user_id);else{await act(action,status,'request',{user_id:profile.user_id},next=>{profile=next;});if(action.isConnected)update(profile);}};
+      action.onclick=()=>{if(relation==='friends')void openChat(profile.user_id);else if(['incoming','blocked','unavailable'].includes(relation))void showProfile(profile.user_id);else void requestFriend(profile,next=>{if(action.isConnected)update(next);});};
      }
      update(p);row.append(action);list.append(row);
     }
