@@ -2432,14 +2432,114 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 });
 
 ;
+/* community-media.js */
+'use strict';
+(() => {
+ const mounted=new WeakMap(),bucket='foamlab-community-images',limit=6*1024*1024;
+ const types={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif'};
+ const stickers=[['thanks','谢谢'],['received','收到'],['like','点赞'],['cheer','加油'],['question','疑问'],['happy','开心'],['think','思考'],['respect','抱拳']];
+ const emojis=[['😄','开心'],['😂','笑哭'],['🥳','庆祝'],['🤔','思考'],['😅','汗颜'],['😭','流泪'],['😮','惊讶'],['👍','赞'],['👏','鼓掌'],['🙏','感谢'],['🤝','握手'],['💪','加油'],['🎉','礼花'],['❤️','爱心'],['🔥','火'],['🚀','起飞'],['🐼','熊猫'],['👀','关注']];
+ let openPicker=null;
+ function mediaPosition(text,position){
+  const lines=/^[ \t]{0,3}([\u0060]{3,}|~{3,})([^\n]*)(?:\n|$)/gm;let opening=null,match;
+  while((match=lines.exec(text))){
+   if(!opening){opening={start:match.index,fence:match[1]};continue;}
+   if(match[1][0]!==opening.fence[0]||match[1].length<opening.fence.length||match[2].trim())continue;
+   if(position>=opening.start&&position<lines.lastIndex)return lines.lastIndex;opening=null;
+  }
+  return position;
+ }
+ const within=(task,ms,message)=>{let timer;return Promise.race([task,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error(message)),ms);})]).finally(()=>clearTimeout(timer));};
+ async function validate(file){
+  if(!types[file.type])throw Error('请选择 PNG、JPG、WebP 或 GIF 图片。');
+  if(!file.size||file.size>limit)throw Error('每张图片须大于 0 且不超过 6 MB。');
+  const bytes=new Uint8Array(await file.slice(0,16).arrayBuffer()),ascii=(start,end)=>String.fromCharCode(...bytes.slice(start,end));
+  const valid=file.type==='image/png'?bytes.slice(0,8).join(',')==='137,80,78,71,13,10,26,10':file.type==='image/jpeg'?bytes[0]===255&&bytes[1]===216&&bytes[2]===255:file.type==='image/gif'?['GIF87a','GIF89a'].includes(ascii(0,6)):ascii(0,4)==='RIFF'&&ascii(8,12)==='WEBP';
+  if(!valid)throw Error('图片格式与文件内容不符，请重新选择。');
+  const url=URL.createObjectURL(file),image=new Image();
+  try{await within(new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(Error('这张图片无法读取，请更换文件。'));image.src=url;}),10000,'图片读取超时，请重试。');if(!image.naturalWidth||image.naturalWidth>16000||image.naturalHeight>16000||image.naturalWidth*image.naturalHeight>60000000)throw Error('图片尺寸过大，请缩小后再上传。');}
+  finally{URL.revokeObjectURL(url);}
+ }
+ function mount(form,input){
+  if(!form||!input||mounted.has(form))return mounted.get(form);
+  const lab=window.FoamLab;if(!lab?.user||lab.role==='blocked')return;
+  const owner=lab.user.id,tools=document.createElement('div');tools.className='community-media';tools.innerHTML='<div class="community-media-toolbar" role="group" aria-label="插入图片、表情和代码"><button type="button" class="button secondary" data-media-upload>上传图片</button><button type="button" class="button secondary" data-media-picker aria-expanded="false">表情包</button><button type="button" class="button secondary" data-media-code title="选中文字后点击，可转为代码块">代码块</button><span class="community-media-hint">可粘贴或拖入图片 · 单张最大 6 MB</span><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden></div><section class="community-media-picker" aria-label="选择表情" hidden><div class="community-media-tabs" role="group" aria-label="表情类型"><button type="button" data-media-tab="stickers" aria-pressed="true">熊猫表情包</button><button type="button" data-media-tab="emoji" aria-pressed="false">常用表情</button><button type="button" class="text-button" data-media-close aria-label="关闭表情面板">×</button></div><div class="community-media-options"></div></section><p class="community-media-status" role="status" aria-live="polite"></p>';
+  input.closest('.form-field')?.after(tools);if(!tools.isConnected)input.after(tools);
+  const picker=tools.querySelector('.community-media-picker'),options=tools.querySelector('.community-media-options'),status=tools.querySelector('[role=status]'),fileInput=tools.querySelector('[type=file]'),toggle=tools.querySelector('[data-media-picker]');
+  let busy=false,disposed=false,selection=null;
+  const current=()=>!disposed&&form.isConnected&&window.foamAuth?.user?.id===owner&&window.FoamLab?.role!=='blocked';
+  const hide=()=>{picker.hidden=true;toggle.setAttribute('aria-expanded','false');if(openPicker===hide)openPicker=null;};
+  function insert(text,{replace=false,select=null,media=false}={}){
+   if(!current())return;
+   const start=media?mediaPosition(input.value,input.selectionEnd):replace?input.selectionStart:input.selectionEnd,end=replace?input.selectionEnd:start;
+   if(input.maxLength>0&&input.value.length-(end-start)+text.length>input.maxLength)throw Error('正文已接近字数上限，请删减后再插入。');
+   input.setRangeText(text,start,end,'end');if(select)input.setSelectionRange(start+select[0],start+select[1]);
+   input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));input.focus({preventScroll:true});
+  }
+  function choices(kind='stickers'){
+   options.replaceChildren();options.classList.toggle('is-emoji',kind==='emoji');
+   tools.querySelectorAll('[data-media-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mediaTab===kind)));
+   for(const [value,label] of kind==='stickers'?stickers:emojis){
+    const button=document.createElement('button');button.type='button';button.className='community-media-choice';button.setAttribute('aria-label',(kind==='stickers'?'熊猫表情：':'表情：')+label);button.title=label;
+    if(kind==='stickers'){const img=document.createElement('img');img.src='/assets/community-stickers/panda-'+value+'.svg';img.alt=label;img.loading='lazy';button.append(img);const caption=document.createElement('span');caption.textContent=label;button.append(caption);}
+    else button.textContent=value;
+    button.onclick=()=>{try{hide();if(selection)input.setSelectionRange(...selection);
+      // Accessible emoji markup also permits a single emoji under the shared two-character message minimum.
+      insert(kind==='stickers'?'\n\n<img src="/assets/community-stickers/panda-'+value+'.svg" alt="熊猫表情：'+label+'" width="128" height="144">\n\n':'<span role="img" aria-label="'+label+'">'+value+'</span>',{media:true});
+     }catch(error){status.textContent=error.message;}};
+    options.append(button);
+   }
+  }
+  toggle.onclick=()=>{if(!picker.hidden){hide();return;}selection=[input.selectionStart,input.selectionEnd];openPicker?.();openPicker=hide;choices();picker.hidden=false;toggle.setAttribute('aria-expanded','true');};
+  tools.querySelectorAll('[data-media-tab]').forEach(b=>b.onclick=()=>choices(b.dataset.mediaTab));
+  tools.querySelector('[data-media-close]').onclick=()=>{hide();toggle.focus({preventScroll:true});};
+  tools.addEventListener('keydown',e=>{if(e.key==='Escape'&&!picker.hidden){e.preventDefault();e.stopPropagation();hide();toggle.focus({preventScroll:true});}});
+  tools.querySelector('[data-media-code]').onclick=()=>{try{
+   hide();const text=input.value.slice(input.selectionStart,input.selectionEnd)||'在这里粘贴代码或运行日志',runs=text.match(/[\u0060]+/g)||[],fence=String.fromCharCode(96).repeat(Math.max(3,...runs.map(v=>v.length+1))),prefix='\n\n'+fence+'text\n';
+   insert(prefix+text+'\n'+fence+'\n\n',{replace:true,select:[prefix.length,prefix.length+text.length]});status.textContent='';
+  }catch(error){status.textContent=error.message;}};
+  async function upload(files){
+   if(busy||!current()||input.matches(':disabled')||input.readOnly)return;
+   const list=Array.from(files);if(!list.length)return;if(list.length>8){status.textContent='每次最多选择 8 张图片，可分批上传。';return;}
+   const submit=[...form.querySelectorAll('[type=submit]')];if(submit.some(b=>b.disabled)){status.textContent='请等待当前发布完成后再上传图片。';return;}
+   hide();busy=true;input.readOnly=true;tools.setAttribute('aria-busy','true');
+   const locks=[...tools.querySelectorAll('button'),...submit].map(button=>[button,button.disabled]);for(const [button]of locks)button.disabled=true;
+   let count=0;const errors=[];
+   try{
+    for(const [i,file]of list.entries()){
+     if(!current())break;status.textContent='正在上传 '+(i+1)+' / '+list.length+'…';
+     try{
+      await validate(file);if(!current())break;
+      const path=owner+'/'+crypto.randomUUID()+'.'+types[file.type],storage=lab.client.storage.from(bucket);
+      const result=await within(storage.upload(path,file,{contentType:file.type,cacheControl:'31536000',upsert:false}),25000,'上传尚未确认，请重试。');if(result.error)throw Error(result.error.message||'图片上传失败，请重试。');if(!current())break;
+      const url=storage.getPublicUrl(path).data.publicUrl,label=file.name.replace(/[\\[\]<>\r\n]/g,' ').slice(0,70)||'图片';
+      insert('\n\n!['+label+']('+url+')\n\n',{media:true});count++;
+     }catch(error){errors.push((file.name?file.name+'：':'')+(error.message||'上传失败，请重试。'));}
+    }
+    if(current())status.textContent=(count?'已插入 '+count+' 张图片，发布后即可显示。':'')+(errors.length?'\n'+errors.join('\n'):'');
+   }finally{busy=false;input.readOnly=false;fileInput.value='';tools.removeAttribute('aria-busy');for(const [button,disabled]of locks)if(button.isConnected)button.disabled=disabled;}
+  }
+  tools.querySelector('[data-media-upload]').onclick=()=>fileInput.click();fileInput.onchange=()=>void upload(fileInput.files);
+  input.addEventListener('paste',e=>{const images=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));if(images.length){e.preventDefault();void upload(images);}});
+  input.addEventListener('dragover',e=>{if([...e.dataTransfer.items].some(item=>item.kind==='file'))e.preventDefault();});
+  input.addEventListener('drop',e=>{const files=[...(e.dataTransfer?.files||[])];if(files.length){e.preventDefault();void upload(files);}});
+  form.addEventListener('submit',e=>{if(busy){e.preventDefault();e.stopImmediatePropagation();status.textContent='图片正在上传，请稍候再发布。';}},true);
+  const outside=e=>{if(!tools.isConnected){document.removeEventListener('pointerdown',outside);hide();disposed=true;return;}if(!tools.contains(e.target))hide();};document.addEventListener('pointerdown',outside);
+  const result={get busy(){return busy;},dispose(){disposed=true;hide();document.removeEventListener('pointerdown',outside);}};mounted.set(form,result);return result;
+ }
+ window.FoamCommunityMedia={mount};
+})();
+
+;
 /* community-replies.js */
 'use strict';
 (() => {
  const mounts=new WeakMap();
- async function mount(host,parent,canReply=true){
+ async function mount(host,parent,canReply=true,options={}){
   mounts.get(host)?.();
   const lab=window.FoamLab,{esc}=lab,[key,id]=Object.entries(parent)[0];
-  host.querySelectorAll('.lab-message-list,.lab-reply-form,.lab-message-more').forEach(n=>n.remove());
+  if(key==='thread_id'&&options.threadAuthor)host.dataset.nativeAnswers='true';else delete host.dataset.nativeAnswers;
+  host.querySelectorAll('.lab-message-list,.lab-reply-form,.lab-message-more,.lab-message-sort').forEach(n=>n.remove());
   const list=document.createElement('div');list.className='lab-message-list';host.append(list);
   const more=document.createElement('button');more.type='button';more.className='button secondary lab-message-more';more.textContent='加载更多回复';more.hidden=true;host.append(more);
   const form=document.createElement('form');form.className='lab-reply-form';
@@ -2448,19 +2548,36 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   const canDelete=row=>!!lab.user&&(owns(row)||['admin','editor','moderator'].includes(lab.role));
   form.innerHTML=lab.role==='blocked'?'<p class="lab-evidence">此账号的发言权限已停用，仍可阅读公开讨论。</p>':!canReply?'<p class="lab-evidence">此讨论已关闭回复。</p>':!lab.user?'<p>使用 GitHub 账号登录后，可以发表评论和回答问题。</p><button type="button" class="button secondary" data-lab-login>使用 GitHub 登录</button>':'<div class="reply-composer-target" hidden><div><strong data-reply-recipient></strong><p data-reply-excerpt></p></div><button type="button" class="text-button" data-cancel-reply>取消回复</button></div><label class="form-field"><span>公开回复 · 支持 Markdown、TeX 和代码块</span><textarea name="body" rows="6" minlength="2" maxlength="30000" required placeholder="写下你的回复…"></textarea></label><div class="admin-actions"><button class="button" type="submit">发布回复</button><button type="button" class="button secondary" data-preview-reply>预览</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
   host.append(form);
+  if(lab.user&&allowed)window.FoamCommunityMedia?.mount(form,form.elements.body);
   const PAGE_SIZE=5,ROOT_BATCH=200;
   let names={},replyTarget=null,live=true,renderVersion=0,rootLimit=ROOT_BATCH;
   const records=new Map(),index=new Map(),parents=new Map(),threadRoots=new Map(),children=new Map(),threadStates=new Map();let roots=[];
   const outbox=new Map();let activeSend=null,profileSync=null;
+  let order='oldest',acceptedId=options.acceptedId||null,sortVersion=0;const likeCounts=new Map();
+  const sortBar=document.createElement('div');sortBar.className='lab-message-sort';
+  sortBar.innerHTML='<label>'+(key==='thread_id'?'回答排序':'评论排序')+' <select aria-label="'+(key==='thread_id'?'回答排序':'评论排序')+'"><option value="oldest">最早发布</option><option value="newest">最新发布</option><option value="likes">点赞最多</option></select></label><span role="status" aria-live="polite"></span>';list.before(sortBar);
+  const sortControl=sortBar.querySelector('select'),sortStatus=sortBar.querySelector('[role=status]');
+  const compare=(a,b)=>Number(b===acceptedId)-Number(a===acceptedId)||(order==='likes'?(likeCounts.get(b)||0)-(likeCounts.get(a)||0):0)||(order==='oldest'?1:-1)*(index.get(a).created_at.localeCompare(index.get(b).created_at))||a.localeCompare(b);
+  sortControl.onchange=async()=>{
+   const previous=order,next=sortControl.value,version=++sortVersion;sortControl.disabled=true;sortStatus.textContent=next==='likes'?'正在读取点赞数量…':'';
+   try{
+    if(next==='likes'){const ids=[...index.keys()];for(let i=0;i<ids.length;i+=200){const counts=lab.check(await lab.client.rpc('foamlab_like_counts',{targets:ids.slice(i,i+200).map(id=>({kind:'comment',id}))}));if(!live||version!==sortVersion)return;for(const row of counts||[])likeCounts.set(row.id,Number(row.count)||0);}}
+    if(!live||version!==sortVersion)return;order=next;rebuildTree();await render();sortStatus.textContent='';
+   }catch(error){order=previous;sortControl.value=previous;sortStatus.textContent=error.message||'排序暂时无法更新，请重试。';}
+   finally{if(live&&version===sortVersion)sortControl.disabled=false;}
+  };
   const findRow=id=>records.get(id);
   const state=id=>{if(!threadStates.has(id))threadStates.set(id,{expanded:true,page:0});return threadStates.get(id);};
   function rebuildTree(){
    const ordered=[...index.values()].sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id));
    parents.clear();threadRoots.clear();children.clear();roots=[];
    for(const row of ordered)parents.set(row.id,index.has(row.reply_to_id)&&row.reply_to_id!==row.id?row.reply_to_id:null);
+   // A nested accepted answer becomes a visible root; stored reply relationships stay unchanged.
+   if(index.has(acceptedId))parents.set(acceptedId,null);
    // Break malformed cycles once, keeping every comment reachable.
    const done=new Set();for(const row of ordered){let cursor=row.id;const path=new Set();while(cursor&&!done.has(cursor)){if(path.has(cursor)){parents.set(cursor,null);break;}path.add(cursor);cursor=parents.get(cursor);}for(const id of path)done.add(id);}
    for(const row of ordered){let cursor=row.id;const path=[];while(!threadRoots.has(cursor)&&parents.get(cursor)){path.push(cursor);cursor=parents.get(cursor);}const root=threadRoots.get(cursor)||cursor;threadRoots.set(cursor,root);for(const id of path)threadRoots.set(id,root);if(root===row.id)roots.push(row.id);else{if(!children.has(root))children.set(root,[]);children.get(root).push(row.id);}}
+   roots.sort(compare);for(const rows of children.values())rows.sort(compare);
   }
   async function loadIndex(){
    // Only relationship metadata is scanned; full Markdown is fetched for visible pages.
@@ -2479,8 +2596,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
    const target=findRow(r.reply_to_id),quoted=target&&parents.get(target.id);
    const quote=r.reply_to_id?'<div class="reply-context'+(quoted?'':' reply-context-inline')+'"'+(target?' data-quote-id="'+esc(target.id)+'"':'')+'>'+(target?'<a href="#comment-'+esc(target.id)+'">回复 '+esc(names[target.author_id]||'社区成员')+'</a>'+(quoted?'<p>'+esc(snippet(target.body))+'</p>':''):'<span>原评论已不可见</span>')+'</div>':'';
    const pending=delivery&&delivery.status!=='sent';
-   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">'+(owns(r)?'删除我的回复':'删除回复')+'</button>':'');
-   return '<article class="lab-message" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'><div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+lab.markdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
+   const canAccept=key==='thread_id'&&allowed&&lab.user&&(lab.user.id===options.threadAuthor||lab.role==='admin')&&r.author_id!==options.threadAuthor;
+   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(canAccept?'<button type="button" class="text-button" data-accept-answer="'+esc(r.id)+'">'+(r.id===acceptedId?'取消采纳':'采纳回答')+'</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">'+(owns(r)?'删除我的回复':'删除回复')+'</button>':'');
+   return '<article class="lab-message'+(r.id===acceptedId?' is-accepted':'')+'" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'>'+(r.id===acceptedId?'<div class="accepted-answer-badge">✓ 已采纳</div>':'')+'<div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+lab.markdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
   }
   function paintOutbox(){
    // Local deliveries remain visible under their root even when its older replies are paged/collapsed.
@@ -2514,9 +2632,17 @@ if(__exports != exports)module.exports = exports;return module.exports}));
    rootLimit=Math.max(rootLimit,roots.indexOf(root)+1);await render();
    if(!live)return;const node=document.getElementById('comment-'+target);node?.scrollIntoView({block:'center',behavior:'instant'});node?.focus({preventScroll:true});
   }
-  const onHash=()=>void locate().catch(()=>{});addEventListener('hashchange',onHash);mounts.set(host,()=>{live=false;removeEventListener('hashchange',onHash);});
+  const onHash=()=>void locate().catch(()=>{}),onLike=e=>{if(e.detail?.kind!=='comment'||!index.has(e.detail.id))return;likeCounts.set(e.detail.id,e.detail.count);if(order==='likes'){rebuildTree();void render().catch(()=>{});}};
+  addEventListener('hashchange',onHash);addEventListener('foamlab:like-change',onLike);mounts.set(host,()=>{live=false;window.FoamCommunityMedia?.mount(form,form.elements.body)?.dispose();removeEventListener('hashchange',onHash);removeEventListener('foamlab:like-change',onLike);});
   more.onclick=async()=>{more.disabled=true;try{rootLimit+=ROOT_BATCH;await render();}catch(e){window.foamNotify?.(e.message);}finally{more.disabled=false;}};
+  // Keep WebKit from scrolling a near-edge action between mouse press and release.
+  list.addEventListener('mousedown',e=>{const button=e.target.closest('[data-accept-answer]');if(e.button===0&&button&&!button.disabled){e.preventDefault();button.focus({preventScroll:true});}});
   list.onclick=async e=>{
+   const accept=e.target.closest('[data-accept-answer]');if(accept){
+    if(accept.disabled)return;accept.disabled=true;
+    try{const next=accept.dataset.acceptAnswer===acceptedId?null:accept.dataset.acceptAnswer,result=lab.check(await lab.client.rpc('foamlab_accept_answer',{thread_id:id,message_id:next}));if(!live)return;acceptedId=result.accepted_message_id||null;options.onAccept?.(acceptedId);rebuildTree();await render();window.foamNotify?.(acceptedId?'回答已采纳，问题标记为已解决。':'已取消采纳。');}
+    catch(error){window.foamNotify?.(error.message);accept.disabled=false;}return;
+   }
    const retry=e.target.closest('[data-retry-message]');if(retry){const entry=outbox.get(retry.dataset.retryMessage);if(entry&&!activeSend)void send(entry);return;}
    const toggle=e.target.closest('[data-toggle-replies]'),page=e.target.closest('[data-page-replies]');
    if(toggle||page){const button=toggle||page;if(button.disabled)return;const id=toggle?.dataset.toggleReplies||page.dataset.pageReplies,s=state(id),before={...s},toolbar=button.closest('.lab-reply-thread-toolbar'),top=toolbar.getBoundingClientRect().top;button.disabled=true;if(toggle)s.expanded=!s.expanded;else s.page=Number(page.dataset.page);try{await render();const next=document.querySelector('[data-toggle-replies="'+id+'"]');if(next){scrollBy({top:next.closest('.lab-reply-thread-toolbar').getBoundingClientRect().top-top,behavior:'instant'});next.focus({preventScroll:true});}}catch(err){Object.assign(s,before);button.disabled=false;window.foamNotify?.(err.message);}return;}
@@ -2529,6 +2655,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     editor.innerHTML='<label class="form-field"><span>编辑我的回复 · 支持 Markdown、TeX 和代码块</span><textarea rows="6" minlength="2" maxlength="30000" required aria-label="编辑我的回复"></textarea></label><div class="admin-actions"><button class="button" type="submit">保存修改</button><button type="button" class="button secondary" data-edit-preview>预览</button><button type="button" class="text-button" data-edit-cancel>取消</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
     card.querySelector('[data-message-body]').hidden=true;card.querySelector('.community-post-actions').hidden=true;card.querySelector('.community-post-actions').after(editor);
     const input=editor.querySelector('textarea');input.value=row.body;editor.scrollIntoView({block:'nearest',behavior:'instant'});input.focus({preventScroll:true});
+    window.FoamCommunityMedia?.mount(editor,input);
     const close=()=>{editor.remove();card.querySelector('[data-message-body]').hidden=false;card.querySelector('.community-post-actions').hidden=false;edit.focus({preventScroll:true});};
     editor.querySelector('[data-edit-cancel]').onclick=close;
     editor.querySelector('[data-edit-preview]').onclick=()=>{const preview=editor.querySelector('.lab-preview');preview.innerHTML=lab.markdown(input.value);preview.hidden=!preview.hidden;};
@@ -2890,25 +3017,28 @@ window.foamArticleAliases=Object.freeze({"kolev-2-01-02-02":{"slug":"kolev-2-01-
  void lab.lessonNavigation(article,item);const complete=$('#lab-complete');if(complete){let done=false;if(lab.user){const r=await lab.client.from('foamlab_learning_progress').select('completed').eq('user_id',lab.user.id).eq('content_id',item.id).maybeSingle();done=!!r.data?.completed;}complete.textContent=done?'已学完 · 点击撤销':'标记为已学';complete.onclick=async()=>{if(!lab.user){lab.login();return;}complete.disabled=true;try{await lab.recordCompletion(item.id,!done);done=!done;complete.textContent=done?'已学完 · 点击撤销':'标记为已学';}catch(e){window.foamNotify?.(e.message);}finally{complete.disabled=false;}};}
  if(item.comments_enabled){try{await lab.messages($('#lab-comments'),{content_id:item.id});}catch(e){lab.error($('#lab-comments'),e);}}else $('#lab-comments').insertAdjacentHTML('beforeend','<p class="muted">作者已关闭这篇内容的评论。</p>');
  }catch(e){lab.error(article,e);}})();
- lab.messages=async(host,parent,canReply=true)=>{await lab.ready;return window.FoamReplies.mount(host,parent,canReply);};
- const forum=$('#lab-forum');if(forum)(async()=>{try{await lab.ready;await lab.settingsReady;const forumParams=new URLSearchParams(location.search),id=forumParams.get('topic');if(id){const thread=lab.check(await lab.client.from('foamlab_threads').select('*').eq('id',id).neq('status','hidden').maybeSingle());if(!thread)throw Error('讨论不存在或已隐藏。');const pageHeading=forum.parentElement.querySelector('.page-heading');if(pageHeading)pageHeading.remove();document.title=thread.title+' · 讨论中心 · FoamLab';const names=await lab.names([thread.author_id]);forum.innerHTML='<a class="text-link" href="/community/">← 全部讨论</a><article class="lab-topic"><span class="pill">'+esc(thread.category)+' · '+esc(thread.version)+'</span><h1>'+(thread.pinned?'<span class="pill community-pinned">置顶</span> ':'')+esc(thread.title)+'</h1><div class="article-meta community-byline">'+lab.authorMeta(thread)+'<span>'+esc(({open:'待解决',resolved:'已解决',closed:'已关闭'})[thread.status])+'</span></div><div class="prose">'+lab.markdown(thread.body)+'</div><div class="community-post-actions">'+lab.likeButton('question',thread.id)+(lab.user?.id===thread.author_id?'<a class="text-link" href="/studio/?tab=discussion">管理我的问题 →</a>':'')+'</div>'+(lab.user?.id===thread.author_id&&thread.status!=='closed'?'<button class="button secondary" id="resolve-thread">'+(thread.status==='resolved'?'重新打开问题':'标记问题已解决')+'</button>':'')+'</article><section class="lab-comments" id="thread-replies"><h2>回答与讨论</h2></section>';await lab.messages($('#thread-replies'),{thread_id:id},thread.status!=='closed');$('#resolve-thread')?.addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{if(thread.accepted_message_id&&thread.status==='resolved')lab.check(await lab.client.rpc('foamlab_accept_answer',{thread_id:id,message_id:null}));else lab.check(await lab.client.from('foamlab_threads').update({status:thread.status==='resolved'?'open':'resolved'}).eq('id',id));location.reload();}catch(err){window.foamNotify?.(err.message);button.disabled=false;}});return;}
+ lab.messages=async(host,parent,canReply=true,options={})=>{await lab.ready;return window.FoamReplies.mount(host,parent,canReply,options);};
+ const forum=$('#lab-forum');if(forum)(async()=>{try{await lab.ready;await lab.settingsReady;const forumParams=new URLSearchParams(location.search),id=forumParams.get('topic');if(id){const thread=lab.check(await lab.client.from('foamlab_threads').select('*').eq('id',id).neq('status','hidden').maybeSingle());if(!thread)throw Error('讨论不存在或已隐藏。');const pageHeading=forum.parentElement.querySelector('.page-heading');if(pageHeading)pageHeading.remove();document.title=thread.title+' · 讨论中心 · FoamLab';const names=await lab.names([thread.author_id]);forum.innerHTML='<a class="text-link" href="/community/">← 全部讨论</a><article class="lab-topic"><span class="pill">'+esc(thread.category)+' · '+esc(thread.version)+'</span><h1>'+(thread.pinned?'<span class="pill community-pinned">置顶</span> ':'')+esc(thread.title)+'</h1><div class="article-meta community-byline">'+lab.authorMeta(thread)+'<span data-topic-status>'+esc(({open:'待解决',resolved:'已解决',closed:'已关闭'})[thread.status])+'</span></div><div class="prose">'+lab.markdown(thread.body)+'</div><div class="community-post-actions">'+lab.likeButton('question',thread.id)+(lab.user?.id===thread.author_id&&lab.role!=='blocked'?'<a class="text-link" href="/studio/?tab=discussion">管理我的问题 →</a><button type="button" class="text-button danger" id="delete-own-thread">删除问题</button>':'')+'</div>'+(lab.user?.id===thread.author_id&&lab.role!=='blocked'&&thread.status!=='closed'?'<button class="button secondary" id="resolve-thread">'+(thread.status==='resolved'?'重新打开问题':'标记问题已解决')+'</button>':'')+'</article><section class="lab-comments" id="thread-replies"><h2>回答与讨论</h2></section>';await lab.messages($('#thread-replies'),{thread_id:id},thread.status!=='closed',{acceptedId:thread.accepted_message_id,threadAuthor:thread.author_id,onAccept:accepted=>{thread.accepted_message_id=accepted;thread.status=accepted?'resolved':'open';const status=$('[data-topic-status]');if(status)status.textContent=accepted?'已解决':'待解决';const resolve=$('#resolve-thread');if(resolve)resolve.textContent=accepted?'重新打开问题':'标记问题已解决';}});$('#delete-own-thread')?.addEventListener('click',async e=>{if(!confirm('删除这个问题及全部回答？删除后无法恢复。'))return;const button=e.currentTarget;button.disabled=true;try{const removed=lab.check(await lab.client.from('foamlab_threads').delete().eq('id',id).eq('author_id',lab.user.id).select('id'));if(!removed.length)throw Error('问题已删除或当前账号无权操作，请刷新后重试。');location.href='/community/';}catch(error){window.foamNotify?.(error.message);button.disabled=false;}});$('#resolve-thread')?.addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{if(thread.accepted_message_id&&thread.status==='resolved')lab.check(await lab.client.rpc('foamlab_accept_answer',{thread_id:id,message_id:null}));else lab.check(await lab.client.from('foamlab_threads').update({status:thread.status==='resolved'?'open':'resolved'}).eq('id',id));location.reload();}catch(err){window.foamNotify?.(err.message);button.disabled=false;}});return;}
  let category='全部',forumStatus=['open','resolved'].includes(forumParams.get('status'))?forumParams.get('status'):'';
+ let forumSort=['newest','oldest','likes'].includes(forumParams.get('sort'))?forumParams.get('sort'):'newest';
+ const cacheKey=status=>status+'|'+forumSort;
  const pageSize=200,statusPages=new Map(),cacheLifetime=30000;
  let statusLoading=false,loadError='',requestVersion=0,statusRequest=null;
- const threadQuery=status=>{let request=lab.client.from('foamlab_threads').select('id,title,category,version,status,pinned,created_at,updated_at,author_id').neq('status','hidden');if(status)request=request.eq('status',status);return request.order('pinned',{ascending:false}).order('created_at',{ascending:false}).order('id');};
- const initialRows=lab.check(await threadQuery(forumStatus).range(0,pageSize-1));
- statusPages.set(forumStatus,{rows:initialRows,offset:initialRows.length,more:initialRows.length===pageSize,at:Date.now()});
+ const threadQuery=status=>{let request=lab.client.from('foamlab_threads').select('id,title,category,version,status,pinned,created_at,updated_at,author_id').neq('status','hidden');if(status)request=request.eq('status',status);return request.order('pinned',{ascending:false}).order('created_at',{ascending:forumSort==='oldest'}).order('id');};
+ const threadPage=(status,offset,signal)=>{const request=forumSort==='likes'?lab.client.rpc('foamlab_discussion_page',{sort_order:forumSort,status_filter:status,page_offset:offset,page_size:pageSize}):threadQuery(status).range(offset,offset+pageSize-1);return signal?request.abortSignal(signal):request;};
+ const initialRows=lab.check(await threadPage(forumStatus,0));
+ statusPages.set(cacheKey(forumStatus),{rows:initialRows,offset:initialRows.length,more:initialRows.length===pageSize,at:Date.now()});
  function cachedPage(status){
-  const all=statusPages.get(''),saved=statusPages.get(status);
+  const all=statusPages.get(cacheKey('')),saved=statusPages.get(cacheKey(status));
   // A complete all-status page can answer both filters without another request.
   // Partial pages must keep independent server-side pagination for each status.
   if(status&&all&&!all.more&&(!saved||all.at>saved.at)){
-   const rows=all.rows.filter(row=>row.status===status),page={rows,offset:rows.length,more:false,at:all.at};statusPages.set(status,page);return page;
+   const rows=all.rows.filter(row=>row.status===status),page={rows,offset:rows.length,more:false,at:all.at};statusPages.set(cacheKey(status),page);return page;
   }
   return saved;
  }
  const currentRows=()=>cachedPage(forumStatus)?.rows||[];
- forum.innerHTML='<div class="forum-toolbar"><label class="search-field"><input id="forum-query" type="search" aria-label="搜索讨论" placeholder="搜索问题标题、软件版本与分类"></label><button class="button" id="new-topic">提出问题 +</button></div><div class="filter-tabs" id="forum-status-filters" aria-label="解决状态">'+[['','全部'],['open','待解决'],['resolved','已解决']].map(([value,label])=>'<button type="button" data-forum-status="'+value+'" class="'+(value===forumStatus?'selected':'')+'" aria-pressed="'+String(value===forumStatus)+'">'+label+'</button>').join('')+'</div><div class="filter-tabs" id="forum-filters" aria-label="问题分类">'+['全部','使用问题','网格与几何','数值方法','编程开发','结果与后处理','其他问题'].map((c,i)=>'<button class="'+(!i?'selected':'')+'" aria-pressed="'+String(!i)+'" data-category="'+c+'">'+c+'</button>').join('')+'</div><p class="muted" id="forum-loaded-note"></p><div id="forum-topic-list"></div><button class="button secondary" id="forum-more" type="button">加载更多讨论</button><section id="topic-compose" class="lab-compose" hidden><h2>提出问题</h2><form id="topic-form"><label class="form-field"><span>问题标题</span><input name="title" minlength="5" maxlength="180" required></label><div class="form-grid"><label class="form-field"><span>分类</span><select name="category">'+['使用问题','网格与几何','数值方法','编程开发','结果与后处理','其他问题'].map(c=>'<option>'+c+'</option>').join('')+'</select></label><label class="form-field"><span>软件版本</span><input name="version" value="v2512" maxlength="50" required></label></div><label class="form-field"><span>问题详情 · Markdown / TeX</span><textarea name="body" rows="14" minlength="10" maxlength="40000" required>## 要解决的问题\n\n## 环境与运行命令\n\n```bash\necho "$WM_PROJECT_VERSION"\n```\n\n## 最小配置与报错日志\n\n## 已尝试的方法\n</textarea></label><div class="admin-actions"><button class="button" type="submit">发布到讨论中心</button><button type="button" class="button secondary" id="topic-preview">预览</button></div><div class="prose lab-preview" id="topic-preview-body" hidden></div><p class="form-status" role="status"></p></form></section>';
+ forum.innerHTML='<div class="forum-toolbar"><label class="search-field"><input id="forum-query" type="search" aria-label="搜索讨论" placeholder="搜索问题标题、软件版本与分类"></label><label class="forum-sort">讨论排序 <select id="forum-sort" aria-label="讨论排序">'+[['newest','最新发布'],['oldest','最早发布'],['likes','点赞最多']].map(([value,label])=>'<option value="'+value+'" '+(value===forumSort?'selected':'')+'>'+label+'</option>').join('')+'</select></label><button class="button" id="new-topic">提出问题 +</button></div><div class="filter-tabs" id="forum-status-filters" aria-label="解决状态">'+[['','全部'],['open','待解决'],['resolved','已解决']].map(([value,label])=>'<button type="button" data-forum-status="'+value+'" class="'+(value===forumStatus?'selected':'')+'" aria-pressed="'+String(value===forumStatus)+'">'+label+'</button>').join('')+'</div><div class="filter-tabs" id="forum-filters" aria-label="问题分类">'+['全部','使用问题','网格与几何','数值方法','编程开发','结果与后处理','其他问题'].map((c,i)=>'<button class="'+(!i?'selected':'')+'" aria-pressed="'+String(!i)+'" data-category="'+c+'">'+c+'</button>').join('')+'</div><p class="muted" id="forum-loaded-note"></p><div id="forum-topic-list"></div><button class="button secondary" id="forum-more" type="button">加载更多讨论</button><section id="topic-compose" class="lab-compose" hidden><h2>提出问题</h2><form id="topic-form"><label class="form-field"><span>问题标题</span><input name="title" minlength="5" maxlength="180" required></label><div class="form-grid"><label class="form-field"><span>分类</span><select name="category">'+['使用问题','网格与几何','数值方法','编程开发','结果与后处理','其他问题'].map(c=>'<option>'+c+'</option>').join('')+'</select></label><label class="form-field"><span>软件版本</span><input name="version" value="v2512" maxlength="50" required></label></div><label class="form-field"><span>问题详情 · Markdown / TeX</span><textarea name="body" rows="14" minlength="10" maxlength="40000" required>## 要解决的问题\n\n## 环境与运行命令\n\n```bash\necho "$WM_PROJECT_VERSION"\n```\n\n## 最小配置与报错日志\n\n## 已尝试的方法\n</textarea></label><div class="admin-actions"><button class="button" type="submit">发布到讨论中心</button><button type="button" class="button secondary" id="topic-preview">预览</button></div><div class="prose lab-preview" id="topic-preview-body" hidden></div><p class="form-status" role="status"></p></form></section>';
  function render(){const q=$('#forum-query').value.trim().toLowerCase(),rows=currentRows();const found=rows.filter(t=>(category==='全部'||t.category===category)&&[t.title,t.category,t.version].join(' ').toLowerCase().includes(q));$('#forum-topic-list').innerHTML=found.map(t=>'<article class="community-topic-card"><a class="lab-topic-row" href="/community/?topic='+t.id+'"><span class="topic-symbol">'+(t.status==='resolved'?'✓':t.pinned?'↑':'?')+'</span><div><h3>'+(t.pinned?'<span class="pill community-pinned">置顶</span> ':'')+esc(t.title)+'</h3><p>'+esc(t.category)+' · '+esc(t.version)+'</p><div class="community-byline topic-byline" data-forum-author="'+esc(t.id)+'">'+lab.authorMeta(t)+'</div></div><span class="pill">'+esc(({open:'待解决',resolved:'已解决',closed:'已关闭'})[t.status])+'</span></a>'+lab.likeButton('question',t.id)+'</article>').join('')||(statusLoading?'<div class="lab-empty">正在加载讨论…</div>':loadError?'<div class="lab-empty"><p>讨论暂时无法加载。</p><button type="button" class="button secondary" id="retry-forum">重新加载</button></div>':q.trim()||category!=='全部'||forumStatus?'<div class="lab-empty"><h2>没有匹配的问题</h2><p>可以换一个关键词，或清除筛选查看已加载的讨论。</p><button class="button secondary" type="button" id="clear-forum-filters">清除筛选</button></div>':'<div class="lab-empty"><h2>还没有讨论</h2><p>登录 GitHub 账号后，可以提出第一个问题。</p></div>');const retry=$('#retry-forum');if(retry)retry.onclick=()=>void selectStatus(forumStatus);const clear=$('#clear-forum-filters');if(clear)clear.onclick=()=>{$('#forum-query').value='';category='全部';$('#forum-filters').querySelectorAll('button').forEach(b=>{const selected=b.dataset.category===category;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});if(forumStatus)void selectStatus('');else render();$('#forum-query').focus();};}
  function updateLoaded(){
   const page=cachedPage(forumStatus),note=$('#forum-loaded-note'),more=$('#forum-more');
@@ -2928,13 +3058,13 @@ window.foamArticleAliases=Object.freeze({"kolev-2-01-02-02":{"slug":"kolev-2-01-
   statusLoading=true;loadError='';if(!previous)render();updateLoaded();
   const timeout=setTimeout(()=>request.abort(),10000);
   try{
-   const batch=lab.check(await threadQuery(status).range(offset,offset+pageSize-1).abortSignal(request.signal));
+   const batch=lab.check(await threadPage(status,offset,request.signal));
    if(version!==requestVersion||status!==forumStatus)return;
    const rows=append?[...previous.rows]:[],known=new Set(rows.map(row=>row.id));
    rows.push(...batch.filter(row=>!known.has(row.id)));
-   statusPages.set(status,{rows,offset:offset+batch.length,more:batch.length===pageSize,at:append?previous.at:Date.now()});
+   statusPages.set(cacheKey(status),{rows,offset:offset+batch.length,more:batch.length===pageSize,at:append?previous.at:Date.now()});
    // A refreshed all-status list supersedes older status snapshots.
-   if(!status&&!append){statusPages.delete('open');statusPages.delete('resolved');}
+   if(!status&&!append){statusPages.delete(cacheKey('open'));statusPages.delete(cacheKey('resolved'));}
    statusLoading=false;render();refreshAuthors(rows);
   }catch(error){
    if(version!==requestVersion||status!==forumStatus)return;
@@ -2953,6 +3083,13 @@ window.foamArticleAliases=Object.freeze({"kolev-2-01-02-02":{"slug":"kolev-2-01-
  }
  $('#forum-more').onclick=()=>{if(!statusLoading&&cachedPage(forumStatus)?.more)void loadStatus(true);};
  $('#forum-status-filters').onclick=e=>{const button=e.target.closest('[data-forum-status]');if(button)void selectStatus(button.dataset.forumStatus);};
+ $('#forum-sort').onchange=async e=>{
+  const next=e.target.value;if(!['newest','oldest','likes'].includes(next)||next===forumSort)return;
+  statusRequest?.abort();statusRequest=null;++requestVersion;statusLoading=false;loadError='';forumSort=next;
+  const url=new URL(location.href);if(next==='newest')url.searchParams.delete('sort');else url.searchParams.set('sort',next);history.replaceState(history.state,'',url);
+  const cached=cachedPage(forumStatus);if(!cached)statusLoading=true;render();updateLoaded();if(cached)refreshAuthors(cached.rows);
+  if(!cached||Date.now()-cached.at>=cacheLifetime)await loadStatus();
+ };
  $('#forum-query').oninput=render;
  $('#forum-filters').onclick=e=>{const b=e.target.closest('[data-category]');if(!b)return;category=b.dataset.category;$('#forum-filters').querySelectorAll('button').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});render();};
  window.addEventListener('pagehide',()=>{++requestVersion;statusRequest?.abort();statusRequest=null;statusLoading=false;});
@@ -2960,6 +3097,7 @@ window.foamArticleAliases=Object.freeze({"kolev-2-01-02-02":{"slug":"kolev-2-01-
  render();updateLoaded();refreshAuthors(initialRows);
  const canCreate=lab.role!=='blocked'&&(lab.settings?.discussion_open!==false||lab.role==='admin');if(!canCreate){$('#new-topic').disabled=true;$('#new-topic').textContent=lab.role==='blocked'?'此账号暂不能发言':'暂时停止新建讨论';$('#forum-topic-list').insertAdjacentHTML('beforebegin','<p class="lab-evidence">'+(lab.role==='blocked'?'此账号的发言权限已停用，仍可阅读公开讨论。':'管理员暂时关闭新建讨论，已有公开问题与回答仍可阅读。')+'</p>');}const source={title:(forumParams.get('about')||'').trim().slice(0,180),slug:'',kind:''};const from=forumParams.get('from')||'';if(/^[a-z0-9][a-z0-9_/-]{0,179}$/.test(from)){try{const result=lab.check(await lab.client.from('foamlab_content').select('slug,title,kind,metadata').eq('slug',from).eq('status','published').maybeSingle());if(result&&!result.metadata?.admin_only){source.title=result.title;source.slug=result.slug;source.kind=result.kind;}}catch{}}
  const compose=$('#topic-compose'),topicForm=$('#topic-form'),newTopic=$('#new-topic');if(source.title){const context=document.createElement('section');context.className='forum-source lab-evidence';context.setAttribute('aria-label','提问来源');const label=document.createElement('strong');label.textContent=source.kind==='lesson'?'来源课程':'来源内容';const description=document.createElement('p');if(source.slug){const link=document.createElement('a');link.href='/read/?slug='+encodeURIComponent(source.slug);link.textContent=source.title+' →';description.append(link);}else description.textContent=source.title;context.append(label,description);forum.prepend(context);context.after(compose);topicForm.elements.title.value='关于「'+source.title.slice(0,160)+'」的问题';if(canCreate)newTopic.textContent=lab.user?(source.kind==='lesson'?'针对本课提问':'针对这篇内容提问'):'登录后提问';}
+ if(lab.user&&canCreate)window.FoamCommunityMedia?.mount(topicForm,topicForm.elements.body);
  function openCompose(scroll=true){compose.hidden=false;if(scroll){compose.scrollIntoView({behavior:'smooth',block:'start'});topicForm.elements.title.focus({preventScroll:true});}}
  newTopic.onclick=async()=>{if(!canCreate)return;if(!lab.user){const u=new URL(location.href);u.searchParams.set('compose','1');history.replaceState(history.state,'',u.pathname+u.search+u.hash);newTopic.disabled=true;try{await lab.login();}catch{window.foamNotify?.('登录暂时无法发起，请稍后重试。');}finally{newTopic.disabled=false;}return;}openCompose();};if(lab.user&&canCreate&&(source.title||forumParams.get('compose')==='1'))openCompose(!source.title);
  $('#topic-preview').onclick=()=>{const p=$('#topic-preview-body');p.innerHTML=lab.markdown($('#topic-form').elements.body.value);p.hidden=!p.hidden;};$('#topic-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('[type=submit]');b.disabled=true;try{if(!canCreate)throw Error('当前无法新建讨论。');const title=f.elements.title.value.trim(),body=f.elements.body.value.trim();if(title.length<5||body.length<10)throw Error('标题至少需要 5 个有效字符，问题详情至少需要 10 个有效字符。');await lab.ensureProfile();const r=lab.check(await lab.client.from('foamlab_threads').insert({title,body,category:f.elements.category.value,version:f.elements.version.value,author_id:lab.user.id}).select('id').single());location.href='/community/?topic='+r.id;}catch(err){f.querySelector('.form-status').textContent=err.message;b.disabled=false;}};

@@ -26,7 +26,7 @@
   const previous={count:s.count,liked:s.liked},liked=!s.liked;
   // Give immediate feedback; only the server-confirmed state is cached.
   Object.assign(s,{busy:true,version:s.version+1,liked,count:Math.max(0,s.count+(liked?1:-1))});paint(k);
-  try{await L.ready;if(L.role==='blocked')throw Error('此账号暂不能点赞。');const row=L.check(await L.client.rpc('foamlab_set_like',{target_kind:s.kind,target_id:s.id,liked}));Object.assign(s,{count:Math.max(0,Number(row.count)||0),liked:!!row.liked,ready:true});save(k);}
+  try{await L.ready;if(L.role==='blocked')throw Error('此账号暂不能点赞。');const row=L.check(await L.client.rpc('foamlab_set_like',{target_kind:s.kind,target_id:s.id,liked}));Object.assign(s,{count:Math.max(0,Number(row.count)||0),liked:!!row.liked,ready:true});save(k);window.dispatchEvent(new CustomEvent('foamlab:like-change',{detail:{kind:s.kind,id:s.id,count:s.count,liked:s.liked}}));}
   catch(err){Object.assign(s,previous);window.foamNotify?.(err.message||'点赞未成功，请重试。');}
   finally{s.busy=false;paint(k);}
  });

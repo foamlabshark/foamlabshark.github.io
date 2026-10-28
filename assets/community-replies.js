@@ -1,10 +1,11 @@
 'use strict';
 (() => {
  const mounts=new WeakMap();
- async function mount(host,parent,canReply=true){
+ async function mount(host,parent,canReply=true,options={}){
   mounts.get(host)?.();
   const lab=window.FoamLab,{esc}=lab,[key,id]=Object.entries(parent)[0];
-  host.querySelectorAll('.lab-message-list,.lab-reply-form,.lab-message-more').forEach(n=>n.remove());
+  if(key==='thread_id'&&options.threadAuthor)host.dataset.nativeAnswers='true';else delete host.dataset.nativeAnswers;
+  host.querySelectorAll('.lab-message-list,.lab-reply-form,.lab-message-more,.lab-message-sort').forEach(n=>n.remove());
   const list=document.createElement('div');list.className='lab-message-list';host.append(list);
   const more=document.createElement('button');more.type='button';more.className='button secondary lab-message-more';more.textContent='加载更多回复';more.hidden=true;host.append(more);
   const form=document.createElement('form');form.className='lab-reply-form';
@@ -13,19 +14,36 @@
   const canDelete=row=>!!lab.user&&(owns(row)||['admin','editor','moderator'].includes(lab.role));
   form.innerHTML=lab.role==='blocked'?'<p class="lab-evidence">此账号的发言权限已停用，仍可阅读公开讨论。</p>':!canReply?'<p class="lab-evidence">此讨论已关闭回复。</p>':!lab.user?'<p>使用 GitHub 账号登录后，可以发表评论和回答问题。</p><button type="button" class="button secondary" data-lab-login>使用 GitHub 登录</button>':'<div class="reply-composer-target" hidden><div><strong data-reply-recipient></strong><p data-reply-excerpt></p></div><button type="button" class="text-button" data-cancel-reply>取消回复</button></div><label class="form-field"><span>公开回复 · 支持 Markdown、TeX 和代码块</span><textarea name="body" rows="6" minlength="2" maxlength="30000" required placeholder="写下你的回复…"></textarea></label><div class="admin-actions"><button class="button" type="submit">发布回复</button><button type="button" class="button secondary" data-preview-reply>预览</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
   host.append(form);
+  if(lab.user&&allowed)window.FoamCommunityMedia?.mount(form,form.elements.body);
   const PAGE_SIZE=5,ROOT_BATCH=200;
   let names={},replyTarget=null,live=true,renderVersion=0,rootLimit=ROOT_BATCH;
   const records=new Map(),index=new Map(),parents=new Map(),threadRoots=new Map(),children=new Map(),threadStates=new Map();let roots=[];
   const outbox=new Map();let activeSend=null,profileSync=null;
+  let order='oldest',acceptedId=options.acceptedId||null,sortVersion=0;const likeCounts=new Map();
+  const sortBar=document.createElement('div');sortBar.className='lab-message-sort';
+  sortBar.innerHTML='<label>'+(key==='thread_id'?'回答排序':'评论排序')+' <select aria-label="'+(key==='thread_id'?'回答排序':'评论排序')+'"><option value="oldest">最早发布</option><option value="newest">最新发布</option><option value="likes">点赞最多</option></select></label><span role="status" aria-live="polite"></span>';list.before(sortBar);
+  const sortControl=sortBar.querySelector('select'),sortStatus=sortBar.querySelector('[role=status]');
+  const compare=(a,b)=>Number(b===acceptedId)-Number(a===acceptedId)||(order==='likes'?(likeCounts.get(b)||0)-(likeCounts.get(a)||0):0)||(order==='oldest'?1:-1)*(index.get(a).created_at.localeCompare(index.get(b).created_at))||a.localeCompare(b);
+  sortControl.onchange=async()=>{
+   const previous=order,next=sortControl.value,version=++sortVersion;sortControl.disabled=true;sortStatus.textContent=next==='likes'?'正在读取点赞数量…':'';
+   try{
+    if(next==='likes'){const ids=[...index.keys()];for(let i=0;i<ids.length;i+=200){const counts=lab.check(await lab.client.rpc('foamlab_like_counts',{targets:ids.slice(i,i+200).map(id=>({kind:'comment',id}))}));if(!live||version!==sortVersion)return;for(const row of counts||[])likeCounts.set(row.id,Number(row.count)||0);}}
+    if(!live||version!==sortVersion)return;order=next;rebuildTree();await render();sortStatus.textContent='';
+   }catch(error){order=previous;sortControl.value=previous;sortStatus.textContent=error.message||'排序暂时无法更新，请重试。';}
+   finally{if(live&&version===sortVersion)sortControl.disabled=false;}
+  };
   const findRow=id=>records.get(id);
   const state=id=>{if(!threadStates.has(id))threadStates.set(id,{expanded:true,page:0});return threadStates.get(id);};
   function rebuildTree(){
    const ordered=[...index.values()].sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id));
    parents.clear();threadRoots.clear();children.clear();roots=[];
    for(const row of ordered)parents.set(row.id,index.has(row.reply_to_id)&&row.reply_to_id!==row.id?row.reply_to_id:null);
+   // A nested accepted answer becomes a visible root; stored reply relationships stay unchanged.
+   if(index.has(acceptedId))parents.set(acceptedId,null);
    // Break malformed cycles once, keeping every comment reachable.
    const done=new Set();for(const row of ordered){let cursor=row.id;const path=new Set();while(cursor&&!done.has(cursor)){if(path.has(cursor)){parents.set(cursor,null);break;}path.add(cursor);cursor=parents.get(cursor);}for(const id of path)done.add(id);}
    for(const row of ordered){let cursor=row.id;const path=[];while(!threadRoots.has(cursor)&&parents.get(cursor)){path.push(cursor);cursor=parents.get(cursor);}const root=threadRoots.get(cursor)||cursor;threadRoots.set(cursor,root);for(const id of path)threadRoots.set(id,root);if(root===row.id)roots.push(row.id);else{if(!children.has(root))children.set(root,[]);children.get(root).push(row.id);}}
+   roots.sort(compare);for(const rows of children.values())rows.sort(compare);
   }
   async function loadIndex(){
    // Only relationship metadata is scanned; full Markdown is fetched for visible pages.
@@ -44,8 +62,9 @@
    const target=findRow(r.reply_to_id),quoted=target&&parents.get(target.id);
    const quote=r.reply_to_id?'<div class="reply-context'+(quoted?'':' reply-context-inline')+'"'+(target?' data-quote-id="'+esc(target.id)+'"':'')+'>'+(target?'<a href="#comment-'+esc(target.id)+'">回复 '+esc(names[target.author_id]||'社区成员')+'</a>'+(quoted?'<p>'+esc(snippet(target.body))+'</p>':''):'<span>原评论已不可见</span>')+'</div>':'';
    const pending=delivery&&delivery.status!=='sent';
-   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">'+(owns(r)?'删除我的回复':'删除回复')+'</button>':'');
-   return '<article class="lab-message" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'><div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+lab.markdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
+   const canAccept=key==='thread_id'&&allowed&&lab.user&&(lab.user.id===options.threadAuthor||lab.role==='admin')&&r.author_id!==options.threadAuthor;
+   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(canAccept?'<button type="button" class="text-button" data-accept-answer="'+esc(r.id)+'">'+(r.id===acceptedId?'取消采纳':'采纳回答')+'</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">'+(owns(r)?'删除我的回复':'删除回复')+'</button>':'');
+   return '<article class="lab-message'+(r.id===acceptedId?' is-accepted':'')+'" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'>'+(r.id===acceptedId?'<div class="accepted-answer-badge">✓ 已采纳</div>':'')+'<div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+lab.markdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
   }
   function paintOutbox(){
    // Local deliveries remain visible under their root even when its older replies are paged/collapsed.
@@ -79,9 +98,17 @@
    rootLimit=Math.max(rootLimit,roots.indexOf(root)+1);await render();
    if(!live)return;const node=document.getElementById('comment-'+target);node?.scrollIntoView({block:'center',behavior:'instant'});node?.focus({preventScroll:true});
   }
-  const onHash=()=>void locate().catch(()=>{});addEventListener('hashchange',onHash);mounts.set(host,()=>{live=false;removeEventListener('hashchange',onHash);});
+  const onHash=()=>void locate().catch(()=>{}),onLike=e=>{if(e.detail?.kind!=='comment'||!index.has(e.detail.id))return;likeCounts.set(e.detail.id,e.detail.count);if(order==='likes'){rebuildTree();void render().catch(()=>{});}};
+  addEventListener('hashchange',onHash);addEventListener('foamlab:like-change',onLike);mounts.set(host,()=>{live=false;window.FoamCommunityMedia?.mount(form,form.elements.body)?.dispose();removeEventListener('hashchange',onHash);removeEventListener('foamlab:like-change',onLike);});
   more.onclick=async()=>{more.disabled=true;try{rootLimit+=ROOT_BATCH;await render();}catch(e){window.foamNotify?.(e.message);}finally{more.disabled=false;}};
+  // Keep WebKit from scrolling a near-edge action between mouse press and release.
+  list.addEventListener('mousedown',e=>{const button=e.target.closest('[data-accept-answer]');if(e.button===0&&button&&!button.disabled){e.preventDefault();button.focus({preventScroll:true});}});
   list.onclick=async e=>{
+   const accept=e.target.closest('[data-accept-answer]');if(accept){
+    if(accept.disabled)return;accept.disabled=true;
+    try{const next=accept.dataset.acceptAnswer===acceptedId?null:accept.dataset.acceptAnswer,result=lab.check(await lab.client.rpc('foamlab_accept_answer',{thread_id:id,message_id:next}));if(!live)return;acceptedId=result.accepted_message_id||null;options.onAccept?.(acceptedId);rebuildTree();await render();window.foamNotify?.(acceptedId?'回答已采纳，问题标记为已解决。':'已取消采纳。');}
+    catch(error){window.foamNotify?.(error.message);accept.disabled=false;}return;
+   }
    const retry=e.target.closest('[data-retry-message]');if(retry){const entry=outbox.get(retry.dataset.retryMessage);if(entry&&!activeSend)void send(entry);return;}
    const toggle=e.target.closest('[data-toggle-replies]'),page=e.target.closest('[data-page-replies]');
    if(toggle||page){const button=toggle||page;if(button.disabled)return;const id=toggle?.dataset.toggleReplies||page.dataset.pageReplies,s=state(id),before={...s},toolbar=button.closest('.lab-reply-thread-toolbar'),top=toolbar.getBoundingClientRect().top;button.disabled=true;if(toggle)s.expanded=!s.expanded;else s.page=Number(page.dataset.page);try{await render();const next=document.querySelector('[data-toggle-replies="'+id+'"]');if(next){scrollBy({top:next.closest('.lab-reply-thread-toolbar').getBoundingClientRect().top-top,behavior:'instant'});next.focus({preventScroll:true});}}catch(err){Object.assign(s,before);button.disabled=false;window.foamNotify?.(err.message);}return;}
@@ -94,6 +121,7 @@
     editor.innerHTML='<label class="form-field"><span>编辑我的回复 · 支持 Markdown、TeX 和代码块</span><textarea rows="6" minlength="2" maxlength="30000" required aria-label="编辑我的回复"></textarea></label><div class="admin-actions"><button class="button" type="submit">保存修改</button><button type="button" class="button secondary" data-edit-preview>预览</button><button type="button" class="text-button" data-edit-cancel>取消</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
     card.querySelector('[data-message-body]').hidden=true;card.querySelector('.community-post-actions').hidden=true;card.querySelector('.community-post-actions').after(editor);
     const input=editor.querySelector('textarea');input.value=row.body;editor.scrollIntoView({block:'nearest',behavior:'instant'});input.focus({preventScroll:true});
+    window.FoamCommunityMedia?.mount(editor,input);
     const close=()=>{editor.remove();card.querySelector('[data-message-body]').hidden=false;card.querySelector('.community-post-actions').hidden=false;edit.focus({preventScroll:true});};
     editor.querySelector('[data-edit-cancel]').onclick=close;
     editor.querySelector('[data-edit-preview]').onclick=()=>{const preview=editor.querySelector('.lab-preview');preview.innerHTML=lab.markdown(input.value);preview.hidden=!preview.hidden;};
