@@ -3,8 +3,7 @@
  const entries=document.querySelector('.home-community-links');if(!entries)return;
  const L=window.FoamLab,esc=L.esc,dialogs={},state={page:1,rows:[],total:0,request:0,edit:null,newDraft:'',pending:null,loading:false,pinning:false};let lastUser=null;
  const own=row=>!!L.user&&L.role!=='blocked'&&row.author_id===L.user.id;
- const canDelete=row=>!!L.user&&(own(row)||['admin','editor','moderator'].includes(L.role));
- const canPin=()=>!!L.user&&L.role==='admin';
+ const canDelete=own;
  const pinBadge=row=>row.pinned?'<span class="pill home-guestbook-pinned">置顶</span>':'';
  const orderedMessages=()=>L.client.from('foamlab_guestbook').select('*',{count:'exact'}).order('pinned',{ascending:false}).order('created_at',{ascending:false}).order('id',{ascending:false});
  const preview=kind=>entries.querySelector('[data-home-preview="'+kind+'"]');
@@ -65,32 +64,20 @@
    await L.ready;compose();const response=await orderedMessages().range((state.page-1)*20,state.page*20-1),rows=L.check(response);
    const names=await L.names(rows.map(r=>r.author_id));if(request!==state.request)return;if(state.page===1)previewMessages(rows,names);
    state.total=response.count??rows.length;const pages=Math.max(1,Math.ceil(state.total/20));if(state.page>pages){state.page=pages;return loadBoard();}state.rows=rows;
-   list.innerHTML=rows.map(r=>'<article class="home-guestbook-item" data-guestbook-id="'+esc(r.id)+'"><div class="community-byline">'+pinBadge(r)+L.authorMeta(r)+'</div><div class="prose">'+L.markdown(r.body)+'</div><div class="community-post-actions">'+(canPin()?'<button class="text-button" type="button" data-guestbook-pin="'+esc(r.id)+'" aria-pressed="'+String(!!r.pinned)+'" '+(state.pinning?'disabled':'')+'>'+(r.pinned?'取消置顶':'置顶')+'</button>':'')+(own(r)?'<button class="text-button" type="button" data-guestbook-edit="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button class="text-button danger" type="button" data-guestbook-delete="'+esc(r.id)+'">删除</button>':'')+'</div></article>').join('')||'<p class="home-dialog-status">还没有留言，欢迎写下第一条。</p>';
+   list.innerHTML=rows.map(r=>'<article class="home-guestbook-item" data-guestbook-id="'+esc(r.id)+'"><div class="community-byline">'+pinBadge(r)+L.authorMeta(r)+'</div><div class="prose">'+L.markdown(r.body)+'</div><div class="community-post-actions">'+(own(r)?'<button class="text-button" type="button" data-guestbook-edit="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button class="text-button danger" type="button" data-guestbook-delete="'+esc(r.id)+'">删除</button>':'')+'</div></article>').join('')||'<p class="home-dialog-status">还没有留言，欢迎写下第一条。</p>';
    note.textContent='共 '+state.total+' 条留言';board.querySelector('.home-guestbook-pager').innerHTML=pages>1?'<button type="button" class="text-button" data-guestbook-page="'+(state.page-1)+'" '+(state.page===1?'disabled':'')+'>上一页</button><span>'+state.page+' / '+pages+'</span><button type="button" class="text-button" data-guestbook-page="'+(state.page+1)+'" '+(state.page===pages?'disabled':'')+'>下一页</button>':'';
    window.dispatchEvent(new Event('foamlab:messages'));
   }catch(error){if(request===state.request)note.textContent='留言暂时无法读取，请点击“刷新留言”重试。';}
   finally{if(request===state.request)state.loading=false;}
  }
  board.addEventListener('click',async e=>{
-  const pin=e.target.closest('[data-guestbook-pin]');if(pin){
-   if(pin.disabled||state.pinning||!canPin())return;const row=state.rows.find(r=>r.id===pin.dataset.guestbookPin);if(!row)return;
-   state.pinning=true;for(const button of board.querySelectorAll('[data-guestbook-pin]'))button.disabled=true;
-   try{
-    const saved=L.check(await L.client.from('foamlab_guestbook').update({pinned:!row.pinned}).eq('id',row.id).eq('updated_at',row.updated_at).eq('pinned',!!row.pinned).select('id'));
-    if(!saved.length)throw Error('留言已变化或当前账号无权置顶，请刷新后重试。');
-    state.page=1;await loadBoard();
-    const scroller=board.querySelector('.home-dialog-body'),list=board.querySelector('[data-guestbook-list]');scroller.scrollTop+=list.getBoundingClientRect().top-scroller.getBoundingClientRect().top-scroller.clientTop;
-   }catch(error){board.querySelector('[data-guestbook-state]').textContent=error.message;}
-   finally{state.pinning=false;for(const button of board.querySelectorAll('[data-guestbook-pin]'))button.disabled=false;}
-   return;
-  }
   const page=e.target.closest('[data-guestbook-page]');if(page&&!page.disabled){state.page=Number(page.dataset.guestbookPage);await loadBoard();return;}
   const edit=e.target.closest('[data-guestbook-edit]');if(edit){const row=state.rows.find(r=>r.id===edit.dataset.guestbookEdit),form=board.querySelector('form');if(!row||!own(row)||form.querySelector('[type=submit]').disabled)return;
    if(state.edit?.id===row.id){form.elements.body.focus();return;}if(state.edit&&form.elements.body.value!==state.edit.body&&!confirm('放弃当前尚未保存的修改？'))return;
    if(!state.edit)state.newDraft=form.elements.body.value;state.edit={...row};form.elements.body.value=row.body;form.querySelector('[data-compose-label]').textContent='编辑我的留言';form.querySelector('[type=submit]').textContent='保存修改';form.querySelector('[data-guestbook-cancel]').hidden=false;form.querySelector('.lab-preview').hidden=true;form.querySelector('.form-status').textContent='';form.scrollIntoView({block:'nearest'});form.elements.body.focus();return;
   }
   const del=e.target.closest('[data-guestbook-delete]');if(!del||del.disabled)return;const row=state.rows.find(r=>r.id===del.dataset.guestbookDelete);if(!row||!canDelete(row)||!confirm('删除这条留言？'))return;
-  del.disabled=true;try{const rows=L.check(await L.client.from('foamlab_guestbook').delete().eq('id',row.id).eq('updated_at',row.updated_at).select('id'));if(!rows.length)throw Error('留言已变化或当前账号无权删除，请刷新后重试。');if(state.edit?.id===row.id)finishEdit(board.querySelector('form'));await loadBoard();}catch(error){board.querySelector('[data-guestbook-state]').textContent=error.message;del.disabled=false;}
+  del.disabled=true;try{const rows=L.check(await L.client.from('foamlab_guestbook').delete().eq('id',row.id).eq('author_id',L.user.id).eq('updated_at',row.updated_at).select('id'));if(!rows.length)throw Error('留言已变化或当前账号无权删除，请刷新后重试。');if(state.edit?.id===row.id)finishEdit(board.querySelector('form'));await loadBoard();}catch(error){board.querySelector('[data-guestbook-state]').textContent=error.message;del.disabled=false;}
  });
  updates.querySelector('[data-home-retry]').onclick=loadUpdates;
  board.querySelector('[data-guestbook-refresh]').onclick=()=>void loadBoard();

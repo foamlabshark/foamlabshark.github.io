@@ -3,7 +3,7 @@
  const mounts=new WeakMap();
  async function mount(host,parent,canReply=true,options={}){
   mounts.get(host)?.();
-  const lab=window.FoamLab,{esc}=lab,[key,id]=Object.entries(parent)[0];
+  const lab=window.FoamLab,{esc}=lab,[key,id]=Object.entries(parent)[0],postMarkdown=body=>window.FoamCommunityMedia?.render(body)||lab.markdown(body);
   if(key==='thread_id'&&options.threadAuthor)host.dataset.nativeAnswers='true';else delete host.dataset.nativeAnswers;
   host.querySelectorAll('.lab-message-list,.lab-reply-form,.lab-message-more,.lab-message-sort').forEach(n=>n.remove());
   const list=document.createElement('div');list.className='lab-message-list';host.append(list);
@@ -11,8 +11,8 @@
   const form=document.createElement('form');form.className='lab-reply-form';
   const allowed=canReply&&lab.role!=='blocked';
   const owns=row=>!!lab.user&&lab.role!=='blocked'&&row.author_id===lab.user.id;
-  const canDelete=row=>!!lab.user&&(owns(row)||['admin','editor','moderator'].includes(lab.role));
-  form.innerHTML=lab.role==='blocked'?'<p class="lab-evidence">此账号的发言权限已停用，仍可阅读公开讨论。</p>':!canReply?'<p class="lab-evidence">此讨论已关闭回复。</p>':!lab.user?'<p>使用 GitHub 账号登录后，可以发表评论和回答问题。</p><button type="button" class="button secondary" data-lab-login>使用 GitHub 登录</button>':'<div class="reply-composer-target" hidden><div><strong data-reply-recipient></strong><p data-reply-excerpt></p></div><button type="button" class="text-button" data-cancel-reply>取消回复</button></div><label class="form-field"><span>公开回复 · 支持 Markdown、TeX 和代码块</span><textarea name="body" rows="6" minlength="2" maxlength="30000" required placeholder="写下你的回复…"></textarea></label><div class="admin-actions"><button class="button" type="submit">发布回复</button><button type="button" class="button secondary" data-preview-reply>预览</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
+  const canDelete=owns;
+  form.innerHTML=lab.role==='blocked'?'<p class="lab-evidence">此账号的发言权限已停用，仍可阅读公开讨论。</p>':!canReply?'<p class="lab-evidence">此讨论已关闭回复。</p>':!lab.user?'<p>使用 GitHub 账号登录后，可以发表评论和回答问题。</p><button type="button" class="button secondary" data-lab-login>使用 GitHub 登录</button>':'<div class="reply-composer-target" hidden><div><strong data-reply-recipient></strong><p data-reply-excerpt></p></div><button type="button" class="text-button" data-cancel-reply>取消回复</button></div><label class="form-field"><span>公开回复 · 支持 Markdown、TeX 和代码块</span><textarea name="body" rows="6" minlength="1" maxlength="30000" required placeholder="写下你的回复…"></textarea></label><div class="admin-actions"><button class="button" type="submit">发布回复</button><button type="button" class="button secondary" data-preview-reply>预览</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
   host.append(form);
   if(lab.user&&allowed)window.FoamCommunityMedia?.mount(form,form.elements.body);
   const PAGE_SIZE=5,ROOT_BATCH=200;
@@ -62,9 +62,9 @@
    const target=findRow(r.reply_to_id),quoted=target&&parents.get(target.id);
    const quote=r.reply_to_id?'<div class="reply-context'+(quoted?'':' reply-context-inline')+'"'+(target?' data-quote-id="'+esc(target.id)+'"':'')+'>'+(target?'<a href="#comment-'+esc(target.id)+'">回复 '+esc(names[target.author_id]||'社区成员')+'</a>'+(quoted?'<p>'+esc(snippet(target.body))+'</p>':''):'<span>原评论已不可见</span>')+'</div>':'';
    const pending=delivery&&delivery.status!=='sent';
-   const canAccept=key==='thread_id'&&allowed&&lab.user&&(lab.user.id===options.threadAuthor||lab.role==='admin')&&r.author_id!==options.threadAuthor;
-   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(canAccept?'<button type="button" class="text-button" data-accept-answer="'+esc(r.id)+'">'+(r.id===acceptedId?'取消采纳':'采纳回答')+'</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">'+(owns(r)?'删除我的回复':'删除回复')+'</button>':'');
-   return '<article class="lab-message'+(r.id===acceptedId?' is-accepted':'')+'" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'>'+(r.id===acceptedId?'<div class="accepted-answer-badge">✓ 已采纳</div>':'')+'<div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+lab.markdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
+   const canAccept=key==='thread_id'&&allowed&&lab.user&&lab.user.id===options.threadAuthor&&r.author_id!==options.threadAuthor;
+   const actions=pending?'<span class="reply-delivery-status" role="status">'+(delivery.status==='sending'?'发送中…':'尚未确认发布：'+esc(delivery.error||'请重试'))+'</span>'+(delivery.status==='failed'?'<button type="button" class="text-button" data-retry-message="'+esc(r.id)+'"'+(activeSend?' disabled':'')+'>重试发布</button>':''):lab.likeButton('comment',r.id)+(allowed?'<button type="button" class="text-button" data-reply-message="'+esc(r.id)+'">回复</button>':'')+(canAccept?'<button type="button" class="text-button" data-accept-answer="'+esc(r.id)+'">'+(r.id===acceptedId?'取消采纳':'采纳回答')+'</button>':'')+(owns(r)?'<button type="button" class="text-button" data-edit-message="'+esc(r.id)+'">编辑</button>':'')+(canDelete(r)?'<button type="button" class="text-button danger" data-delete-message="'+esc(r.id)+'">删除</button>':'');
+   return '<article class="lab-message'+(r.id===acceptedId?' is-accepted':'')+'" id="comment-'+esc(r.id)+'" tabindex="-1" data-message-id="'+esc(r.id)+'" data-author-id="'+esc(r.author_id)+'"'+(pending?' data-delivery="'+delivery.status+'"':'')+'>'+(r.id===acceptedId?'<div class="accepted-answer-badge">✓ 已采纳</div>':'')+'<div class="lab-message-meta community-byline">'+lab.authorMeta(r)+'</div>'+quote+'<div class="prose" data-message-body>'+postMarkdown(r.body)+'</div><div class="community-post-actions">'+actions+'</div>'+threadControls(r.id)+'</article>';
   }
   function paintOutbox(){
    // Local deliveries remain visible under their root even when its older replies are paged/collapsed.
@@ -118,28 +118,28 @@
     if(!row||!owns(row))return;
     if(card.querySelector(':scope > .lab-message-editor')){card.querySelector(':scope > .lab-message-editor textarea').focus();return;}
     const editor=document.createElement('form');editor.className='lab-message-editor';
-    editor.innerHTML='<label class="form-field"><span>编辑我的回复 · 支持 Markdown、TeX 和代码块</span><textarea rows="6" minlength="2" maxlength="30000" required aria-label="编辑我的回复"></textarea></label><div class="admin-actions"><button class="button" type="submit">保存修改</button><button type="button" class="button secondary" data-edit-preview>预览</button><button type="button" class="text-button" data-edit-cancel>取消</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
+    editor.innerHTML='<label class="form-field"><span>编辑我的回复 · 支持 Markdown、TeX 和代码块</span><textarea rows="6" minlength="1" maxlength="30000" required aria-label="编辑我的回复"></textarea></label><div class="admin-actions"><button class="button" type="submit">保存修改</button><button type="button" class="button secondary" data-edit-preview>预览</button><button type="button" class="text-button" data-edit-cancel>取消</button></div><div class="prose lab-preview" hidden></div><p class="form-status" role="status"></p>';
     card.querySelector('[data-message-body]').hidden=true;card.querySelector('.community-post-actions').hidden=true;card.querySelector('.community-post-actions').after(editor);
-    const input=editor.querySelector('textarea');input.value=row.body;editor.scrollIntoView({block:'nearest',behavior:'instant'});input.focus({preventScroll:true});
+    const input=editor.querySelector('textarea');input.value=window.FoamCommunityMedia?.plainEmojis(row.body)||row.body;editor.scrollIntoView({block:'nearest',behavior:'instant'});input.focus({preventScroll:true});
     window.FoamCommunityMedia?.mount(editor,input);
-    const close=()=>{editor.remove();card.querySelector('[data-message-body]').hidden=false;card.querySelector('.community-post-actions').hidden=false;edit.focus({preventScroll:true});};
+    const close=()=>{window.FoamCommunityMedia?.mount(editor,input)?.dispose();editor.remove();card.querySelector('[data-message-body]').hidden=false;card.querySelector('.community-post-actions').hidden=false;edit.focus({preventScroll:true});};
     editor.querySelector('[data-edit-cancel]').onclick=close;
-    editor.querySelector('[data-edit-preview]').onclick=()=>{const preview=editor.querySelector('.lab-preview');preview.innerHTML=lab.markdown(input.value);preview.hidden=!preview.hidden;};
+    editor.querySelector('[data-edit-preview]').onclick=()=>{const preview=editor.querySelector('.lab-preview');preview.innerHTML=postMarkdown(input.value);preview.hidden=!preview.hidden;};
     editor.onsubmit=async event=>{
      event.preventDefault();const button=editor.querySelector('[type=submit]');if(button.disabled)return;
      button.disabled=true;editor.querySelector('[data-edit-cancel]').disabled=true;
      try{
-      const body=input.value.trim();if(body.length<2)throw Error('回复至少需要 2 个有效字符。');
+      const body=input.value.trim();if(body.length<1)throw Error('回复至少需要 1 个有效字符。');
       let query=lab.client.from('foamlab_messages').update({body}).eq('id',row.id).eq('author_id',lab.user.id);
       if(row.updated_at)query=query.eq('updated_at',row.updated_at);
       const saved=lab.check(await query.select('*'));
       if(!saved.length)throw Error('回复已被修改、删除或不可编辑。请保留当前文字，刷新后重试。');
-      Object.assign(row,saved[0]);card.querySelector('[data-message-body]').innerHTML=lab.markdown(row.body);close();
+      window.FoamCommunityMedia?.commit(editor,saved[0].body);Object.assign(row,saved[0]);card.querySelector('[data-message-body]').innerHTML=postMarkdown(row.body);close();
       for(const quote of list.querySelectorAll('[data-quote-id]'))if(quote.dataset.quoteId===row.id&&quote.querySelector('p'))quote.querySelector('p').textContent=snippet(row.body);
       if(replyTarget?.id===row.id)form.querySelector('[data-reply-excerpt]').textContent=snippet(row.body);
       window.dispatchEvent(new Event('foamlab:messages'));window.foamNotify?.('回复已更新。');
      }catch(err){editor.querySelector('.form-status').textContent=err.message;}
-     finally{button.disabled=false;editor.querySelector('[data-edit-cancel]').disabled=false;}
+     finally{window.FoamCommunityMedia?.settle(editor);button.disabled=false;editor.querySelector('[data-edit-cancel]').disabled=false;}
     };return;
    }
    const reply=e.target.closest('[data-reply-message]');
@@ -148,7 +148,7 @@
    const row=findRow(del.dataset.deleteMessage);if(!row||!canDelete(row)||!confirm('删除这条回复？'))return;
    del.disabled=true;
    try{
-    let query=lab.client.from('foamlab_messages').delete().eq('id',row.id);if(row.updated_at)query=query.eq('updated_at',row.updated_at);
+    let query=lab.client.from('foamlab_messages').delete().eq('id',row.id).eq('author_id',lab.user.id);if(row.updated_at)query=query.eq('updated_at',row.updated_at);
     const removed=lab.check(await query.select('id'));if(!removed.length)throw Error('回复状态已变化或当前账号无权删除，请刷新后重试。');
     records.delete(row.id);index.delete(row.id);rebuildTree();
     if(replyTarget?.id===row.id){replyTarget=null;form.querySelector('.reply-composer-target').hidden=true;}
@@ -169,7 +169,7 @@
     if(!posted){entry.attempted=true;posted=lab.check(await lab.client.from('foamlab_messages').insert(entry.payload).select('*').single());}
     if(!posted||posted.id!==entry.row.id||posted.status!=='visible')throw Error('回复状态暂时无法确认，请重试。');
     if(!live)return;
-    entry.row={...entry.row,...posted};entry.status='sent';records.set(posted.id,entry.row);index.set(posted.id,entry.row);rebuildTree();
+    window.FoamCommunityMedia?.commit(form,posted.body);entry.row={...entry.row,...posted};entry.status='sent';records.set(posted.id,entry.row);index.set(posted.id,entry.row);rebuildTree();
     // Do not clear a newer draft or a different reply target while this request was in flight.
     if(form.elements.body.value.trim()===entry.payload.body&&(replyTarget?.id||null)===entry.payload.reply_to_id){form.elements.body.value='';replyTarget=null;form.querySelector('.reply-composer-target').hidden=true;form.querySelector('.lab-preview').hidden=true;placeComposer();}
     paintOutbox();status.textContent='回复已发布。';history.replaceState(history.state,'','#comment-'+posted.id);
@@ -179,14 +179,14 @@
     void render().catch(()=>{if(live)window.foamNotify?.('回复已发布，其他评论暂时未能刷新。');});
     window.dispatchEvent(new Event('foamlab:messages'));window.dispatchEvent(new Event('foamlab:activity'));window.foamNotify?.('回复已发布。');
    }catch(err){if(live){entry.status='failed';entry.error=err.message||'网络异常，请重试';status.textContent=entry.error;}}
-   finally{activeSend=null;if(live){button.disabled=false;paintOutbox();}}
+   finally{activeSend=null;window.FoamCommunityMedia?.settle(form);if(live){button.disabled=false;paintOutbox();}}
   }
   if(lab.user&&allowed){
    form.querySelector('[data-cancel-reply]').onclick=()=>{replyTarget=null;form.querySelector('.reply-composer-target').hidden=true;placeComposer();form.scrollIntoView({block:'nearest',behavior:'instant'});form.elements.body.focus({preventScroll:true});};
-   form.querySelector('[data-preview-reply]').onclick=()=>{const preview=form.querySelector('.lab-preview');preview.innerHTML=lab.markdown(form.elements.body.value);preview.hidden=!preview.hidden;};
+   form.querySelector('[data-preview-reply]').onclick=()=>{const preview=form.querySelector('.lab-preview');preview.innerHTML=postMarkdown(form.elements.body.value);preview.hidden=!preview.hidden;};
    form.onsubmit=e=>{e.preventDefault();if(activeSend)return;
     const body=form.elements.body.value.trim(),reply_to_id=replyTarget?.id||null;
-    if(body.length<2||body.length>30000){form.querySelector('.form-status').textContent='回复需要 2 至 30000 个有效字符。';return;}
+    if(body.length<1||body.length>30000){form.querySelector('.form-status').textContent='回复需要 1 至 30000 个有效字符。';return;}
     let entry=[...outbox.values()].find(item=>item.status==='failed'&&item.payload.body===body&&item.payload.reply_to_id===reply_to_id);
     if(!entry){const payload={...parent,id:crypto.randomUUID(),reply_to_id,author_id:lab.user.id,body};entry={payload,row:{...payload,created_at:new Date().toISOString(),author_name:window.foamAuth?.profile?.display_name||lab.user.user_metadata?.user_name||'我'},status:'sending',attempted:false};outbox.set(payload.id,entry);}
     void send(entry);
