@@ -6,7 +6,22 @@ window.FoamCMSQuestions=async C=>{
  let rows=[],names={},current=null,baseline='',{page,q,status,scope}=state;const persist=()=>Object.assign(state,{page,q,status,scope});
  const fingerprint=f=>JSON.stringify([...new FormData(f)]),isDirty=()=>!!p.querySelector('#cms-question-form')&&fingerprint(p.querySelector('#cms-question-form'))!==baseline;
  async function discard(){return !isDirty()||await UI.confirmAction({title:'放弃尚未保存的问题修改？',message:current?.title||'新问题',action:'放弃修改'});}
- async function load(){const loaded=[];if(scope==='participated'){for(let start=0;;start+=200){const batch=L.check(await L.client.rpc('foamlab_participated_discussions',{sort_order:'newest',status_filter:'',page_offset:start,page_size:200}));loaded.push(...batch);if(batch.length<200)break;}}else{for(let start=0;;start+=100){let request=L.client.from('foamlab_threads').select('id,title,category,version,status,author_id,created_at,updated_at,accepted_message_id,pinned');if(!C.admin||scope==='mine')request=request.eq('author_id',L.user.id);const batch=L.check(await request.order('created_at',{ascending:false}).order('id').range(start,start+99));loaded.push(...batch);if(batch.length<100)break;}}const loadedNames=await L.names(loaded.map(r=>r.author_id));rows=loaded;names=loadedNames;}
+ const cache=state.cache||(state.cache=new Map()),pending=new Map(),owner={};let scopeRequest=0,cacheRevision=0;p.foamQuestionOwner=owner;
+ const clearCache=()=>{cache.clear();pending.clear();++cacheRevision;++scopeRequest;};
+ const apply=entry=>{rows=entry.rows;names=entry.names;};
+ async function fetchScope(target,force=false){
+  const saved=cache.get(target);if(!force&&saved&&Date.now()-saved.at<30000)return saved;if(pending.has(target))return pending.get(target);
+  const revision=cacheRevision,task=(async()=>{const loaded=[];if(target==='participated'){for(let start=0;;start+=200){const batch=L.check(await L.client.rpc('foamlab_participated_discussions',{sort_order:'newest',status_filter:'',page_offset:start,page_size:200}));loaded.push(...batch);if(batch.length<200)break;}}else{for(let start=0;;start+=100){let request=L.client.from('foamlab_threads').select('id,title,category,version,status,author_id,created_at,updated_at,accepted_message_id,pinned');if(!C.admin||target==='mine')request=request.eq('author_id',L.user.id);const batch=L.check(await request.order('created_at',{ascending:false}).order('id').range(start,start+99));loaded.push(...batch);if(batch.length<100)break;}}const loadedNames=await L.names(loaded.map(r=>r.author_id));const entry={rows:loaded,names:loadedNames,at:Date.now()};if(revision===cacheRevision)cache.set(target,entry);return entry;})();pending.set(target,task);try{return await task;}finally{if(pending.get(target)===task)pending.delete(target);}}
+ async function load(force=false){const target=scope,entry=await fetchScope(target,force);if(target===scope)apply(entry);}
+ function prefetch(){for(const target of C.admin?['all','mine','participated']:['mine','participated'])if(target!==scope)void fetchScope(target).catch(()=>{});}
+ function selectScope(target){
+  const request=++scopeRequest;scope=target;page=1;const saved=cache.get(target);if(saved)apply(saved);else{rows=[];names={};}render();
+  p.querySelector('[data-question-scope="'+scope+'"]').focus({preventScroll:true});
+  if(saved&&Date.now()-saved.at<30000)return;
+  const list=p.querySelector('#cms-question-list');list.setAttribute('aria-busy','true');if(!saved)list.innerHTML='<p class="muted" role="status">正在加载问题…</p>';
+  void fetchScope(target).then(entry=>{if(request!==scopeRequest||scope!==target||p.foamQuestionOwner!==owner||!p.querySelector('#cms-question-list'))return;apply(entry);render();}).catch(error=>{if(request!==scopeRequest||p.foamQuestionOwner!==owner||!p.querySelector('#cms-question-list'))return;list.removeAttribute('aria-busy');if(!saved)list.innerHTML='<p class="cms-empty">问题暂时无法加载，请点击刷新重试。</p>';notice(error.message||'问题暂时无法加载。',true);});
+ }
+
  function render(){
   current=null;baseline='';p.innerHTML='<div class="cms-toolbar"><div><h2>讨论中心</h2><p>'+(scope==='participated'?'查看自己回复过的其他人的问题。':C.admin?'查看所有人的问题，管理解决状态、显示状态与置顶。':'管理自己的问题，补充计算条件并更新解决状态。')+'</p></div><div class="admin-actions"><button class="button secondary" data-question-refresh>刷新</button><button class="button" data-question-new>提出问题</button></div></div>'+'<div class="cms-subtabs">'+(C.admin?'<button data-question-scope="all">全部讨论</button>':'')+'<button data-question-scope="mine">我的提问</button><button data-question-scope="participated">我参与的</button></div>'+'<div class="filter-tabs" id="cms-question-tabs">'+[['','全部'],['open','待解决'],['resolved','已解决'],...(C.admin?[['closed','已关闭'],['hidden','已隐藏']]:[])].map(([value,label])=>'<button type="button" data-question-status="'+value+'">'+label+'</button>').join('')+'</div><div class="cms-filters cms-question-filters"><input type="search" id="cms-question-search" aria-label="搜索问题" placeholder="搜索问题标题、作者、分类或版本" value="'+esc(q)+'"><select id="cms-question-status" aria-label="问题状态"><option value="">全部状态</option>'+Object.entries(labels).map(([value,name])=>'<option value="'+value+'" '+(value===status?'selected':'')+'>'+name+'</option>').join('')+'</select></div><div id="cms-question-list"></div><div id="cms-question-pager"></div>';
   function list(){
@@ -20,10 +35,10 @@ window.FoamCMSQuestions=async C=>{
   p.querySelector('#cms-question-status').onchange=e=>{status=e.target.value;page=1;list();};
   p.onclick=e=>{const b=e.target.closest('[data-question-new],[data-question-edit],[data-page],[data-question-status],[data-question-scope],[data-question-refresh],[data-question-action]');if(!b)return;
    if(b.hasAttribute('data-question-status')){status=b.dataset.questionStatus;page=1;list();return;}
-   if(b.dataset.questionScope){if(scope===b.dataset.questionScope)return;run(async()=>{const previous=scope;scope=b.dataset.questionScope;try{await load();page=1;render();}catch(error){scope=previous;throw error;}});return;}
+   if(b.dataset.questionScope){if(scope!==b.dataset.questionScope)selectScope(b.dataset.questionScope);return;}
    if(b.dataset.page){page=Number(b.dataset.page);list();return;}
    run(async()=>{
-    if(b.hasAttribute('data-question-refresh')){await load();render();notice('问题列表已更新。');return;}
+    if(b.hasAttribute('data-question-refresh')){clearCache();await load(true);render();prefetch();notice('问题列表已更新。');return;}
     if(!b.dataset.questionAction){await edit(b.dataset.questionEdit);return;}
     const row=rows.find(r=>r.id===b.dataset.questionAction),op=b.dataset.op;
     if(!C.admin&&(row.author_id!==L.user.id||(op!=='delete'&&(!['open','resolved'].includes(row.status)||!['open','resolved'].includes(op)))))throw Error('只能管理自己的问题。');
@@ -32,11 +47,11 @@ window.FoamCMSQuestions=async C=>{
     if(op==='delete'){let request=L.client.from('foamlab_threads').delete().eq('id',row.id).eq('updated_at',row.updated_at);if(!C.admin)request=request.eq('author_id',L.user.id);const changed=L.check(await request.select('id'));if(!changed.length)throw Error('问题已在其他页面更新，请刷新后重试。');}
     else if(op==='open'&&row.status==='resolved'&&row.accepted_message_id){if(row.author_id!==L.user.id)throw Error('只有提问者本人可以取消采纳。');L.check(await L.client.rpc('foamlab_accept_answer',{thread_id:row.id,message_id:null}));}
     else{let request=L.client.from('foamlab_threads').update(op==='pin'?{pinned:!row.pinned}:{status:op==='open'&&row.accepted_message_id?'resolved':op}).eq('id',row.id).eq('updated_at',row.updated_at);if(!C.admin)request=request.eq('author_id',L.user.id);const changed=L.check(await request.select('id'));if(!changed.length)throw Error('问题已在其他页面更新，请刷新后重试。');}
-    await load();render();notice('已'+text+'。');
+    clearCache();await load(true);render();prefetch();notice('已'+text+'。');
    });
   };list();
  }
- async function edit(id){current=id?L.check(await (C.admin?L.client.from('foamlab_threads').select('*').eq('id',id):L.client.from('foamlab_threads').select('*').eq('id',id).eq('author_id',L.user.id)).single()):null;
+ async function edit(id){++scopeRequest;current=id?L.check(await (C.admin?L.client.from('foamlab_threads').select('*').eq('id',id):L.client.from('foamlab_threads').select('*').eq('id',id).eq('author_id',L.user.id)).single()):null;
   if(current&&!C.admin&&!['open','resolved'].includes(current.status))throw Error('此问题已关闭或隐藏，暂不能编辑。');
   await L.settingsReady;if(!current&&L.settings.discussion_open===false&&!C.admin)throw Error('管理员暂时关闭新建问题，已有问题仍可查看。');
   const v=current||{title:'',version:'v2512',category:'使用问题',status:'open',body:'## 要解决的问题\n\n## 环境与运行命令\n\n## 最小配置与报错日志\n\n## 已尝试的方法\n'};
@@ -48,8 +63,8 @@ window.FoamCMSQuestions=async C=>{
     let result;
     if(current){let request=L.client.from('foamlab_threads').update(values).eq('id',current.id).eq('updated_at',current.updated_at);if(!C.admin)request=request.eq('author_id',L.user.id);const updated=L.check(await request.select());if(!updated.length)throw Error('问题已在其他页面更新，请保留修改后重新载入。');result=updated[0];}
     else result=L.check(await L.client.from('foamlab_threads').insert({...values,author_id:L.user.id}).select().single());
-    window.FoamCommunityMedia?.commit(f,values.body);const wasEdit=!!current;baseline=fingerprint(f);await load();render();notice(wasEdit?'问题已保存。':'问题已发布，讨论中心已同步更新。');window.dispatchEvent(new Event('foamlab:activity'));
+    window.FoamCommunityMedia?.commit(f,values.body);const wasEdit=!!current;baseline=fingerprint(f);clearCache();await load(true);render();prefetch();notice(wasEdit?'问题已保存。':'问题已发布，讨论中心已同步更新。');window.dispatchEvent(new Event('foamlab:activity'));
    }).finally(()=>window.FoamCommunityMedia?.settle(f));};
  }
- await load();render();return {isDirty};
+ await load();render();prefetch();return {isDirty};
 };
