@@ -1366,7 +1366,8 @@
     $('.social-group-summary',d).textContent=(dimension==='institutions'?'学校／单位':'研究方向')+' · 共 '+result.total+' 位成员';
     for(const p of result.items){
      const row=document.createElement('article');row.className='social-group-member';row.dataset.memberId=p.user_id;
-     const identity=document.createElement('button');identity.type='button';identity.className='social-person';identity.dataset.socialProfile=p.user_id;identity.innerHTML=person(p);identity.setAttribute('aria-label','查看 '+title(p)+' 的资料');row.append(identity);
+     const identity=document.createElement('button');identity.type='button';identity.className='social-person';identity.dataset.socialProfile=p.user_id;identity.innerHTML=person(p);identity.setAttribute('aria-label','查看 '+title(p)+' 的资料');
+     const name=identity.querySelector('strong'),heading=document.createElement('span');heading.className='social-group-name';name.replaceWith(heading);heading.append(name);heading.insertAdjacentHTML('beforeend',online(p));row.append(identity);
      const research=document.createElement('small');research.className='social-group-research';research.textContent=p.research||'未填写研究方向';row.append(research);
      const action=document.createElement('button');action.type='button';action.className='secondary social-group-action';
      function update(profile){
