@@ -2,9 +2,10 @@
 (() => {
  const root=document.documentElement,media=matchMedia('(prefers-color-scheme: dark)');
  const modes={system:'跟随系统',light:'亮色',dark:'暗色'};
- const palettes={green:'青松绿',blue:'雾海蓝',pink:'蔷薇粉',lavender:'浅藤紫',beige:'暖米黄'};
- let choice='system',palette='green';
- function read(){try{choice=localStorage.getItem('foamlab.theme')||'system';palette=localStorage.getItem('foamlab.palette')||'green';}catch{}if(!Object.hasOwn(modes,choice))choice='system';if(!Object.hasOwn(palettes,palette))palette='green';}
+ const palettes={green:'青松绿',blue:'雾海蓝',pink:'蔷薇粉',lavender:'浅藤紫',beige:'暖米黄',halloween:'万圣节特供'};
+ const defaultPalette=root.dataset.defaultPalette||'green';
+ let choice='system',palette=defaultPalette;
+ function read(){try{choice=localStorage.getItem('foamlab.theme')||'system';palette=localStorage.getItem('foamlab.palette')||defaultPalette;}catch{}if(!Object.hasOwn(modes,choice))choice='system';if(!Object.hasOwn(palettes,palette))palette=defaultPalette;}
  function save(key,value){try{localStorage.setItem(key,value);}catch{}}
  const modeIcons={dark:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',light:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',system:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>'};
  const svg=body=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';

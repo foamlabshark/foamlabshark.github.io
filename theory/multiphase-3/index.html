@@ -14,26 +14,29 @@
 (() => {
  const root=document.documentElement;
  root.classList.add('has-js');
- let theme='system',palette='green',width=null,collapsed=false;
- try{theme=localStorage.getItem('foamlab.theme')||'system';palette=localStorage.getItem('foamlab.palette')||'green';width=Number(localStorage.getItem('foamlab.sidebarWidth'));collapsed=localStorage.getItem('foamlab.sidebarCollapsed')==='1';}catch{}
+ const today=new Date();
+ const defaultPalette=today.getMonth()===9&&today.getDate()===31?'halloween':'green';
+ root.dataset.defaultPalette=defaultPalette;
+ let theme='system',palette=defaultPalette,width=null,collapsed=false;
+ try{theme=localStorage.getItem('foamlab.theme')||'system';palette=localStorage.getItem('foamlab.palette')||defaultPalette;width=Number(localStorage.getItem('foamlab.sidebarWidth'));collapsed=localStorage.getItem('foamlab.sidebarCollapsed')==='1';}catch{}
  root.dataset.theme=['light','dark'].includes(theme)?theme:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
- root.dataset.palette=['green','blue','pink','lavender','beige'].includes(palette)?palette:'green';
+ root.dataset.palette=['green','blue','pink','lavender','beige','halloween'].includes(palette)?palette:defaultPalette;
  root.style.colorScheme=root.dataset.theme;
- const backgrounds={green:{light:'#f6f5f0',dark:'#111816'},blue:{light:'#f3f5f8',dark:'#111821'},pink:{light:'#faf4f5',dark:'#20171c'},lavender:{light:'#f6f4fa',dark:'#1b1723'},beige:{light:'#faf6ed',dark:'#201c15'}};
+ const backgrounds={green:{light:'#f6f5f0',dark:'#111816'},blue:{light:'#f3f5f8',dark:'#111821'},pink:{light:'#faf4f5',dark:'#20171c'},lavender:{light:'#f6f4fa',dark:'#1b1723'},beige:{light:'#faf6ed',dark:'#201c15'},halloween:{light:'#fcf4e9',dark:'#1b1621'}};
  document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>meta.content=backgrounds[root.dataset.palette][root.dataset.theme]);
  root.classList.toggle('sidebar-collapsed',collapsed);
  if(innerWidth>=761&&Number.isFinite(width)&&width>=200)root.style.setProperty('--sidebar',Math.round(Math.max(200,Math.min(480,Math.floor(innerWidth*.38),width)))+'px');
 })();
 </script>
   <script>/* Keep the entry visible while town-entry.js checks whether the town is open. */(function(){var d=document.documentElement;d.dataset.townEntry='true';try{var s=JSON.parse(localStorage.getItem('foamlab.town.entry')||'null');d.dataset.townAvailable=String(!s||s.available!==false);}catch(e){d.dataset.townAvailable='true';}})();</script>
-  <link rel="stylesheet" href="/assets/site-core.css?v=dd13a10e17f2">
+  <link rel="stylesheet" href="/assets/site-core.css?v=e725e05904e3">
   <link rel="preload" href="/assets/site-extras.css?v=310ee28ddef3" as="style">
   <link rel="preload" href="/assets/card-backgrounds.css?v=db5eb4e1635e" as="style">
   <link rel="stylesheet" href="/assets/fvm-labs.css?v=8dd2f9ee84d0">
   
   
   <script src="/assets/runtime-account.js?v=2a26aaf26f58" defer></script>
-  <script src="/assets/appearance.js?v=67ddfcfe66ed" defer></script>
+  <script src="/assets/appearance.js?v=44da249f6cca" defer></script>
   <script src="/assets/sidebar-resize.js?v=3ef87a0899a4" defer></script>
   <script src="/assets/navigation.js?v=a67edbc2e644" defer></script>
   <script type="application/json" id="catalog-hint">{"path":"/theory/multiphase-3/","key":"kolev-3","ids":["b25d8a0e-9ac0-5c10-bdc2-6e4f532fa0d4","8da5e980-dd60-59db-8b04-67c79b327c5a","16561660-04fc-5f05-9c36-2cb89e947abe","713ce030-0a2f-5c04-868a-2a4d14db34fa","08e61b5a-b474-5fb4-920a-7c34b58abc0d","db183b7d-cd35-58cb-a0b1-40af5603254b","5c7c483c-d233-5c32-b26c-896e6265600d","c434fa48-9b78-58aa-9b7e-d2439881a108","dd7e76a6-cf5b-5903-818f-891c73cffa7d","fa6c0fd1-9558-5e68-a9a4-752e2326433e","52c76a1c-aa76-5515-91dd-18baf56a8768","1b42e7c3-4e3a-5d1d-8d21-43a064957d14","ac852791-0762-5e3c-b431-7b8c70848744","39693585-77a7-5ff0-87d0-7973171774c1"]}</script>
@@ -51,7 +54,7 @@
   <script src="/assets/theory-catalog.js?v=39d470a75fb8" defer></script>
   <script src="/assets/runtime-panda-art.js?v=78327e8b086f" defer fetchpriority="low"></script>
   <script src="/assets/town/town-entry.js?v=0fd12f64c729" defer></script>
-  <script src="/assets/runtime-panda-pet.js?v=ab2ad85aa634" defer fetchpriority="low"></script>
+  <script src="/assets/runtime-panda-pet.js?v=521dfc5ae450" defer fetchpriority="low"></script>
   <script src="/assets/runtime-panda-eggs.js?v=5c6365f3f3f8" defer fetchpriority="low"></script>
   <link rel="stylesheet" href="/assets/site-extras.css?v=310ee28ddef3">
   <link rel="stylesheet" href="/assets/card-backgrounds.css?v=db5eb4e1635e">

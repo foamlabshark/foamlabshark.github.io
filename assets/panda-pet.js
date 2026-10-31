@@ -2,7 +2,36 @@
 (() => {
  const $=(s,r=document)=>r.querySelector(s), art=window.foamPandaArt;
  if(!art)return;
- document.querySelectorAll('[data-panda-portrait]').forEach(el=>{el.innerHTML=art();el.dataset.outfit='scarf';el.dataset.form='cub';});
+ document.querySelectorAll('[data-panda-portrait]').forEach(el=>{
+  el.innerHTML=art();el.dataset.outfit='scarf';el.dataset.form='cub';
+  if(!el.classList.contains('fl-portrait'))return;
+  // Attach the festival pieces to the animated body parts so they move with the bear.
+  const portrait=el.querySelector('.pa-char');
+  portrait.querySelector('.pa-leg').insertAdjacentHTML('beforebegin',`
+   <g class="pa-halloween" aria-hidden="true">
+    <path d="M53 101q27 13 54 0l14 48-14-4-8 8-10-7-11 8-9-9-12 5-3-8-16 3z" fill="#4d385e" stroke="#302437" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="m52 103 26 18 29-18-9 20-19-1-17 5z" fill="#835b88"/>
+    <path d="M77 121q-10 13-16 21m21-20 12 20" fill="none" stroke="#ad7c9c" stroke-width="1.3"/>
+    <circle cx="79" cy="119" r="3.6" fill="#ffd079" stroke="#995626"/>
+   </g>`);
+  portrait.querySelector('.pa-head').insertAdjacentHTML('beforeend',`
+   <g class="pa-halloween" aria-hidden="true" transform="rotate(-8 79 40)" stroke-linejoin="round">
+    <path d="M48 40q13-13 23-37 11-14 37-10-18 8-16 16l13 31z" fill="#4a365b" stroke="#302437" stroke-width="2.4"/>
+    <path d="M75 5q8-9 27-10-15 7-13 14l7 17-11-7z" fill="#705277"/>
+    <path d="m57 29 41-4 4 9-48 7z" fill="#d48542"/>
+    <rect x="76" y="26" width="10" height="8" rx="1.5" fill="#ffcd76" stroke="#53344d" stroke-width="1.4"/>
+    <path d="M36 40q22 1 38-3 22-6 38-4 10 1 9 4-1 5-28 9-34 6-57 1-10-3 0-7z" fill="#67496d" stroke="#302437" stroke-width="2.4"/>
+    <path d="M40 44q32 6 70-5" fill="none" stroke="#bf8193" stroke-width="1.3"/>
+    <path d="m75 14 1.7 3.6 3.6 1.4-3.6 1.5-1.7 3.5-1.4-3.5-3.7-1.5 3.7-1.4z" fill="#ffe5ac"/>
+   </g>`);
+  portrait.querySelector('.pa-arm-r').insertAdjacentHTML('beforeend',`
+   <g class="pa-halloween" aria-hidden="true">
+    <path d="M110 144q-2-24 12-13 4 4 3 12" fill="none" stroke="#6b442e" stroke-width="2.6"/>
+    <path d="M117 139c-14-5-21 12-13 20 5 5 12 5 15 4 16 2 23-15 11-22-5-3-10-2-13-2z" fill="#ee9042" stroke="#714034" stroke-width="2"/>
+    <path d="M112 141q-9 11-2 18m14-18q8 9 1 18" fill="none" stroke="#cb692f" stroke-width="1.4"/>
+    <path d="m108 149 4-5 2 5zm11 0 3-5 3 5zm-9 4 4 1 2-1 2 2 5-2q-5 9-13 0z" fill="#643649"/>
+   </g>`);
+ });
  const tips=[
  ['foamVersion 可以查看当前终端加载的 OpenFOAM 版本。','foamVersion'],
  ['生成网格后运行 checkMesh，可以查看网格的几何与拓扑质量。','checkMesh'],
