@@ -26,7 +26,12 @@
   try{
    const D=await window.FoamDirectory.ready;
    if(!D.available)throw Error('directory unavailable');
-   const node=D.nodes.find(row=>row.key===(hub?'theory':key));if(!node)throw Error('missing module');
+   const node=D.nodes.find(row=>row.key===(hub?'theory':key));if(parallel){
+    const status=document.querySelector('[data-private-book-status]');
+    if(!node||!node.visible){status.textContent='此目录当前未开放。';return;}
+    document.querySelector('[data-private-book-content]').hidden=false;status.hidden=true;
+   }
+   if(!node)throw Error('missing module');
    if(hub){
     const children=D.children(node.id).filter(D.isVisible);
     hub.innerHTML=children.map(row=>`<article class="lab-card"><div class="lab-card-body"><h2><a href="${esc(D.url(row))}">${esc(row.name)}</a></h2><p>${esc(row.description||'')}</p><a class="button secondary" href="${esc(D.url(row))}">查看课程目录 →</a></div></article>`).join('');
@@ -47,6 +52,8 @@
    }
    target.dataset.loaded='true';
   }catch{
+   const status=parallel&&document.querySelector('[data-private-book-status]');
+   if(status&&!status.hidden)status.textContent='目录暂时无法读取，请刷新重试。';
    target.innerHTML='<p role="alert">课程目录暂时无法读取，请检查网络后重试。</p><button class="button secondary" type="button">重新加载</button>';
    target.querySelector('button').addEventListener('click',()=>location.reload());
   }finally{target.setAttribute('aria-busy','false');}
