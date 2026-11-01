@@ -54,7 +54,17 @@
   const onPage=page.filter(possible);
   function sync(){
    host.querySelectorAll('[data-bulk-file]').forEach(c=>{c.checked=fileIds.has(c.dataset.bulkFile);});
-   host.querySelectorAll('[data-bulk-folder]').forEach(c=>{c.checked=folderIds.has(c.dataset.bulkFolder);});
+   const lockedFolders=new Map();
+   for(const selected of folderIds){
+    for(const parent of tree.ancestors(selected))if(parent.id!==selected)lockedFolders.set(parent.id,'已勾选下级目录');
+    for(const child of tree.descendants(selected))if(child!==selected)lockedFolders.set(child,'已勾选上级目录');
+   }
+   host.querySelectorAll('[data-bulk-folder]').forEach(c=>{
+    const id=c.dataset.bulkFolder;
+    c.checked=folderIds.has(id);
+    c.disabled=lockedFolders.has(id);
+    c.title=lockedFolders.get(id)||'';
+   });
    const total=fileIds.size+folderIds.size,check=box.querySelector('[data-bulk-page]');
    check.disabled=!onPage.length;check.checked=onPage.length>0&&onPage.every(r=>fileIds.has(r.id));check.indeterminate=!check.checked&&onPage.some(r=>fileIds.has(r.id));
    box.querySelector('[data-bulk-count]').textContent='已选 '+folderIds.size+' 个模块、'+fileIds.size+' 个文件';
@@ -62,6 +72,7 @@
   }
   host.onchange=e=>{
    const el=e.target,id=el.dataset.bulkFolder||el.dataset.bulkFile;
+   if(el.disabled)return;
    if(id){const set=el.dataset.bulkFolder?folderIds:fileIds;el.checked?set.add(id):set.delete(id);sync();}
    if(el.hasAttribute('data-bulk-page')){onPage.forEach(r=>el.checked?fileIds.add(r.id):fileIds.delete(r.id));sync();}
   };

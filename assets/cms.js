@@ -118,13 +118,12 @@
     context.querySelector('.cms-directory-actions')?.remove();
     context.querySelector('p').textContent='按原目录查看回收内容。恢复子项目时，请先恢复其上级目录。';
    }
-   if(bulk&&selected&&!B.protected(selected)){
-    const actions=bin?(selected.recycle_root?['restore','purge']:[]):['move','archive'];
+   if(bin&&selected?.recycle_root&&!B.protected(selected)){
     const group=document.createElement('div');group.className='cms-directory-actions';
-    for(const action of actions){const b=document.createElement('button');b.type='button';b.className='text-button'+(action==='purge'?' danger':'');b.dataset.folderAction=action;
-     b.textContent=({move:'移动整个模块',archive:'下架整个模块',restore:'恢复整个模块',purge:'彻底删除模块'})[action];
+    for(const [action,label] of [['restore','恢复整个模块'],['purge','彻底删除模块']]){const b=document.createElement('button');b.type='button';b.className='text-button'+(action==='purge'?' danger':'');b.dataset.folderAction=action;
+     b.textContent=label;
      b.onclick=()=>submit(action,[selected],[]);group.append(b);}
-    if(actions.length)context.append(group);
+    context.append(group);
    }
    if(selected&&B.protected(selected))context.querySelector('[data-delete-directory]')?.remove();
    if(!bin&&selected&&window.FoamSectionPage.supported(selected)){const button=document.createElement('button');button.type='button';button.className='text-button';button.textContent='编辑入口页';button.dataset.editSectionPage='';context.querySelector('[data-edit-directory]').after(button);button.onclick=()=>directoryUI.editPage(selected);}

@@ -1,5 +1,20 @@
 'use strict';
 (() => {
+ const stats=document.querySelector('[data-learning-counts]');
+ async function updateLearningCounts(){
+  const L=window.FoamLab;
+  try{
+   await L.contentReady;
+   const counts=L.check(await L.client.rpc('foamlab_public_learning_counts'));
+   for(const field of stats.querySelectorAll('[data-count]'))field.textContent=counts[field.dataset.count];
+   stats.removeAttribute('title');
+  }catch{stats.title='统计暂时无法更新';}
+  finally{stats.setAttribute('aria-busy','false');}
+ }
+ if(stats){
+  void updateLearningCounts();
+  window.addEventListener('pageshow',e=>{if(e.persisted)void updateLearningCounts();});
+ }
  const entries=document.querySelector('.home-community-links');if(!entries)return;
  const L=window.FoamLab,esc=L.esc,dialogs={},state={page:1,rows:[],total:0,request:0,edit:null,newDraft:'',pending:null,loading:false,pinning:false};let lastUser=null;
  const own=row=>!!L.user&&L.role!=='blocked'&&row.author_id===L.user.id;
