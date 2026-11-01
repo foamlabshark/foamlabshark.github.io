@@ -1,8 +1,12 @@
 'use strict';
 (() => {
  const D=window.FoamDirectory;
+ const trees=new Map();
  window.FoamCMSDirectories=api=>{
-  const {L,UI,run,notice,getRows,select,getSelected}=api,esc=L.esc;let opened=new Set();const rootId=api.rootId||null;
+  const {L,UI,run,notice,getRows,select,getSelected}=api,esc=L.esc,rootId=api.rootId||null;
+  const dirs=api.treeModel||D,bin=!!api.bin,treeKey=(rootId||'site')+(bin?':bin':'');
+  if(!trees.has(treeKey))trees.set(treeKey,{opened:new Set(),lastSelection:null});
+  const state=trees.get(treeKey),opened=state.opened;
   const refresh=async()=>{await D.load();D.nav();select(getSelected());};
   async function edit(node=null,parent=null){
    const excluded=node?D.descendants(node.id):[],oldParent=node?.parent_id||'';
@@ -17,16 +21,31 @@
    await D.load();D.nav();if(v.parent_id)opened.add(v.parent_id);select(result[0].id);notice('目录已保存。');
   }
   async function remove(node){
-   const ids=D.descendants(node.id),affected=getRows().filter(r=>r.section_ids?.some(id=>ids.includes(id))),unassigned=affected.filter(r=>r.section_ids.every(id=>ids.includes(id)));
-   if(!await UI.confirmAction({title:'删除这个目录及其子目录？',message:D.path(node.id),details:[ids.length+' 个目录将从导航移除。',affected.length+' 篇内容受影响，其中 '+unassigned.length+' 篇会进入“未归类”。','正文、附件和文章地址保留；其他目录中的位置也会保留。'],action:'确认删除目录',danger:true}))return;
-   L.check(await L.client.rpc('foamlab_delete_section',{section_id:node.id,expected_revision:node.revision}));await api.reload();await D.load();D.nav();select(node.parent_id===rootId?'':node.parent_id||'');notice('目录已删除。保留的内容可在原有位置或“未归类”中找到。');
+   if(!await window.FoamCMSBulk.perform('trash',[node],[]))return;
+   window.FoamCMSBulk.clear();await D.load();await api.reload();D.nav();select(node.parent_id===rootId?'':node.parent_id||'');notice('目录已移入回收站。');
   }
   function mount(host){
-   const selected=getSelected();D.ancestors(selected).forEach(n=>opened.add(n.id));
-   const counts=new Map();for(const row of getRows()){const ids=new Set();for(const id of row.section_ids||[])for(const n of D.ancestors(id))ids.add(n.id);for(const id of ids)counts.set(id,(counts.get(id)||0)+1);}
-   const branch=n=>{const children=D.children(n.id),count=counts.get(n.id)||0,target=api.managementTarget?.(n.id);return '<div><div class="cms-tree-row">'+(children.length?'<button class="cms-tree-toggle" data-tree-toggle="'+n.id+'" aria-expanded="'+opened.has(n.id)+'" aria-label="展开'+esc(n.name)+'">'+(opened.has(n.id)?'▾':'▸')+'</button>':'<span class="cms-tree-toggle"></span>')+'<button class="directory-select '+(n.id===selected?'selected':'')+'" data-select-directory="'+n.id+'" title="'+esc(D.path(n.id))+'">'+esc(n.name)+' <small>'+(target?'管理':count)+'</small>'+(!n.visible?' · 隐藏':'')+'</button></div>'+(children.length?'<div class="cms-tree-children" data-tree-children="'+n.id+'" '+(opened.has(n.id)?'':'hidden')+'>'+children.map(branch).join('')+'</div>':'')+'</div>';};
-   host.innerHTML='<h3>'+(api.treeTitle||(rootId?'资料目录':'网站目录'))+'</h3><div class="cms-tree-root-actions"><button class="directory-select '+(!selected?'selected':'')+'" data-select-directory="">'+(api.allLabel||(rootId?'全部资料':'全部内容'))+'</button><button class="directory-select '+(selected==='unassigned'?'selected':'')+'" data-select-directory="unassigned">未归类</button><button data-add-module>＋ 添加模块</button></div>'+D.children(rootId).map(branch).join('');
-   host.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-tree-toggle')){const id=b.dataset.treeToggle;if(opened.has(id))opened.delete(id);else opened.add(id);mount(host);}else if(b.hasAttribute('data-select-directory'))select(b.dataset.selectDirectory);else if(b.hasAttribute('data-add-module'))run(()=>edit(null,rootId));};
+   const selected=getSelected();
+   if(selected!==state.lastSelection){
+    dirs.ancestors(selected).forEach(n=>opened.add(n.id));state.lastSelection=selected;
+   }
+   const ancestors=new Set(dirs.ancestors(selected).slice(0,-1).map(n=>n.id));
+   const counts=new Map();for(const row of getRows()){const ids=new Set();for(const id of row.section_ids||[])for(const n of dirs.ancestors(id))ids.add(n.id);for(const id of ids)counts.set(id,(counts.get(id)||0)+1);}
+   const branch=n=>{const children=dirs.children(n.id),count=counts.get(n.id)||0,target=api.managementTarget?.(n.id);return '<div><div class="cms-tree-row">'+(children.length?'<button class="cms-tree-toggle" data-tree-toggle="'+n.id+'" aria-expanded="'+opened.has(n.id)+'" aria-label="'+(opened.has(n.id)?'收起':'展开')+esc(n.name)+'">'+(opened.has(n.id)?'▾':'▸')+'</button>':'<span class="cms-tree-toggle"></span>')+(api.bulk?window.FoamCMSBulk.folderCheck(n,bin):'')+'<button class="directory-select '+(n.id===selected?'selected':ancestors.has(n.id)?'selected-ancestor':'')+'" data-select-directory="'+n.id+'" title="'+esc(dirs.path(n.id))+'">'+esc(n.name)+' <small>'+(target?'管理':count)+'</small>'+(!n.visible?' · 隐藏':'')+'</button></div>'+(children.length?'<div class="cms-tree-children" data-tree-children="'+n.id+'" '+(opened.has(n.id)?'':'hidden')+'>'+children.map(branch).join('')+'</div>':'')+'</div>';};
+   host.innerHTML='<h3>'+(api.treeTitle||(rootId?'资料目录':'网站目录'))+'</h3><div class="cms-tree-root-actions"><button class="directory-select '+(!selected?'selected':'')+'" data-select-directory="">'+(api.allLabel||(rootId?'全部资料':'全部内容'))+'</button><button class="directory-select '+(selected==='unassigned'?'selected':'')+'" data-select-directory="unassigned">未归类</button>'+(bin?'':'<button data-add-module>＋ 添加模块</button>')+'</div>'+dirs.children(rootId).map(branch).join('');
+   function toggle(id){
+    const next=!opened.has(id),arrow=host.querySelector('[data-tree-toggle="'+id+'"]');
+    if(next)opened.add(id);else opened.delete(id);
+    host.querySelector('[data-tree-children="'+id+'"]').hidden=!next;
+    arrow.textContent=next?'▾':'▸';
+    arrow.setAttribute('aria-expanded',String(next));
+    arrow.setAttribute('aria-label',(next?'收起':'展开')+dirs.get(id).name);
+   }
+   host.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-tree-toggle')){toggle(b.dataset.treeToggle);}else if(b.hasAttribute('data-select-directory')){
+    const id=b.dataset.selectDirectory;
+    if(id===selected&&dirs.children(id).length&&id){toggle(id);}
+    else select(id);
+   }else if(b.hasAttribute('data-add-module'))run(()=>edit(null,rootId));};
   }
   return {mount,edit:node=>run(()=>edit(node)),editPage:node=>run(()=>window.FoamCMSSectionPage({L,UI,notice,refresh},node)),add:parent=>run(()=>edit(null,parent)),remove:node=>run(()=>remove(node)),refresh};
  };

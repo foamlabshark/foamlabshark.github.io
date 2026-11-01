@@ -11,6 +11,7 @@
   return 'member';
  }
  function effective(item){
+  if((item.section_ids||[]).some(id=>window.FoamDirectory?.ancestors(id).some(n=>n.key==='internal')))return 'admin';
   if(item.metadata?.admin_only===true||item.metadata?.admin_only==='true')return 'admin';
   if(rank[item.read_access]!==undefined)return item.read_access;
   const modes=(item.section_ids||[]).map(section);

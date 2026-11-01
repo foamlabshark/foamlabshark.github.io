@@ -63,8 +63,8 @@
   }}catch{}
   try{const hint=JSON.parse(document.getElementById('catalog-hint')?.textContent||'null');if(hint?.path===location.pathname&&Array.isArray(hint.ids)&&hint.ids.length&&hint.ids.length<=2000&&!new URLSearchParams(location.search).has('topic'))void readContent(hint.ids,shapeFor(hint)).catch(()=>{});}catch{}
  }
- D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('id,key,name,parent_id,href,description,nav_group,visible,sort_order,revision,created_at,updated_at,read_access').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.nodes=nodes;D.available=true;
-  try{sessionStorage.setItem(hintKey,JSON.stringify({user:L.user?.id||null,at:Date.now(),nodes:nodes.map(({id,key,href,parent_id})=>({id,key,href,parent_id}))}));}catch{}
+ D.load=async()=>{await L.contentReady;prefetchCatalog();const nodes=[];for(let start=0;;start+=500){const r=L.check(await L.client.from('foamlab_sections').select('id,key,name,parent_id,href,description,nav_group,visible,sort_order,revision,created_at,updated_at,read_access,recycle_root').order('sort_order').order('id').range(start,start+499));nodes.push(...r);if(r.length<500)break;}D.recycled=nodes.filter(n=>n.recycle_root);D.nodes=nodes.filter(n=>!n.recycle_root);D.available=true;
+  try{sessionStorage.setItem(hintKey,JSON.stringify({user:L.user?.id||null,at:Date.now(),nodes:D.nodes.map(({id,key,href,parent_id})=>({id,key,href,parent_id}))}));}catch{}
   return D;
  };
  D.ready=D.load().catch(e=>{D.error=e;return D;});
