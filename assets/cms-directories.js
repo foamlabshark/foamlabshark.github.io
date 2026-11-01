@@ -5,7 +5,7 @@
  window.FoamCMSDirectories=api=>{
   const {L,UI,run,notice,getRows,select,getSelected}=api,esc=L.esc,rootId=api.rootId||null;
   const dirs=api.treeModel||D,bin=!!api.bin,treeKey=(rootId||'site')+(bin?':bin':'');
-  if(!trees.has(treeKey))trees.set(treeKey,{opened:new Set(),lastSelection:null});
+  if(!trees.has(treeKey))trees.set(treeKey,{opened:new Set(),lastSelection:null,scrollTop:0,anchor:null});
   const state=trees.get(treeKey),opened=state.opened;
   const refresh=async()=>{await D.load();D.nav();select(getSelected());};
   async function edit(node=null,parent=null){
@@ -21,18 +21,32 @@
    await D.load();D.nav();if(v.parent_id)opened.add(v.parent_id);select(result[0].id);notice('目录已保存。');
   }
   async function remove(node){
+   if(api.submit)return api.submit('trash',[node],[]);
    if(!await window.FoamCMSBulk.perform('trash',[node],[]))return;
    window.FoamCMSBulk.clear();await D.load();await api.reload();D.nav();select(node.parent_id===rootId?'':node.parent_id||'');notice('目录已移入回收站。');
   }
   function mount(host){
    const selected=getSelected();
-   if(selected!==state.lastSelection){
-    dirs.ancestors(selected).forEach(n=>opened.add(n.id));state.lastSelection=selected;
+   host.dataset.treeKey=treeKey;
+   function remember(){state.scrollTop=host.scrollTop;const y=host.getBoundingClientRect().top;const first=[...host.querySelectorAll('[data-select-directory]')].find(b=>b.getClientRects().length&&b.getBoundingClientRect().bottom>y);state.anchor=first?{id:first.dataset.selectDirectory,offset:first.getBoundingClientRect().top-y}:null;}
+   const selectedPath=dirs.ancestors(selected).map(n=>n.id).join('/');
+   if(selected!==state.lastSelection||selectedPath!==state.lastPath){
+    dirs.ancestors(selected).forEach(n=>opened.add(n.id));state.lastSelection=selected;state.lastPath=selectedPath;
    }
    const ancestors=new Set(dirs.ancestors(selected).slice(0,-1).map(n=>n.id));
    const counts=new Map();for(const row of getRows()){const ids=new Set();for(const id of row.section_ids||[])for(const n of dirs.ancestors(id))ids.add(n.id);for(const id of ids)counts.set(id,(counts.get(id)||0)+1);}
    const branch=n=>{const children=dirs.children(n.id),count=counts.get(n.id)||0,target=api.managementTarget?.(n.id);return '<div><div class="cms-tree-row">'+(children.length?'<button class="cms-tree-toggle" data-tree-toggle="'+n.id+'" aria-expanded="'+opened.has(n.id)+'" aria-label="'+(opened.has(n.id)?'收起':'展开')+esc(n.name)+'">'+(opened.has(n.id)?'▾':'▸')+'</button>':'<span class="cms-tree-toggle"></span>')+(api.bulk?window.FoamCMSBulk.folderCheck(n,bin):'')+'<button class="directory-select '+(n.id===selected?'selected':ancestors.has(n.id)?'selected-ancestor':'')+'" data-select-directory="'+n.id+'" title="'+esc(dirs.path(n.id))+'">'+esc(n.name)+' <small>'+(target?'管理':count)+'</small>'+(!n.visible?' · 隐藏':'')+'</button></div>'+(children.length?'<div class="cms-tree-children" data-tree-children="'+n.id+'" '+(opened.has(n.id)?'':'hidden')+'>'+children.map(branch).join('')+'</div>':'')+'</div>';};
    host.innerHTML='<h3>'+(api.treeTitle||(rootId?'资料目录':'网站目录'))+'</h3><div class="cms-tree-root-actions"><button class="directory-select '+(!selected?'selected':'')+'" data-select-directory="">'+(api.allLabel||(rootId?'全部资料':'全部内容'))+'</button><button class="directory-select '+(selected==='unassigned'?'selected':'')+'" data-select-directory="unassigned">未归类</button>'+(bin?'':'<button data-add-module>＋ 添加模块</button>')+'</div>'+dirs.children(rootId).map(branch).join('');
+   host.scrollTop=state.scrollTop;
+   if(api.openRecycle){
+    const footer=document.createElement('div');footer.className='cms-tree-footer';
+    footer.innerHTML='<button type="button" data-cms-tab="recycle" class="directory-select '+(bin?'selected':'')+'" aria-current="'+(bin?'page':'false')+'">回收站</button>'+(bin?'<button type="button" data-return-content>← 返回内容管理</button>':'');
+    footer.querySelector('[data-cms-tab]').onclick=e=>{e.stopPropagation();api.openRecycle();};
+    footer.querySelector('[data-return-content]')?.addEventListener('click',e=>{e.stopPropagation();api.returnContent();});
+    host.append(footer);
+   }
+   if(state.anchor){const anchor=host.querySelector('[data-select-directory="'+CSS.escape(state.anchor.id)+'"]');if(anchor?.getClientRects().length)host.scrollTop+=anchor.getBoundingClientRect().top-host.getBoundingClientRect().top-state.anchor.offset;}
+   host.onscroll=remember;
    function toggle(id){
     const next=!opened.has(id),arrow=host.querySelector('[data-tree-toggle="'+id+'"]');
     if(next)opened.add(id);else opened.delete(id);
@@ -47,6 +61,6 @@
     else select(id);
    }else if(b.hasAttribute('data-add-module'))run(()=>edit(null,rootId));};
   }
-  return {mount,edit:node=>run(()=>edit(node)),editPage:node=>run(()=>window.FoamCMSSectionPage({L,UI,notice,refresh},node)),add:parent=>run(()=>edit(null,parent)),remove:node=>run(()=>remove(node)),refresh};
+  return {mount,edit:node=>run(()=>edit(node)),editPage:node=>run(()=>window.FoamCMSSectionPage({L,UI,notice,refresh},node)),add:parent=>run(()=>edit(null,parent)),remove:node=>api.submit?api.submit('trash',[node],[]):run(()=>remove(node)),refresh};
  };
 })();

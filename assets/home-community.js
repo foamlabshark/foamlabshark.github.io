@@ -102,6 +102,8 @@
  addEventListener('hashchange',fromHash);fromHash();
  setInterval(()=>{if(board.open&&!document.hidden&&!state.loading&&!state.edit&&!state.pinning)void loadBoard();},30000);
  setInterval(()=>{if(!document.hidden)void loadPreviews();},60000);
+ window.addEventListener('pageshow',e=>{if(e.persisted)void loadPreviews();});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){void loadPreviews();if(stats)void updateLearningCounts();}});
  window.addEventListener('foam-auth-change',()=>{const id=window.foamAuth.user?.id||null;if(lastUser!==id){lastUser=id;state.edit=null;state.newDraft='';state.pending=null;board.querySelector('[data-guestbook-compose]').replaceChildren();if(board.open)void loadBoard();}});
  L.ready.then(()=>lastUser=L.user?.id||null).catch(()=>{});
  void loadPreviews().catch(()=>{previewLoading=false;for(const kind of ['updates','guestbook'])preview(kind).innerHTML='<li class="home-preview-loading">暂时无法读取，请稍后重试。</li>';});
