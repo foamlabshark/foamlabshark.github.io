@@ -2890,7 +2890,8 @@ window.foamArticleAliases=Object.freeze({"kolev-2-01-02-02":{"slug":"kolev-2-01-
  lab.ready=(async()=>{await lab.contentReady;if(lab.user){const id=lab.user.id,r=await lab.client.from('foamlab_roles').select('role').eq('user_id',id).maybeSingle();if(window.foamAuth.user?.id===id)lab.role=r.data?.role||'member';else{lab.user=window.foamAuth.user;lab.role=null;}}authInitialized=true;return lab;})();
  window.addEventListener('foam-auth-change',e=>{
   if(window.foamAuth.loading)return;
-  if(!window.foamAuth.user||window.foamAuth.user.is_anonymous){document.querySelectorAll('.article[data-cms-slug]:not([data-cms-slug=""]),#live-article').forEach(host=>lab.lockArticle?.(host));document.querySelectorAll('.topic-introduction').forEach(e=>e.remove());}
+  // A guest session also emits a ready event. Clear private content only when a signed-in reader loses that session.
+  if(lab.user && !lab.user.is_anonymous && (!window.foamAuth.user || window.foamAuth.user.is_anonymous)){document.querySelectorAll('.article[data-cms-slug]:not([data-cms-slug=""]),#live-article').forEach(host=>lab.lockArticle?.(host));document.querySelectorAll('.topic-introduction').forEach(e=>e.remove());}
   if(!authInitialized)return;
   if(lab.user?.id===window.foamAuth.user?.id){if(e.detail?.accountUpdated&&!e.detail?.profileSaved)void lab.refreshAccountProgress();return;}
   lab.user=window.foamAuth.user;lab.role=null;

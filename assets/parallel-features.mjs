@@ -94,11 +94,13 @@ function addFilter(host, label, callback) {
   field.className='search-field'; input.type='search'; input.placeholder=label; input.setAttribute('aria-label',label);
   field.append(input); host.prepend(field); input.addEventListener('input',()=>callback(input.value.trim()));
 }
-export function enhance(article,item) {
+export async function enhance(article,item) {
   const body=article.querySelector('.prose');
   if (!body || window.foamCurrentContent?.id!==item.id) return;
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='/assets/parallel-features.css'; document.head.append(css);
+  css.rel='stylesheet'; css.href='/assets/parallel-features.css';
+  await new Promise(resolve=>{css.onload=css.onerror=resolve; document.head.append(css);});
+  if (!body.isConnected || window.foamCurrentContent?.id!==item.id) return;
   const feature=item.metadata.parallel_book.feature;
   if (Object.hasOwn(demos,feature)) {
     const container=body.querySelector('.parallel-demo');
