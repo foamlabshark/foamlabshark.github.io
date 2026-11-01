@@ -10,6 +10,15 @@
  // Static and live navigation share one state and one delegated arrow handler.
  // Links only navigate; neither page activation nor data loading opens a group.
  window.FoamNavigation={isOpen,restore};
+ const theory=document.getElementById('nav-children-theory');
+
+if(theory&&!theory.querySelector('a[href="/parallel-computing/"]')){
+  const link=document.createElement('a');
+  link.className='nav-item nav-subitem';
+  link.href='/parallel-computing/';
+  link.innerHTML='<span>并行与高性能计算（中文精读）</span>';
+  theory.appendChild(link);
+}
  restore();
  nav.addEventListener('click',e=>{const button=e.target.closest('.nav-expand');if(!button||!nav.contains(button))return;e.preventDefault();const group=button.closest('[data-nav-section]'),open=button.getAttribute('aria-expanded')!=='true';saved[group.dataset.navSection]=open;toggle(group,open);try{localStorage.setItem('foamlab-nav-groups',JSON.stringify(saved));}catch{}});
  function activate(item){
