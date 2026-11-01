@@ -86,6 +86,14 @@
   const roots=D.children(null).filter(D.isVisible),town=roots.find(n=>n.key==='town'),regular=roots.filter(n=>n.key!=='town'),groups=[...new Set(regular.map(n=>n.nav_group))];
   const townLink=town?'<a class="town-entry town-nav-entry" href="'+esc(D.url(town))+'"><i class="town-nav-panda" aria-hidden="true"></i><span><strong>'+esc(town.name)+'</strong><small>带熊猫去逛逛</small></span><b aria-hidden="true">↗</b></a>':'';
   nav.innerHTML=townLink+groups.map(group=>'<div class="nav-label">'+esc(group)+'</div>'+regular.filter(n=>n.nav_group===group).map(n=>item(n)).join('')).join('');
+  const theoryLinks=nav.querySelector('[data-nav-section="theory"] > .nav-subgroup');
+
+if(theoryLinks && !theoryLinks.querySelector('a[href="/parallel-computing/"]')){
+  theoryLinks.insertAdjacentHTML(
+    'beforeend',
+    '<a class="nav-item nav-subitem" href="/parallel-computing/"><span>并行与高性能计算（中文精读）</span></a>'
+  );
+}
   if(focus?.key){const group=[...nav.querySelectorAll('[data-nav-section]')].find(g=>g.dataset.navSection===focus.key);group?.querySelector(focus.arrow?':scope > .nav-parent > .nav-expand':':scope > .nav-parent > a')?.focus({preventScroll:true});}
  };
  D.breadcrumb=item=>{
